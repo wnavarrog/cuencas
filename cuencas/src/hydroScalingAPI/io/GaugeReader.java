@@ -1,0 +1,121 @@
+/*
+ * gaugeReader.java
+ *
+ * Created on June 13, 2003, 11:33 AM
+ */
+
+package hydroScalingAPI.io;
+
+/**
+ *
+ * @author  Ricardo Mantilla
+ */
+public class GaugeReader{
+
+    Object[] register;
+    String[] parameters={   "[code]",
+                            "[agency]",
+                            "[type]",
+                            "[site name]",
+                            "[stream name]",
+                            "[county]",
+                            "[state]",
+                            "[data source]",
+                            "[latitude (deg:min:sec)]",
+                            "[longitude (deg:min:sec)]",
+                            "[altitude ASL (m)]",
+                            "[drainage area (km^2)]",
+                            "[data units]",
+                            "[data accuracy]"};
+    
+    
+    /** Creates a new instance of gaugeReader */
+    public GaugeReader(java.io.File gaugeFile) throws java.io.IOException {
+        
+        register=new Object[parameters.length+1];
+        
+        java.io.FileInputStream inputLocal=new java.io.FileInputStream(gaugeFile);
+        java.util.zip.GZIPInputStream inputComprim=new java.util.zip.GZIPInputStream(inputLocal);
+        java.io.BufferedReader fileMeta = new java.io.BufferedReader(new java.io.InputStreamReader(inputComprim));
+
+        String fullLine;
+        int hemisphereFactor;
+
+        for (int i=0;i<6;i++){
+            try{
+            do{
+                fullLine=fileMeta.readLine();
+            } while (!fullLine.equalsIgnoreCase(parameters[i]));
+            register[i]=fileMeta.readLine();
+            }catch(NullPointerException ne){
+                System.out.println(gaugeFile);
+            }
+        }
+        do{
+            fullLine=fileMeta.readLine();
+        } while (!fullLine.equalsIgnoreCase(parameters[6]));
+        register[6]=hydroScalingAPI.tools.StateName.StateName(fileMeta.readLine());
+        
+        do{
+            fullLine=fileMeta.readLine();
+        } while (!fullLine.equalsIgnoreCase(parameters[7]));
+        register[7]=fileMeta.readLine();
+        
+        for (int i=8;i<10;i++){
+            do{
+                fullLine=fileMeta.readLine();
+            } while (!fullLine.equalsIgnoreCase(parameters[i]));
+            fullLine=fileMeta.readLine();
+            if (fullLine.equalsIgnoreCase("n/a")) register[i]=fullLine;
+                else register[i]=hydroScalingAPI.tools.DMSToDegrees.getDoubleDegrees(fullLine);
+        }
+        for (int i=10;i<12;i++){
+            do{
+                fullLine=fileMeta.readLine();
+            } while (!fullLine.equalsIgnoreCase(parameters[i]));
+            fullLine=fileMeta.readLine();
+            if (fullLine.equalsIgnoreCase("n/a")) register[i]=fullLine;
+                else register[i]=new Double(fullLine);
+        }
+        for (int i=12;i<parameters.length;i++){
+            do{
+                fullLine=fileMeta.readLine();
+            } while (!fullLine.equalsIgnoreCase(parameters[i]));
+            register[i]=fileMeta.readLine();
+        }
+        
+        fileMeta.close();
+        inputComprim.close();
+        inputLocal.close();
+        
+        register[register.length-1]=gaugeFile;
+        
+    }
+    
+    public Object[] getRegisterForDataBase(){
+        return register;
+    }
+    
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        
+        
+            java.io.File[] filesToRead=new java.io.File("/hidrosigDataBases/Continental_US_database/Sites/Gauges/Precipitation").listFiles(new hydroScalingAPI.util.fileUtilities.DotFilter("gz"));
+            System.out.println("There are "+filesToRead.length+" files");
+            for (int i=0;i<filesToRead.length;i++){
+                try{
+                    System.out.println("Ready to read file "+filesToRead[i].getName());
+                    GaugeReader testRegister=new GaugeReader(filesToRead[i]);
+                }catch(java.io.IOException IOE){
+                    System.err.println("Failed trying to load File");
+                    System.err.println(IOE);
+                }
+            }
+            
+        
+        
+    }
+    
+}

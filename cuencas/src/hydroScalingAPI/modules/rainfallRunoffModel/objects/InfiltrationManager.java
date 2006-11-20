@@ -1,0 +1,154 @@
+/*
+ * InfiltrationManager.java
+ *
+ * Created on May 28, 2004, 2:48 PM
+ */
+
+package hydroScalingAPI.modules.rainfallRunoffModel.objects;
+
+/**
+ *
+ * @author  ricardo
+ */
+public class InfiltrationManager {
+    
+    private hydroScalingAPI.io.MetaRaster metaInfilt;
+    private float[] infiltrationValue;
+    int[][] matrizPintada;
+
+    /** Creates a new instance of InfiltrationManager */
+    public InfiltrationManager(hydroScalingAPI.util.geomorphology.objects.LinksAnalysis linksStructure, float infiltRate) {
+        
+        infiltrationValue=new float[linksStructure.connectionsArray.length];
+        java.util.Arrays.fill(infiltrationValue,infiltRate);
+        
+    }
+    
+    public InfiltrationManager(hydroScalingAPI.util.geomorphology.objects.Basin myCuenca, hydroScalingAPI.util.geomorphology.objects.LinksAnalysis linksStructure, hydroScalingAPI.io.MetaRaster metaDatos, byte[][] matDir, int[][] magnitudes) {
+        
+        //Una vez leidos los archivos:
+        //Lleno la matriz de direcciones
+        
+        int[][] matDirBox=new int[myCuenca.getMaxY()-myCuenca.getMinY()+3][myCuenca.getMaxX()-myCuenca.getMinX()+3];
+        
+        for (int i=1;i<matDirBox.length-1;i++) for (int j=1;j<matDirBox[0].length-1;j++){
+            matDirBox[i][j]=(int) matDir[i+myCuenca.getMinY()-1][j+myCuenca.getMinX()-1];
+        }
+        
+        try{
+            
+            metaInfilt=metaDatos;
+            /****** OJO QUE ACA PUEDE HABER UN ERROR (POR LA CUESTION DE LA COBERTURA DEL MAPA SOBRE LA CUENCA)*****************/
+            if (metaInfilt.getMinLon() > metaDatos.getMinLon()+myCuenca.getMinX()*metaDatos.getResLon()/3600.0 ||
+                metaInfilt.getMinLat() > metaDatos.getMinLat()+myCuenca.getMinY()*metaDatos.getResLat()/3600.0 ||
+                metaInfilt.getMaxLon() < metaDatos.getMinLon()+(myCuenca.getMaxX()+2)*metaDatos.getResLon()/3600.0 ||
+                metaInfilt.getMaxLat() < metaDatos.getMinLat()+(myCuenca.getMaxY()+2)*metaDatos.getResLat()/3600.0) {
+                    System.out.println("Not Area Coverage");
+                    return;
+            }
+            
+            int xOulet,yOulet;
+            hydroScalingAPI.util.geomorphology.objects.HillSlope myHillActual;
+            
+            matrizPintada=new int[myCuenca.getMaxY()-myCuenca.getMinY()+3][myCuenca.getMaxX()-myCuenca.getMinX()+3];
+            
+            for (int i=0;i<linksStructure.contactsArray.length;i++){
+                if (linksStructure.magnitudeArray[i] < linksStructure.basinMagnitude){
+
+                    xOulet=linksStructure.contactsArray[i]%metaDatos.getNumCols();
+                    yOulet=linksStructure.contactsArray[i]/metaDatos.getNumCols();
+
+                    myHillActual=new hydroScalingAPI.util.geomorphology.objects.HillSlope(xOulet,yOulet,matDir,magnitudes,metaDatos);
+                    for (int j=0;j<myHillActual.getXYHillSlope()[0].length;j++){
+                        matrizPintada[myHillActual.getXYHillSlope()[1][j]-myCuenca.getMinY()+1][myHillActual.getXYHillSlope()[0][j]-myCuenca.getMinX()+1]=i+1;
+                    }
+                } else {
+                    
+                    xOulet=myCuenca.getXYBasin()[0][0];
+                    yOulet=myCuenca.getXYBasin()[1][0];
+
+                    myHillActual=new hydroScalingAPI.util.geomorphology.objects.HillSlope(xOulet,yOulet,matDir,magnitudes,metaDatos);
+                    for (int j=0;j<myHillActual.getXYHillSlope()[0].length;j++){
+                        matrizPintada[myHillActual.getXYHillSlope()[1][j]-myCuenca.getMinY()+1][myHillActual.getXYHillSlope()[0][j]-myCuenca.getMinX()+1]=i+1;
+                    }
+                }
+            }
+            
+            infiltrationValue=new float[linksStructure.contactsArray.length];
+            
+            double[] evalSpot;
+            float[][] dataSnapShot;
+            int MatX,MatY;
+            
+            double[] dx;
+            double dy;
+            
+            dy = 6378.0*metaDatos.getResLat()*Math.PI/(3600.0*180.0);
+            dx = new double[metaDatos.getNumRows()];
+            /*Se calcula para cada fila del DEMC el valor de la distancia horizontal del pixel 
+              y la diagonal, dependiendo de la latitud.*/
+            for (int i=0 ; i<metaDatos.getNumRows() ; i++){
+              dx[i] = 6378.0*Math.cos(((i+1)*metaDatos.getResLat()/3600.0 + metaDatos.getMinLat())*Math.PI/180.0)*metaDatos.getResLat()*Math.PI/(3600.0*180.0);
+            }
+            float[][] upAreaValues=linksStructure.getVarValues(0);
+            
+            //for (int i=0;i<upAreaValues[0].length;i++) System.out.print(upAreaValues[0][i]+" ");
+            //System.out.println("");
+            
+            //System.out.println("-----------------Start of Files Reading----------------");
+            
+            metaInfilt.setLocationBinaryFile(new java.io.File(metaInfilt.getLocationMeta().getPath().substring(0,metaInfilt.getLocationMeta().getPath().lastIndexOf(".metaVHC"))+".vhc"));
+            dataSnapShot=new hydroScalingAPI.io.DataRaster(metaInfilt).getFloat();
+
+            //recorto la seccion que esta en la cuenca (TIENE QUE CONTENERLA)
+
+            double demMinLon=metaDatos.getMinLon();
+            double demMinLat=metaDatos.getMinLat();
+            double demResLon=metaDatos.getResLon();
+            double demResLat=metaDatos.getResLat();
+
+            int basinMinX=myCuenca.getMinX();
+            int basinMinY=myCuenca.getMinY();
+
+            double infiltMinLon=metaInfilt.getMinLon();
+            double infiltMinLat=metaInfilt.getMinLat();
+            double infiltResLon=metaInfilt.getResLon();
+            double infiltResLat=metaInfilt.getResLat();
+
+
+            for (int j=0;j<matrizPintada.length;j++) for (int k=0;k<matrizPintada[0].length;k++){
+                evalSpot=new double[] {demMinLon+(basinMinX+k-1)*demResLon/3600.0,
+                                       demMinLat+(basinMinY+j-1)*demResLat/3600.0};
+
+                MatX=(int) Math.round((evalSpot[0]-infiltMinLon)/infiltResLon*3600.0);
+                MatY=(int) Math.round((evalSpot[1]-infiltMinLat)/infiltResLat*3600.0);
+
+                if (matrizPintada[j][k] > 0){
+                    infiltrationValue[matrizPintada[j][k]-1]+=dataSnapShot[MatY][MatX]*(double)(dy*dx[j+basinMinY-1]);
+                }
+
+            }
+            
+            for (int j=0;j<linksStructure.contactsArray.length;j++){
+                infiltrationValue[j]/=upAreaValues[0][j];
+            }
+
+        } catch (java.io.IOException IOE){
+            System.out.print(IOE);
+        }
+    }
+    
+    public float getInfiltrationOnHillslope(int HillNumber){
+        
+        return infiltrationValue[HillNumber];
+        
+    }
+    
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        // TODO code application logic here
+    }
+    
+}

@@ -1,0 +1,116 @@
+package hydroScalingAPI.tools;
+
+public class DegreesToDMS extends Object {
+
+    public static int LATITUDE=0;
+    public static int LONGITUDE=1;
+    private static String prettyString="";
+    
+    /** Creates new degreesToGMS */
+    public static void processNumber(double degrees, int type) {
+        /*
+            Typo defines:
+            0: Latitude
+            1: Longitude
+        */
+        if (type == 0){
+            String HemisphereNS="";
+            if (degrees >= 0) HemisphereNS="N";
+            if (degrees < 0) HemisphereNS="S";
+            
+            degrees=Math.abs(degrees);
+            int latGra=(int) degrees;
+            int latMin=(int) ((degrees-latGra)*60);
+            int latSec=(int) (((degrees-latGra)*60-latMin)*60);
+            int latDec=(int) ((((degrees-latGra)*60.0f-latMin)*60.0f-latSec)*100);
+            if(latDec == 99){
+                latDec = 0;
+                latSec ++;
+                if(latSec == 60){
+                    latSec =0;
+                    latMin ++;
+                     if(latMin == 60){
+                        latMin = 0;
+                        degrees ++;
+                    }
+                }
+                
+            }
+            String latGraS;
+            if (latGra < 10) 
+                latGraS="0"+latGra; 
+            else 
+                latGraS=new Integer(latGra).toString();
+            String latMinS;
+            if (latMin < 10) 
+                latMinS="0"+latMin; 
+            else 
+                latMinS=new Integer(latMin).toString();
+            String latSecS;
+            if (latSec < 10) 
+                latSecS="0"+latSec; 
+            else 
+                latSecS=new Integer(latSec).toString();
+            String latDecS;
+            if (latDec < 10) latDecS="0"+latDec; 
+            else 
+                latDecS=new Integer(latDec).toString();
+            
+            prettyString=latGraS+":"+latMinS+":"+latSecS+"."+latDecS+" "+HemisphereNS;
+        }
+        
+        else if (type == 1){
+            String HemisphereWE="";
+            if (degrees >= 0) HemisphereWE="E";
+            if (degrees < 0) HemisphereWE="W";
+            
+            degrees=Math.abs(degrees);
+            int lonGra=(int) degrees;
+            int lonMin=(int) ((degrees-lonGra)*60);
+            int lonSec=(int) (((degrees-lonGra)*60-lonMin)*60);
+            int lonDec=(int) ((((degrees-lonGra)*60.0f-lonMin)*60.0f-lonSec)*100);
+            if(lonDec == 99){
+                lonDec = 0;
+                lonSec ++;
+                if(lonSec == 60){
+                    lonSec =0;
+                    lonMin ++;
+                     if(lonMin == 60){
+                        lonMin = 0;
+                        degrees ++;
+                    }
+                }
+            }
+            String lonGraS;
+            if (lonGra < 10) lonGraS="0"+lonGra; else lonGraS=new Integer(lonGra).toString();
+            String lonMinS;
+            if (lonMin < 10) lonMinS="0"+lonMin; else lonMinS=new Integer(lonMin).toString();
+            String lonSecS;
+            if (lonSec < 10) lonSecS="0"+lonSec; else lonSecS=new Integer(lonSec).toString();
+            String lonDecS;
+            if (lonDec < 10) lonDecS="0"+lonDec; else lonDecS=new Integer(lonDec).toString();
+            
+            prettyString=lonGraS+":"+lonMinS+":"+lonSecS+"."+lonDecS+" "+HemisphereWE;
+        }
+        
+    }
+    
+    public static String getprettyString(double degrees, int type){
+        processNumber(degrees,type);
+        return prettyString;
+    }
+    
+    public static String getprettyString(float degrees, int type){
+        processNumber((double)degrees,type);
+        return prettyString;
+    }
+    
+    
+    public static void main (String args[]) {
+        
+        System.out.println(hydroScalingAPI.tools.DegreesToDMS.getprettyString(-100.056,1));
+        System.out.println(hydroScalingAPI.tools.DegreesToDMS.getprettyString(-90.056,0));
+        System.exit(0);
+    }
+
+}

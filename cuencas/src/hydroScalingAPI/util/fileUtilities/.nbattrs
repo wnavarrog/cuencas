@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE attributes PUBLIC "-//NetBeans//DTD DefaultAttributes 1.0//EN" "http://www.netbeans.org/dtds/attributes-1_0.dtd">
+<attributes version="1.0">
+    <fileobject name="ChronoFile.java">
+        <attr name="class_dependency_java.lang.Comparable" stringvalue="ChronoFile"/>
+        <attr name="class_dependency_java.lang.Object" stringvalue="ChronoFile"/>
+    </fileobject>
+    <fileobject name="DotFilter.java">
+        <attr name="class_dependency_java.io.FileFilter" stringvalue="DotFilter"/>
+        <attr name="class_dependency_java.lang.Object" stringvalue="DotFilter"/>
+    </fileobject>
+    <fileobject name="NameDotFilter.java">
+        <attr name="class_dependency_java.io.FileFilter" stringvalue="NameDotFilter"/>
+        <attr name="class_dependency_java.lang.Object" stringvalue="NameDotFilter"/>
+    </fileobject>
+</attributes>

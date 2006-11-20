@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE attributes PUBLIC "-//NetBeans//DTD DefaultAttributes 1.0//EN" "http://www.netbeans.org/dtds/attributes-1_0.dtd">
+<attributes version="1.0">
+    <fileobject name="DemOpenDialog.java">
+        <attr name="class_dependency_javax.swing.JDialog" stringvalue="DemOpenDialog"/>
+    </fileobject>
+    <fileobject name="DemViewer2D.java">
+        <attr name="class_dependency_hydroScalingAPI.subGUIs.widgets.RasterViewer" stringvalue="DemViewer2D"/>
+        <attr name="class_dependency_visad.DisplayListener" stringvalue="DemViewer2D"/>
+    </fileobject>
+    <fileobject name="DemViewer3D.java">
+        <attr name="class_dependency_hydroScalingAPI.subGUIs.widgets.RasterViewer" stringvalue="DemViewer3D"/>
+        <attr name="class_dependency_visad.DisplayListener" stringvalue="DemViewer3D"/>
+    </fileobject>
+    <fileobject name="GaugesOpenDialog.java">
+        <attr name="class_dependency_javax.swing.JDialog" stringvalue="GaugesOpenDialog"/>
+    </fileobject>
+    <fileobject name="HydroClimateViewer2D.java">
+        <attr name="class_dependency_hydroScalingAPI.subGUIs.widgets.RasterViewer" stringvalue="HydroClimateViewer2D"/>
+        <attr name="class_dependency_visad.DisplayListener" stringvalue="HydroClimateViewer2D"/>
+    </fileobject>
+    <fileobject name="HydroOpenDialog.java">
+        <attr name="class_dependency_javax.swing.JDialog" stringvalue="HydroOpenDialog"/>
+    </fileobject>
+    <fileobject name="ImportLocationImage.java">
+        <attr name="class_dependency_javax.swing.JDialog" stringvalue="ImportLocationImage"/>
+    </fileobject>
+    <fileobject name="LocationsEditor.java">
+        <attr name="class_dependency_javax.swing.JDialog" stringvalue="LocationsEditor"/>
+    </fileobject>
+    <fileobject name="LocationsOpenDialog.java">
+        <attr name="class_dependency_javax.swing.JDialog" stringvalue="LocationsOpenDialog"/>
+    </fileobject>
+    <fileobject name="LocationsViewer.java">
+        <attr name="class_dependency_javax.swing.JDialog" stringvalue="LocationsViewer"/>
+    </fileobject>
+    <fileobject name="NetworkTools.java">
+        <attr name="class_dependency_javax.swing.JDialog" stringvalue="NetworkTools"/>
+    </fileobject>
+    <fileobject name="RasterPalettesManager.java">
+        <attr name="class_dependency_javax.swing.JPanel" stringvalue="RasterPalettesManager"/>
+    </fileobject>
+    <fileobject name="RasterViewerControlsDialog.java">
+        <attr name="class_dependency_javax.swing.JDialog" stringvalue="RasterViewerControlsDialog"/>
+    </fileobject>
+</attributes>

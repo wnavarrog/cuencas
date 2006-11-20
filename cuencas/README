@@ -1,0 +1,18 @@
+To eliminate sources in copied directory
+
+find . -name "*.java*" > listSource
+%s/\.\//rm\ \.\//g
+
+To create the jar file use this command
+
+jar -cmfv Cuencas.Manifest.txt cuencas.jar hydroScalingAPI/ 
+
+Then you will need to sign you jars
+
+jarsigner -keystore myKeystore cuencas.jar myself
+
+myKeystore is a file located in the /var/www/html/pandora/ folder
+
+Send it to CIRES
+
+scp cuencas.jar ricardo@cires:public_html/cuencas/webstart/

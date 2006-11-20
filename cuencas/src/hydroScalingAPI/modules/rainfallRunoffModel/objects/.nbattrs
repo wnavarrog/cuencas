@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE attributes PUBLIC "-//NetBeans//DTD DefaultAttributes 1.0//EN" "http://www.netbeans.org/dtds/attributes-1_0.dtd">
+<attributes version="1.0">
+    <fileobject name="HillSlopesInfo.java">
+        <attr name="class_dependency_java.lang.Object" stringvalue="HillSlopesInfo"/>
+    </fileobject>
+    <fileobject name="LinksInfo.java">
+        <attr name="class_dependency_java.lang.Object" stringvalue="LinksInfo"/>
+    </fileobject>
+    <fileobject name="NetworkEquations_S1S2.java">
+        <attr name="class_dependency_hydroScalingAPI.util.ordDiffEqSolver.BasicFunction" stringvalue="NetworkEquations_S1S2"/>
+    </fileobject>
+    <fileobject name="NetworkEquations_Simple.java">
+        <attr name="class_dependency_hydroScalingAPI.util.ordDiffEqSolver.BasicFunction" stringvalue="NetworkEquations_Simple"/>
+    </fileobject>
+</attributes>

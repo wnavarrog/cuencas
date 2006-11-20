@@ -1,0 +1,36 @@
+[Name]
+Subset from Subset from Imprted DEM from USGS Files
+
+[Southernmost Latitude]
+37:32:39.00 N
+
+[Westernmost Longitude]
+96:41:47.98 W
+
+[Longitudinal Resolution (ArcSec)]
+3.0
+
+[Latitudinal Resolution (ArcSec)]
+3.0
+
+[# Columns]
+206
+
+[# Rows]
+161
+
+[Format]
+Integer
+
+[Missing]
+0
+
+[Temporal Resolution]
+Fix
+
+[Units]
+m
+
+[Information]
+Subseted interactively
+
