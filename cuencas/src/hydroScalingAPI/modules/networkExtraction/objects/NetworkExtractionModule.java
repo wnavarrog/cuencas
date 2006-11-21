@@ -414,7 +414,7 @@ public class NetworkExtractionModule implements Runnable {
     }//metodo corrUnipit
     
     
-    //Calcula el incremento diferencial para la correcci�n de zonas planas.
+    //Calcula el incremento diferencial para la correccion de zonas planas.
     public double calculaIncr(java.util.Vector F){
 
         int max_M=0;

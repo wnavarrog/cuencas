@@ -289,6 +289,25 @@ public class Basin extends Object{
         return maxY;
     }
     
+    public float[] getElevations(hydroScalingAPI.io.MetaRaster mr) throws java.io.IOException{
+        
+        float[] elevationsBasin=new float[xyBasin[0].length];
+        String currFormat=mr.getFormat();
+        java.io.File currBinLoc=mr.getLocationBinaryFile();
+        mr.restoreOriginalFormat();
+        mr.setLocationBinaryFile(new java.io.File(currBinLoc.getAbsolutePath().subSequence(0, currBinLoc.getAbsolutePath().lastIndexOf("."))+".dem"));
+        float[][] elevations=new hydroScalingAPI.io.DataRaster(mr).getFloat();
+        minZ=Float.MAX_VALUE;
+        maxZ=Float.MIN_VALUE;
+        
+        for (int k=0; k < xyBasin[0].length; k++){
+            elevationsBasin[k]=elevations[xyBasin[1][k]][xyBasin[0][k]]; 
+        }
+        
+        return elevationsBasin;
+    
+    }
+    
     public float getRelief(hydroScalingAPI.io.MetaRaster mr) throws java.io.IOException{
         
         String currFormat=mr.getFormat();

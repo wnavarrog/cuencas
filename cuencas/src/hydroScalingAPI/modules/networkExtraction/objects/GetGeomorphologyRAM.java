@@ -328,9 +328,78 @@ public abstract class GetGeomorphologyRAM extends Object {
             if(Proc.RedRas[i][j] == 1 && Proc.DIR[i-1+(Proc.DIR[i][j]-1)/3][j-1+(Proc.DIR[i][j]-1)%3] <= 0) {
                 TDO[i][j]=1;
                 toMark=new int[][] {{i,j}};
-        
+                
                 while(toMark != null){
-                    markDistances(Proc,toMark,GDO,TDO);
+                    //markDistances(Proc,toMark,GDO,TDO);
+                    
+                    //*****************************************************************************************
+                    int[][] ijs=toMark.clone();
+                    java.util.Vector tribsVector=new java.util.Vector();
+        
+                    for(int incoming=0;incoming<ijs.length;incoming++){
+
+                        int iIndex=ijs[incoming][0];
+                        int jIndex=ijs[incoming][1];
+
+                        byte pcambio=0;
+                        for (byte k=0; k <= 8; k++){
+                            if (Proc.RedRas[iIndex+(k/3)-1][jIndex+(k%3)-1] == 1 && Proc.DIR[iIndex+(k/3)-1][jIndex+(k%3)-1]==9-k){
+                                pcambio++;
+                            }
+                        }
+
+                        double dist = 0.0;
+
+                        switch (Proc.DIR[iIndex][jIndex]) {
+
+                            case 1:     dist=Proc.dxy[iIndex];
+                                        break;  
+                            case 2:     dist=Proc.dy;
+                                        break;
+                            case 3:     dist=Proc.dxy[iIndex];
+                                        break;
+                            case 4:     dist=Proc.dx[iIndex];
+                                        break;
+                            case 5:     dist=1;
+                                        break;
+                            case 6:     dist=Proc.dx[iIndex];
+                                        break;
+                            case 7:     dist=Proc.dxy[iIndex];
+                                        break;
+                            case 8:     dist=Proc.dy;
+                                        break;
+                            case 9:     dist=Proc.dxy[iIndex];
+                                        break;
+                        }
+
+                        GDO[iIndex][jIndex]=dist+GDO[iIndex-1+(Proc.DIR[iIndex][jIndex]-1)/3][jIndex-1+(Proc.DIR[iIndex][jIndex]-1)%3];
+                        TDO[iIndex][jIndex]+=TDO[iIndex-1+(Proc.DIR[iIndex][jIndex]-1)/3][jIndex-1+(Proc.DIR[iIndex][jIndex]-1)%3];
+                        if(pcambio > 1) {
+                            TDO[iIndex][jIndex]++;
+                            pcambio=0;
+                        }
+
+                        for (byte k=0; k <= 8; k++){
+                            if (Proc.RedRas[iIndex+(k/3)-1][jIndex+(k%3)-1] == 1 && Proc.DIR[iIndex+(k/3)-1][jIndex+(k%3)-1]==9-k){
+                                tribsVector.add(new int[] {iIndex+(k/3)-1,jIndex+(k%3)-1});
+                            }
+                        }
+                    }
+
+                    int countTribs=tribsVector.size();
+
+                    if(countTribs != 0){
+                        toMark=new int[countTribs][2];
+                        for(int k=0;k<countTribs;k++){
+                            toMark[k]=(int[])tribsVector.get(k);
+                        }
+                    } else {
+                        toMark=null;
+                    }
+
+                    //****************************************************************************************************
+                    
+                    
                 }
             }
         }
@@ -372,50 +441,50 @@ public abstract class GetGeomorphologyRAM extends Object {
         
         for(int incoming=0;incoming<ijs.length;incoming++){
             
-            int i=ijs[incoming][0];
-            int j=ijs[incoming][1];
+            int iIndex=ijs[incoming][0];
+            int jIndex=ijs[incoming][1];
         
             byte pcambio=0;
             for (byte k=0; k <= 8; k++){
-                if (Proc.RedRas[i+(k/3)-1][j+(k%3)-1] == 1 && Proc.DIR[i+(k/3)-1][j+(k%3)-1]==9-k){
+                if (Proc.RedRas[iIndex+(k/3)-1][jIndex+(k%3)-1] == 1 && Proc.DIR[iIndex+(k/3)-1][jIndex+(k%3)-1]==9-k){
                     pcambio++;
                 }
             }
 
             double dist = 0.0;
 
-            switch (Proc.DIR[i][j]) {
+            switch (Proc.DIR[iIndex][jIndex]) {
 
-                case 1:     dist=Proc.dxy[i];
+                case 1:     dist=Proc.dxy[iIndex];
                             break;  
                 case 2:     dist=Proc.dy;
                             break;
-                case 3:     dist=Proc.dxy[i];
+                case 3:     dist=Proc.dxy[iIndex];
                             break;
-                case 4:     dist=Proc.dx[i];
+                case 4:     dist=Proc.dx[iIndex];
                             break;
                 case 5:     dist=1;
                             break;
-                case 6:     dist=Proc.dx[i];
+                case 6:     dist=Proc.dx[iIndex];
                             break;
-                case 7:     dist=Proc.dxy[i];
+                case 7:     dist=Proc.dxy[iIndex];
                             break;
                 case 8:     dist=Proc.dy;
                             break;
-                case 9:     dist=Proc.dxy[i];
+                case 9:     dist=Proc.dxy[iIndex];
                             break;
             }
 
-            GDO[i][j]=dist+GDO[i-1+(Proc.DIR[i][j]-1)/3][j-1+(Proc.DIR[i][j]-1)%3];
-            TDO[i][j]+=TDO[i-1+(Proc.DIR[i][j]-1)/3][j-1+(Proc.DIR[i][j]-1)%3];
+            GDO[iIndex][jIndex]=dist+GDO[iIndex-1+(Proc.DIR[iIndex][jIndex]-1)/3][jIndex-1+(Proc.DIR[iIndex][jIndex]-1)%3];
+            TDO[iIndex][jIndex]+=TDO[iIndex-1+(Proc.DIR[iIndex][jIndex]-1)/3][jIndex-1+(Proc.DIR[iIndex][jIndex]-1)%3];
             if(pcambio > 1) {
-                TDO[i][j]++;
+                TDO[iIndex][jIndex]++;
                 pcambio=0;
             }
 
             for (byte k=0; k <= 8; k++){
-                if (Proc.RedRas[i+(k/3)-1][j+(k%3)-1] == 1 && Proc.DIR[i+(k/3)-1][j+(k%3)-1]==9-k){
-                    tribsVector.add(new int[] {i+(k/3)-1,j+(k%3)-1});
+                if (Proc.RedRas[iIndex+(k/3)-1][jIndex+(k%3)-1] == 1 && Proc.DIR[iIndex+(k/3)-1][jIndex+(k%3)-1]==9-k){
+                    tribsVector.add(new int[] {iIndex+(k/3)-1,jIndex+(k%3)-1});
                 }
             }
         }

@@ -50,7 +50,7 @@ public class BasinAnalyzer extends javax.swing.JDialog{
         
         
     
-    private boolean[] firstTouchTab=new boolean[8];
+    private boolean[] firstTouchTab=new boolean[9];
     
     
     private RealType    numLinks= RealType.getRealType("numLinks") ,
@@ -69,7 +69,9 @@ public class BasinAnalyzer extends javax.swing.JDialog{
                         dotColor=RealType.getRealType("dotColor"),
                         logAreaIndex=RealType.getRealType("logAreaIndex"),
                         logAreaValue=RealType.getRealType("logAreaValue"),
-                        drainageDensity=RealType.getRealType("drainageDensity");
+                        drainageDensity=RealType.getRealType("drainageDensity"),
+                        percentAreaValue=RealType.getRealType("percentAreaValue"),
+                        elevationValue=RealType.getRealType("elevationValue");
     
     private RealTupleType espacioHorton= new RealTupleType(streamOrder,hortonVar),
                           espacioDD= new RealTupleType(logAreaValue,drainageDensity),
@@ -82,7 +84,9 @@ public class BasinAnalyzer extends javax.swing.JDialog{
                             func_bins_frequencies=new FunctionType(bins, frequencies),
                             func_xVarLink_yVarLink=new FunctionType(x_var_index, espacioXLYL),
                             func_logArea_drainageDensity_Lines=new FunctionType(logAreaValue, drainageDensity),
-                            func_logArea_drainageDensity=new FunctionType(logAreaIndex, espacioDD);
+                            func_logArea_drainageDensity=new FunctionType(logAreaIndex, espacioDD),
+                            func_elePer_eleVal=new FunctionType(percentAreaValue, elevationValue);
+    
     
     private DisplayImpl displayW,
                         displayH,
@@ -92,9 +96,10 @@ public class BasinAnalyzer extends javax.swing.JDialog{
                         displayMap_Hortonian,
                         displayMap_RSNs,
                         display_Links,
-                        displayDD;
+                        displayDD,
+                        displayHC;
     
-    private FlatField vals_ff_W, vals_ff_H, vals_ff_Li, vals_ff_DD;
+    private FlatField vals_ff_W, vals_ff_H, vals_ff_Li, vals_ff_DD,vals_ff_HC;
     
     private ScalarMap   disMap,
                         numLinkMap,
@@ -122,9 +127,11 @@ public class BasinAnalyzer extends javax.swing.JDialog{
                         yVarValueMap,
                         logAreaMap,
                         ddMap,
-                        ddValueMap;
+                        ddValueMap,
+                        percentAreaMap,
+                        elevationMap;
     
-    private DataReferenceImpl data_refW, data_refH,data_ref_varRaster, data_refLi, data_refDD,data_ref_RSNTiles;
+    private DataReferenceImpl data_refW, data_refH,data_ref_varRaster, data_refLi, data_refDD,data_ref_RSNTiles,data_refHC;
     
     private DataReferenceImpl[] data_refHDis,
                                 data_refHDis_Hortonian,
@@ -434,6 +441,24 @@ public class BasinAnalyzer extends javax.swing.JDialog{
         
         jPanel25.remove(jPanel43);
         
+        //creo la estructura grafica para la Hypsometric Curve
+        
+        displayHC = new DisplayImplJ3D("displayHypsometricCurve",new visad.java3d.TwoDDisplayRendererJ3D());
+        
+        dispGMC = (GraphicsModeControl) displayHC.getGraphicsModeControl();
+        dispGMC.setScaleEnable(true);
+        
+        pc = displayHC.getProjectionControl();
+        pc.setAspectCartesian(new double[] {1.0, 0.5});
+        
+        percentAreaMap = new ScalarMap( percentAreaValue, Display.XAxis );
+        percentAreaMap.setScalarName("% of Area");
+        elevationMap = new ScalarMap( elevationValue, Display.YAxis );
+        elevationMap.setScalarName("Elevation [m]");
+        
+        displayHC.addMap( percentAreaMap );
+        displayHC.addMap( elevationMap );
+        
         //creo la estructura grafica para la Drainage Density
         
         displayDD = new DisplayImplJ3D("displayDrainageDensity",new visad.java3d.TwoDDisplayRendererJ3D());
@@ -613,6 +638,39 @@ public class BasinAnalyzer extends javax.swing.JDialog{
         data_refW.setData(vals_ff_W);
         
         displayW.addReference( data_refW );
+        
+    }
+    
+    private void plotHypCurve() throws RemoteException, VisADException,java.io.IOException{
+        displayHC.removeAllReferences();
+        
+        float[] eleBasin=myCuenca.getElevations(metaDatos);
+        java.util.Arrays.sort(eleBasin);
+        float localMinElev=eleBasin[0];
+        float localMaxElev=eleBasin[eleBasin.length-1];
+        
+        float[][] keyElev=new float[1][100];
+        float[][] accumElev=new float[1][100];
+        int k=0;
+        for(int i=0;i<eleBasin.length;i++){
+            float eleToTest=localMinElev+k/99.0f*(localMaxElev-localMinElev);
+            if(eleBasin[i] >= eleToTest) {
+                keyElev[0][keyElev[0].length-1-k]=eleToTest;
+                accumElev[0][k]=i/(float)eleBasin.length;
+                k++;
+                i--;
+            }
+        }
+        
+        Irregular1DSet percents=new Irregular1DSet(elevationValue,accumElev);
+        
+        vals_ff_HC = new FlatField( func_elePer_eleVal, percents);
+        vals_ff_HC.setSamples( keyElev );
+        
+        data_refHC = new DataReferenceImpl("data_ref_HC");
+        data_refHC.setData(vals_ff_HC);
+        
+        displayHC.addReference( data_refHC );
         
     }
     
@@ -1566,6 +1624,7 @@ public class BasinAnalyzer extends javax.swing.JDialog{
         jPanel26 = new javax.swing.JPanel();
         jPanel27 = new javax.swing.JPanel();
         loadSpatialVariable = new javax.swing.JButton();
+        jPanel51 = new javax.swing.JPanel();
         jPanel46 = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
         htmlGeomorphometricReport = new javax.swing.JEditorPane();
@@ -2365,6 +2424,10 @@ public class BasinAnalyzer extends javax.swing.JDialog{
 
         panelOpciones.addTab("Hortonian Analisis", null, jPanel23, "");
 
+        jPanel51.setLayout(new java.awt.BorderLayout());
+
+        panelOpciones.addTab("Hypsometric Curve", jPanel51);
+
         jPanel46.setLayout(new java.awt.BorderLayout());
 
         jScrollPane4.setViewportView(htmlGeomorphometricReport);
@@ -2375,8 +2438,7 @@ public class BasinAnalyzer extends javax.swing.JDialog{
 
         getContentPane().add(panelOpciones, java.awt.BorderLayout.CENTER);
 
-    }
-    // </editor-fold>//GEN-END:initComponents
+    }// </editor-fold>//GEN-END:initComponents
 
     private void rsnScaleSliderMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_rsnScaleSliderMouseReleased
          try{
@@ -2829,6 +2891,8 @@ public class BasinAnalyzer extends javax.swing.JDialog{
           
           jPanel7.remove(display_Links.getComponent());
           
+          jPanel51.remove(displayHC.getComponent());
+          
           if ( panelOpciones.getSelectedIndex()==0) {
               jPanel1.add("Center",displayW.getComponent());
           }
@@ -2915,7 +2979,19 @@ public class BasinAnalyzer extends javax.swing.JDialog{
           }
           
           if ( panelOpciones.getSelectedIndex()==7) {
-              
+              jPanel51.add("Center",displayHC.getComponent());
+              if (!firstTouchTab[7]){
+                  try{
+                      plotHypCurve();
+                  } catch (RemoteException r){
+                      System.err.print(r);
+                  } catch (VisADException v){
+                      System.err.print(v);
+                  } catch (java.io.IOException IOE){
+                      System.err.print(IOE);
+                  }
+                  firstTouchTab[7]=true;
+              }
           }
           
       }
@@ -3129,9 +3205,9 @@ public class BasinAnalyzer extends javax.swing.JDialog{
             //hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
             //metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS/Whitewaters.dir"));
             
-            java.io.File theFile=new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Topography/1_ArcSec_USGS/walnutGulchUpdated.metaDEM");
+            java.io.File theFile=new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Topography/1_ArcSec_USGS/ORIGINAL/walnutGulchUpdated.metaDEM");
             hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
-            metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Topography/1_ArcSec_USGS/walnutGulchUpdated.dir"));
+            metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Topography/1_ArcSec_USGS/ORIGINAL/walnutGulchUpdated.dir"));
             
             String formatoOriginal=metaModif.getFormat();
             metaModif.setFormat("Byte");
@@ -3234,6 +3310,7 @@ public class BasinAnalyzer extends javax.swing.JDialog{
     private javax.swing.JPanel jPanel49;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel50;
+    private javax.swing.JPanel jPanel51;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
