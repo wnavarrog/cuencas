@@ -91,9 +91,9 @@ public class HSJToEsriASCII {
     public static void main(String[] args) {
         
         try{
-            HSJToEsriASCII exporter=new HSJToEsriASCII(new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Topography/0.3_ArcSecUSGS/89883214.metaDEM"),
+            HSJToEsriASCII exporter=new HSJToEsriASCII(new java.io.File("C:/Documents and Settings/Administrator/My Documents/databases/Gila River DB/Rasters/Topography/mogollon.metaDEM"),
                                                        new java.io.File("/tmp/"));
-            exporter.fileToExport(new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Topography/0.3_ArcSecUSGS/89883214.dem"));
+            exporter.fileToExport(new java.io.File("C:/Documents and Settings/Administrator/My Documents/databases/Gila River DB/Rasters/Topography/mogollon.dem"));
             exporter.writeEsriFile();
             
             /*new GrassToHSJ(new java.io.File("/home/ricardo/garbage/testsGrass/1630327a.grass"),

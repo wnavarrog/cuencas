@@ -396,9 +396,9 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
     
     public static void subMain2(String args[]) throws java.io.IOException, VisADException {
         
-        java.io.File theFile=new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Topography/1_ArcSec_USGS/walnutGulchUpdated.metaDEM");
+        java.io.File theFile=new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Topography/1_ArcSec_USGS/ORIGINAL/walnutGulchUpdated.metaDEM");
         hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
-        metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Topography/1_ArcSec_USGS/walnutGulchUpdated.dir"));
+        metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Topography/1_ArcSec_USGS/ORIGINAL/walnutGulchUpdated.dir"));
         
         String formatoOriginal=metaModif.getFormat();
         metaModif.setFormat("Byte");
@@ -410,10 +410,10 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
         
         hydroScalingAPI.mainGUI.ParentGUI tempFrame=new hydroScalingAPI.mainGUI.ParentGUI();
         
-        new SimulationToAsciiFile(82,260,matDirs,magnitudes,metaModif,150, 2,0.0f,2,new java.io.File("/tmp/")).executeSimulation();
-        new SimulationToAsciiFile(82,260,matDirs,magnitudes,metaModif, 50, 6,0.0f,2,new java.io.File("/tmp/")).executeSimulation();
-        new SimulationToAsciiFile(82,260,matDirs,magnitudes,metaModif, 10,30,0.0f,2,new java.io.File("/tmp/")).executeSimulation();
-        new SimulationToAsciiFile(82,260,matDirs,magnitudes,metaModif,  5,60,0.0f,2,new java.io.File("/tmp/")).executeSimulation();
+        new SimulationToAsciiFile(82,260,matDirs,magnitudes,metaModif,150, 2,3.0f,2,new java.io.File("/tmp/")).executeSimulation();
+        new SimulationToAsciiFile(82,260,matDirs,magnitudes,metaModif, 50, 6,3.0f,2,new java.io.File("/tmp/")).executeSimulation();
+        new SimulationToAsciiFile(82,260,matDirs,magnitudes,metaModif, 10,30,3.0f,2,new java.io.File("/tmp/")).executeSimulation();
+        new SimulationToAsciiFile(82,260,matDirs,magnitudes,metaModif,  5,60,3.0f,2,new java.io.File("/tmp/")).executeSimulation();
         
     }
     
