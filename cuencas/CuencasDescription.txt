@@ -1,5 +1,0 @@
-<html>
-<body bgcolor="#FFFFFF" text="#FFFFFF" link="#FFFFFF" vlink="#CCCCCC">
-<strong>Cuencas</strong> is a river networks analysis tool. It is a simplified version of the original GIS called HidroSig, developed by the Water Resources Department at the </font><font face="Verdana, Arial, Helvetica, sans-serif"><em><font face="Times New Roman, Times, serif"><strong>Universidad Nacional de Colombia</strong>
-</body>
-</html>
