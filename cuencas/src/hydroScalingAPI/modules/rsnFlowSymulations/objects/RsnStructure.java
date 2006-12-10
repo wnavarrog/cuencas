@@ -34,7 +34,8 @@ public class RsnStructure {
             rsnDepth=Integer.parseInt(fileMeta.readLine().split(":")[1].trim());
             
             String tmp=""; int treeCounter=0;
-            while(tmp != null || tmp.equalsIgnoreCase("Random Geometry")){
+            while(tmp != null){
+                if(tmp.equalsIgnoreCase("Random Geometry")) break;
                 tmp=fileMeta.readLine();
                 treeCounter++;
             }
@@ -48,13 +49,17 @@ public class RsnStructure {
             fileMeta.readLine();
             for(int i=0;i<treeCounter;i++){
                 rsnTreeDecoding[i]=fileMeta.readLine();
-                System.out.println(rsnTreeDecoding[i]);
             }
             
             tmp=fileMeta.readLine();
-            if(tmp.equalsIgnoreCase("Random Geometry")){
-                linkAreas=new float[1][treeCounter];
-                linkLengths=new float[1][treeCounter];
+            linkAreas=new float[1][treeCounter];
+            linkLengths=new float[1][treeCounter];
+            
+            java.util.Arrays.fill(linkAreas[0],0.10f);
+            java.util.Arrays.fill(linkLengths[0],0.30f);
+
+            if(tmp != null && tmp.equalsIgnoreCase("Random Geometry")){
+                randomGeometry=true;
                 fileMeta.readLine();
                 tmp=fileMeta.readLine();
                 String[] theInfo=tmp.split(",");
@@ -104,6 +109,7 @@ public class RsnStructure {
         rsnTree=new hydroScalingAPI.util.randomSelfSimilarNetworks.Generator(0,rsnDepth,myDis_I,myDis_E,labelFormat.format(0));
         rsnTreeDecoding=rsnTree.decodeRsnTree();
         
+        randomGeometry=true;
         linkAreas=new float[1][rsnTreeDecoding.length];
         linkLengths=new float[1][rsnTreeDecoding.length];
         
@@ -326,8 +332,8 @@ public class RsnStructure {
      */
     public static void main(String[] args) {
         //main0(args); //Test features of this Object
-        //main1(args); //Test write-read feature
-        main2(args); //Test Dd vs A relationship for RSNs
+        main1(args); //Test write-read feature
+        //main2(args); //Test Dd vs A relationship for RSNs
     }
     
     public static void main0(String[] args) {
@@ -369,7 +375,7 @@ public class RsnStructure {
         hydroScalingAPI.util.probability.DiscreteDistribution myUD_E=new hydroScalingAPI.util.probability.GeneralGeometricDistribution(0.57253316,0.19803630, 1);
         RsnStructure myRsnStruc=new RsnStructure(3,myUD_I,myUD_E);
         
-        java.io.File theFile=new java.io.File("/home/ricardo/temp/testRSNdecode.rsn");
+        java.io.File theFile=new java.io.File("/Users/ricardo/temp/testRSNdecode.rsn");
         
         try{
             myRsnStruc.writeRsnTreeDecoding(theFile);
