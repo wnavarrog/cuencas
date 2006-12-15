@@ -7,8 +7,10 @@ package hydroScalingAPI;
  */
 
 /**
- *
- * @author  Ricardo Mantilla
+ * This class is the typical entrance point to the CUENCAS GUI.  It launches a splash screen and initializes some libraries. It is designed to test for the presence of Java3D.
+ * 
+ * It can be ommited and initilize the GUI using {@link hydroScalingAPI.mainGUI.ParentGUI}
+ * @author Ricardo Mantilla
  */
 public class Cuencas {
     
