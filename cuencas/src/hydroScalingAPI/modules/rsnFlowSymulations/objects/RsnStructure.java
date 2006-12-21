@@ -20,7 +20,7 @@ public class RsnStructure {
     private int[] nextLink,completeStreamLinksArray;
     
     private boolean randomGeometry=false;
-    private float[][] upAreas, linkOrders, upLength,linkAreas,linkLengths;
+    private float[][] upAreas, linkOrders, upLength,linkAreas,linkLengths,longestLenght;
     private int[] magnitudes;
     
     private int minimumIntegerDigits=4;
@@ -206,11 +206,13 @@ public class RsnStructure {
         linkOrders=new float[1][rsnTreeSize];
         upLength=new float[1][rsnTreeSize];
         magnitudes=new int[rsnTreeSize];
+        longestLenght=new float[1][rsnTreeSize];
         
         for(int i=0;i<rsnTreeSize;i++){
             linkCode=rsnTreeDecoding[i].split(",");
             upAreas[0][i]=linkAreas[0][i];
             upLength[0][i]=linkLengths[0][i];
+            longestLenght[0][i]=linkLengths[0][i];
             if(linkCode[rsnDepth+1].equalsIgnoreCase("E")) {
                 trackPath.add(""+i);
                 linkOrders[0][i]=1;
@@ -230,6 +232,7 @@ public class RsnStructure {
                     
                     upAreas[0][nextLink[toAssign]]+=upAreas[0][toAssign];
                     upLength[0][nextLink[toAssign]]+=upLength[0][toAssign];
+                    longestLenght[0][nextLink[toAssign]]=Math.max(longestLenght[0][nextLink[toAssign]],longestLenght[0][toAssign]+linkLengths[0][nextLink[toAssign]]);
                     magnitudes[nextLink[toAssign]]+=magnitudes[toAssign];
                     
                     if(linkOrders[0][nextLink[toAssign]] == linkOrders[0][toAssign])
@@ -302,6 +305,10 @@ public class RsnStructure {
         return linkOrders;
     }
     
+    public float[][] getLongestLength(){
+        return longestLenght;
+    }
+    
     public int[] getCompleteStreamLinksArray(){
         return completeStreamLinksArray;
     }
@@ -332,8 +339,8 @@ public class RsnStructure {
      */
     public static void main(String[] args) {
         //main0(args); //Test features of this Object
-        main1(args); //Test write-read feature
-        //main2(args); //Test Dd vs A relationship for RSNs
+        //main1(args); //Test write-read feature
+        main2(args); //Test Dd vs A relationship for RSNs
     }
     
     public static void main0(String[] args) {
@@ -412,13 +419,18 @@ public class RsnStructure {
         hydroScalingAPI.util.probability.ContinuumDistribution myLinkAreaDistro_E=new hydroScalingAPI.util.probability.LogGaussianDistribution(Elae,SDlae);
         hydroScalingAPI.util.probability.ContinuumDistribution myLinkAreaDistro_I=new hydroScalingAPI.util.probability.LogGaussianDistribution(0.01f+0.88f*Elae,0.04f+0.85f*SDlae);
                         
-        RsnStructure myRsnStruc=new RsnStructure(6,myUD_I,myUD_E, myLinkAreaDistro_E, myLinkAreaDistro_I);
+        //RsnStructure myRsnStruc=new RsnStructure(5,myUD_I,myUD_E, myLinkAreaDistro_E, myLinkAreaDistro_I);
+        RsnStructure myRsnStruc=new RsnStructure(6,myUD_I,myUD_E);
         
         float[][] upAreas=myRsnStruc.getUpAreas();
         float[][] upLength=myRsnStruc.getUpLength();
         float[][] upOrder=myRsnStruc.getHortonOrders();
-        for (int i=0;i<upLength[0].length;i++){
-            System.out.println(i+" "+upAreas[0][i]+" "+upLength[0][i]/upAreas[0][i]+" "+upOrder[0][i]);
+        float[][] longLength=myRsnStruc.getLongestLength();
+        
+        int[] compLinks=myRsnStruc.getCompleteStreamLinksArray();
+        
+        for (int i=0;i<compLinks.length;i++){
+            if(upOrder[0][compLinks[i]]>2)System.out.println(i+" "+upAreas[0][compLinks[i]]+" "+upLength[0][compLinks[i]]+" "+upOrder[0][compLinks[i]]+" "+longLength[0][compLinks[i]]);
         }
         
     }
