@@ -24,8 +24,8 @@ public class test_utm_gdc
         for (i = 0;i<gdc.length;i++)
         {
             gdc[i] = new Gdc_Coord_3d();
-	    //utm[i] = new Utm_Coord_3d(677381.97,4124276.57 ,100,(byte)13,true);
-            utm[i] = new Utm_Coord_3d( 677382.0,4124276.5 ,0,(byte)13,true);
+	    utm[i] = new Utm_Coord_3d(677381.97,4124276.57 ,100,(byte)13,true);
+            //utm[i] = new Utm_Coord_3d( 677382.0,4124276.5 ,0,(byte)13,true);
 
         }
 
