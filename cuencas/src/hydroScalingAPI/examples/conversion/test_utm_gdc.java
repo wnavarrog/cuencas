@@ -1,4 +1,4 @@
-package hydroScalingAPI.examples;
+package hydroScalingAPI.examples.conversion;
 
 import java.lang.*;
 import geotransform.coords.*;
