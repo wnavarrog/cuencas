@@ -52,7 +52,7 @@ public class CuencasTwoDDisplayRendererJ3D extends CuencasDisplayRendererJ3D{
     }
     
     /**
-     * @param mbClass - sub Class of MouseBehaviorJ3D
+     * @param mbj3dClass - sub Class of MouseBehaviorJ3D
      */
     public CuencasTwoDDisplayRendererJ3D(Class mbj3dClass) {
         super();

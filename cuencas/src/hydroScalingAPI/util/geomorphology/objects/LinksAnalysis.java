@@ -8,8 +8,7 @@ package hydroScalingAPI.util.geomorphology.objects;
 
 /**
  *
- * @author  ricardo
- * @version
+ * @author  Ricardo Mantilla
  */
 public class LinksAnalysis extends java.lang.Object {
     

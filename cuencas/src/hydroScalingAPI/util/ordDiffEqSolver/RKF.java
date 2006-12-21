@@ -8,8 +8,7 @@ package hydroScalingAPI.util.ordDiffEqSolver;
 
 /**
  *
- * @author  Ricardo Mantilla
- * @version 
+ * @author  Ricardo Mantilla 
  */
 public class RKF extends java.lang.Object {
 

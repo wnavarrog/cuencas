@@ -9,7 +9,6 @@ package hydroScalingAPI.util.plot;
 /**
  *
  * @author  olver
- * @version
  */
 
 public class plot1 extends javax.swing.JDialog {

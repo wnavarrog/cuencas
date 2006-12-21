@@ -8,8 +8,7 @@ package hydroScalingAPI.util.ordDiffEqSolver;
 
 /**
  *
- * @author  ricardo
- * @version 
+ * @author  Ricardo Mantilla 
  */
 public class RK4 {
     

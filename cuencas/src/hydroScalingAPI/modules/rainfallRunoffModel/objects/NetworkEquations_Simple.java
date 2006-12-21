@@ -8,8 +8,7 @@ package hydroScalingAPI.modules.rainfallRunoffModel.objects;
 
 /**
  *
- * @author  ricardo
- * @version 
+ * @author  ricardo 
  */
 public class NetworkEquations_Simple implements hydroScalingAPI.util.ordDiffEqSolver.BasicFunction {
     private hydroScalingAPI.util.geomorphology.objects.LinksAnalysis linksConectionStruct;

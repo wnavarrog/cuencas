@@ -8,8 +8,7 @@ package hydroScalingAPI.util.geomorphology.objects;
 
 /**
  *
- * @author  Ricardo Mantilla
- * @version 
+ * @author  Ricardo Mantilla 
  */
 public class HortonAnalysis extends java.lang.Object {
     

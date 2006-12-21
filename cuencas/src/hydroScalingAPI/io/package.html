@@ -5,6 +5,12 @@
     <title></title>
   </head>
   <body>
-    Provides classes and interfaces for handling ... bla bla bla
+    This package contains all the classes that comunicate directly with the
+database.  The different classes have the capability to read and write the
+CUENCAS database formats.  These classes can deliver the data in appropriate
+formats to be used by VisAD or other visualization and analysis packages.  No
+classes outside this package should access the database.  All other classes
+access the database indirecly, which means that future modifications of data
+formats and standards should not impact the rest of the hydroScalingAPI.
   </body>
 </html>

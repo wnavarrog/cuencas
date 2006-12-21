@@ -9,7 +9,6 @@ package hydroScalingAPI.modules.networkAnalysis.objects;
 /**
  *
  * @author  ricardo
- * @version
  */
 public class RsnTile extends java.lang.Object {
     

@@ -8,8 +8,7 @@ package hydroScalingAPI.util.fileUtilities;
 
 /**
  *
- * @author  Administrador
- * @version 
+ * @author  Ricardo Mantilla
  */
 public class DirFilter extends Object implements java.io.FileFilter{
 

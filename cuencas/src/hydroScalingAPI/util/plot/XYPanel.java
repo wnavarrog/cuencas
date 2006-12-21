@@ -8,8 +8,7 @@ package hydroScalingAPI.util.plot;
 
 /**
  *
- * @author  olver
- * @version 
+ * @author  olver 
  */
 public class XYPanel extends java.awt.Panel   {
 

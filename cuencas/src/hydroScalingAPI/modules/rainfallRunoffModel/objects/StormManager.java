@@ -9,7 +9,6 @@ package hydroScalingAPI.modules.rainfallRunoffModel.objects;
 /**
  *
  * @author  ricardo
- * @version 
  */
 public class StormManager {
     

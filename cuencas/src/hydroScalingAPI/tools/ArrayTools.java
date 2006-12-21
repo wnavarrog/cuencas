@@ -42,7 +42,7 @@ public abstract class ArrayTools {
      * 
      * @param twoArray 
      * @throws java.io.IOException 
-     * @return 
+     * @return oneArray
      */
     public static float[] convertTwoToOne(float[][] twoArray) throws java.io.IOException{
         float[] oneArray = new float[twoArray[0].length];

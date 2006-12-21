@@ -8,8 +8,7 @@ package hydroScalingAPI.util.plot;
 
 /**
  *
- * @author  olver
- * @version 
+ * @author  olver 
  */
 public class plot extends java.awt.Dialog {
 

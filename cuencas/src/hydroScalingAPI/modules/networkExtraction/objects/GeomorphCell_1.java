@@ -3,7 +3,6 @@ package hydroScalingAPI.modules.networkExtraction.objects;
 /**
  *
  * @author  Jorge Mario Ramirez
- * @version
  */
 public class GeomorphCell_1 extends Object {
     public int stat;

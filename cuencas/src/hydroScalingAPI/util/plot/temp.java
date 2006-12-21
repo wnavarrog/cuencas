@@ -8,8 +8,7 @@ package hydroScalingAPI.util.plot;
 
 /**
  *
- * @author  olver
- * @version 
+ * @author  olver 
  */
 public class temp extends javax.swing.JDialog {
 

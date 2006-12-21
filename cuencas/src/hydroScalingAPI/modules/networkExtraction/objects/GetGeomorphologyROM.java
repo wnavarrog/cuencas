@@ -3,8 +3,7 @@ package hydroScalingAPI.modules.networkExtraction.objects;
 /**
  *
  * @author  Jorge Mario Ramirez
- * @version
- */
+  */
 public class GetGeomorphologyROM extends Object {
     
     private int GEO[][];

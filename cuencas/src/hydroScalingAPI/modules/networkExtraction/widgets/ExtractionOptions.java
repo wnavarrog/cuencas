@@ -3,7 +3,6 @@ package hydroScalingAPI.modules.networkExtraction.widgets;
 /**
  *
  * @author  Jorge Mario Ramirez
- * @version
  */
 public class ExtractionOptions extends javax.swing.JDialog {
     
