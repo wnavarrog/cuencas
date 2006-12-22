@@ -183,6 +183,10 @@ public class LinksAnalysis extends java.lang.Object {
         
     }
     
+    /**
+     * 
+     * @return Returns network Horton-Strahler order.
+     */
     public int getBasinOrder(){
         return basinOrder;
     }
