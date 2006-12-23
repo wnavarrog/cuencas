@@ -8,8 +8,7 @@ package hydroScalingAPI.examples.rainRunoffSimulations;
 
 /**
  *
- * @author  ricardo
- * @version
+ * @author  Ricardo Mantilla
  */
 
 import visad.*;
