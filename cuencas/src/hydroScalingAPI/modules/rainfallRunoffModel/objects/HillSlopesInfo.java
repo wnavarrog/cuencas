@@ -8,7 +8,7 @@ package hydroScalingAPI.modules.rainfallRunoffModel.objects;
 
 /**
  *
- * @author  ricardo
+ * @author Ricardo Mantilla
  */
 public class HillSlopesInfo extends java.lang.Object {
     

@@ -8,7 +8,7 @@ package hydroScalingAPI.examples.artifitialFields;
 
 /**
  *
- * @author  ricardo
+ * @author Ricardo Mantilla
  */
 public class createRandomInfiltrationMap {
     

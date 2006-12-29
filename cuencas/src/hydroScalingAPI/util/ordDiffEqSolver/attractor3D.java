@@ -6,15 +6,15 @@
 
 package hydroScalingAPI.tools.ordDiffEqSolver;
 
-/**
- *
- * @author  Ricardo y Lily
- * @version 
- */
 import visad.*;
 import visad.java3d.DisplayImplJ3D;
 import java.rmi.RemoteException;
 
+/**
+ *
+ * @author  Ricardo Mantilla
+ * @version 
+ */
 public class attractor3D extends javax.swing.JFrame {
 
     /** Creates new form attractor3D */
@@ -90,8 +90,15 @@ public class attractor3D extends javax.swing.JFrame {
     /**
     * @param args the command line arguments
     */
-    public static void main (String args[]) throws RemoteException, VisADException {
-        new attractor3D ().setVisible(true);
+    public static void main (String args[]){
+        try{
+            new hydroScalingAPI.tools.ordDiffEqSolver.attractor3D().setVisible(true);
+        } catch(RemoteException rie){
+            
+        } catch(VisADException vie){
+            
+        }
+        
     }
 
 

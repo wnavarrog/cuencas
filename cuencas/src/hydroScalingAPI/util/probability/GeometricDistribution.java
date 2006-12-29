@@ -8,7 +8,7 @@ package hydroScalingAPI.util.probability;
 
 /**
  *
- * @author  ricardo
+ * @author Ricardo Mantilla
  */
 public class GeometricDistribution implements hydroScalingAPI.util.probability.DiscreteDistribution{
     

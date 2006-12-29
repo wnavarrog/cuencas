@@ -8,7 +8,7 @@ package hydroScalingAPI.util.probability;
 
 /**
  *
- * @author  ricardo
+ * @author Ricardo Mantilla
  */
 public class LogGaussianDistribution implements hydroScalingAPI.util.probability.ContinuumDistribution{
     

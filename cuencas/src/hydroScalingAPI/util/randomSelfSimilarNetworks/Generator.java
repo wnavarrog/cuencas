@@ -8,7 +8,7 @@ package hydroScalingAPI.util.randomSelfSimilarNetworks;
 
 /**
  *
- * @author  ricardo
+ * @author Ricardo Mantilla
  */
 public class Generator {
     

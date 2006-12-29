@@ -8,7 +8,7 @@ package hydroScalingAPI.subGUIs.widgets;
 
 /**
  *
- * @author  ricardo
+ * @author Ricardo Mantilla
  */
 public class LocationsViewer extends javax.swing.JDialog {
     

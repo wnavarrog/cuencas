@@ -11,7 +11,7 @@ package hydroScalingAPI.modules;
 
 /**
  *
- * @author ricardo
+ * @author Ricardo Mantilla
  */
 public class ModuleTester {
     

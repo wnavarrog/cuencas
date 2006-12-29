@@ -8,7 +8,7 @@ package hydroScalingAPI.util.database;
 
 /**
  *
- * @author  ricardo
+ * @author Ricardo Mantilla
  */
 public class DB_Register {
     

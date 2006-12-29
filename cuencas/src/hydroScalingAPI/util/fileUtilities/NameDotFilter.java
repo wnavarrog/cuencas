@@ -8,7 +8,7 @@ package hydroScalingAPI.util.fileUtilities;
 
 /**
  *
- * @author  ricardo
+ * @author Ricardo Mantilla
  */
 public class NameDotFilter extends Object implements java.io.FileFilter{
     

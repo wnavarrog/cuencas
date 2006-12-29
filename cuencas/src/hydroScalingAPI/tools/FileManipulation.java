@@ -8,7 +8,7 @@ package hydroScalingAPI.tools;
 
 /**
  *
- * @author  ricardo
+ * @author Ricardo Mantilla
  */
 public abstract class FileManipulation {
     

@@ -8,7 +8,7 @@ package hydroScalingAPI.mainGUI.objects;
 
 /**
  *
- * @author  ricardo
+ * @author Ricardo Mantilla
  */
 public class LocationsManager {
     

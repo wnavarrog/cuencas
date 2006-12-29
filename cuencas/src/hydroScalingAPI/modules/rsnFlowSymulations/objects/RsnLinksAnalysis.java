@@ -8,7 +8,7 @@ package hydroScalingAPI.modules.rsnFlowSymulations.objects;
 
 /**
  *
- * @author  ricardo
+ * @author Ricardo Mantilla
  */
 public class RsnLinksAnalysis extends hydroScalingAPI.util.geomorphology.objects.LinksAnalysis{
     

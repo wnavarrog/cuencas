@@ -8,7 +8,7 @@ package hydroScalingAPI.modules.analysis_TS.widgets;
 
 /**
  *
- * @author  ricardo
+ * @author Ricardo Mantilla
  */
 public class TimeSeriesViewer extends javax.swing.JDialog {
     

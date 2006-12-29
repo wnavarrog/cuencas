@@ -8,7 +8,7 @@ package hydroScalingAPI.examples.rainRunoffSimulations;
 
 /**
  *
- * @author  ricardo
+ * @author Ricardo Mantilla
  * @version
  */
 

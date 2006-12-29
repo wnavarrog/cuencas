@@ -8,7 +8,7 @@ package hydroScalingAPI.subGUIs.widgets;
 
 /**
  *
- * @author  ricardo
+ * @author Ricardo Mantilla
  */
 public class DemViewer2D extends hydroScalingAPI.subGUIs.widgets.RasterViewer implements visad.DisplayListener{
     

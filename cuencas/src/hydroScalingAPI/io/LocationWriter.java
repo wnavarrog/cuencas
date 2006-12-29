@@ -8,7 +8,7 @@ package hydroScalingAPI.io;
 
 /**
  *
- * @author  ricardo
+ * @author Ricardo Mantilla
  */
 public class LocationWriter {
     

@@ -12,7 +12,7 @@ import java.rmi.RemoteException;
 
 /**
  *
- * @author  ricardo
+ * @author Ricardo Mantilla
  */
 public class kansasWidthsAnalysis {
     

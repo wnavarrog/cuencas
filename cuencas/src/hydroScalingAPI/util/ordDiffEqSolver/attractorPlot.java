@@ -6,16 +6,15 @@
 
 package hydroScalingAPI.util.ordDiffEqSolver;
 
-/**
- *
- * @author  Ricardo y Lily
- * @version 
- */
-
 import visad.*;
 import visad.java3d.DisplayImplJ3D;
 import java.rmi.RemoteException;
 
+/**
+ *
+ * @author Ricardo Mantilla
+ * @version 
+ */
 public class attractorPlot extends java.lang.Object {
 
     /** Creates new attractorPlot */

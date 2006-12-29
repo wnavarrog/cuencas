@@ -8,7 +8,7 @@ package hydroScalingAPI.examples.dlgs;
 
 /**
  *
- * @author  ricardo
+ * @author Ricardo Mantilla
  */
 public class SelectWhitewatersDLGs {
     

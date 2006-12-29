@@ -8,7 +8,7 @@ package hydroScalingAPI.examples.dataAnalysis;
 
 /**
  *
- * @author  ricardo
+ * @author Ricardo Mantilla
  */
 public class NewZealandHGAnalysis {
     

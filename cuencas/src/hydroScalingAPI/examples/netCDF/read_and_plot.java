@@ -8,7 +8,7 @@ package hydroScalingAPI.examples.netCDF;
 
 /**
  *
- * @author  ricardo
+ * @author Ricardo Mantilla
  */
 public class read_and_plot {
     

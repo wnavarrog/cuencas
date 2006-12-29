@@ -8,7 +8,7 @@ package hydroScalingAPI.modules.rainfallRunoffModel.objects;
 
 /**
  *
- * @author  ricardo 
+ * @author Ricardo Mantilla 
  */
 public class LinksInfo extends java.lang.Object {
 

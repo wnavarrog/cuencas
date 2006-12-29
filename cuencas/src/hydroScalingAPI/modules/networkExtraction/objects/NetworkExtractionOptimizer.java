@@ -8,7 +8,7 @@ package hydroScalingAPI.modules.networkExtraction.objects;
 
 /**
  *
- * @author  ricardo
+ * @author Ricardo Mantilla
  */
 public class NetworkExtractionOptimizer implements Runnable {
     

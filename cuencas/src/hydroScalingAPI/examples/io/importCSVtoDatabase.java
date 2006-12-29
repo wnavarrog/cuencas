@@ -8,7 +8,7 @@ package hydroScalingAPI.examples.io;
 
 /**
  *
- * @author  ricardo
+ * @author Ricardo Mantilla
  */
 public class importCSVtoDatabase {
     

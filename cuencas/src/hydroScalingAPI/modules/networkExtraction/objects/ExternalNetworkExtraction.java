@@ -8,7 +8,7 @@ package hydroScalingAPI.modules.networkExtraction.objects;
 
 /**
  *
- * @author  ricardo
+ * @author Ricardo Mantilla
  */
 public class ExternalNetworkExtraction extends Thread{
     

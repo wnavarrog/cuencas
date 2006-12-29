@@ -8,7 +8,7 @@ package hydroScalingAPI.mainGUI.widgets;
 
 /**
  *
- * @author  ricardo
+ * @author Ricardo Mantilla
  */
 public class Splash extends javax.swing.JFrame {
     

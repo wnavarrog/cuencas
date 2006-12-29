@@ -8,7 +8,7 @@ package hydroScalingAPI.mainGUI.objects;
 
 /**
  *
- * @author  ricardo
+ * @author Ricardo Mantilla
  */
 public class GaugesGUI_monitor extends Thread{
     private hydroScalingAPI.mainGUI.ParentGUI mainFrame;
