@@ -13,7 +13,6 @@ import java.rmi.RemoteException;
 /**
  *
  * @author Ricardo Mantilla
- * @version 
  */
 public class attractorPlot extends java.lang.Object {
 
