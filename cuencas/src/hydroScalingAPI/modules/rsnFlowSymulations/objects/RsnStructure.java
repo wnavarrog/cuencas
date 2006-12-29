@@ -64,6 +64,7 @@ public class RsnStructure {
                 tmp=fileMeta.readLine();
                 String[] theInfo=tmp.split(",");
                 for(int i=0;i<treeCounter;i++) linkAreas[0][i]=Float.parseFloat(theInfo[i]);
+                fileMeta.readLine();
                 tmp=fileMeta.readLine();
                 theInfo=tmp.split(",");
                 for(int i=0;i<treeCounter;i++) linkLengths[0][i]=Float.parseFloat(theInfo[i]);
@@ -340,7 +341,8 @@ public class RsnStructure {
     public static void main(String[] args) {
         //main0(args); //Test features of this Object
         //main1(args); //Test write-read feature
-        main2(args); //Test Dd vs A relationship for RSNs
+        //main2(args); //Test Dd vs A relationship for RSNs
+        main3(args); //Read Info from Embeded trees
     }
     
     public static void main0(String[] args) {
@@ -408,7 +410,7 @@ public class RsnStructure {
         System.exit(0);
     }
     
-     public static void main2(String[] args) {
+    public static void main2(String[] args) {
          
         hydroScalingAPI.util.probability.DiscreteDistribution myUD_I=new hydroScalingAPI.util.probability.GeometricDistribution(0.42,0);
         hydroScalingAPI.util.probability.DiscreteDistribution myUD_E=new hydroScalingAPI.util.probability.GeometricDistribution(0.49,1);
@@ -433,6 +435,30 @@ public class RsnStructure {
             if(upOrder[0][compLinks[i]]>2)System.out.println(i+" "+upAreas[0][compLinks[i]]+" "+upLength[0][compLinks[i]]+" "+upOrder[0][compLinks[i]]+" "+longLength[0][compLinks[i]]);
         }
         
+    }
+    
+    public static void main3(String[] args) {
+        
+        //java.io.File theFile=new java.io.File("/Users/ricardo/workFiles/PhD Thesis Results/E1I1/ord_4/Modified_RSN_result-SN_0.0.rsn.csv");
+        //java.io.File theFile=new java.io.File("/Users/ricardo/workFiles/PhD Thesis Results/E1I1/ord_4/RSN_result-SN_0.0.rsn.csv");
+        
+        //java.io.File theFile=new java.io.File("/Users/ricardo/workFiles/PhD Thesis Results/RSN_Data/ord_4/Modified_RSN_result-SN_14.0.rsn.csv");
+        java.io.File theFile=new java.io.File("/Users/ricardo/workFiles/PhD Thesis Results/RSN_Data/ord_4/RSN_result-SN_14.0.rsn.csv");
+
+        RsnStructure myRsnStruc=new RsnStructure(theFile);
+        
+        float[][] upAreas=myRsnStruc.getUpAreas();
+        float[][] upLength=myRsnStruc.getUpLength();
+        float[][] upOrder=myRsnStruc.getHortonOrders();
+        float[][] longLength=myRsnStruc.getLongestLength();
+        
+        int[] compLinks=myRsnStruc.getCompleteStreamLinksArray();
+        
+        for (int i=0;i<compLinks.length;i++){
+            System.out.println(i+" "+upAreas[0][compLinks[i]]+" "+upLength[0][compLinks[i]]+" "+upOrder[0][compLinks[i]]+" "+longLength[0][compLinks[i]]);
+        }
+        
+        System.exit(0);
     }
     
 }
