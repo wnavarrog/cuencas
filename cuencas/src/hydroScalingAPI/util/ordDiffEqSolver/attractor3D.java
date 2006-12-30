@@ -32,8 +32,7 @@ import java.rmi.RemoteException;
 
 /**
  *
- * @author  Ricardo Mantilla
- * @version 
+ * @author  Ricardo Mantilla 
  */
 public class attractor3D extends javax.swing.JFrame {
 

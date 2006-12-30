@@ -37,6 +37,10 @@ import javax.vecmath.*;
 
 import java.util.*;
 
+/**
+ *
+ * @author Ricardo Mantilla
+ */
 public class CuencasTwoDDisplayRendererJ3D extends CuencasDisplayRendererJ3D{
     
     private boolean boxMode;

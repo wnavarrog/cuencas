@@ -24,6 +24,10 @@ package hydroScalingAPI.modules.rainfallRunoffModel.objects;
 //import java.io.*;
 import visad.*;
 
+/**
+ *
+ * @author Peter Furey
+ */
 public class ChezyVelocities{
     
     // These lines assign names to objects but do not create them.

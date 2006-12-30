@@ -28,7 +28,7 @@ package hydroScalingAPI.tools;
 
 /**
  *
- * @author  furey
+ * @author  Peter Furey
  */
 public class Pair implements Comparable{
 

@@ -20,6 +20,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 package hydroScalingAPI.tools;
 
+/**
+ *
+ * @author Ricardo Mantilla
+ */
 public class Stats{
     
     public float meanValue=0.0f;

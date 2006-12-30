@@ -24,6 +24,10 @@ import visad.*;
 import visad.java2d.DisplayImplJ2D;
 import java.rmi.RemoteException;
 
+/**
+ *
+ * @author Ricardo Mantilla
+ */
 public class RasterPalettesManager extends javax.swing.JPanel {
     
     private visad.util.LabeledColorWidget myLabeledColorWidget;

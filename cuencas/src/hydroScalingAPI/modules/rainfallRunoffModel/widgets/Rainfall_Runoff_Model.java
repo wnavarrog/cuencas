@@ -29,7 +29,6 @@ package hydroScalingAPI.modules.rainfallRunoffModel.widgets;
 /**
  *
  * @author  Ricardo Mantilla
- * @version 
  */
 
 import visad.*;

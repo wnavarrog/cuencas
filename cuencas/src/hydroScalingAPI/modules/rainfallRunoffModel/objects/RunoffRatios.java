@@ -22,6 +22,10 @@ package hydroScalingAPI.modules.rainfallRunoffModel.objects;
 
 import java.io.*;
 
+/**
+ *
+ * @author Peter Furey
+ */
 public class RunoffRatios {
    
      //String source_dir="/home/furey/Data/walnut_ks/Sb_Whitewater/";

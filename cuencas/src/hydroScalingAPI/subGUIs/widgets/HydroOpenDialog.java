@@ -20,6 +20,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 package hydroScalingAPI.subGUIs.widgets;
 
+/**
+ *
+ * @author Ricardo Mantilla
+ */
 public class HydroOpenDialog extends javax.swing.JDialog {
     
     private int[] selectedSubMap;

@@ -20,6 +20,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 package hydroScalingAPI.tools;
 
+/**
+ *
+ * @author Ricardo Mantilla
+ */
 public abstract class DMSToDegrees{
     public static int LATITUDE=0;
     public static int LONGITUDE=1;
