@@ -30,13 +30,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 package hydroScalingAPI.examples.dataAnalysis;
 
-/**
- *
- * @author matt
- */
 import visad.*;
 import java.util.*;
 
+/**
+ *
+ * @author Matt Luck
+ */
 public class linkAddresses {
     
     private hydroScalingAPI.io.MetaRaster metaData;

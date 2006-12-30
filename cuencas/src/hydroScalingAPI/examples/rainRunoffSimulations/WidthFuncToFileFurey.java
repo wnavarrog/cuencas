@@ -35,6 +35,10 @@ package hydroScalingAPI.examples.rainRunoffSimulations;
 import visad.*;
 import java.io.*;
 
+/**
+ *
+ * @author Peter Furey
+ */
 public class WidthFuncToFileFurey extends java.lang.Object {
     
     private hydroScalingAPI.io.MetaRaster metaDatos;

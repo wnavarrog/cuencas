@@ -26,6 +26,10 @@ import geotransform.coords.*;
 import geotransform.ellipsoids.*;
 import geotransform.transforms.*;
 
+/**
+ *
+ * @author  Ricardo Mantilla
+ */
 public class conv_gdc_utm
 {
     static final int MAX_POINTS = 1; // total number of points

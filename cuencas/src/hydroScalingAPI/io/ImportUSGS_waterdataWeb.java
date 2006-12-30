@@ -24,18 +24,16 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * Created on July 7, 2003, 3:19 PM
  */
 
-/**
- *
- * @author  furey
- */
-
-
 package hydroScalingAPI.io;
 
 //import java.io.*;
 import java.util.StringTokenizer;
 import java.lang.Float;
 
+/**
+ *
+ * @author Peter Furey
+ */
 public class ImportUSGS_waterdataWeb {
    
     String output_dir="/hidrosigDataBases/Whitewater_database/Sites/Gauges/Streamflow/";

@@ -26,15 +26,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 package hydroScalingAPI.examples.rainRunoffSimulations;
 
-/**
- *
- * @author  john mobley
- * @version
- */
-
 import visad.*;
 import java.io.*;
 
+/**
+ *
+ * @author Ricardo Mantilla
+ */
 public class SimulationToMobleyFile extends java.lang.Object {
     
     private hydroScalingAPI.io.MetaRaster metaDatos;

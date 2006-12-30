@@ -27,17 +27,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.examples.rainRunoffSimulations;
 //package hydroScalingAPI.tools;
 
-/**
- *
- * @author  furey
- * @version 
- */
-
 import visad.*;
 import java.io.*;
 import java.util.Vector;
 import hydroScalingAPI.tools.*;
 
+/**
+ *
+ * @author Peter Furey
+ */
 public class WidthFuncToFileFurey_node extends java.lang.Object {
     
     private hydroScalingAPI.io.MetaRaster metaDatos;

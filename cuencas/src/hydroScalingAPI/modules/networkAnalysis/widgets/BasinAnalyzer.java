@@ -26,17 +26,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 package hydroScalingAPI.modules.networkAnalysis.widgets;
 
-/**
- *
- * @author  Ricardo Mantilla
- * @version
- */
-
 import visad.*;
 import visad.java3d.DisplayImplJ3D;
 import java.rmi.RemoteException;
 import java.awt.Font;
 
+/**
+ *
+ * @author  Ricardo Mantilla
+ */
 public class BasinAnalyzer extends javax.swing.JDialog{
     
     private float[] red;

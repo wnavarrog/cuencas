@@ -26,11 +26,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 package hydroScalingAPI.modules.rainfallRunoffModel.widgets;
 
-/**
- *
- * @author  Ricardo Mantilla
- */
-
 import visad.*;
 import visad.java2d.DisplayImplJ2D;
 import visad.java3d.DisplayImplJ3D;
@@ -38,6 +33,10 @@ import java.rmi.RemoteException;
 import java.awt.Font;
 
 
+/**
+ *
+ * @author Ricardo Mantilla
+ */
 public class Rainfall_Runoff_Model extends javax.swing.JDialog implements DisplayListener{
     
     private float[] red;

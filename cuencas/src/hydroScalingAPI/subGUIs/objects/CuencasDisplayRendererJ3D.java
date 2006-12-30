@@ -24,10 +24,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * Created on June 12, 2001, 5:04 PM
  */
 
-/**
- *
- * @author Ricardo Mantilla
- */
 package hydroScalingAPI.subGUIs.objects;
 
 import visad.*;
@@ -41,6 +37,10 @@ import javax.vecmath.*;
 
 import java.util.*;
 
+/**
+ *
+ * @author Ricardo Mantilla
+ */
 public class CuencasDisplayRendererJ3D extends visad.java3d.DefaultDisplayRendererJ3D{    
 
   private boolean boxMode;

@@ -26,14 +26,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 package hydroScalingAPI.examples.rainRunoffSimulations;
 
+import visad.*;
+
 /**
  *
  * @author Ricardo Mantilla
- * @version
  */
-
-import visad.*;
-
 public class RsnFlowSimulationToAsciiFile extends java.lang.Object {
     
     private hydroScalingAPI.io.MetaRaster metaDatos;
