@@ -27,7 +27,8 @@ package hydroScalingAPI.util.geomorphology.objects;
 public class Basin extends Object{
 
     private int[][] xyBasin;
-    private float[][] xyContour;
+    private int[][] xyContour;
+    private float[][] lonLatCountour;
     private int minX,maxX,minY,maxY;
     private float minZ,maxZ;
     private hydroScalingAPI.io.MetaRaster localMetaRaster;
@@ -125,7 +126,7 @@ public class Basin extends Object{
     public visad.Gridded2DSet getBasinDivide() throws visad.VisADException {
         
         visad.RealTupleType domain=new visad.RealTupleType(visad.RealType.Longitude,visad.RealType.Latitude);
-        visad.Gridded2DSet basinCountour=new visad.Gridded2DSet(domain,xyContour,xyContour[0].length);
+        visad.Gridded2DSet basinCountour=new visad.Gridded2DSet(domain,lonLatCountour,lonLatCountour[0].length);
         
         return basinCountour;
     }
@@ -134,47 +135,47 @@ public class Basin extends Object{
         
         float shapeF=1;
         
-        float[][] xyContourMeters=new float[2][xyContour[0].length];
+        float[][] lonLatCountourMeters=new float[2][lonLatCountour[0].length];
         
         geotransform.coords.Gdc_Coord_3d gdc = new geotransform.coords.Gdc_Coord_3d();
         geotransform.coords.Utm_Coord_3d utm = new geotransform.coords.Utm_Coord_3d();
-        utm.zone=(byte)(4/27.0*xyContour[1][0]+28.666);
+        utm.zone=(byte)(4/27.0*lonLatCountour[1][0]+28.666);
         utm.z=0;
         utm.hemisphere_north=true;
 
         geotransform.transforms.Gdc_To_Utm_Converter.Init(new geotransform.ellipsoids.CD_Ellipsoid());
         
-        for(int i=0;i<xyContour[0].length;i++){
+        for(int i=0;i<lonLatCountour[0].length;i++){
         
-            gdc.longitude=xyContour[0][i];
-            gdc.latitude=xyContour[1][i];
+            gdc.longitude=lonLatCountour[0][i];
+            gdc.latitude=lonLatCountour[1][i];
 
             geotransform.transforms.Gdc_To_Utm_Converter.Convert(gdc,utm);
             
-            xyContourMeters[0][i]=(float)utm.x;
-            xyContourMeters[1][i]=(float)utm.y;
+            lonLatCountourMeters[0][i]=(float)utm.x;
+            lonLatCountourMeters[1][i]=(float)utm.y;
 
             
         }
         
         float dm=Float.MIN_VALUE; int llPos=0;
-        for(int i=0;i<xyContourMeters[0].length;i++){
-            float ddd=distancePoints(xyContourMeters[0][0], xyContourMeters[1][0], xyContourMeters[0][i], xyContourMeters[1][i]);
+        for(int i=0;i<lonLatCountourMeters[0].length;i++){
+            float ddd=distancePoints(lonLatCountourMeters[0][0], lonLatCountourMeters[1][0], lonLatCountourMeters[0][i], lonLatCountourMeters[1][i]);
             if(ddd > dm) {
                 dm=ddd;
                 llPos=i;
             }
         }
         float dm1=Float.MIN_VALUE,dm2=Float.MIN_VALUE, dAl=Float.MIN_VALUE;
-        for(int i=llPos+1;i<xyContourMeters[0].length;i++){
-            dm1=distancePoints(xyContourMeters[0][llPos], xyContourMeters[1][llPos], xyContourMeters[0][i], xyContourMeters[1][i]);
-            dm2=distancePoints(xyContourMeters[0][llPos], xyContourMeters[0][llPos], xyContourMeters[0][i], xyContourMeters[0][i]);
+        for(int i=llPos+1;i<lonLatCountourMeters[0].length;i++){
+            dm1=distancePoints(lonLatCountourMeters[0][llPos], lonLatCountourMeters[1][llPos], lonLatCountourMeters[0][i], lonLatCountourMeters[1][i]);
+            dm2=distancePoints(lonLatCountourMeters[0][llPos], lonLatCountourMeters[0][llPos], lonLatCountourMeters[0][i], lonLatCountourMeters[0][i]);
             dAl=Math.max(dm1*dm2/(float)Math.sqrt(dm1*dm1+dm2*dm2),dAl);
         }
         float dAr=Float.MIN_VALUE;
         for(int i=1;i<llPos;i++){
-            dm1=distancePoints(xyContourMeters[0][0], xyContourMeters[1][0], xyContourMeters[0][i], xyContourMeters[1][i]);
-            dm2=distancePoints(xyContourMeters[0][0], xyContourMeters[0][0], xyContourMeters[0][i], xyContourMeters[0][i]);
+            dm1=distancePoints(lonLatCountourMeters[0][0], lonLatCountourMeters[1][0], lonLatCountourMeters[0][i], lonLatCountourMeters[1][i]);
+            dm2=distancePoints(lonLatCountourMeters[0][0], lonLatCountourMeters[0][0], lonLatCountourMeters[0][i], lonLatCountourMeters[0][i]);
             dAr=Math.max(dm1*dm2/(float)Math.sqrt(dm1*dm1+dm2*dm2),dAr);
         }
         shapeF=dm/(dAr+dAl);
@@ -186,8 +187,12 @@ public class Basin extends Object{
         return (float)Math.sqrt(Math.pow(X0-X1,2)+Math.pow(Y0-Y1,2));
     }
     
-    public float[][] getLonLatBasinDivide(){
+    public int[][] getXYBasinDivide(){
         return xyContour;
+    }
+    
+    public float[][] getLonLatBasinDivide(){
+        return lonLatCountour;
     }
     
     public visad.RealTuple getOutletTuple() throws visad.VisADException, java.rmi.RemoteException{
@@ -287,12 +292,14 @@ public class Basin extends Object{
         
         idsContorno.add(idsContorno.firstElement());
         
-        xyContour=new float[2][idsContorno.size()];
-        
+        lonLatCountour=new float[2][idsContorno.size()];
+        xyContour=new int[2][idsContorno.size()];
         for (int k=0; k <idsContorno.size(); k++){
             int[] xys=(int[]) idsContorno.elementAt(k);
-            xyContour[0][k]=(float) ((xys[0]+minX-2)*localMetaRaster.getResLon()/3600.0f+localMetaRaster.getMinLon());
-            xyContour[1][k]=(float) ((xys[1]+minY-2)*localMetaRaster.getResLat()/3600.0f+localMetaRaster.getMinLat());
+            xyContour[0][k]=xys[0]+minX-2;
+            xyContour[1][k]=xys[1]+minY-2;
+            lonLatCountour[0][k]=(float) ((xys[0]+minX-2)*localMetaRaster.getResLon()/3600.0f+localMetaRaster.getMinLon());
+            lonLatCountour[1][k]=(float) ((xys[1]+minY-2)*localMetaRaster.getResLat()/3600.0f+localMetaRaster.getMinLat());
         }
     }
     
