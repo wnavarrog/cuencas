@@ -27,7 +27,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.examples.artifitialFields;
 
 /**
- *
+ * This class creates files that are appropriate as infiltration maps for a
+ * rainfall runoff simulation.
  * @author Ricardo Mantilla
  */
 public class createInfiltrationMap {
@@ -121,6 +122,10 @@ public class createInfiltrationMap {
         
     }
     
+    /**
+     * Writes a metafile with the information needed for the infiltration map created
+     * using information from an external program.
+     */
     public void createMetaFile(java.io.File directory, String newMetaName, hydroScalingAPI.io.MetaRaster originalMeta) {
           try{          
               java.io.File saveFile=new java.io.File(directory.getPath()+java.io.File.separator+newMetaName+".metaVHC");
@@ -159,7 +164,7 @@ public class createInfiltrationMap {
               writer.println("mm/h");
               writer.println(""); 
               writer.println("[Information]");
-              writer.println("Infiltration map desicgned to conserve mass from events");
+              writer.println("Infiltration map designed to conserve mass from events");
               writer.close();
          } catch (java.io.IOException bs) {
              System.out.println("Error composing metafile: "+bs);
@@ -168,7 +173,8 @@ public class createInfiltrationMap {
      }
     
     /**
-     * @param args the command line arguments
+     * Executes the program
+     * @param args The programs takes no arguments
      */
     public static void main(String[] args) {
         try{
