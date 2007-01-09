@@ -100,6 +100,33 @@ public class DemViewer2D extends hydroScalingAPI.subGUIs.widgets.RasterViewer im
         display.enableEvent(visad.DisplayEvent.MOUSE_MOVED);
         display.addDisplayListener(this);
         
+        display.getComponent().addMouseWheelListener(new java.awt.event.MouseWheelListener() {
+            public void mouseWheelMoved(java.awt.event.MouseWheelEvent e) {
+                int rot = e.getWheelRotation();
+                try{
+                    visad.ProjectionControl pControl = display.getProjectionControl();
+                    double[] pControlMatrix = pControl.getMatrix();
+                    if (pControlMatrix.length > 10){
+                        // Zoom in
+                        if (rot < 0){
+                            pControlMatrix[0] = pControlMatrix[0]*1.1f;
+                            pControlMatrix[5] = pControlMatrix[5]*1.1f;
+                            pControlMatrix[10] = pControlMatrix[10]*1.1f;
+                        }
+                        // Zoom out
+                        if (rot > 0){
+                            pControlMatrix[0] = pControlMatrix[0]*0.9f;
+                            pControlMatrix[5] = pControlMatrix[5]*0.9f;
+                            pControlMatrix[10] = pControlMatrix[10]*0.9f; }
+                    }
+                    pControl.setMatrix(pControlMatrix);
+                    pControl.saveProjection();
+                } catch (java.rmi.RemoteException re) {} catch (visad.VisADException ve) {}
+            }
+        });
+
+        
+        
         this.getContentPane().add("Center",display.getComponent());
         
         hydroScalingAPI.subGUIs.widgets.RasterPalettesManager availablePalettes=new hydroScalingAPI.subGUIs.widgets.RasterPalettesManager(colorScaleMap);
