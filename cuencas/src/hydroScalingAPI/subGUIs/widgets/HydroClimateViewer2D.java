@@ -79,6 +79,31 @@ public class HydroClimateViewer2D  extends hydroScalingAPI.subGUIs.widgets.Raste
         display.enableEvent(visad.DisplayEvent.MOUSE_MOVED);
         display.addDisplayListener(this);
         
+        display.getComponent().addMouseWheelListener(new java.awt.event.MouseWheelListener() {
+            public void mouseWheelMoved(java.awt.event.MouseWheelEvent e) {
+                int rot = e.getWheelRotation();
+                try{
+                    visad.ProjectionControl pControl = display.getProjectionControl();
+                    double[] pControlMatrix = pControl.getMatrix();
+                    if (pControlMatrix.length > 10){
+                        // Zoom in
+                        if (rot < 0){
+                            pControlMatrix[0] = pControlMatrix[0]*1.1f;
+                            pControlMatrix[5] = pControlMatrix[5]*1.1f;
+                            pControlMatrix[10] = pControlMatrix[10]*1.1f;
+                        }
+                        // Zoom out
+                        if (rot > 0){
+                            pControlMatrix[0] = pControlMatrix[0]*0.9f;
+                            pControlMatrix[5] = pControlMatrix[5]*0.9f;
+                            pControlMatrix[10] = pControlMatrix[10]*0.9f; }
+                    }
+                    pControl.setMatrix(pControlMatrix);
+                    pControl.saveProjection();
+                } catch (java.rmi.RemoteException re) {} catch (visad.VisADException ve) {}
+            }
+        });
+        
         this.getContentPane().add("Center",display.getComponent());
         
         super.refreshReferences(mainFrame.nameOnGauges(),mainFrame.nameOnLocations());
@@ -136,7 +161,10 @@ public class HydroClimateViewer2D  extends hydroScalingAPI.subGUIs.widgets.Raste
                 setLongitudeLabel(hydroScalingAPI.tools.DegreesToDMS.getprettyString(resultX,1)+" ["+MatX+"]");
                 setLatitudeLabel(hydroScalingAPI.tools.DegreesToDMS.getprettyString(resultY,0)+" ["+MatY+"]");
                 visad.RealTuple spotValue=(visad.RealTuple) localField.evaluate(new visad.RealTuple(domain, new double[] {resultX,resultY}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
-                setValueLabel(""+spotValue.getValues()[0]);
+                if(metaData.getUnits().equalsIgnoreCase("categories"))
+                    setValueLabel(spotValue.getValues()[0]+"-"+metaData.getCategory(""+(int)spotValue.getValues()[0]));
+                else
+                    setValueLabel(""+spotValue.getValues()[0]);
             }
             
         } catch (Exception e) {

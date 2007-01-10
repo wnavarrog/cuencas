@@ -171,6 +171,8 @@ public class MetaRaster{
                 java.util.StringTokenizer tokens=new java.util.StringTokenizer(fullLine,":");
                 if (tokens.countTokens()>1){
                     categories.put(tokens.nextToken(),tokens.nextToken());
+                } else {
+                    categories.put(tokens.nextToken(),"Unknown");
                 }
             }
         }
