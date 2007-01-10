@@ -426,6 +426,7 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         importHydroFromGRASS = new javax.swing.JMenuItem();
         importHydroFromGRID = new javax.swing.JMenuItem();
         importHydroFromNetCDF = new javax.swing.JMenuItem();
+        importHydroFromBIL_USGS = new javax.swing.JMenuItem();
         importSites = new javax.swing.JMenu();
         importSitesFromGazetteer = new javax.swing.JMenuItem();
         importSitesFromMapSourceAscii = new javax.swing.JMenuItem();
@@ -958,7 +959,7 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         importDEM.add(importDemFromGRID);
 
         importDemFromBIL_USGS.setFont(new java.awt.Font("Dialog", 0, 10));
-        importDemFromBIL_USGS.setText("From USGS BIL (30m DEMs)");
+        importDemFromBIL_USGS.setText("From USGS BIL Format");
         importDemFromBIL_USGS.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 importDemFromBIL_USGSActionPerformed(evt);
@@ -969,6 +970,12 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
 
         importDemFromUSGS.setFont(new java.awt.Font("Verdana", 0, 10));
         importDemFromUSGS.setText("From USGS website (90m DEMs)");
+        importDemFromUSGS.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                importDemFromUSGSActionPerformed(evt);
+            }
+        });
+
         importDEM.add(importDemFromUSGS);
 
         importDemFromSRTM.setFont(new java.awt.Font("Verdana", 0, 10));
@@ -996,6 +1003,16 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         importHydroFromNetCDF.setFont(new java.awt.Font("Verdana", 0, 10));
         importHydroFromNetCDF.setText("From NetCDF File");
         importHydro.add(importHydroFromNetCDF);
+
+        importHydroFromBIL_USGS.setFont(new java.awt.Font("Dialog", 0, 10));
+        importHydroFromBIL_USGS.setText("From USGS BIL Format");
+        importHydroFromBIL_USGS.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                importHydroFromBIL_USGSActionPerformed(evt);
+            }
+        });
+
+        importHydro.add(importHydroFromBIL_USGS);
 
         jMenuImport.add(importHydro);
 
@@ -1222,6 +1239,35 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void importDemFromUSGSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importDemFromUSGSActionPerformed
+// TODO add your handling code here:
+    }//GEN-LAST:event_importDemFromUSGSActionPerformed
+
+    private void importHydroFromBIL_USGSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importHydroFromBIL_USGSActionPerformed
+        javax.swing.JFileChooser fcI=new javax.swing.JFileChooser();
+        fcI.setFileSelectionMode(fcI.DIRECTORIES_ONLY);
+        fcI.setDialogTitle("BIL Directory Structure");
+        int result=fcI.showDialog(this,"Select");
+        java.io.File dirInput = fcI.getSelectedFile();
+        if (result == javax.swing.JFileChooser.CANCEL_OPTION) return;
+        
+        javax.swing.JFileChooser fcO=new javax.swing.JFileChooser(localInfoManager.dataBaseRastersHydPath);
+        fcO.setFileSelectionMode(fcO.DIRECTORIES_ONLY);
+        fcO.setDialogTitle("Output Directory");
+        result = fcO.showDialog(this,"Select");
+        
+        java.io.File dirOutput = fcO.getSelectedFile();
+        if (result == javax.swing.JFileChooser.CANCEL_OPTION) return;
+        
+        try{
+            new hydroScalingAPI.io.BilToHSJ(dirInput,dirOutput,1);
+            setUpGUI(true);
+        }catch(java.io.IOException ioe){
+            System.err.println("Failed during BIL file import");
+            System.err.println(ioe);
+        }
+    }//GEN-LAST:event_importHydroFromBIL_USGSActionPerformed
+
     private void licenseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_licenseActionPerformed
         new hydroScalingAPI.mainGUI.widgets.License(this).setVisible(true);
     }//GEN-LAST:event_licenseActionPerformed
@@ -1406,7 +1452,7 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         if (result == javax.swing.JFileChooser.CANCEL_OPTION) return;
         
         try{
-            new hydroScalingAPI.io.BilToHSJ(dirInput,new java.io.File(dirOutput.getPath()+"/"+dirInput.getName()+".metaDEM"));
+            new hydroScalingAPI.io.BilToHSJ(dirInput,dirOutput,0);
             setUpGUI(true);
         }catch(java.io.IOException ioe){
             System.err.println("Failed during BIL file import");
@@ -1703,6 +1749,7 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
     private javax.swing.JMenuItem importDemFromUSGS;
     private javax.swing.JButton importDlgFile;
     private javax.swing.JMenu importHydro;
+    private javax.swing.JMenuItem importHydroFromBIL_USGS;
     private javax.swing.JMenuItem importHydroFromGRASS;
     private javax.swing.JMenuItem importHydroFromGRID;
     private javax.swing.JMenuItem importHydroFromNetCDF;

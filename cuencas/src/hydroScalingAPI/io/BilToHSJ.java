@@ -42,9 +42,9 @@ public class BilToHSJ {
                                     "[Units]",
                                     "[Information]"
                                 };
-    
+    private  String[][]       extensionPairs = {{"dem","metaDEM"},{"vhc","metaVHC"}};
     /** Creates a new instance of BillToHSJ */
-    public BilToHSJ(java.io.File inputDirectory, java.io.File outputFile) throws java.io.IOException {
+    public BilToHSJ(java.io.File inputDirectory, java.io.File outputDirectory,int type) throws java.io.IOException {
         
         if(!checkDirectoryContents(inputDirectory)) return;
         
@@ -105,12 +105,20 @@ public class BilToHSJ {
         geoBuffer.close();
         headerBuffer.close();
         
-        java.io.BufferedWriter metaBuffer = new java.io.BufferedWriter(new java.io.FileWriter(outputFile));
-        String rasterPath= outputFile.getPath().substring(0,outputFile.getPath().lastIndexOf(".metaDEM"))+".dem";
-        java.io.DataOutputStream rasterBuffer = new java.io.DataOutputStream(new java.io.BufferedOutputStream(new java.io.FileOutputStream(new java.io.File(rasterPath))));
+        String fileBinSalida=outputDirectory.getPath()+"/"+inputDirectory.getName()+"."+extensionPairs[type][0];
+        String fileAscSalida=outputDirectory.getPath()+"/"+inputDirectory.getName()+"."+extensionPairs[type][1];
+        
+        java.io.File outputMetaFile=new java.io.File(fileAscSalida);
+        java.io.File outputBinaryFile=new java.io.File(fileBinSalida);
+        
+        java.io.BufferedWriter metaBuffer = new java.io.BufferedWriter(new java.io.FileWriter(outputMetaFile));
+        java.io.DataOutputStream rasterBuffer = new java.io.DataOutputStream(new java.io.BufferedOutputStream(new java.io.FileOutputStream(outputBinaryFile)));
         
         metaBuffer.write(parameters[0]+"\n");
-        metaBuffer.write("DEM from The National Map Seamless Data Distribution System"+"\n");
+        if(type == 0)
+            metaBuffer.write("DEM from The National Map Seamless Data Distribution System"+"\n"); 
+        else
+            metaBuffer.write("Data from The National Map Seamless Data Distribution System"+"\n"); 
         metaBuffer.write("\n");
         metaBuffer.write(parameters[1]+"\n");
         metaBuffer.write(minLatStr+"\n");
@@ -143,7 +151,10 @@ public class BilToHSJ {
         metaBuffer.write("m"+"\n");
         metaBuffer.write("\n");
         metaBuffer.write(parameters[11]+"\n");
-        metaBuffer.write("This DEM comes from the USGS DEMs database."+"\n");
+        if(type == 0)
+            metaBuffer.write("This DEM comes from the USGS DEMs database."+"\n");
+        else
+            metaBuffer.write("This Data comes from the USGS DEMs database."+"\n"); 
         metaBuffer.write("\n");
         
         metaBuffer.close();
@@ -184,7 +195,8 @@ public class BilToHSJ {
      */
     public static void main(String[] args) {
         try{
-            new hydroScalingAPI.io.BilToHSJ(new java.io.File("/home/furey/basin1/25941066"),new java.io.File("/tmp/25941066.metaDEM"));
+            new hydroScalingAPI.io.BilToHSJ(new java.io.File("/home/furey/basin1/25941066"),
+                                            new java.io.File("/tmp/25941066.metaDEM"),0);
         }catch(java.io.IOException ioe){
             System.err.println("error");
             ioe.printStackTrace();

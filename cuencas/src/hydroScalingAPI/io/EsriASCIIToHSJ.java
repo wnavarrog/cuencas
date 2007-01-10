@@ -168,8 +168,8 @@ public class EsriASCIIToHSJ extends Object {
     public static void main(String args[]) {
         
         try {
-            new EsriASCIIToHSJ(new java.io.File("/home/matt/demtest/dem48states-1km.asc"),
-            new java.io.File("/home/matt/demtest/"),0);
+            new EsriASCIIToHSJ( new java.io.File("/home/matt/demtest/dem48states-1km.asc"),
+                                new java.io.File("/home/matt/demtest/"),0);
             
         } catch (Exception IOE){
             System.out.print(IOE);
