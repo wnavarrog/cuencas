@@ -295,16 +295,17 @@ public class NetworkExtractionModule implements Runnable {
         
         if(taskGEO){
             if(!archPro){
+                GetGeomorphologyRAM.getDistanceToBorder(this);
+                System.gc();
                 GetGeomorphologyRAM.getGEO(this);
                 writeGEO(metaDEM.getLocationBinaryFile());
-                GetGeomorphologyRAM.getDistanceToBorder(this);
                 GetGeomorphologyRAM.getRedVect(this);
             }else{
                 if (printDebug) System.out.println(">>> Calculating Geormorphology - ROM based Algorithm");
-                new hydroScalingAPI.modules.networkExtraction.objects.GetGeomorphologyROM(metaDEM);
-                System.gc();
-                
                 GetGeomorphologyRAM.getDistanceToBorder(this);
+                System.gc();
+                new hydroScalingAPI.modules.networkExtraction.objects.GetGeomorphologyROM(metaDEM);
+                
                 
                 if (printDebug) System.out.println(">>> Geormorphology Completed");
                 GetGeomorphologyRAM.getRedVect(this);
