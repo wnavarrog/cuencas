@@ -1449,18 +1449,15 @@ public abstract class RasterViewer extends javax.swing.JInternalFrame {
     private void zoomOutDisplayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_zoomOutDisplayActionPerformed
         try{
             visad.ProjectionControl pc = display.getProjectionControl();
-            double[] val=pc.getMatrix();
-            if(val[0] > 0.5){
-                val[0]*=0.5;
-                val[5]*=0.5;
-                
-                visad.VisADRay rayLR = dr.getMouseBehavior().findRay(this.getContentPane().getWidth()/2, (this.getContentPane().getHeight()-toolsPanel.getHeight()-layersPanel.getHeight())/2);
+            double[] scaleMatrix = dr.getMouseBehavior().make_matrix(0.0, 0.0, 0.0,
+                                                                     0.5, 0.5, 0.5,
+                                                                     0.0, 0.0, 0.0);
+            double[] currentMatrix = pc.getMatrix();
+            scaleMatrix = dr.getMouseBehavior().multiply_matrix(scaleMatrix,currentMatrix);
 
-                val[3]=-rayLR.position[0]*val[0];     //final X position
-                val[7]=-rayLR.position[1]*val[3];     //final Y position
+            
 
-                pc.setMatrix(val);
-            }
+            pc.setMatrix(scaleMatrix);
         } catch (visad.VisADException v){
             System.err.println(v);
         } catch (java.rmi.RemoteException r){
@@ -1471,22 +1468,16 @@ public abstract class RasterViewer extends javax.swing.JInternalFrame {
     private void zoomInDisplayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_zoomInDisplayActionPerformed
         try{
             
-            java.text.NumberFormat number4 = java.text.NumberFormat.getNumberInstance();
-            java.text.DecimalFormat dpoint4 = (java.text.DecimalFormat)number4;
-            dpoint4.applyPattern("0.00000");
-            
             visad.ProjectionControl pc = display.getProjectionControl();
-            double[] val=pc.getMatrix();
+            double[] scaleMatrix = dr.getMouseBehavior().make_matrix(0.0, 0.0, 0.0,
+                                                                     2.0, 2.0, 2.0,
+                                                                     0.0, 0.0, 0.0);
+            double[] currentMatrix = pc.getMatrix();
+            scaleMatrix = dr.getMouseBehavior().multiply_matrix(scaleMatrix,currentMatrix);
+
             
-            val[0]*=2;
-            val[5]*=2;
 
-            visad.VisADRay rayLR = dr.getMouseBehavior().findRay(this.getContentPane().getWidth()/2, (this.getContentPane().getHeight()-toolsPanel.getHeight()-layersPanel.getHeight())/2);
-
-            val[3]=-rayLR.position[0]*val[0];     //final X position
-            val[7]=-rayLR.position[1]*val[3];     //final Y position*/
-
-            pc.setMatrix(val);
+            pc.setMatrix(scaleMatrix);
         } catch (visad.VisADException v){
             System.err.println(v);
         } catch (java.rmi.RemoteException r){

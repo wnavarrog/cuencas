@@ -42,7 +42,7 @@ public class HydroClimateViewer2D  extends hydroScalingAPI.subGUIs.widgets.Raste
         setTitle(metaData.toString());
         localField=metaData.getField();
         
-        dr=new  hydroScalingAPI.subGUIs.objects.CuencasTwoDDisplayRendererJ3D();
+        dr=new visad.java3d.TwoDDisplayRendererJ3D();
         display = new visad.java3d.DisplayImplJ3D("disp",dr);
         
         visad.GraphicsModeControl dispGMC = (visad.GraphicsModeControl) display.getGraphicsModeControl();
@@ -83,23 +83,25 @@ public class HydroClimateViewer2D  extends hydroScalingAPI.subGUIs.widgets.Raste
             public void mouseWheelMoved(java.awt.event.MouseWheelEvent e) {
                 int rot = e.getWheelRotation();
                 try{
-                    visad.ProjectionControl pControl = display.getProjectionControl();
-                    double[] pControlMatrix = pControl.getMatrix();
-                    if (pControlMatrix.length > 10){
-                        // Zoom in
-                        if (rot < 0){
-                            pControlMatrix[0] = pControlMatrix[0]*1.1f;
-                            pControlMatrix[5] = pControlMatrix[5]*1.1f;
-                            pControlMatrix[10] = pControlMatrix[10]*1.1f;
-                        }
-                        // Zoom out
-                        if (rot > 0){
-                            pControlMatrix[0] = pControlMatrix[0]*0.9f;
-                            pControlMatrix[5] = pControlMatrix[5]*0.9f;
-                            pControlMatrix[10] = pControlMatrix[10]*0.9f; }
+                    visad.ProjectionControl pc = display.getProjectionControl();
+                    double[] scaleMatrix = dr.getMouseBehavior().make_matrix(0.0, 0.0, 0.0,
+                            1.0, 1.0, 1.0,
+                            0.0, 0.0, 0.0);
+                    double[] currentMatrix = pc.getMatrix();
+                    // Zoom in
+                    if (rot < 0){
+                        scaleMatrix = dr.getMouseBehavior().make_matrix(0.0, 0.0, 0.0,
+                                                                        1.1, 1.1, 1.1,
+                                                                        0.0, 0.0, 0.0);
                     }
-                    pControl.setMatrix(pControlMatrix);
-                    pControl.saveProjection();
+                    // Zoom out
+                    if (rot > 0){
+                        scaleMatrix = dr.getMouseBehavior().make_matrix(0.0, 0.0, 0.0,
+                                                                        0.9, 0.9, 0.9,
+                                                                        0.0, 0.0, 0.0);
+                    }
+                    scaleMatrix = dr.getMouseBehavior().multiply_matrix(scaleMatrix,currentMatrix);
+                    pc.setMatrix(scaleMatrix);
                 } catch (java.rmi.RemoteException re) {} catch (visad.VisADException ve) {}
             }
         });
