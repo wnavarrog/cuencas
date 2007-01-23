@@ -272,6 +272,9 @@
                         </Property>
                         <Property name="text" type="java.lang.String" value="To ARC-INFO Grid File"/>
                       </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="exportDemToGRIDActionPerformed"/>
+                      </Events>
                     </MenuItem>
                   </SubComponents>
                 </Menu>
@@ -298,6 +301,9 @@
                         </Property>
                         <Property name="text" type="java.lang.String" value="To ARC-INFO Grid File"/>
                       </Properties>
+                      <Events>
+                        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="exportHydroToGRIDActionPerformed"/>
+                      </Events>
                     </MenuItem>
                     <MenuItem class="javax.swing.JMenuItem" name="exportHydroToNetCDF">
                       <Properties>

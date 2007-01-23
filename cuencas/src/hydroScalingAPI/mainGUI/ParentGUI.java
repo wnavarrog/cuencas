@@ -1,21 +1,21 @@
 /*
 CUENCAS is a River Network Oriented GIS
 Copyright (C) 2005  Ricardo Mantilla
-
+ 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
 as published by the Free Software Foundation; either version 2
 of the License, or (at your option) any later version.
-
+ 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
-
+ 
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
+ */
 
 
 /*
@@ -29,10 +29,10 @@ package hydroScalingAPI.mainGUI;
 /**
  *
  * @author  Ricardo Mantilla
-*/
+ */
 
 public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.InternalFrameListener{
-
+    
     private java.util.Hashtable openWindows=new java.util.Hashtable();
     private java.util.Hashtable openWindowsMenusVector=new java.util.Hashtable();
     private java.util.Vector openWindowsIdentifiers=new java.util.Vector();
@@ -53,20 +53,20 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         initComponents();
         setUpGUI(false);
     }
-
+    
     public void setUpGUI(boolean justUpdate){
-       
+        
         if(!justUpdate){
             /*GUI Size*/
             setBounds(  localInfoManager.gui_Xpos,
-                        localInfoManager.gui_Ypos,
-                        localInfoManager.gui_Xsize,
-                        localInfoManager.gui_Ysize);
+                    localInfoManager.gui_Ypos,
+                    localInfoManager.gui_Xsize,
+                    localInfoManager.gui_Ysize);
             splitPane.setDividerLocation(250);
-
+            
             /*Bulilds the recent files and recent DB menus*/
             bulidRecentFilesMenu();
-
+            
             /*Removes leftovers from previously loaded databases*/
             activeGaugesContainer.setListData(new java.util.Vector());
             activeLocationsContainer.setListData(new java.util.Vector());
@@ -75,10 +75,10 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         /*JTrees for Raster data - Topography and Hydrology*/
         javax.swing.tree.DefaultMutableTreeNode topoTreeModel=new javax.swing.tree.DefaultMutableTreeNode("Elevation Maps");
         topoTree.setModel(new javax.swing.tree.DefaultTreeModel(topoTreeModel));
-
+        
         javax.swing.tree.DefaultMutableTreeNode hydroTreeModel=new javax.swing.tree.DefaultMutableTreeNode("Hydrological Fields");
         hydroTree.setModel(new javax.swing.tree.DefaultTreeModel(hydroTreeModel));
-
+        
         /*If a Data Base exists use it to complete the interface*/
         if (localInfoManager.dataBaseExists){
             
@@ -92,11 +92,11 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
             if (localInfoManager.dataBaseRastersHydExists){
                 new hydroScalingAPI.mainGUI.objects.BuildFilesTree(hydroTreeModel,localInfoManager.dataBaseRastersHydPath,new hydroScalingAPI.util.fileUtilities.DotFilter("metaVHC")).start();
             }
-
+            
             if(!justUpdate){
                 /*Strats up the DataBase Engine*/
                 localDatabaseEngine=new hydroScalingAPI.util.database.DataBaseEngine();
-
+                
                 /*Gauges and Locations*/
                 GaugesPanelEnabled(false);
                 if (localInfoManager.dataBaseSitesGaugesExists){
@@ -105,7 +105,7 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
                 } else {
                     localGaugesManager=null;
                 }
-
+                
                 LocationsPanelEnabled(false);
                 if (localInfoManager.dataBaseSitesLocationsExists){
                     localLocationsManager=new hydroScalingAPI.mainGUI.objects.LocationsManager(localInfoManager,localDatabaseEngine);
@@ -123,7 +123,7 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
             } else {
                 localLocationsManager=null;
             }
-
+            
             /*Polygons*/
             polygonContainer.removeAll();
             if (localInfoManager.dataBasePolygonsExists){
@@ -150,7 +150,7 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
                     showPolygonActionPerformed(evt);
                 }
             });
-
+            
             polygonContainer.add(showPolyFile);
         }
         
@@ -170,7 +170,7 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
                     showVectorActionPerformed(evt);
                 }
             });
-
+            
             shapesContainer.add(showShapeFile);
         }
         
@@ -186,71 +186,71 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
                     showVectorActionPerformed(evt);
                 }
             });
-
+            
             dlgsContainer.add(showDlgFile);
         }
         
     }
     
     private void bulidRecentFilesMenu(){
-
+        
         if (localInfoManager.recentFiles.size() >0){
             jMenuRecentFiles.removeAll();
             for (int i=0;i<localInfoManager.recentFiles.size();i++){
-                javax.swing.JMenuItem fileElement = new javax.swing.JMenuItem ();
-                fileElement.setFont (new java.awt.Font ("Dialog", 0, 10));
-                fileElement.setText (i+". "+((java.io.File) localInfoManager.recentFiles.elementAt(i)).getName());
-                fileElement.addActionListener (new java.awt.event.ActionListener () {
-                    public void actionPerformed (java.awt.event.ActionEvent evt) {
+                javax.swing.JMenuItem fileElement = new javax.swing.JMenuItem();
+                fileElement.setFont(new java.awt.Font("Dialog", 0, 10));
+                fileElement.setText(i+". "+((java.io.File) localInfoManager.recentFiles.elementAt(i)).getName());
+                fileElement.addActionListener(new java.awt.event.ActionListener() {
+                    public void actionPerformed(java.awt.event.ActionEvent evt) {
                         openRecentFile(evt);
                     }
                 }
                 );
-
-                jMenuRecentFiles.add (fileElement);
+                
+                jMenuRecentFiles.add(fileElement);
             }
         }
         
         if (localInfoManager.recentDataBases.size() > 0){
             jMenuRecentDB.removeAll();
             for (int i=0;i<localInfoManager.recentDataBases.size();i++){
-                javax.swing.JMenuItem fileElement = new javax.swing.JMenuItem ();
-                fileElement.setFont (new java.awt.Font ("Dialog", 0, 10));
-                fileElement.setText (i+". "+((java.io.File) localInfoManager.recentDataBases.elementAt(i)).getName());
-                fileElement.addActionListener (new java.awt.event.ActionListener () {
-                    public void actionPerformed (java.awt.event.ActionEvent evt) {
+                javax.swing.JMenuItem fileElement = new javax.swing.JMenuItem();
+                fileElement.setFont(new java.awt.Font("Dialog", 0, 10));
+                fileElement.setText(i+". "+((java.io.File) localInfoManager.recentDataBases.elementAt(i)).getName());
+                fileElement.addActionListener(new java.awt.event.ActionListener() {
+                    public void actionPerformed(java.awt.event.ActionEvent evt) {
                         openRecentDataBase(evt);
                     }
                 }
                 );
-
-                jMenuRecentDB.add (fileElement);
+                
+                jMenuRecentDB.add(fileElement);
             }
         }
     }
     
     private void addToRecentFiles(java.io.File fileToAdd){
         
-        if (localInfoManager.recentFiles.size() > 10 ) 
+        if (localInfoManager.recentFiles.size() > 10 )
             localInfoManager.recentFiles.remove(localInfoManager.recentFiles.lastElement());
         
         if(localInfoManager.recentFiles.contains(fileToAdd))
             localInfoManager.recentFiles.removeElement(fileToAdd);
-
+        
         localInfoManager.recentFiles.add(0,fileToAdd);
         
         bulidRecentFilesMenu();
-
+        
     }
     
     private void addToRecentDatabases(java.io.File fileToAdd){
         
-        if (localInfoManager.recentDataBases.size() > 10 ) 
+        if (localInfoManager.recentDataBases.size() > 10 )
             localInfoManager.recentDataBases.remove(localInfoManager.recentDataBases.lastElement());
         
         if(localInfoManager.recentDataBases.contains(fileToAdd))
             localInfoManager.recentDataBases.removeElement(fileToAdd);
-
+        
         localInfoManager.recentDataBases.add(0,fileToAdd);
         
     }
@@ -310,7 +310,7 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         }
         return theVectors;
     }
-        
+    
     public Object[] getActivePolygons(){
         Object[] thePolygons=new Object[polygonContainer.getComponentCount()];
         for (int i=0;i<polygonContainer.getComponentCount();i++){
@@ -1047,6 +1047,12 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
 
         exportDemToGRID.setFont(new java.awt.Font("Verdana", 0, 10));
         exportDemToGRID.setText("To ARC-INFO Grid File");
+        exportDemToGRID.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                exportDemToGRIDActionPerformed(evt);
+            }
+        });
+
         exportDEM.add(exportDemToGRID);
 
         jMenuExport.add(exportDEM);
@@ -1059,6 +1065,12 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
 
         exportHydroToGRID.setFont(new java.awt.Font("Verdana", 0, 10));
         exportHydroToGRID.setText("To ARC-INFO Grid File");
+        exportHydroToGRID.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                exportHydroToGRIDActionPerformed(evt);
+            }
+        });
+
         exportHydro.add(exportHydroToGRID);
 
         exportHydroToNetCDF.setFont(new java.awt.Font("Verdana", 0, 10));
@@ -1239,10 +1251,76 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void exportDemToGRIDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportDemToGRIDActionPerformed
+        javax.swing.JFileChooser fcI=new javax.swing.JFileChooser(localInfoManager.dataBaseRastersDemPath);
+        fcI.setFileSelectionMode(fcI.FILES_ONLY);
+        fcI.setDialogTitle("DEM File Selection");
+        javax.swing.filechooser.FileFilter demFilter = new visad.util.ExtensionFileFilter("*","DEM File");
+        fcI.addChoosableFileFilter(demFilter);
+        int result=fcI.showOpenDialog(this);
+        java.io.File fileInput = fcI.getSelectedFile();
+        if (result == javax.swing.JFileChooser.CANCEL_OPTION) return;
+        if (!fcI.getSelectedFile().isFile()) return;
+        
+        javax.swing.JFileChooser fcO=new javax.swing.JFileChooser();
+        fcO.setFileSelectionMode(fcO.DIRECTORIES_ONLY);
+        fcO.setDialogTitle("Output Directory");
+        result=fcO.showDialog(this,"Select");
+        if (result == javax.swing.JFileChooser.CANCEL_OPTION) return;
+        
+        java.io.File dirOutput = fcO.getSelectedFile();
+        if (dirOutput == null) return;
+        
+        try{
+            String fileName=fileInput.getPath().substring(0,fileInput.getPath().lastIndexOf("."))+".metaDEM";
+            String fileExtension=fileInput.getPath().substring(fileInput.getPath().lastIndexOf("."));
+            java.io.File theMetaFile=new java.io.File(fileName);
+            hydroScalingAPI.io.HSJToEsriASCII exporter=new hydroScalingAPI.io.HSJToEsriASCII(theMetaFile,dirOutput);
+            exporter.fileToExport(fcI.getSelectedFile(),hydroScalingAPI.tools.ExtensionToFormat.getFormat(fileExtension));
+            exporter.writeEsriFile();
+            setUpGUI(true);
+        }catch(java.io.IOException ioe){
+            System.err.println("Failed during ESRI-ASCII file import");
+            ioe.printStackTrace();
+        }
+    }//GEN-LAST:event_exportDemToGRIDActionPerformed
+    
+    private void exportHydroToGRIDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportHydroToGRIDActionPerformed
+        javax.swing.JFileChooser fcI=new javax.swing.JFileChooser(localInfoManager.dataBaseRastersHydPath);
+        fcI.setFileSelectionMode(fcI.FILES_ONLY);
+        fcI.setDialogTitle("Hydroclimatic File Selection");
+        javax.swing.filechooser.FileFilter vhcFilter = new visad.util.ExtensionFileFilter("vhc","Hydroclimatic File");
+        fcI.addChoosableFileFilter(vhcFilter);
+        int result=fcI.showOpenDialog(this);
+        java.io.File fileInput = fcI.getSelectedFile();
+        if (result == javax.swing.JFileChooser.CANCEL_OPTION) return;
+        if (!fcI.getSelectedFile().isFile()) return;
+        
+        javax.swing.JFileChooser fcO=new javax.swing.JFileChooser();
+        fcO.setFileSelectionMode(fcO.DIRECTORIES_ONLY);
+        fcO.setDialogTitle("Output Directory");
+        result=fcO.showDialog(this,"Select");
+        if (result == javax.swing.JFileChooser.CANCEL_OPTION) return;
+        
+        java.io.File dirOutput = fcO.getSelectedFile();
+        if (dirOutput == null) return;
+        
+        try{
+            java.io.File theMetaFile=new java.io.File(fileInput.getPath().substring(0,fileInput.getPath().lastIndexOf("."))+".metaVHC");
+            hydroScalingAPI.io.HSJToEsriASCII exporter=new hydroScalingAPI.io.HSJToEsriASCII(theMetaFile,dirOutput);
+            exporter.fileToExport(fcI.getSelectedFile());
+            exporter.writeEsriFile();
+            setUpGUI(true);
+        }catch(java.io.IOException ioe){
+            System.err.println("Failed during ESRI-ASCII file import");
+            ioe.printStackTrace();
+        }
+    }//GEN-LAST:event_exportHydroToGRIDActionPerformed
+    
     private void importDemFromUSGSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importDemFromUSGSActionPerformed
 // TODO add your handling code here:
     }//GEN-LAST:event_importDemFromUSGSActionPerformed
-
+    
     private void importHydroFromBIL_USGSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importHydroFromBIL_USGSActionPerformed
         javax.swing.JFileChooser fcI=new javax.swing.JFileChooser();
         fcI.setFileSelectionMode(fcI.DIRECTORIES_ONLY);
@@ -1267,11 +1345,11 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
             System.err.println(ioe);
         }
     }//GEN-LAST:event_importHydroFromBIL_USGSActionPerformed
-
+    
     private void licenseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_licenseActionPerformed
         new hydroScalingAPI.mainGUI.widgets.License(this).setVisible(true);
     }//GEN-LAST:event_licenseActionPerformed
-
+    
     private void importHydroFromGRIDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importHydroFromGRIDActionPerformed
         javax.swing.JFileChooser fcI=new javax.swing.JFileChooser();
         fcI.setFileSelectionMode(fcI.FILES_ONLY);
@@ -1298,7 +1376,7 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
             ioe.printStackTrace();
         }
     }//GEN-LAST:event_importHydroFromGRIDActionPerformed
-
+    
     private void importDemFromGRIDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importDemFromGRIDActionPerformed
         javax.swing.JFileChooser fcI=new javax.swing.JFileChooser();
         fcI.setFileSelectionMode(fcI.FILES_ONLY);
@@ -1325,7 +1403,7 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
             ioe.printStackTrace();
         }
     }//GEN-LAST:event_importDemFromGRIDActionPerformed
-
+    
     private void exportDemToGRASSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportDemToGRASSActionPerformed
         javax.swing.JFileChooser fcI=new javax.swing.JFileChooser(localInfoManager.dataBaseRastersDemPath);
         fcI.setFileSelectionMode(fcI.FILES_ONLY);
@@ -1362,7 +1440,7 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         }
         
     }//GEN-LAST:event_exportDemToGRASSActionPerformed
-
+    
     private void importDemFromGRASSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importDemFromGRASSActionPerformed
         javax.swing.JFileChooser fcI=new javax.swing.JFileChooser();
         fcI.setFileSelectionMode(fcI.FILES_ONLY);
@@ -1389,19 +1467,19 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
             ioe.printStackTrace();
         }
     }//GEN-LAST:event_importDemFromGRASSActionPerformed
-
+    
     private void openDatabaseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openDatabaseButtonActionPerformed
         openDBActionPerformed(null);
     }//GEN-LAST:event_openDatabaseButtonActionPerformed
-
+    
     private void openHydroButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openHydroButtonActionPerformed
         openHydroActionPerformed(null);
     }//GEN-LAST:event_openHydroButtonActionPerformed
-
+    
     private void openDEMButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openDEMButtonActionPerformed
         openDEMActionPerformed(null);
     }//GEN-LAST:event_openDEMButtonActionPerformed
-
+    
     private void createDBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createDBActionPerformed
         javax.swing.JFileChooser fcI=new javax.swing.JFileChooser();
         fcI.setFileSelectionMode(fcI.DIRECTORIES_ONLY);
@@ -1434,7 +1512,7 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         setUpGUI(false);
         
     }//GEN-LAST:event_createDBActionPerformed
-
+    
     private void importDemFromBIL_USGSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importDemFromBIL_USGSActionPerformed
         javax.swing.JFileChooser fcI=new javax.swing.JFileChooser();
         fcI.setFileSelectionMode(fcI.DIRECTORIES_ONLY);
@@ -1459,7 +1537,7 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
             System.err.println(ioe);
         }
     }//GEN-LAST:event_importDemFromBIL_USGSActionPerformed
-
+    
     private void addLocationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addLocationActionPerformed
         hydroScalingAPI.subGUIs.widgets.LocationsEditor theEditor=new hydroScalingAPI.subGUIs.widgets.LocationsEditor(this);
         theEditor.setVisible(true);
@@ -1477,44 +1555,44 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
             refreshAllWindowsReferences();
         }
     }//GEN-LAST:event_addLocationActionPerformed
-
+    
     private void addGaugeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addGaugeActionPerformed
         // Add your handling code here:
     }//GEN-LAST:event_addGaugeActionPerformed
-
+    
     private void editLocationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editLocationActionPerformed
         Object[] toView=activeLocationsContainer.getSelectedValues();
         if (toView.length > 0) {
             new hydroScalingAPI.subGUIs.widgets.LocationsEditor(this,toView[0]).setVisible(true);
         }
     }//GEN-LAST:event_editLocationActionPerformed
-
+    
     private void editGaugeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editGaugeActionPerformed
         // Add your handling code here:
     }//GEN-LAST:event_editGaugeActionPerformed
-
+    
     private void showLocationNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showLocationNameActionPerformed
         if (activeLocationsContainer.getModel().getSize() > 0) {
             refreshAllWindowsReferences();
         }
     }//GEN-LAST:event_showLocationNameActionPerformed
-
+    
     private void showGaugeCodeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showGaugeCodeActionPerformed
         if (activeGaugesContainer.getModel().getSize() > 0){
             refreshAllWindowsReferences();
         }
     }//GEN-LAST:event_showGaugeCodeActionPerformed
-
+    
     private void clearLocationsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearLocationsActionPerformed
         activeLocationsContainer.setListData(new java.util.Vector());
         refreshAllWindowsReferences();
     }//GEN-LAST:event_clearLocationsActionPerformed
-
+    
     private void clearGaugesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearGaugesActionPerformed
         activeGaugesContainer.setListData(new java.util.Vector());
         refreshAllWindowsReferences();
     }//GEN-LAST:event_clearGaugesActionPerformed
-
+    
     private void networkExtractionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_networkExtractionActionPerformed
         javax.swing.JFileChooser fc=new javax.swing.JFileChooser(localInfoManager.dataBaseRastersDemPath);
         fc.setFileSelectionMode(fc.FILES_ONLY);
@@ -1522,7 +1600,7 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         javax.swing.filechooser.FileFilter mdtFilter = new visad.util.ExtensionFileFilter("metaDEM","Digital Elevation Model");
         fc.addChoosableFileFilter(mdtFilter);
         int result = fc.showOpenDialog(this);
-
+        
         if (result == javax.swing.JFileChooser.CANCEL_OPTION) return;
         if (!fc.getSelectedFile().isFile()) return;
         
@@ -1540,12 +1618,12 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         }
         
     }//GEN-LAST:event_networkExtractionActionPerformed
-
+    
     private void launchLocationViewerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_launchLocationViewerActionPerformed
         Object[] toView=activeLocationsContainer.getSelectedValues();
         if (toView.length > 0) new hydroScalingAPI.subGUIs.widgets.LocationsViewer(this,toView).setVisible(true);
     }//GEN-LAST:event_launchLocationViewerActionPerformed
-
+    
     private void locationsToDisplayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_locationsToDisplayActionPerformed
         hydroScalingAPI.subGUIs.widgets.LocationsOpenDialog locationsSelector=new hydroScalingAPI.subGUIs.widgets.LocationsOpenDialog(this);
         locationsSelector.setVisible(true);
@@ -1554,7 +1632,7 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         showLocationName.setSelected(locationsSelector.showNames());
         refreshAllWindowsReferences();
     }//GEN-LAST:event_locationsToDisplayActionPerformed
-
+    
     private void gaugesToDisplayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_gaugesToDisplayActionPerformed
         hydroScalingAPI.subGUIs.widgets.GaugesOpenDialog gaugesSelector=new hydroScalingAPI.subGUIs.widgets.GaugesOpenDialog(this);
         gaugesSelector.setVisible(true);
@@ -1563,7 +1641,7 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         showGaugeCode.setSelected(gaugesSelector.showNames());
         refreshAllWindowsReferences();
     }//GEN-LAST:event_gaugesToDisplayActionPerformed
-
+    
     private void openDBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openDBActionPerformed
         javax.swing.JFileChooser fc=new javax.swing.JFileChooser("/");
         fc.setFileSelectionMode(fc.DIRECTORIES_ONLY);
@@ -1572,12 +1650,12 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         java.io.File selectedFile = fc.getSelectedFile();
         
         if (result == javax.swing.JFileChooser.CANCEL_OPTION) return;
-
+        
         addToRecentDatabases(selectedFile);
         localInfoManager.checkDataBase();
         setUpGUI(false);
     }//GEN-LAST:event_openDBActionPerformed
-
+    
     private void openHydroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openHydroActionPerformed
         
         javax.swing.JFileChooser fc=new javax.swing.JFileChooser("/");
@@ -1588,11 +1666,11 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         int result = fc.showDialog(this,"Select");
         if (result == javax.swing.JFileChooser.CANCEL_OPTION) return;
         if (!fc.getSelectedFile().isFile()) return;
-
+        
         openVHC(fc.getSelectedFile());
         
     }//GEN-LAST:event_openHydroActionPerformed
-
+    
     private void openDEMActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openDEMActionPerformed
         
         javax.swing.JFileChooser fc=new javax.swing.JFileChooser("/");
@@ -1603,21 +1681,21 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         int result = fc.showDialog(this,"Select");
         if (result == javax.swing.JFileChooser.CANCEL_OPTION) return;
         if (!fc.getSelectedFile().isFile()) return;
-
+        
         openDEM(fc.getSelectedFile());
         
     }//GEN-LAST:event_openDEMActionPerformed
-
+    
     private void hydroTreeMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_hydroTreeMouseClicked
         
         javax.swing.tree.TreePath selPath = hydroTree.getPathForLocation(evt.getX(), evt.getY());
-        if (selPath == null) return; 
+        if (selPath == null) return;
         String fileToDisplay=(String) selPath.getLastPathComponent().toString();
         if(fileToDisplay.lastIndexOf("metaVHC") != -1) {
             Object[] directions=selPath.getPath();
             fileToDisplay=localInfoManager.dataBaseRastersHydPath.getPath();
             for(int i=1;i<selPath.getPathCount();i++) fileToDisplay+=("/"+directions[i].toString());
-
+            
             java.io.File selectedFile=new java.io.File(fileToDisplay);
             
             if(evt.getClickCount() == 1) {
@@ -1628,17 +1706,17 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         }
         
     }//GEN-LAST:event_hydroTreeMouseClicked
-
+    
     private void topoTreeMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_topoTreeMouseClicked
         
         javax.swing.tree.TreePath selPath = topoTree.getPathForLocation(evt.getX(), evt.getY());
-        if (selPath == null) return; 
+        if (selPath == null) return;
         String fileToDisplay=(String) selPath.getLastPathComponent().toString();
         if(fileToDisplay.lastIndexOf("metaDEM") != -1) {
             Object[] directions=selPath.getPath();
             fileToDisplay=localInfoManager.dataBaseRastersDemPath.getPath();
             for(int i=1;i<selPath.getPathCount();i++) fileToDisplay+=("/"+directions[i].toString());
-
+            
             java.io.File selectedFile=new java.io.File(fileToDisplay);
             
             if(evt.getClickCount() == 1) {
@@ -1647,34 +1725,34 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
                 openDEM(selectedFile);
             }
         }
-
+        
     }//GEN-LAST:event_topoTreeMouseClicked
-
+    
     private void displayMetaFile(java.io.File selectedFile){
         
-        metaFileViewer=new javax.swing.JTextArea ();
-        metaFileViewer.setWrapStyleWord (true);
-        metaFileViewer.setLineWrap (true);
+        metaFileViewer=new javax.swing.JTextArea();
+        metaFileViewer.setWrapStyleWord(true);
+        metaFileViewer.setLineWrap(true);
         metaFileViewer.setFont(new java.awt.Font("Arial", 0, 10));
-
+        
         try{
             java.io.FileReader reader = new java.io.FileReader(selectedFile);
             java.io.BufferedReader buffer=new java.io.BufferedReader(reader);
-
+            
             String line;
             metaFileViewer.removeAll();
             while ((line=buffer.readLine()) != null) {
                 metaFileViewer.append(line+"\n");
             }
             buffer.close();
-
+            
         } catch (java.io.IOException IOE){
             System.err.println("Error Loading Meta-Information for "+selectedFile);
             System.err.println(IOE);
         }
-
-        jScrollPane4.setViewportView (metaFileViewer);
-
+        
+        jScrollPane4.setViewportView(metaFileViewer);
+        
         jScrollPane4.updateUI();
         
     }
@@ -1841,7 +1919,7 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
     private javax.swing.JMenuItem waterBalance;
     private javax.swing.JMenu window;
     // End of variables declaration//GEN-END:variables
-
+    
     
     public void openDEM(java.io.File selectedFile){
         try{
@@ -1851,7 +1929,7 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
             
             if (openDem.mapsSelected()){
                 addToRecentFiles(selectedFile);
-        
+                
                 for (int i=0;i<openDem.getSelectedMetaRasters().length;i++){
                     hydroScalingAPI.io.MetaRaster subDemMetaDEM=openDem.getSelectedMetaRasters()[i];
                     
@@ -1868,7 +1946,7 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
                     
                 }
                 
-            } 
+            }
         } catch (java.io.IOException ioe){
             System.err.println("Failed building DemViewer2D");
             System.err.println(ioe);
@@ -1887,27 +1965,27 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
             if(openVhc.mapsSelected()){
                 addToRecentFiles(selectedFile);
             }
-
+            
             if(openVhc.isMultiple()){
             } else {
-            
+                
                 for (int i=0;i<openVhc.getSelectedMetaRasters().length;i++){
                     hydroScalingAPI.io.MetaRaster subVhcMetaDEM=openVhc.getSelectedMetaRasters()[i];
-
+                    
                     hydroScalingAPI.subGUIs.widgets.HydroClimateViewer2D thisVhcViewer=new hydroScalingAPI.subGUIs.widgets.HydroClimateViewer2D(this,subVhcMetaDEM,openVhc.getRelatedMaps());
-
+                    
                     subGUIs_container.add(thisVhcViewer, javax.swing.JLayeredPane.DEFAULT_LAYER);
                     try{
                         thisVhcViewer.setSelected(true);
                     } catch (java.beans.PropertyVetoException PVE){
                         System.err.println(PVE);
                     }
-
+                    
                     thisVhcViewer.setBounds(25*(openWindows.size()-1), 25*(openWindows.size()-1), thisVhcViewer.getWidth()+5, thisVhcViewer.getHeight()+5);
-
+                    
                 }
             }
-
+            
             
         } catch (java.io.IOException ioe){
             System.err.println("Failed building HydroClimateViewer2D");
@@ -1918,7 +1996,7 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         }
     }
     
-    private void openRecentFile (java.awt.event.ActionEvent evt){
+    private void openRecentFile(java.awt.event.ActionEvent evt){
         
         int fileSelectedIndex=new Integer(((javax.swing.JMenuItem) evt.getSource()).getText().substring(0,1)).intValue();
         java.io.File selectedFile=(java.io.File) localInfoManager.recentFiles.elementAt(fileSelectedIndex);
@@ -1930,7 +2008,7 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         }
     }
     
-    private void openRecentDataBase (java.awt.event.ActionEvent evt){
+    private void openRecentDataBase(java.awt.event.ActionEvent evt){
         int dbSelectedIndex=new Integer(((javax.swing.JMenuItem) evt.getSource()).getText().substring(0,1)).intValue();
         Object theDBtoLoad=localInfoManager.recentDataBases.elementAt(dbSelectedIndex);
         localInfoManager.recentDataBases.removeElementAt(dbSelectedIndex) ;
@@ -1954,7 +2032,7 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         openWindowsMenusVector.put(stringId,aWindow);
         openWindowsIdentifiers.add(stringId);
     }
-
+    
     private void windowSelected(String stringId){
         javax.swing.JInternalFrame theWindow=(javax.swing.JInternalFrame)openWindows.get(stringId);
         theWindow.toFront();
@@ -2023,7 +2101,7 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         hydroScalingAPI.subGUIs.widgets.RasterViewer rv=(hydroScalingAPI.subGUIs.widgets.RasterViewer)internalFrameEvent.getInternalFrame();
         String windowIdentifier=rv.getTitle();
         rv.setIdentifier(windowIdentifier+Math.random());
-
+        
         registerWindow(windowIdentifier,rv);
     }
     

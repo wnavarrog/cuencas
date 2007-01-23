@@ -17,7 +17,6 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-
 /*
  * HSJToEsriASCII.java
  *
@@ -47,6 +46,12 @@ public class HSJToEsriASCII {
     }
     
     public void fileToExport(java.io.File file) throws java.io.IOException{
+        myMetaInfo.setLocationBinaryFile(file);
+        data=new hydroScalingAPI.io.DataRaster(myMetaInfo).getFloat();
+    }
+    
+    public void fileToExport(java.io.File file,String fileFormat) throws java.io.IOException{
+        myMetaInfo.setFormat(fileFormat);
         myMetaInfo.setLocationBinaryFile(file);
         data=new hydroScalingAPI.io.DataRaster(myMetaInfo).getFloat();
     }
