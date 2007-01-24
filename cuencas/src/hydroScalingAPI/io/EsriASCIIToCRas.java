@@ -25,11 +25,13 @@ import java.util.*;
 import hydroScalingAPI.tools.*;
 
 /**
- *
- * @author  Ricardo Mantilla
- * @author  Matt Luck
+ * This class takes ESRI GRID raster file and creates a CUENCAS raster, which can
+ * be DEM or hydrometeorological fields.  IMPORTANT:  The Class assumes the
+ * original GRID file is in the LAT-LONG projection.
+ * @author Ricardo Mantilla
+ * @author Matt Luck
  */
-public class EsriASCIIToHSJ extends Object {
+public class EsriASCIIToCRas extends Object {
     
     private  String[]         variables = new String[8];
     private  String[]         metaInfo = new String[12];
@@ -50,8 +52,15 @@ public class EsriASCIIToHSJ extends Object {
                                         "[Temporal Resolution]",
                                         "[Units]",
                                         "[Information]"};
-    /*Type 0 = DEM, 1= VHC*/
-    public EsriASCIIToHSJ(java.io.File archivo, java.io.File salida, int type) throws java.io.IOException {
+    /**
+     * Creates an instance of the EsriASCIIToCRas
+     * @param inputFile The GRID file to be imported
+     * @param outputDir The directory where the CUENCAS Raster will be placed
+     * @param type 0: Import a DEM (creates a *.metaDEM and a *.dem file)
+     * 1: Import any other kind of field (creates a *.metaVHC and a *.vhc file)
+     * @throws java.io.IOException Captures errors during the reading and/or wrtining process
+     */
+    public EsriASCIIToCRas(java.io.File inputFile, java.io.File outputDir, int type) throws java.io.IOException {
         
         java.io.FileReader ruta;
         java.io.BufferedReader buffer;
@@ -59,7 +68,7 @@ public class EsriASCIIToHSJ extends Object {
         java.util.StringTokenizer tokens;
         String linea=null, basura, nexttoken;
         
-        ruta = new FileReader(archivo);
+        ruta = new FileReader(inputFile);
         buffer=new BufferedReader(ruta);
         
         for (int i=0;i<6;i++) {
@@ -89,23 +98,23 @@ public class EsriASCIIToHSJ extends Object {
         }
         buffer.close();
         
-        fileName=archivo.getName();
-        String fileBinSalida=salida.getPath()+"/"+fileName.substring(0,fileName.lastIndexOf("."))+"."+extensionPairs[type][0];
-        String fileAscSalida=salida.getPath()+"/"+fileName.substring(0,fileName.lastIndexOf("."))+"."+extensionPairs[type][1];
+        fileName=inputFile.getName();
+        String fileBinoutputDir=outputDir.getPath()+"/"+fileName.substring(0,fileName.lastIndexOf("."))+"."+extensionPairs[type][0];
+        String fileAscoutputDir=outputDir.getPath()+"/"+fileName.substring(0,fileName.lastIndexOf("."))+"."+extensionPairs[type][1];
         
         calculateMetadata(variables);
-        newfilebinary(new java.io.File(fileBinSalida));
-        newfileMetadata(new java.io.File(fileAscSalida));
+        newfilebinary(new java.io.File(fileBinoutputDir));
+        newfileMetadata(new java.io.File(fileAscoutputDir));
     }
     
-    private void newfilebinary(java.io.File archivo) throws java.io.IOException{
+    private void newfilebinary(java.io.File inputFile) throws java.io.IOException{
         
-        java.io.FileOutputStream        salida;
+        java.io.FileOutputStream        outputDir;
         java.io.DataOutputStream        newfile;
         java.io.BufferedOutputStream    bufferout;
         
-        salida = new FileOutputStream(archivo);
-        bufferout=new BufferedOutputStream(salida);
+        outputDir = new FileOutputStream(inputFile);
+        bufferout=new BufferedOutputStream(outputDir);
         newfile=new DataOutputStream(bufferout);
         
         for (int i=rows-1;i>-1;i--) for (int j=0;j<columns;j++) {
@@ -113,18 +122,18 @@ public class EsriASCIIToHSJ extends Object {
         }
         newfile.close();
         bufferout.close();
-        salida.close();
+        outputDir.close();
     }
     
-    private void newfileMetadata(java.io.File archivo) throws java.io.IOException{
+    private void newfileMetadata(java.io.File inputFile) throws java.io.IOException{
         
-        java.io.FileOutputStream        salida;
+        java.io.FileOutputStream        outputDir;
         java.io.OutputStreamWriter      newfile;
         java.io.BufferedOutputStream    bufferout;
         String                          retorno="\n";
         
-        salida = new FileOutputStream(archivo);
-        bufferout=new BufferedOutputStream(salida);
+        outputDir = new FileOutputStream(inputFile);
+        bufferout=new BufferedOutputStream(outputDir);
         newfile=new OutputStreamWriter(bufferout);
         
         for (int i=0;i<12;i++) {
@@ -137,7 +146,7 @@ public class EsriASCIIToHSJ extends Object {
         
         newfile.close();
         bufferout.close();
-        salida.close();
+        outputDir.close();
         
     }
     
@@ -165,10 +174,14 @@ public class EsriASCIIToHSJ extends Object {
         metaInfo[11] = "Imported from Esri - Ascii format";
     }
     
+    /**
+     * Test the class features.
+     * @param args The arguments are not used.
+     */
     public static void main(String args[]) {
         
         try {
-            new EsriASCIIToHSJ( new java.io.File("/home/matt/demtest/dem48states-1km.asc"),
+            new EsriASCIIToCRas( new java.io.File("/home/matt/demtest/dem48states-1km.asc"),
                                 new java.io.File("/home/matt/demtest/"),0);
             
         } catch (Exception IOE){

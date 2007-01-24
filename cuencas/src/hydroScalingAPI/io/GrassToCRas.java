@@ -24,17 +24,21 @@ import java.io.*;
 import java.util.*;
 
 /**
- *
- * @author  Ricardo Mantilla
- * @author  Matt Luck
+ * This class takes GRASS ASCII raster file and creates a CUENCAS raster, which can
+ * be DEM or hydrometeorological fields.  IMPORTANT:  The Class assumes the
+ * original GRASS file is in the LAT-LONG projection.
+ * @author Ricardo Mantilla
+ * @author Matt Luck
  */
-public class GrassToHSJ extends Object {
+public class GrassToCRas extends Object {
     
     private  String[]         variables = new String[8];
     private  String[]         metaInfo = new String[12];
     private  String           fileName;
     private  float[][]        matrix;
     private  int              columns,rows;
+    
+    private  String[][]       extensionPairs = {{"dem","metaDEM"},{"vhc","metaVHC"}};
     
     private  String[] parameters = {    "[Name]",
                                         "[Southernmost Latitude]",
@@ -51,7 +55,15 @@ public class GrassToHSJ extends Object {
     
     
     
-    public GrassToHSJ(java.io.File archivo, java.io.File salida) throws java.io.IOException{
+    /**
+     * Creates an instance of the GrassToCRas
+     * @param type 0: Import a DEM (creates a *.metaDEM and a *.dem file)
+     * 1: Import any other kind of field (creates a *.metaVHC and a *.vhc file)
+     * @param inputFile The GRASS file to be imported
+     * @param outputDir The directory where the CUENCAS Raster will be placed
+     * @throws java.io.IOException Captures errors during the reading and/or wrtining process
+     */
+    public GrassToCRas(java.io.File inputFile, java.io.File outputDir, int type) throws java.io.IOException{
         
         java.io.FileReader         ruta;
         java.io.BufferedReader     buffer;
@@ -60,7 +72,7 @@ public class GrassToHSJ extends Object {
         String                          linea=null,
                                         basura,nexttoken;
         
-        ruta = new FileReader(archivo);
+        ruta = new FileReader(inputFile);
         buffer=new BufferedReader(ruta);
         
         linea = buffer.readLine();
@@ -115,23 +127,23 @@ public class GrassToHSJ extends Object {
         }
         buffer.close();
         
-        fileName=archivo.getName();
-        String fileBinSalida=salida.getPath()+"/"+fileName.substring(0,fileName.lastIndexOf("."))+".dem";
-        String fileAscSalida=salida.getPath()+"/"+fileName.substring(0,fileName.lastIndexOf("."))+".metaDEM";
+        fileName=inputFile.getName();
+        String fileBinoutputDir=outputDir.getPath()+"/"+fileName.substring(0,fileName.lastIndexOf("."))+"."+extensionPairs[type][0];
+        String fileAscoutputDir=outputDir.getPath()+"/"+fileName.substring(0,fileName.lastIndexOf("."))+"."+extensionPairs[type][1];
         
         calculaMetadatos(variables);
-        newFileBinary(new java.io.File(fileBinSalida));
-        newFileMetaInfo(new java.io.File(fileAscSalida));
+        newFileBinary(new java.io.File(fileBinoutputDir));
+        newFileMetaInfo(new java.io.File(fileAscoutputDir));
     }
     
-    private void newFileBinary(java.io.File archivo) throws java.io.IOException{
+    private void newFileBinary(java.io.File inputFile) throws java.io.IOException{
         
-        java.io.FileOutputStream        salida;
+        java.io.FileOutputStream        outputDir;
         java.io.DataOutputStream        newfile;
         java.io.BufferedOutputStream    bufferout;
         
-        salida = new FileOutputStream(archivo);
-        bufferout=new BufferedOutputStream(salida);
+        outputDir = new FileOutputStream(inputFile);
+        bufferout=new BufferedOutputStream(outputDir);
         newfile=new DataOutputStream(bufferout);
         
             for (int i=rows-1;i>-1;i--) for (int j=0;j<columns;j++) {
@@ -139,18 +151,18 @@ public class GrassToHSJ extends Object {
             }
         newfile.close();
         bufferout.close();
-        salida.close();
+        outputDir.close();
     }
     
-    private void newFileMetaInfo(java.io.File archivo) throws java.io.IOException{
+    private void newFileMetaInfo(java.io.File inputFile) throws java.io.IOException{
         
-        java.io.FileOutputStream        salida;
+        java.io.FileOutputStream        outputDir;
         java.io.OutputStreamWriter      newfile;
         java.io.BufferedOutputStream    bufferout;
         String                          retorno="\n";
         
-        salida = new FileOutputStream(archivo);
-        bufferout=new BufferedOutputStream(salida);
+        outputDir = new FileOutputStream(inputFile);
+        bufferout=new BufferedOutputStream(outputDir);
         newfile=new OutputStreamWriter(bufferout);
         
         for (int i=0;i<12;i++) {
@@ -163,7 +175,7 @@ public class GrassToHSJ extends Object {
         
         newfile.close();
         bufferout.close();
-        salida.close();
+        outputDir.close();
         
     }
     
@@ -195,13 +207,17 @@ public class GrassToHSJ extends Object {
         metaInfo[11] = "Imported from Grass format";
     }
     
+    /**
+     * Test the class
+     * @param args the command line arguments
+     */
     public static void main (String args[]) {
         
         try{
-            new GrassToHSJ(new java.io.File("/Documents and Settings/ricardo/My Documents/temp/spearfish.grass"),
-                           new java.io.File("/Documents and Settings/ricardo/My Documents/temp/"));
+            new GrassToCRas(new java.io.File("/Documents and Settings/ricardo/My Documents/temp/spearfish.grass"),
+                           new java.io.File("/Documents and Settings/ricardo/My Documents/temp/"),0);
             
-            /*new GrassToHSJ(new java.io.File("/home/ricardo/garbage/testsGrass/1630327a.grass"),
+            /*new GrassToCRas(new java.io.File("/home/ricardo/garbage/testsGrass/1630327a.grass"),
                            new java.io.File("/home/ricardo/garbage/testsGrass/"));*/
            
         } catch (java.io.IOException IOE){

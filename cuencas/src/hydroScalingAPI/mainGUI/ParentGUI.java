@@ -429,7 +429,7 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         importHydroFromBIL_USGS = new javax.swing.JMenuItem();
         importSites = new javax.swing.JMenu();
         importSitesFromGazetteer = new javax.swing.JMenuItem();
-        importSitesFromMapSourceAscii = new javax.swing.JMenuItem();
+        importSitesFromWaterUSGS = new javax.swing.JMenuItem();
         jMenuExport = new javax.swing.JMenu();
         exportDEM = new javax.swing.JMenu();
         exportDemToGRASS = new javax.swing.JMenuItem();
@@ -988,6 +988,12 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         importHydro.setFont(new java.awt.Font("Verdana", 0, 10));
         importHydroFromGRASS.setFont(new java.awt.Font("Verdana", 0, 10));
         importHydroFromGRASS.setText("From GRASS File");
+        importHydroFromGRASS.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                importHydroFromGRASSActionPerformed(evt);
+            }
+        });
+
         importHydro.add(importHydroFromGRASS);
 
         importHydroFromGRID.setFont(new java.awt.Font("Verdana", 0, 10));
@@ -1019,12 +1025,12 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         importSites.setText("Import Sites");
         importSites.setFont(new java.awt.Font("Verdana", 0, 10));
         importSitesFromGazetteer.setFont(new java.awt.Font("Verdana", 0, 10));
-        importSitesFromGazetteer.setText("From USGS Gazetteer");
+        importSitesFromGazetteer.setText("Locations From USGS Gazetteer");
         importSites.add(importSitesFromGazetteer);
 
-        importSitesFromMapSourceAscii.setFont(new java.awt.Font("Verdana", 0, 10));
-        importSitesFromMapSourceAscii.setText("From Map Source ASCII File");
-        importSites.add(importSitesFromMapSourceAscii);
+        importSitesFromWaterUSGS.setFont(new java.awt.Font("Verdana", 0, 10));
+        importSitesFromWaterUSGS.setText("Streamflow Gauge From Water.USGS.gov");
+        importSites.add(importSitesFromWaterUSGS);
 
         jMenuImport.add(importSites);
 
@@ -1082,7 +1088,7 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         exportSites.setText("Export Sites");
         exportSites.setFont(new java.awt.Font("Verdana", 0, 10));
         exportSitesToAscii.setFont(new java.awt.Font("Verdana", 0, 10));
-        exportSitesToAscii.setText("To USGS Gazetteer");
+        exportSitesToAscii.setText("To ASCII File");
         exportSites.add(exportSitesToAscii);
 
         jMenuExport.add(exportSites);
@@ -1369,7 +1375,7 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         if (dirOutput == null) return;
         
         try{
-            new hydroScalingAPI.io.EsriASCIIToHSJ(fileInput,dirOutput,1);
+            new hydroScalingAPI.io.EsriASCIIToCRas(fileInput,dirOutput,1);
             setUpGUI(true);
         }catch(java.io.IOException ioe){
             System.err.println("Failed during ESRI-ASCII file import");
@@ -1396,7 +1402,7 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         if (dirOutput == null) return;
         
         try{
-            new hydroScalingAPI.io.EsriASCIIToHSJ(fileInput,dirOutput,0);
+            new hydroScalingAPI.io.EsriASCIIToCRas(fileInput,dirOutput,0);
             setUpGUI(true);
         }catch(java.io.IOException ioe){
             System.err.println("Failed during ESRI-ASCII file import");
@@ -1425,7 +1431,7 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         if (dirOutput == null) return;
         
         try{
-            hydroScalingAPI.io.HSJToGrass exporter=new hydroScalingAPI.io.HSJToGrass(fileInput,dirOutput);
+            hydroScalingAPI.io.CRasToGrass exporter=new hydroScalingAPI.io.CRasToGrass(fileInput,dirOutput);
             hydroScalingAPI.subGUIs.widgets.DemOpenDialog openDem=new hydroScalingAPI.subGUIs.widgets.DemOpenDialog(this,new hydroScalingAPI.io.MetaRaster(fileInput));
             openDem.setVisible(true);
             if (openDem.mapsSelected()){
@@ -1460,7 +1466,7 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         if (dirOutput == null) return;
         
         try{
-            new hydroScalingAPI.io.GrassToHSJ(fileInput,dirOutput);
+            new hydroScalingAPI.io.GrassToCRas(fileInput,dirOutput,0);
             setUpGUI(true);
         }catch(java.io.IOException ioe){
             System.err.println("Failed during GRASS file import");
@@ -1835,7 +1841,7 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
     private javax.swing.JButton importShapeFile;
     private javax.swing.JMenu importSites;
     private javax.swing.JMenuItem importSitesFromGazetteer;
-    private javax.swing.JMenuItem importSitesFromMapSourceAscii;
+    private javax.swing.JMenuItem importSitesFromWaterUSGS;
     private javax.swing.JMenuItem index;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenu jMenuExport;

@@ -33,7 +33,13 @@ package hydroScalingAPI.examples.artifitialFields;
  */
 public class createInfiltrationMap {
     
-    /** Creates a new instance of createInfiltrationMap */
+    /**
+     * Creates a new instance of createInfiltrationMap
+     * @param baseMetaDEM Takes a file pointing to an existing MetaDEM
+     * @param inputInfo 
+     * @param outputDir 
+     * @throws java.io.IOException 
+     */
     public createInfiltrationMap(java.io.File baseMetaDEM, java.io.File inputInfo, java.io.File outputDir) throws java.io.IOException{
         
         hydroScalingAPI.io.MetaRaster metaData=new hydroScalingAPI.io.MetaRaster(baseMetaDEM);
@@ -125,6 +131,9 @@ public class createInfiltrationMap {
     /**
      * Writes a metafile with the information needed for the infiltration map created
      * using information from an external program.
+     * @param directory 
+     * @param newMetaName 
+     * @param originalMeta 
      */
     public void createMetaFile(java.io.File directory, String newMetaName, hydroScalingAPI.io.MetaRaster originalMeta) {
           try{          

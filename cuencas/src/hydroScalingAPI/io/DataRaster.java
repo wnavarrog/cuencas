@@ -21,8 +21,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.io;
 
 /**
- *
- * @author  Ricardo Mantilla
+ * Uses the information on a {@link hydroScalingAPI.io.MetaRaster} to read one of
+ * the binary files associated to it.  Methods contained in this class return data
+ * in different formats (Byte, Integer, Float or Double) and in different
+ * arrangements (matrix or vector).
+ * @author Ricardo Mantilla
  */
 public class DataRaster extends Object {
 
@@ -40,7 +43,13 @@ public class DataRaster extends Object {
     double[] FDAD;
     int noFaltantes;
     
-    /** Creates new dataRaster */
+    /**
+     * Creates a DataRaster object that will read files associated with the metaRaster
+     * file given as a parameter.
+     * @param metaInfo The {@link hydroScalingAPI.io.MetaRaster} with information about the binary file
+     * to be read.
+     * @throws java.io.IOException Captures problems while reading the binary file
+     */
     public DataRaster(hydroScalingAPI.io.MetaRaster metaInfo) throws java.io.IOException{
         localMetaData=metaInfo;
                     
@@ -72,6 +81,10 @@ public class DataRaster extends Object {
         dataDataStream.close();
     }
     
+    /**
+     * Casts data into Byte Format and returns a Matrix.
+     * @return Returns an Matrix (Array[n][m]) of Bytes.
+     */
     public byte[][] getByte(){
         if (dataByte != null) return dataByte;
         
@@ -87,22 +100,10 @@ public class DataRaster extends Object {
         return aDatosByte;
     }
     
-    public byte[][] getByteLine(){
-        
-        byte[][] aDatosByte=new byte[1][localMetaData.getNumRows()*localMetaData.getNumCols()];
-        
-        if (localMetaData.getProperty("[Format]").equalsIgnoreCase("Byte"))
-            for (int i=0;i<localMetaData.getNumRows();i++) for(int j=0;j<localMetaData.getNumCols();j++) aDatosByte[0][i*localMetaData.getNumCols()+j]=(byte) dataByte[i][j];
-        if (localMetaData.getProperty("[Format]").equalsIgnoreCase("Integer"))
-            for (int i=0;i<localMetaData.getNumRows();i++) for(int j=0;j<localMetaData.getNumCols();j++) aDatosByte[0][i*localMetaData.getNumCols()+j]=(byte) dataInteger[i][j];
-        if (localMetaData.getProperty("[Format]").equalsIgnoreCase("Float"))
-            for (int i=0;i<localMetaData.getNumRows();i++) for(int j=0;j<localMetaData.getNumCols();j++) aDatosByte[0][i*localMetaData.getNumCols()+j]=(byte) dataFloat[i][j];
-        if (localMetaData.getProperty("[Format]").equalsIgnoreCase("Double"))
-            for (int i=0;i<localMetaData.getNumRows();i++) for(int j=0;j<localMetaData.getNumCols();j++) aDatosByte[0][i*localMetaData.getNumCols()+j]=(byte) dataDouble[i][j];
-
-        return aDatosByte;
-    }
-    
+    /**
+     * Casts data into Integer Format and returns a Matrix.
+     * @return Returns an Matrix (Array[n][m]) of Integers.
+     */
     public int[][] getInt(){
         if (dataInteger != null) return dataInteger;
         
@@ -118,22 +119,10 @@ public class DataRaster extends Object {
         return aDatosInteger;
     }
     
-    public int[][] getIntLine(){
-        
-        int[][] aDatosInteger=new int[1][localMetaData.getNumRows()*localMetaData.getNumCols()];
-        
-        if (localMetaData.getProperty("[Format]").equalsIgnoreCase("Byte"))
-            for (int i=0;i<localMetaData.getNumRows();i++) for(int j=0;j<localMetaData.getNumCols();j++) aDatosInteger[0][i*localMetaData.getNumCols()+j]=(int) dataByte[i][j];
-        if (localMetaData.getProperty("[Format]").equalsIgnoreCase("Integer"))
-            for (int i=0;i<localMetaData.getNumRows();i++) for(int j=0;j<localMetaData.getNumCols();j++) aDatosInteger[0][i*localMetaData.getNumCols()+j]=(int) dataInteger[i][j];
-        if (localMetaData.getProperty("[Format]").equalsIgnoreCase("Float"))
-            for (int i=0;i<localMetaData.getNumRows();i++) for(int j=0;j<localMetaData.getNumCols();j++) aDatosInteger[0][i*localMetaData.getNumCols()+j]=(int) dataFloat[i][j];
-        if (localMetaData.getProperty("[Format]").equalsIgnoreCase("Double"))
-            for (int i=0;i<localMetaData.getNumRows();i++) for(int j=0;j<localMetaData.getNumCols();j++) aDatosInteger[0][i*localMetaData.getNumCols()+j]=(int) dataDouble[i][j];
-
-        return aDatosInteger;
-    }
-    
+    /**
+     * Casts data into Float Format and returns a Matrix.
+     * @return Returns an Matrix (Array[n][m]) of Floats.
+     */
     public float[][] getFloat(){
         if (dataFloat!=null) return dataFloat;
         
@@ -149,6 +138,11 @@ public class DataRaster extends Object {
         return aDatosFloat;
     }
     
+    /**
+     * Casts data into Float Format and returns a single column Vector.  This is
+     * arrangement is usefull for Visad Flatfields.
+     * @return Returns an single column Vector (Array[1][n*m]) of Floats.
+     */
     public float[][] getFloatLine(){
         
         float[][] aDatosFloat=new float[1][localMetaData.getNumRows()*localMetaData.getNumCols()];
@@ -165,6 +159,13 @@ public class DataRaster extends Object {
         return aDatosFloat;
     }
     
+    /**
+     * Casts data into Float Format and returns a single column Vector.  In addition
+     * data is mapped in the range [0,1] using the cumulative probability distribution
+     * function.  This arrangement is useful for Visad Flatfields and is used to create
+     * a coloring scheeme that better represents data variability.
+     * @return Returns an single column Vector (Array[1][n*m]) of histogram equalized Floats.
+     */
     public float[][] getFloatLineEqualized(){
         
         float[][] aDatosFloat=getFloatLine();
@@ -193,6 +194,13 @@ public class DataRaster extends Object {
         return aDatosFloat;
     }
     
+    /**
+     * Casts data into Float Format and returns a matrix (Array[n][m]).  In addition
+     * data is mapped in the range [0,1] using the cumulative probability distribution
+     * function.  This arrangement is useful for Visad Flatfields and is used to create
+     * a coloring scheeme that better represents data variability.
+     * @return Returns an single column Vector (Array[1][n*m]) of histogram equalized Floats.
+     */
     public float[][] getFloatEqualized(){
         
         float[][] aDatosFloat=getFloat();
@@ -225,6 +233,11 @@ public class DataRaster extends Object {
         return aDatosFloat;
     }
     
+    /**
+     * Maps a number into the [0,1] according to the cumulative distribution function.
+     * @param f The value to be transformed
+     * @return a Float in the interval (0,1)
+     */
     public float getEqualized(float f){
         try{
             if(new Float(localMetaData.getProperty("[Missing]")).floatValue() == f)
@@ -238,7 +251,15 @@ public class DataRaster extends Object {
         }
     }
     
-    public float[][] getFloatLineEqualized(float[] FDA){
+    /**
+     * Casts data into Float Format and returns a matrix (Array[n][m]).  In addition data 
+     * is mapped in the range [0,1] using a predetrmined cumulative probability distribution
+     * function.  This arrangement is useful for Visad Flatfields and is used to create
+     * a coloring scheeme that better represents data variability.
+     * @param CDF The Cumulative Distristribution Function to be used.
+     * @return Returns an single column Vector (Array[1][n*m]) of histogram equalized Floats.
+     */
+    public float[][] getFloatLineEqualized(float[] CDF){
         
         //FDA es un vector con datos ordendados, es util cuando se va a equalizar un mapa basado en un conjunto de mapas
         
@@ -248,7 +269,7 @@ public class DataRaster extends Object {
         
         for (int j=0;j<aDatosFloat[0].length;j++){
             if (aDatosFloat[0][j] != faltante){
-                aDatosFloat[0][j]=(float) (1+java.util.Arrays.binarySearch(FDA,aDatosFloat[0][j])/(float) (FDA.length-1)*254);
+                aDatosFloat[0][j]=(float) (1+java.util.Arrays.binarySearch(CDF,aDatosFloat[0][j])/(float) (CDF.length-1)*254);
             } else {
                 aDatosFloat[0][j]=0.0f;
             }
@@ -257,6 +278,10 @@ public class DataRaster extends Object {
         return aDatosFloat;
     }
     
+    /**
+     * Casts data into Double Format and returns a Matrix.
+     * @return Returns an Matrix (Array[n][m]) of Floats.
+     */
     public double[][] getDouble(){
         if (dataDouble != null) return dataDouble;
         
@@ -269,22 +294,6 @@ public class DataRaster extends Object {
         if (localMetaData.getProperty("[Format]").equalsIgnoreCase("Float"))
             for (int i=0;i<localMetaData.getNumRows();i++) for(int j=0;j<localMetaData.getNumCols();j++) aDatosDouble[i][j]=(double) dataFloat[i][j];
         
-        return aDatosDouble;
-    }
-    
-    public double[][] getDoubleLine(){
-        
-        double[][] aDatosDouble=new double[1][localMetaData.getNumRows()*localMetaData.getNumCols()];
-        
-        if (localMetaData.getProperty("[Format]").equalsIgnoreCase("Byte"))
-            for (int i=0;i<localMetaData.getNumRows();i++) for(int j=0;j<localMetaData.getNumCols();j++) aDatosDouble[0][i*localMetaData.getNumCols()+j]=(double) dataByte[i][j];
-        if (localMetaData.getProperty("[Format]").equalsIgnoreCase("Integer"))
-            for (int i=0;i<localMetaData.getNumRows();i++) for(int j=0;j<localMetaData.getNumCols();j++) aDatosDouble[0][i*localMetaData.getNumCols()+j]=(double) dataInteger[i][j];
-        if (localMetaData.getProperty("[Format]").equalsIgnoreCase("Float"))
-            for (int i=0;i<localMetaData.getNumRows();i++) for(int j=0;j<localMetaData.getNumCols();j++) aDatosDouble[0][i*localMetaData.getNumCols()+j]=(double) dataFloat[i][j];
-        if (localMetaData.getProperty("[Format]").equalsIgnoreCase("Double"))
-            for (int i=0;i<localMetaData.getNumRows();i++) for(int j=0;j<localMetaData.getNumCols();j++) aDatosDouble[0][i*localMetaData.getNumCols()+j]=(double) dataDouble[i][j];
-
         return aDatosDouble;
     }
     
@@ -380,6 +389,10 @@ public class DataRaster extends Object {
         return aDatosFloat;
     }*/
 
+    /**
+     * A few tests of this class.
+     * @param args Arguments are ignored.
+     */
     public static void main (String args[]) {
         try{
             hydroScalingAPI.io.MetaRaster metaRaster1=new hydroScalingAPI.io.MetaRaster (new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Hydrology/storms/randomField/randomMean100.metaVHC"));

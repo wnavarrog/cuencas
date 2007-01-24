@@ -27,8 +27,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.io;
 
 /**
- *
- * @author  Ricardo Mantilla
+ * This class populates the site database
+ * @author Ricardo Mantilla
  */
 public class ImportUSGS_StateGazetteer {
     
@@ -45,7 +45,7 @@ public class ImportUSGS_StateGazetteer {
 
     
     /** Creates a new instance of ImportUSGS_StateGazetteer */
-    public ImportUSGS_StateGazetteer(String state,String[] validFeatures) {
+    public ImportUSGS_StateGazetteer(String state,String[] validFeatures, String outputDir, float[] limits) {
         
         java.util.Vector validFeatureTypes=new java.util.Vector();
         for (int i=0;i<validFeatures.length;i++){
@@ -71,63 +71,69 @@ public class ImportUSGS_StateGazetteer {
                 thisLocation.latitude=locationInfo.substring(80,87);
                 if (thisLocation.latitude.equalsIgnoreCase("UNKNOWN")) {
                     thisLocation.latitude="N/A";
+                    thisLocation.latitudeNumeric=0;
                 } else {
                     thisLocation.latitude=locationInfo.substring(80,82)+":"+locationInfo.substring(82,84)+":"+locationInfo.substring(84,86)+" N";
+                    thisLocation.latitudeNumeric=Float.parseFloat(locationInfo.substring(80,82))+Float.parseFloat(locationInfo.substring(82,84))/60.0f+Float.parseFloat(locationInfo.substring(84,86))/3600.0f;
+                    
                 }
                 thisLocation.longitude=locationInfo.substring(88,95);
                 if (thisLocation.longitude.equalsIgnoreCase("UNKNOWN")) {
                     thisLocation.longitude="N/A";
+                    thisLocation.longitudeNumeric=0;
                 } else {
                     thisLocation.longitude=locationInfo.substring(88,91)+":"+locationInfo.substring(91,93)+":"+locationInfo.substring(93,95)+" W";
+                    thisLocation.longitudeNumeric=-(Float.parseFloat(locationInfo.substring(88,91))+Float.parseFloat(locationInfo.substring(91,93))/60.0f+Float.parseFloat(locationInfo.substring(93,95))/3600.0f);
                 }
                 thisLocation.Elevation=locationInfo.substring(114,119).trim();
                 if (thisLocation.Elevation.equalsIgnoreCase("")) thisLocation.Elevation="N/A";
                 
                 if (validFeatureTypes.contains(thisLocation.Type)){
-                    new java.io.File("/hidrosigDataBases/Continental_US_database/Sites/Locations/"+thisLocation.State+"/"+thisLocation.Type+"/").mkdirs();
-                    java.io.File theFile = new java.io.File("/hidrosigDataBases/Continental_US_database/Sites/Locations/"+thisLocation.State+"/"+thisLocation.Type+"/"+thisLocation.Name.toLowerCase()+".txt.gz");
-                    java.io.FileOutputStream inputLocal=new java.io.FileOutputStream(theFile);
-                    java.util.zip.GZIPOutputStream inputComprim=new java.util.zip.GZIPOutputStream(inputLocal);
-                    java.io.BufferedWriter bufferLocalW= new java.io.BufferedWriter(new java.io.OutputStreamWriter(inputComprim));
+                    if(thisLocation.latitudeNumeric > limits[0] & thisLocation.latitudeNumeric < limits[1] & thisLocation.longitudeNumeric > limits[2] & thisLocation.latitudeNumeric <limits[3]){
+                        new java.io.File(outputDir+thisLocation.State+"/"+thisLocation.Type+"/").mkdirs();
+                        java.io.File theFile = new java.io.File(outputDir+thisLocation.State+"/"+thisLocation.Type+"/"+thisLocation.Name.toLowerCase()+".txt.gz");
+                        java.io.FileOutputStream inputLocal=new java.io.FileOutputStream(theFile);
+                        java.util.zip.GZIPOutputStream inputComprim=new java.util.zip.GZIPOutputStream(inputLocal);
+                        java.io.BufferedWriter bufferLocalW= new java.io.BufferedWriter(new java.io.OutputStreamWriter(inputComprim));
 
-                    System.out.println(theFile);
-                    
-                    bufferLocalW.write("[type]"+"\n");
-                    bufferLocalW.write(thisLocation.Type+"\n");
-                    bufferLocalW.write("\n");
-                    bufferLocalW.write("[source]"+"\n");
-                    bufferLocalW.write("USGS"+"\n");
-                    bufferLocalW.write("\n");
-                    bufferLocalW.write("[site name]"+"\n");
-                    bufferLocalW.write(thisLocation.Name+"\n");
-                    bufferLocalW.write("\n");
-                    bufferLocalW.write("[county]"+"\n");
-                    bufferLocalW.write(thisLocation.County+"\n");
-                    bufferLocalW.write("\n");
-                    bufferLocalW.write("[state]"+"\n");
-                    bufferLocalW.write(thisLocation.State+"\n");
-                    bufferLocalW.write("\n");
-                    bufferLocalW.write("[latitude (deg:min:sec)]"+"\n");
-                    bufferLocalW.write(thisLocation.latitude+"\n");
-                    bufferLocalW.write("\n");
-                    bufferLocalW.write("[longitude (deg:min:sec)]"+"\n");
-                    bufferLocalW.write(thisLocation.longitude+"\n");
-                    bufferLocalW.write("\n");
-                    bufferLocalW.write("[altitude ASL (m)]"+"\n");
-                    bufferLocalW.write(thisLocation.Elevation+"\n");
-                    bufferLocalW.write("\n");
-                    bufferLocalW.write("[images]"+"\n");
-                    for(int j=0;j<thisLocation.Images.length;j++) bufferLocalW.write(thisLocation.Images[j]+"\n");
-                    bufferLocalW.write("\n");
-                    bufferLocalW.write("[information]"+"\n");
-                    bufferLocalW.write(thisLocation.Source+"\n");
-                    bufferLocalW.write("\n");
+                        System.out.println(theFile);
 
-                    bufferLocalW.close();
-                    inputComprim.close();
-                    inputLocal.close();
+                        bufferLocalW.write("[type]"+"\n");
+                        bufferLocalW.write(thisLocation.Type+"\n");
+                        bufferLocalW.write("\n");
+                        bufferLocalW.write("[source]"+"\n");
+                        bufferLocalW.write("USGS"+"\n");
+                        bufferLocalW.write("\n");
+                        bufferLocalW.write("[site name]"+"\n");
+                        bufferLocalW.write(thisLocation.Name+"\n");
+                        bufferLocalW.write("\n");
+                        bufferLocalW.write("[county]"+"\n");
+                        bufferLocalW.write(thisLocation.County+"\n");
+                        bufferLocalW.write("\n");
+                        bufferLocalW.write("[state]"+"\n");
+                        bufferLocalW.write(thisLocation.State+"\n");
+                        bufferLocalW.write("\n");
+                        bufferLocalW.write("[latitude (deg:min:sec)]"+"\n");
+                        bufferLocalW.write(thisLocation.latitude+"\n");
+                        bufferLocalW.write("\n");
+                        bufferLocalW.write("[longitude (deg:min:sec)]"+"\n");
+                        bufferLocalW.write(thisLocation.longitude+"\n");
+                        bufferLocalW.write("\n");
+                        bufferLocalW.write("[altitude ASL (m)]"+"\n");
+                        bufferLocalW.write(thisLocation.Elevation+"\n");
+                        bufferLocalW.write("\n");
+                        bufferLocalW.write("[images]"+"\n");
+                        for(int j=0;j<thisLocation.Images.length;j++) bufferLocalW.write(thisLocation.Images[j]+"\n");
+                        bufferLocalW.write("\n");
+                        bufferLocalW.write("[information]"+"\n");
+                        bufferLocalW.write(thisLocation.Source+"\n");
+                        bufferLocalW.write("\n");
+
+                        bufferLocalW.close();
+                        inputComprim.close();
+                        inputLocal.close();
+                    }
                 }
-                
                 locationInfo=bufferRemoto.readLine();
                 i++;
             }
@@ -213,8 +219,8 @@ public class ImportUSGS_StateGazetteer {
             woods - small area covered with a dense growth of trees; does not include an area of trees under the administration of a political agency (see forest).
          */
         
-        
-        new ImportUSGS_StateGazetteer("arizona",new String[] {"ppl"});
+        float[] limits = {35,40,-115,-110};
+        new ImportUSGS_StateGazetteer("arizona",new String[] {"ppl"},"/hidrosigDataBases/Continental_US_database/Sites/Locations/",limits);
     }
     
 }
@@ -226,7 +232,9 @@ class USGS_LocationProperties {
     public String Type;
     public String County;
     public String latitude;
+    public float latitudeNumeric;
     public String longitude;
+    public float longitudeNumeric;
     public String Source="United States Geological Survey - Geographic Names Information System - Downloadable State and Topical Gazetteer Files - http://geonames.usgs.gov/geonames/stategaz/index.html";
     public String Elevation;
     public String[] Images={"N/A"};

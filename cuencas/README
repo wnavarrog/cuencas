@@ -1,13 +1,4 @@
-To eliminate sources in copied directory
-
-find . -name "*.java*" > listSource
-%s/\.\//rm\ \.\//g
-
-To create the jar file use this command
-
-jar -cmfv Cuencas.Manifest.txt cuencas.jar hydroScalingAPI/ 
-
-Then you will need to sign you jars
+You will need to sign you jars
 
 jarsigner -keystore myKeystore cuencas.jar myself
 

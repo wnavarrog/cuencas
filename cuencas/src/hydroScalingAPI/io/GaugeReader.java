@@ -27,8 +27,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.io;
 
 /**
- *
- * @author  Ricardo Mantilla
+ * This class reads Gauge-type files that contain a time series.
+ * @author Ricardo Mantilla
  */
 public class GaugeReader{
 
@@ -49,7 +49,11 @@ public class GaugeReader{
                             "[data accuracy]"};
     
     
-    /** Creates a new instance of gaugeReader */
+    /**
+     * Creates a new instance of gaugeReader
+     * @param gaugeFile The file containing information about a given gauge.
+     * @throws java.io.IOException Captures errors while reading a file.
+     */
     public GaugeReader(java.io.File gaugeFile) throws java.io.IOException {
         
         register=new Object[parameters.length+1];
@@ -112,11 +116,17 @@ public class GaugeReader{
         
     }
     
+    /**
+     * Creates a registry to be used in a gauges database engine powered by the {@link
+     * hydroScalingAPI.util.database.DataBaseEngine}
+     * @return Returns an database registry {@link hydroScalingAPI.util.database.DB_Register}
+     */
     public Object[] getRegisterForDataBase(){
         return register;
     }
     
     /**
+     * Tests of the class
      * @param args the command line arguments
      */
     public static void main(String[] args) {

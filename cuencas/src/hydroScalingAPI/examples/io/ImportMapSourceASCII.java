@@ -18,11 +18,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
 
-package hydroScalingAPI.io;
+package hydroScalingAPI.examples.io;
 
 /**
- *
- * @author  Ricardo Mantilla
+ * This class was created to import GPS locations from a *.cvs file created using
+ * MapSource.  It also associates images.  ()
+ * @author Ricardo Mantilla
  */
 public class ImportMapSourceASCII {
     

@@ -19,7 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 
 /*
- * HSJToGrass.java
+ * CRasToEsriASCII.java
  *
  * Created on September 21, 2003, 2:01 PM
  */
@@ -27,27 +27,34 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.io;
 
 /**
- *
+ * This class takes CUENCAS raster and creates a ESRI GRID raster inputFile, which can
+ * be DEM or hydrometeorological fields.  IMPORTANT:  The Class will write the
+ * GRID inputFile using a gloabal LAT-LONG WGS-84 projection.
  * @author Ricardo Mantilla
  */
-public class HSJToGrass {
+public class CRasToEsriASCII {
     
     private hydroScalingAPI.io.MetaRaster myMetaInfo;
     private float[][] data;
     
     private java.io.File dirOut,fileName;
     
-    /** Creates a new instance of HSJToGrass */
-    public HSJToGrass(java.io.File file, java.io.File salida) throws java.io.IOException{
+    /**
+     * Creates a new instance of CRasToEsriASCII
+     * @param inputFile The Raster file to be exported
+     * @param outputDir The destination directory
+     * @throws java.io.IOException Captures error in the read/write process
+     */
+    public CRasToEsriASCII(java.io.File inputFile, java.io.File outputDir) throws java.io.IOException{
         
-        dirOut=salida;
-        fileName=file;
+        dirOut=outputDir;
+        fileName=inputFile;
         
         myMetaInfo=new hydroScalingAPI.io.MetaRaster(fileName);
     }
     
-    public void fileToExport(java.io.File file) throws java.io.IOException{
-        myMetaInfo.setLocationBinaryFile(file);
+    public void fileToExport(java.io.File inputFile) throws java.io.IOException{
+        myMetaInfo.setLocationBinaryFile(inputFile);
         data=new hydroScalingAPI.io.DataRaster(myMetaInfo).getFloat();
     }
     
@@ -56,17 +63,24 @@ public class HSJToGrass {
         data=new hydroScalingAPI.io.DataRaster(myMetaInfo).getFloat();
     }
     
-    public void writeGrassFile() throws java.io.IOException{
+    public void writeEsriFile() throws java.io.IOException{
         
-        String fileAscSalida=dirOut.getPath()+"/"+myMetaInfo.getLocationBinaryFile().getName()+".grass";
+        //Warning sign
+        if(myMetaInfo.getResLat() != myMetaInfo.getResLon()){
+            Object[] options = { "OK" };
+            javax.swing.JOptionPane.showOptionDialog(null, "Warning: The grid resolution is different in the latitudinal and longitudinal directions, Esri ASCII does not support this kind of grid.", "Error", javax.swing.JOptionPane.DEFAULT_OPTION, javax.swing.JOptionPane.ERROR_MESSAGE,null, options, options[0]);
+            return;
+        }
         
-        java.io.FileOutputStream        salida;
+        String fileAscSalida=dirOut.getPath()+"/"+myMetaInfo.getLocationBinaryFile().getName()+".asc";
+        
+        java.io.FileOutputStream        outputDir;
         java.io.OutputStreamWriter      newfile;
         java.io.BufferedOutputStream    bufferout;
         String                          retorno="\n";
         
-        salida = new java.io.FileOutputStream(fileAscSalida);
-        bufferout=new java.io.BufferedOutputStream(salida);
+        outputDir = new java.io.FileOutputStream(fileAscSalida);
+        bufferout=new java.io.BufferedOutputStream(outputDir);
         newfile=new java.io.OutputStreamWriter(bufferout);
         
         int nc=myMetaInfo.getNumCols();
@@ -74,18 +88,18 @@ public class HSJToGrass {
         
         float missing=Float.parseFloat(myMetaInfo.getMissing());
         
-        newfile.write("north: "+myMetaInfo.getMaxLat()+retorno);
-        newfile.write("south: "+myMetaInfo.getMinLat()+retorno);
-        newfile.write("east: "+myMetaInfo.getMaxLon()+retorno);
-        newfile.write("west: "+myMetaInfo.getMinLon()+retorno);
-        newfile.write("rows: "+myMetaInfo.getNumRows()+retorno);
-        newfile.write("cols: "+myMetaInfo.getNumCols()+retorno);
+        newfile.write("ncols         "+myMetaInfo.getNumCols()+retorno);
+        newfile.write("nrows         "+myMetaInfo.getNumRows()+retorno);
+        newfile.write("xllcorner     "+myMetaInfo.getMinLon()+retorno);
+        newfile.write("yllcorner     "+myMetaInfo.getMinLat()+retorno);
+        newfile.write("cellsize      "+(myMetaInfo.getResLat()/3600.0D)+retorno);
+        newfile.write("NODATA_value  "+myMetaInfo.getMissing()+retorno);
 
         
         for (int i=(nr-1);i>=0;i--) {
             for (int j=0;j<nc;j++) {
                 if (data[i][j] == missing) {
-                    newfile.write("* ");
+                    newfile.write(myMetaInfo.getMissing()+" ");
                 } else {
                     newfile.write(data[i][j]+" ");
                 }
@@ -95,8 +109,7 @@ public class HSJToGrass {
         
         newfile.close();
         bufferout.close();
-        salida.close();
-        
+        outputDir.close();
     }
     
     /**
@@ -105,10 +118,10 @@ public class HSJToGrass {
     public static void main(String[] args) {
         
         try{
-            HSJToGrass exporter=new HSJToGrass(new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS/WalnutCreek_KS/walnutCreek.metaDEM"),
-                                               new java.io.File("/home/ricardo/temp/"));
-            exporter.fileToExport(new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS/WalnutCreek_KS/walnutCreek.dem"));
-            exporter.writeGrassFile();
+            CRasToEsriASCII exporter=new CRasToEsriASCII(new java.io.File("C:/Documents and Settings/Administrator/My Documents/databases/Gila River DB/Rasters/Topography/mogollon.metaDEM"),
+                                                       new java.io.File("/tmp/"));
+            exporter.fileToExport(new java.io.File("C:/Documents and Settings/Administrator/My Documents/databases/Gila River DB/Rasters/Topography/mogollon.dem"));
+            exporter.writeEsriFile();
             
             /*new GrassToHSJ(new java.io.File("/home/ricardo/garbage/testsGrass/1630327a.grass"),
                            new java.io.File("/home/ricardo/garbage/testsGrass/"));*/

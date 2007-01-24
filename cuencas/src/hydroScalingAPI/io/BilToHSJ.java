@@ -21,13 +21,16 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.io;
 
 /**
- *
- * @author  Ricardo Mantilla
+ * Takes a USGS BIL file and creates a CUENCAS-Raster
+ * @author Ricardo Mantilla
  */
 public class BilToHSJ {
     
     private java.io.File headerInputFile,geoInputFile,dataInputFile;
     
+    /**
+     * The elements to be included in the MetaFile
+     */
     public String[] parameters= { 
                                     "[Name]",
                                     "[Southernmost Latitude]",
@@ -43,7 +46,13 @@ public class BilToHSJ {
                                     "[Information]"
                                 };
     private  String[][]       extensionPairs = {{"dem","metaDEM"},{"vhc","metaVHC"}};
-    /** Creates a new instance of BillToHSJ */
+    /**
+     * Creates a new instance of BillToHSJ
+     * @param inputDirectory The directory where the BIL files are located
+     * @param outputDirectory The location where the CUENCAS-Raster will be writen
+     * @param type 0 for DEM or 1 for VHC
+     * @throws java.io.IOException Captures problems while reading or writing the file
+     */
     public BilToHSJ(java.io.File inputDirectory, java.io.File outputDirectory,int type) throws java.io.IOException {
         
         if(!checkDirectoryContents(inputDirectory)) return;
@@ -191,6 +200,7 @@ public class BilToHSJ {
     }
     
     /**
+     * This method tests this class
      * @param args the command line arguments
      */
     public static void main(String[] args) {
