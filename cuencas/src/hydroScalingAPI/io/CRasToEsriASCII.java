@@ -53,8 +53,14 @@ public class CRasToEsriASCII {
         myMetaInfo=new hydroScalingAPI.io.MetaRaster(fileName);
     }
     
-    public void fileToExport(java.io.File inputFile) throws java.io.IOException{
-        myMetaInfo.setLocationBinaryFile(inputFile);
+    public void fileToExport(java.io.File file) throws java.io.IOException{
+        myMetaInfo.setLocationBinaryFile(file);
+        data=new hydroScalingAPI.io.DataRaster(myMetaInfo).getFloat();
+    }
+    
+    public void fileToExport(java.io.File file,String fileFormat) throws java.io.IOException{
+        myMetaInfo.setFormat(fileFormat);
+        myMetaInfo.setLocationBinaryFile(file);
         data=new hydroScalingAPI.io.DataRaster(myMetaInfo).getFloat();
     }
     

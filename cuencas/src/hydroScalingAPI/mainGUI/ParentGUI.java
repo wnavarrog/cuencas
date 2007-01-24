@@ -988,12 +988,6 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         importHydro.setFont(new java.awt.Font("Verdana", 0, 10));
         importHydroFromGRASS.setFont(new java.awt.Font("Verdana", 0, 10));
         importHydroFromGRASS.setText("From GRASS File");
-        importHydroFromGRASS.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                importHydroFromGRASSActionPerformed(evt);
-            }
-        });
-
         importHydro.add(importHydroFromGRASS);
 
         importHydroFromGRID.setFont(new java.awt.Font("Verdana", 0, 10));
@@ -1281,7 +1275,7 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
             String fileName=fileInput.getPath().substring(0,fileInput.getPath().lastIndexOf("."))+".metaDEM";
             String fileExtension=fileInput.getPath().substring(fileInput.getPath().lastIndexOf("."));
             java.io.File theMetaFile=new java.io.File(fileName);
-            hydroScalingAPI.io.HSJToEsriASCII exporter=new hydroScalingAPI.io.HSJToEsriASCII(theMetaFile,dirOutput);
+            hydroScalingAPI.io.CRasToEsriASCII exporter=new hydroScalingAPI.io.CRasToEsriASCII(theMetaFile,dirOutput);
             exporter.fileToExport(fcI.getSelectedFile(),hydroScalingAPI.tools.ExtensionToFormat.getFormat(fileExtension));
             exporter.writeEsriFile();
             setUpGUI(true);
@@ -1313,7 +1307,7 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         
         try{
             java.io.File theMetaFile=new java.io.File(fileInput.getPath().substring(0,fileInput.getPath().lastIndexOf("."))+".metaVHC");
-            hydroScalingAPI.io.HSJToEsriASCII exporter=new hydroScalingAPI.io.HSJToEsriASCII(theMetaFile,dirOutput);
+            hydroScalingAPI.io.CRasToEsriASCII exporter=new hydroScalingAPI.io.CRasToEsriASCII(theMetaFile,dirOutput);
             exporter.fileToExport(fcI.getSelectedFile());
             exporter.writeEsriFile();
             setUpGUI(true);
