@@ -130,22 +130,3 @@ public class ImportVisitedPointsASCII {
     }
     
 }
-
-class GpsLocationProperties {
-    public String StateAlphaCode;
-    public String State;
-    public String Name;
-    public String Type;
-    public String County;
-    public String latitude;
-    public String longitude;
-    public String Source="United States Geological Survey - Geographic Names Information System - Downloadable State and Topical Gazetteer Files - http://geonames.usgs.gov/geonames/stategaz/index.html";
-    public String Elevation;
-    public String[] Images={"N/A"};
-    public String CellName;
-    
-    public GpsLocationProperties(String st) {
-        State=st;
-    }
-   
-}

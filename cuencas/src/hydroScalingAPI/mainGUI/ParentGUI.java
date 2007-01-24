@@ -420,8 +420,6 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         importDemFromGRASS = new javax.swing.JMenuItem();
         importDemFromGRID = new javax.swing.JMenuItem();
         importDemFromBIL_USGS = new javax.swing.JMenuItem();
-        importDemFromUSGS = new javax.swing.JMenuItem();
-        importDemFromSRTM = new javax.swing.JMenuItem();
         importHydro = new javax.swing.JMenu();
         importHydroFromGRASS = new javax.swing.JMenuItem();
         importHydroFromGRID = new javax.swing.JMenuItem();
@@ -968,20 +966,6 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
 
         importDEM.add(importDemFromBIL_USGS);
 
-        importDemFromUSGS.setFont(new java.awt.Font("Verdana", 0, 10));
-        importDemFromUSGS.setText("From USGS website (90m DEMs)");
-        importDemFromUSGS.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                importDemFromUSGSActionPerformed(evt);
-            }
-        });
-
-        importDEM.add(importDemFromUSGS);
-
-        importDemFromSRTM.setFont(new java.awt.Font("Verdana", 0, 10));
-        importDemFromSRTM.setText("From SRTM website (30m DEMs)");
-        importDEM.add(importDemFromSRTM);
-
         jMenuImport.add(importDEM);
 
         importHydro.setText("Import Hydroclimatic Raster");
@@ -1061,6 +1045,12 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         exportHydro.setFont(new java.awt.Font("Verdana", 0, 10));
         exportHydroToGRASS.setFont(new java.awt.Font("Verdana", 0, 10));
         exportHydroToGRASS.setText("To GRASS File");
+        exportHydroToGRASS.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                exportHydroToGRASSActionPerformed(evt);
+            }
+        });
+
         exportHydro.add(exportHydroToGRASS);
 
         exportHydroToGRID.setFont(new java.awt.Font("Verdana", 0, 10));
@@ -1251,11 +1241,49 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void exportHydroToGRASSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportHydroToGRASSActionPerformed
+        javax.swing.JFileChooser fcI=new javax.swing.JFileChooser(localInfoManager.dataBaseRastersHydPath);
+        fcI.setFileSelectionMode(fcI.FILES_ONLY);
+        fcI.setDialogTitle("Hydroclimatic File Selection");
+        javax.swing.filechooser.FileFilter vhcFilter = new visad.util.ExtensionFileFilter("metaVHC","Hydroclimatic File");
+        fcI.addChoosableFileFilter(vhcFilter);
+        int result=fcI.showOpenDialog(this);
+        java.io.File fileInput = fcI.getSelectedFile();
+        if (result == javax.swing.JFileChooser.CANCEL_OPTION) return;
+        if (!fcI.getSelectedFile().isFile()) return;
+        
+        javax.swing.JFileChooser fcO=new javax.swing.JFileChooser();
+        fcO.setFileSelectionMode(fcO.DIRECTORIES_ONLY);
+        fcO.setDialogTitle("Output Directory");
+        result=fcO.showDialog(this,"Select");
+        if (result == javax.swing.JFileChooser.CANCEL_OPTION) return;
+        
+        java.io.File dirOutput = fcO.getSelectedFile();
+        if (dirOutput == null) return;
+        
+        try{
+            java.io.File theMetaFile=new java.io.File(fileInput.getPath().substring(0,fileInput.getPath().lastIndexOf("."))+".metaVHC");
+            hydroScalingAPI.io.CRasToGrass exporter=new hydroScalingAPI.io.CRasToGrass(theMetaFile,dirOutput);
+            hydroScalingAPI.subGUIs.widgets.HydroOpenDialog openVhc=new hydroScalingAPI.subGUIs.widgets.HydroOpenDialog(this,new hydroScalingAPI.io.MetaRaster(theMetaFile),true);
+            openVhc.setVisible(true);
+            if (openVhc.mapsSelected()){
+                for (int i=0;i<openVhc.getSelectedMetaRasters().length;i++){
+                    exporter.fileToExport(openVhc.getSelectedMetaRasters()[i]);
+                    exporter.writeGrassFile();
+                }
+            }
+            setUpGUI(true);
+        }catch(java.io.IOException ioe){
+            System.err.println("Failed during ESRI-ASCII file import");
+            ioe.printStackTrace();
+        }
+    }//GEN-LAST:event_exportHydroToGRASSActionPerformed
+
     private void exportDemToGRIDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportDemToGRIDActionPerformed
         javax.swing.JFileChooser fcI=new javax.swing.JFileChooser(localInfoManager.dataBaseRastersDemPath);
         fcI.setFileSelectionMode(fcI.FILES_ONLY);
         fcI.setDialogTitle("DEM File Selection");
-        javax.swing.filechooser.FileFilter demFilter = new visad.util.ExtensionFileFilter("*","DEM File");
+        javax.swing.filechooser.FileFilter demFilter = new visad.util.ExtensionFileFilter("metaDEM","DEM File");
         fcI.addChoosableFileFilter(demFilter);
         int result=fcI.showOpenDialog(this);
         java.io.File fileInput = fcI.getSelectedFile();
@@ -1273,11 +1301,16 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         
         try{
             String fileName=fileInput.getPath().substring(0,fileInput.getPath().lastIndexOf("."))+".metaDEM";
-            String fileExtension=fileInput.getPath().substring(fileInput.getPath().lastIndexOf("."));
             java.io.File theMetaFile=new java.io.File(fileName);
             hydroScalingAPI.io.CRasToEsriASCII exporter=new hydroScalingAPI.io.CRasToEsriASCII(theMetaFile,dirOutput);
-            exporter.fileToExport(fcI.getSelectedFile(),hydroScalingAPI.tools.ExtensionToFormat.getFormat(fileExtension));
-            exporter.writeEsriFile();
+            hydroScalingAPI.subGUIs.widgets.DemOpenDialog openDem=new hydroScalingAPI.subGUIs.widgets.DemOpenDialog(this,new hydroScalingAPI.io.MetaRaster(theMetaFile),true);
+            openDem.setVisible(true);
+            if (openDem.mapsSelected()){
+                for (int i=0;i<openDem.getSelectedMetaRasters().length;i++){
+                    exporter.fileToExport(openDem.getSelectedMetaRasters()[i]);
+                    exporter.writeEsriFile();
+                }
+            }
             setUpGUI(true);
         }catch(java.io.IOException ioe){
             System.err.println("Failed during ESRI-ASCII file import");
@@ -1289,7 +1322,7 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         javax.swing.JFileChooser fcI=new javax.swing.JFileChooser(localInfoManager.dataBaseRastersHydPath);
         fcI.setFileSelectionMode(fcI.FILES_ONLY);
         fcI.setDialogTitle("Hydroclimatic File Selection");
-        javax.swing.filechooser.FileFilter vhcFilter = new visad.util.ExtensionFileFilter("vhc","Hydroclimatic File");
+        javax.swing.filechooser.FileFilter vhcFilter = new visad.util.ExtensionFileFilter("metaVHC","Hydroclimatic File");
         fcI.addChoosableFileFilter(vhcFilter);
         int result=fcI.showOpenDialog(this);
         java.io.File fileInput = fcI.getSelectedFile();
@@ -1308,19 +1341,21 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         try{
             java.io.File theMetaFile=new java.io.File(fileInput.getPath().substring(0,fileInput.getPath().lastIndexOf("."))+".metaVHC");
             hydroScalingAPI.io.CRasToEsriASCII exporter=new hydroScalingAPI.io.CRasToEsriASCII(theMetaFile,dirOutput);
-            exporter.fileToExport(fcI.getSelectedFile());
-            exporter.writeEsriFile();
+            hydroScalingAPI.subGUIs.widgets.HydroOpenDialog openVhc=new hydroScalingAPI.subGUIs.widgets.HydroOpenDialog(this,new hydroScalingAPI.io.MetaRaster(theMetaFile),true);
+            openVhc.setVisible(true);
+            if (openVhc.mapsSelected()){
+                for (int i=0;i<openVhc.getSelectedMetaRasters().length;i++){
+                    exporter.fileToExport(openVhc.getSelectedMetaRasters()[i]);
+                    exporter.writeEsriFile();
+                }
+            }
             setUpGUI(true);
         }catch(java.io.IOException ioe){
             System.err.println("Failed during ESRI-ASCII file import");
             ioe.printStackTrace();
         }
     }//GEN-LAST:event_exportHydroToGRIDActionPerformed
-    
-    private void importDemFromUSGSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importDemFromUSGSActionPerformed
-// TODO add your handling code here:
-    }//GEN-LAST:event_importDemFromUSGSActionPerformed
-    
+        
     private void importHydroFromBIL_USGSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importHydroFromBIL_USGSActionPerformed
         javax.swing.JFileChooser fcI=new javax.swing.JFileChooser();
         fcI.setFileSelectionMode(fcI.DIRECTORIES_ONLY);
@@ -1426,7 +1461,7 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         
         try{
             hydroScalingAPI.io.CRasToGrass exporter=new hydroScalingAPI.io.CRasToGrass(fileInput,dirOutput);
-            hydroScalingAPI.subGUIs.widgets.DemOpenDialog openDem=new hydroScalingAPI.subGUIs.widgets.DemOpenDialog(this,new hydroScalingAPI.io.MetaRaster(fileInput));
+            hydroScalingAPI.subGUIs.widgets.DemOpenDialog openDem=new hydroScalingAPI.subGUIs.widgets.DemOpenDialog(this,new hydroScalingAPI.io.MetaRaster(fileInput),true);
             openDem.setVisible(true);
             if (openDem.mapsSelected()){
                 for (int i=0;i<openDem.getSelectedMetaRasters().length;i++){
@@ -1823,8 +1858,6 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
     private javax.swing.JMenuItem importDemFromBIL_USGS;
     private javax.swing.JMenuItem importDemFromGRASS;
     private javax.swing.JMenuItem importDemFromGRID;
-    private javax.swing.JMenuItem importDemFromSRTM;
-    private javax.swing.JMenuItem importDemFromUSGS;
     private javax.swing.JButton importDlgFile;
     private javax.swing.JMenu importHydro;
     private javax.swing.JMenuItem importHydroFromBIL_USGS;

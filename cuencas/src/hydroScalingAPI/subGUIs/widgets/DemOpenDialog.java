@@ -88,23 +88,6 @@ public class DemOpenDialog extends javax.swing.JDialog {
                                       " Gradient Value",
                                       " Topologic Diameter",
                                       " Raster Drainage Network"};
-
-    public String[] formatosAsoc={"",
-                                  "Double",
-                                  "Byte",
-                                  "Float",
-                                  "Byte",
-                                  "Float",
-                                  "Float",
-                                  "Float",
-                                  "Integer",
-                                  "Float",
-                                  "Float",
-                                  "Integer",
-                                  "Double",
-                                  "Integer",
-                                  "Byte"};
-    
     public String[] extraInfo={   "",
                                   " Fixed Digital Elevation Model - ",
                                   " Drainage Directions - ",
@@ -121,9 +104,11 @@ public class DemOpenDialog extends javax.swing.JDialog {
                                   " Topologic Diameter - ",
                                   " Raster Drainage Network - "};
         
-    
-    /** Creates new form mdtGeomorCheck */
     public DemOpenDialog(hydroScalingAPI.mainGUI.ParentGUI parent, hydroScalingAPI.io.MetaRaster md) {
+        this(parent,md,false);
+    }
+    /** Creates new form mdtGeomorCheck */
+    public DemOpenDialog(hydroScalingAPI.mainGUI.ParentGUI parent, hydroScalingAPI.io.MetaRaster md,boolean exporter) {
         super (parent, true);
         initComponents ();
         pack ();
@@ -131,7 +116,12 @@ public class DemOpenDialog extends javax.swing.JDialog {
         myParent=parent;
         metaData=md;
         
-        formatosAsoc[0]=metaData.getProperty("[Format]");
+        if(exporter){
+            open.setText("Export");
+            launch.setEnabled(false);
+            jPanel3.removeAll();
+        }
+        
         extraInfo[0]=metaData.getProperty("[Information]");
         units[0]=(units[1]=metaData.getProperty("[Units]"));
         units[9]=(units[10]=units[0]);
@@ -300,7 +290,10 @@ public class DemOpenDialog extends javax.swing.JDialog {
             listOfMetaRasters[i]=new hydroScalingAPI.io.MetaRaster(metaData.getLocationMeta());
             listOfMetaRasters[i].setName(derivedName[selectedSubMap[i]]);
             listOfMetaRasters[i].setLocationBinaryFile(new java.io.File(demPath+"/"+demName+extension[selectedSubMap[i]]));
-            listOfMetaRasters[i].setFormat(formatosAsoc[selectedSubMap[i]]);
+            if(extension[selectedSubMap[i]].equalsIgnoreCase(".dem"))
+                listOfMetaRasters[i].setFormat(metaData.getFormat());
+            else
+                listOfMetaRasters[i].setFormat(hydroScalingAPI.tools.ExtensionToFormat.getFormat(extension[selectedSubMap[i]]));
             listOfMetaRasters[i].setUnits(units[selectedSubMap[i]]);
             listOfMetaRasters[i].setInformation(extraInfo[selectedSubMap[i]]);
         }catch(java.io.IOException IOE){
