@@ -24,7 +24,7 @@ package hydroScalingAPI.io;
  * Takes a USGS BIL file and creates a CUENCAS-Raster
  * @author Ricardo Mantilla
  */
-public class BilToHSJ {
+public class BilToCRas {
     
     private java.io.File headerInputFile,geoInputFile,dataInputFile;
     
@@ -47,13 +47,13 @@ public class BilToHSJ {
                                 };
     private  String[][]       extensionPairs = {{"dem","metaDEM"},{"vhc","metaVHC"}};
     /**
-     * Creates a new instance of BillToHSJ
+     * Creates a new instance of BilToCRas
      * @param inputDirectory The directory where the BIL files are located
      * @param outputDirectory The location where the CUENCAS-Raster will be writen
      * @param type 0 for DEM or 1 for VHC
      * @throws java.io.IOException Captures problems while reading or writing the file
      */
-    public BilToHSJ(java.io.File inputDirectory, java.io.File outputDirectory,int type) throws java.io.IOException {
+    public BilToCRas(java.io.File inputDirectory, java.io.File outputDirectory,int type) throws java.io.IOException {
         
         if(!checkDirectoryContents(inputDirectory)) return;
         
@@ -205,7 +205,7 @@ public class BilToHSJ {
      */
     public static void main(String[] args) {
         try{
-            new hydroScalingAPI.io.BilToHSJ(new java.io.File("/home/furey/basin1/25941066"),
+            new hydroScalingAPI.io.BilToCRas(new java.io.File("/home/furey/basin1/25941066"),
                                             new java.io.File("/tmp/25941066.metaDEM"),0);
         }catch(java.io.IOException ioe){
             System.err.println("error");

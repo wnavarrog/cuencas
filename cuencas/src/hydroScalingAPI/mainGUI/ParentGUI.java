@@ -1373,7 +1373,7 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         if (result == javax.swing.JFileChooser.CANCEL_OPTION) return;
         
         try{
-            new hydroScalingAPI.io.BilToHSJ(dirInput,dirOutput,1);
+            new hydroScalingAPI.io.BilToCRas(dirInput,dirOutput,1);
             setUpGUI(true);
         }catch(java.io.IOException ioe){
             System.err.println("Failed during BIL file import");
@@ -1565,7 +1565,7 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         if (result == javax.swing.JFileChooser.CANCEL_OPTION) return;
         
         try{
-            new hydroScalingAPI.io.BilToHSJ(dirInput,dirOutput,0);
+            new hydroScalingAPI.io.BilToCRas(dirInput,dirOutput,0);
             setUpGUI(true);
         }catch(java.io.IOException ioe){
             System.err.println("Failed during BIL file import");
