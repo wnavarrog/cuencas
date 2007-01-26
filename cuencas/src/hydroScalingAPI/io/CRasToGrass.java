@@ -27,7 +27,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.io;
 
 /**
- *
+ * This class takes a CUENCAS raster and creates a GRASS ascii raster inputFile, which can
+ * be a DEM or a hydrometeorological field.  IMPORTANT:  The Class will write the
+ * GRID inputFile using a gloabal LAT-LONG WGS-84 projection.
  * @author Ricardo Mantilla
  */
 public class CRasToGrass {
@@ -39,36 +41,54 @@ public class CRasToGrass {
     
     /**
      * Creates a new instance of CRasToGrass
+     * @param inputFile The MetaRaster for the file to be exported
+     * @param outputDir The destination directory
+     * @throws java.io.IOException Captures error in the read/write process
      */
-    public CRasToGrass(java.io.File file, java.io.File salida) throws java.io.IOException{
+    public CRasToGrass(java.io.File inputFile, java.io.File outputDir) throws java.io.IOException{
         
-        dirOut=salida;
-        fileName=file;
+        dirOut=outputDir;
+        fileName=inputFile;
         
         myMetaInfo=new hydroScalingAPI.io.MetaRaster(fileName);
     }
     
-    public void fileToExport(java.io.File file) throws java.io.IOException{
-        myMetaInfo.setLocationBinaryFile(file);
+    /**
+     * Provides the class with the path to the binary file to be exported using the
+     * data from the MetaRaster provided in the constructor
+     * @param inputFile Path to the binary file
+     * @throws java.io.IOException Captures errors reading and/or writing
+     */
+    public void fileToExport(java.io.File inputFile) throws java.io.IOException{
+        myMetaInfo.setLocationBinaryFile(inputFile);
         data=new hydroScalingAPI.io.DataRaster(myMetaInfo).getFloat();
     }
     
+    /**
+     * Takes in a new MetaRaster to use as template for the data to be exported
+     * @param thisMetaInfo The MetaRaster that will be used to retrive binary data
+     * @throws java.io.IOException Errors reading the data
+     */
     public void fileToExport(hydroScalingAPI.io.MetaRaster thisMetaInfo) throws java.io.IOException{
         myMetaInfo=thisMetaInfo;
         data=new hydroScalingAPI.io.DataRaster(myMetaInfo).getFloat();
     }
     
+    /**
+     * Writes the data in GRASS ascii format
+     * @throws java.io.IOException Captures errors while writing the ascii file
+     */
     public void writeGrassFile() throws java.io.IOException{
         
         String fileAscSalida=dirOut.getPath()+"/"+myMetaInfo.getLocationBinaryFile().getName()+".grass";
         
-        java.io.FileOutputStream        salida;
+        java.io.FileOutputStream        outputDir;
         java.io.OutputStreamWriter      newfile;
         java.io.BufferedOutputStream    bufferout;
         String                          retorno="\n";
         
-        salida = new java.io.FileOutputStream(fileAscSalida);
-        bufferout=new java.io.BufferedOutputStream(salida);
+        outputDir = new java.io.FileOutputStream(fileAscSalida);
+        bufferout=new java.io.BufferedOutputStream(outputDir);
         newfile=new java.io.OutputStreamWriter(bufferout);
         
         int nc=myMetaInfo.getNumCols();
@@ -97,11 +117,12 @@ public class CRasToGrass {
         
         newfile.close();
         bufferout.close();
-        salida.close();
+        outputDir.close();
         
     }
     
     /**
+     * Tests for the class
      * @param args the command line arguments
      */
     public static void main(String[] args) {

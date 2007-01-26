@@ -111,7 +111,7 @@ public class NetworkTools extends javax.swing.JDialog {
         getContentPane().add(BasinDivideToPoly);
 
         TribsInput.setFont(new java.awt.Font("Dialog", 0, 10));
-        TribsInput.setText("Create Tribs Points File");
+        TribsInput.setText("tRIBS IO");
         TribsInput.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 TribsInputActionPerformed(evt);
@@ -125,49 +125,22 @@ public class NetworkTools extends javax.swing.JDialog {
 
     private void TribsInputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TribsInputActionPerformed
         try{
-            javax.swing.JFileChooser fc=new javax.swing.JFileChooser(mainFrame.getInfoManager().dataBasePolygonsPath);
-            fc.setFileSelectionMode(fc.FILES_ONLY);
-            fc.setDialogTitle("Directory Selection");
-            javax.swing.filechooser.FileFilter mdtFilter = new visad.util.ExtensionFileFilter("points","Points File");
-            fc.addChoosableFileFilter(mdtFilter);
-            fc.showSaveDialog(this);
-
-            //if (fc.getSelectedFile() == null) return;
-            
             java.io.File theFile=metaDatos.getLocationBinaryFile();
-            metaDatos.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".redRas"));
-            metaDatos.setFormat(hydroScalingAPI.tools.ExtensionToFormat.getFormat(".redRas"));
-            byte[][] rasterNet=new hydroScalingAPI.io.DataRaster(metaDatos).getByte();
+            metaDatos.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".magn"));
+            metaDatos.setFormat("Integer");
+            int [][] magnitudes=new hydroScalingAPI.io.DataRaster(metaDatos).getInt();
             
-            metaDatos.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".corrDEM"));
-            metaDatos.setFormat(hydroScalingAPI.tools.ExtensionToFormat.getFormat(".corrDEM"));
-            double[][] fixedDem=new hydroScalingAPI.io.DataRaster(metaDatos).getDouble();
-            
-        
-            hydroScalingAPI.util.geomorphology.objects.Basin myCuenca=new hydroScalingAPI.util.geomorphology.objects.Basin(xOut,yOut,matDir,metaDatos);
-            float[][] lonLatsDivide=myCuenca.getLonLatBasinDivide();
-            int[][] xyDivide=myCuenca.getXYBasinDivide();
-            float[][] lonLatsBasin=myCuenca.getLonLatBasin();
-            int[][] xyBasin=myCuenca.getXYBasin();
-            
-            System.out.println((lonLatsDivide[0].length+lonLatsBasin[0].length-1));
-            System.out.println((lonLatsBasin[0][0]+metaDatos.getResLon()/2.0)+" "+(lonLatsBasin[1][0]+metaDatos.getResLat()/2.0)+" "+fixedDem[xyBasin[1][0]][xyBasin[0][0]]+" "+2);
-            
-            for(int i=0;i<xyBasin[0].length;i++){
-                if(rasterNet[xyBasin[1][i]][xyBasin[0][i]] != 1)
-                    System.out.println((lonLatsBasin[0][i]+metaDatos.getResLon()/2.0)+" "+(lonLatsBasin[1][i]+metaDatos.getResLat()/2.0)+" "+fixedDem[xyBasin[1][i]][xyBasin[0][i]]+" "+0);
-                else
-                    System.out.println((lonLatsBasin[0][i]+metaDatos.getResLon()/2.0)+" "+(lonLatsBasin[1][i]+metaDatos.getResLat()/2.0)+" "+fixedDem[xyBasin[1][i]][xyBasin[0][i]]+" "+3);
-                
-            }
-            for(int i=0;i<lonLatsDivide[0].length-1;i++) System.out.println(((lonLatsDivide[0][i]+lonLatsDivide[0][i+1])/2.0)+" "+((lonLatsDivide[1][i]+lonLatsDivide[1][i+1])/2.0)+" "+fixedDem[xyDivide[1][i]][xyDivide[0][i]]+" "+1);
-            mainFrame.setUpGUI(true);
-            
+            new hydroScalingAPI.modules.tRIBS_io.widgets.TRIBS_io(mainFrame,xOut,yOut,matDir,magnitudes,metaDatos).setVisible(true);
             closeDialog(null);
         } catch (java.io.IOException IOE){
-            System.err.println("Failed creating polygon file for this basin. "+xOut+" "+yOut);
+            System.err.println("Failed loading Rainfall_Runoff_Model. "+xOut+" "+yOut);
             System.err.println(IOE);
+        } catch (visad.VisADException v){
+            System.err.println("Failed loading Rainfall_Runoff_Model. "+xOut+" "+yOut);
+            System.err.println(v);
         }
+        
+        
     }//GEN-LAST:event_TribsInputActionPerformed
 
     private void BasinDivideToPolyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BasinDivideToPolyActionPerformed

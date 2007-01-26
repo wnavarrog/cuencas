@@ -27,8 +27,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.io;
 
 /**
- * This class takes CUENCAS raster and creates a ESRI GRID raster inputFile, which can
- * be DEM or hydrometeorological fields.  IMPORTANT:  The Class will write the
+ * This class takes a CUENCAS raster and creates a ESRI GRID raster inputFile, which can
+ * be a DEM or a hydrometeorological field.  IMPORTANT:  The Class will write the
  * GRID inputFile using a gloabal LAT-LONG WGS-84 projection.
  * @author Ricardo Mantilla
  */
@@ -41,34 +41,43 @@ public class CRasToEsriASCII {
     
     /**
      * Creates a new instance of CRasToEsriASCII
-     * @param inputFile The Raster file to be exported
+     * @param inputMetaFile The MetaRaster for the file to be exported
      * @param outputDir The destination directory
      * @throws java.io.IOException Captures error in the read/write process
      */
-    public CRasToEsriASCII(java.io.File inputFile, java.io.File outputDir) throws java.io.IOException{
+    public CRasToEsriASCII(java.io.File inputMetaFile, java.io.File outputDir) throws java.io.IOException{
         
         dirOut=outputDir;
-        fileName=inputFile;
+        fileName=inputMetaFile;
         
         myMetaInfo=new hydroScalingAPI.io.MetaRaster(fileName);
     }
     
+    /**
+     * Provides the class with the path to the binary file to be exported using the
+     * data from the MetaRaster provided in the constructor
+     * @param file Path to the binary file
+     * @throws java.io.IOException Captures errors reading and/or writing
+     */
     public void fileToExport(java.io.File file) throws java.io.IOException{
         myMetaInfo.setLocationBinaryFile(file);
         data=new hydroScalingAPI.io.DataRaster(myMetaInfo).getFloat();
     }
     
-    public void fileToExport(java.io.File file,String fileFormat) throws java.io.IOException{
-        myMetaInfo.setFormat(fileFormat);
-        myMetaInfo.setLocationBinaryFile(file);
-        data=new hydroScalingAPI.io.DataRaster(myMetaInfo).getFloat();
-    }
-    
+    /**
+     * Takes in a new MetaRaster to use as template for the data to be exported
+     * @param thisMetaInfo The MetaRaster that will be used to retrive binary data
+     * @throws java.io.IOException Errors reading the data
+     */
     public void fileToExport(hydroScalingAPI.io.MetaRaster thisMetaInfo) throws java.io.IOException{
         myMetaInfo=thisMetaInfo;
         data=new hydroScalingAPI.io.DataRaster(myMetaInfo).getFloat();
     }
     
+    /**
+     * Writes the data in Esri ASCII format
+     * @throws java.io.IOException Captures errors while writing the ascii file
+     */
     public void writeEsriFile() throws java.io.IOException{
         
         //Warning sign
@@ -119,6 +128,7 @@ public class CRasToEsriASCII {
     }
     
     /**
+     * Tests for the class
      * @param args the command line arguments
      */
     public static void main(String[] args) {
@@ -126,7 +136,7 @@ public class CRasToEsriASCII {
         try{
             CRasToEsriASCII exporter=new CRasToEsriASCII(new java.io.File("C:/Documents and Settings/Administrator/My Documents/databases/Gila River DB/Rasters/Topography/mogollon.metaDEM"),
                                                        new java.io.File("/tmp/"));
-            exporter.fileToExport(new java.io.File("C:/Documents and Settings/Administrator/My Documents/databases/Gila River DB/Rasters/Topography/mogollon.dem"));
+            exporter.fileToExport(new hydroScalingAPI.io.MetaRaster(new java.io.File("C:/Documents and Settings/Administrator/My Documents/databases/Gila River DB/Rasters/Topography/mogollon.metaDEM")));
             exporter.writeEsriFile();
             
             /*new GrassToHSJ(new java.io.File("/home/ricardo/garbage/testsGrass/1630327a.grass"),

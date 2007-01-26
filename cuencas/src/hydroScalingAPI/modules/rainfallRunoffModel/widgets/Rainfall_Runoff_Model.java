@@ -59,7 +59,7 @@ public class Rainfall_Runoff_Model extends javax.swing.JDialog implements Displa
     private hydroScalingAPI.modules.rainfallRunoffModel.objects.HillSlopesInfo thisHillsInfo;
     private hydroScalingAPI.modules.rainfallRunoffModel.objects.StormManager storm;
     
-    private DisplayImplJ2D displayMap, displayStorm,activeDisplay,displayPlot,displayNet;
+    private DisplayImplJ3D displayMap, displayStorm,activeDisplay,displayPlot,displayNet;
     private DisplayImplJ3D displayDEM;
     private ScalarMap lonMap,latMap,varMap,lonMapDEM,latMapDEM,
                       varMapDEM,altMapDEM, lonMapStorm,latMapStorm,varMapStorm,
@@ -250,7 +250,7 @@ public class Rainfall_Runoff_Model extends javax.swing.JDialog implements Displa
         
         //Set up interface for Hill-Slope System
         
-        displayMap = new DisplayImplJ2D("displayMap");
+        displayMap = new DisplayImplJ3D("displayMap",new visad.java3d.TwoDDisplayRendererJ3D());
         
         GraphicsModeControl dispGMC = (GraphicsModeControl) displayMap.getGraphicsModeControl();
         dispGMC.setScaleEnable(true);
@@ -293,7 +293,7 @@ public class Rainfall_Runoff_Model extends javax.swing.JDialog implements Displa
         
         //Set up interface for Channel Network
         
-        displayNet = new DisplayImplJ2D("displayNet");
+        displayNet = new DisplayImplJ3D("displayNet",new visad.java3d.TwoDDisplayRendererJ3D());
         
         GraphicsModeControl dispNet = (GraphicsModeControl) displayNet.getGraphicsModeControl();
         dispNet.setScaleEnable(true);
@@ -317,7 +317,7 @@ public class Rainfall_Runoff_Model extends javax.swing.JDialog implements Displa
         
         //Set up interface for Storm Analysis
         
-        displayStorm = new DisplayImplJ2D("displayStorm");
+        displayStorm = new DisplayImplJ3D("displayStorm",new visad.java3d.TwoDDisplayRendererJ3D());
         
         GraphicsModeControl dispGMCStorm = (GraphicsModeControl) displayStorm.getGraphicsModeControl();
         dispGMCStorm.setScaleEnable(true);
@@ -338,7 +338,7 @@ public class Rainfall_Runoff_Model extends javax.swing.JDialog implements Displa
         ProjectionControl pcStorm = displayStorm.getProjectionControl();
         pcStorm.setAspectCartesian(new double[] {1.0, (double) (matrizPintada.length/(double) matrizPintada[0].length)});
         
-        displayPlot= new DisplayImplJ2D("displayPlot");
+        displayPlot= new DisplayImplJ3D("displayPlot",new visad.java3d.TwoDDisplayRendererJ3D());
         
         GraphicsModeControl dispGMCPlot = (GraphicsModeControl) displayPlot.getGraphicsModeControl();
         dispGMCPlot.setScaleEnable(true);
