@@ -133,15 +133,12 @@ public class TRIBS_io extends java.awt.Dialog {
         float[][] lonLatsDivide=myCuenca.getLonLatBasinDivide();
         int[][] xyDivide=myCuenca.getXYBasinDivide();
         
-        byte[][] prunedDir=matDir.clone();
-        for(int i=0;i<prunedDir.length;i++) for(int j=0;j<prunedDir[0].length;j++)  if(magnitudes[i][j] < 1) prunedDir[i][j]=0 ;
-        
-        myCuenca.findNetworkDivide(prunedDir);
-        float[][] lonLatsDivideNet=myCuenca.getLonLatNetworkDivide();
-        int[][] xyDivideNet=myCuenca.getXYNetworkDivide();
-        
-        lonLatsDivide=lonLatsDivideNet;
-        xyDivide=xyDivideNet;
+//        byte[][] prunedDir=matDir.clone();
+//        for(int i=0;i<prunedDir.length;i++) for(int j=0;j<prunedDir[0].length;j++)  if(magnitudes[i][j] < 1) prunedDir[i][j]=0 ;
+//        
+//        myCuenca.findNetworkDivide(prunedDir);
+//        float[][] lonLatsDivideNet=myCuenca.getLonLatNetworkDivide();
+//        int[][] xyDivideNet=myCuenca.getXYNetworkDivide();
         
         int numPoints=xyBasin[0].length+lonLatsDivide[0].length-1;
 
@@ -321,8 +318,8 @@ public class TRIBS_io extends java.awt.Dialog {
      */
     public static void main(String args[]) {
         try{
-            //java.io.File theFile=new java.io.File("/Users/ricardo/Documents/databases/Test_DB/Rasters/Topography/58447060.metaDEM");
-            java.io.File theFile=new java.io.File("/hidrosigDataBases/Test_DB/Rasters/Topography/58447060.metaDEM");
+            java.io.File theFile=new java.io.File("/Users/ricardo/Documents/databases/Test_DB/Rasters/Topography/58447060.metaDEM");
+            //java.io.File theFile=new java.io.File("/hidrosigDataBases/Test_DB/Rasters/Topography/58447060.metaDEM");
             hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster (theFile);
             metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".dir"));
             
