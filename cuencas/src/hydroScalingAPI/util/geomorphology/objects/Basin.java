@@ -27,10 +27,16 @@ package hydroScalingAPI.util.geomorphology.objects;
 public class Basin extends Object{
 
     private int[][] xyBasin;
+    
     private int[][] xyContour;
     private float[][] lonLatCountour;
+    
+    private int[][] xyContourNet;
+    private float[][] lonLatCountourNet;
+    
     private int minX,maxX,minY,maxY;
     private float minZ,maxZ;
+    
     private hydroScalingAPI.io.MetaRaster localMetaRaster;
     
     private int[][] toMark;
@@ -64,7 +70,7 @@ public class Basin extends Object{
             minY=Math.min(minY,xys[1]); maxY=Math.max(maxY,xys[1]); 
         }
         
-        findBasinDivide(fullDirMatrix);
+        findBasinDivide();
         
     }
     
@@ -195,6 +201,14 @@ public class Basin extends Object{
         return lonLatCountour;
     }
     
+    public int[][] getXYNetworkDivide(){
+        return xyContourNet;
+    }
+    
+    public float[][] getLonLatNetworkDivide(){
+        return lonLatCountourNet;
+    }
+    
     public visad.RealTuple getOutletTuple() throws visad.VisADException, java.rmi.RemoteException{
         float[] LonLatBasin=new float[2];
         
@@ -206,7 +220,7 @@ public class Basin extends Object{
         return new visad.RealTuple(rtd1);
     }
     
-    public void findBasinDivide(byte[][] fullDirMatrix){
+    public void findBasinDivide(){
         
         //Relleno la matriz con 0's y 1's
         
@@ -220,10 +234,6 @@ public class Basin extends Object{
         int dirSalida=0;
         int outX=xyBasin[0][0]-minX+2;
         int outY=xyBasin[1][0]-minY+2;
-        
-//        System.out.println("outX: "+outX);
-//        System.out.println("outY: "+outY);
-//        System.out.println("matrizBusqueda[outY][outX]: "+matrizBusqueda[outY][outX]);
         
         if (matrizBusqueda[outY+0][outX+1]==0){
             dirSalida=180;
@@ -250,26 +260,7 @@ public class Basin extends Object{
         
         int foreX;
         int foreY;
-        
-//        System.out.println("searchPointX: "+searchPointX);
-//        System.out.println("searchPointY: "+searchPointY);
-//        System.out.println("matrizBusqueda[searchPointY][searchPointX]: "+matrizBusqueda[searchPointY][searchPointX]);
-//        
-//        for(int i=0;i<matrizBusqueda.length;i++){
-//            for(int j=0;j<matrizBusqueda[0].length;j++){
-//                System.out.print(matrizBusqueda[i][j]+" ");
-//            }
-//            System.out.print("    ");
-//            for(int j=0;j<matrizBusqueda[0].length;j++){
-//                if(matrizBusqueda[i][j] == 1) 
-//                    System.out.print("("+fullDirMatrix[i+minY-2][j+minX-2]+") ");
-//                else
-//                    System.out.print("["+fullDirMatrix[i+minY-2][j+minX-2]+"] ");
-//            }
-//            System.out.println();
-//        }
-//        System.exit(0);
-        
+                
         do{
             do{
                 dirSalida+=90;
@@ -303,6 +294,80 @@ public class Basin extends Object{
         }
     }
     
+    public void findNetworkDivide(byte[][] referenceMatrix){
+        
+        //Relleno la matriz con 0's y 1's
+        
+        int[][] matrizBusqueda=new int[maxY-minY+5][maxX-minX+5];
+        for (int j=0;j<xyBasin[0].length;j++){
+            if(referenceMatrix[xyBasin[1][j]][xyBasin[0][j]] > 0) matrizBusqueda[xyBasin[1][j]-minY+2][xyBasin[0][j]-minX+2]=1;
+        }
+        
+        //Determino la direccion inicial de busqueda
+        
+        int dirSalida=0;
+        int outX=xyBasin[0][0]-minX+2;
+        int outY=xyBasin[1][0]-minY+2;
+        
+        if (matrizBusqueda[outY+0][outX+1]==0){
+            dirSalida=180;
+            outX=outX+1;
+            outY=outY+0;
+        } else  if (matrizBusqueda[outY+0][outX-1]==0){
+                    dirSalida=0;
+                    outX=outX-1;
+                    outY=outY+0;
+                } else  if (matrizBusqueda[outY+1][outX+0]==0){
+                                dirSalida=270;
+                                outX=outX+0;
+                                outY=outY+1;
+                        } else  if (matrizBusqueda[outY-1][outX+0]==0){
+                                    dirSalida=90;
+                                    outX=outX+0;
+                                    outY=outY-1;
+                                }
+        
+        int searchPointX=outX;
+        int searchPointY=outY;
+        
+        java.util.Vector idsContorno=new java.util.Vector();
+        
+        int foreX;
+        int foreY;
+                
+        do{
+            do{
+                dirSalida+=90;
+                foreX=searchPointX+(int) Math.round(Math.cos(dirSalida*Math.PI/180.0));
+                foreY=searchPointY+(int) Math.round(Math.sin(dirSalida*Math.PI/180.0));
+            } while(matrizBusqueda[foreY][foreX] == 1);
+            matrizBusqueda[foreY][foreX]=8;
+            
+            for (int dirVec=-90;dirVec<=180;dirVec+=90){
+                int lookX=foreX+(int) Math.round(Math.cos((dirSalida+dirVec)*Math.PI/180.0));
+                int lookY=foreY+(int) Math.round(Math.sin((dirSalida+dirVec)*Math.PI/180.0));
+                if (matrizBusqueda[lookY][lookX]==1){
+                    idsContorno.add(new int[] {foreX+(int) Math.round(Math.abs(Math.cos(((dirSalida+dirVec-270)-45)*Math.PI/360.0))),foreY+(int) Math.round(Math.abs(Math.cos(((dirSalida+dirVec)-45)*Math.PI/360.0)))});
+                } else break;
+            }
+            searchPointX=foreX;
+            searchPointY=foreY;
+            dirSalida-=180;
+        } while(foreX!=outX || foreY!=outY);
+        
+        idsContorno.add(idsContorno.firstElement());
+        
+        lonLatCountourNet=new float[2][idsContorno.size()];
+        xyContourNet=new int[2][idsContorno.size()];
+        for (int k=0; k <idsContorno.size(); k++){
+            int[] xys=(int[]) idsContorno.elementAt(k);
+            xyContourNet[0][k]=xys[0]+minX-2;
+            xyContourNet[1][k]=xys[1]+minY-2;
+            lonLatCountourNet[0][k]=(float) ((xys[0]+minX-2)*localMetaRaster.getResLon()/3600.0f+localMetaRaster.getMinLon());
+            lonLatCountourNet[1][k]=(float) ((xys[1]+minY-2)*localMetaRaster.getResLat()/3600.0f+localMetaRaster.getMinLat());
+        }
+    }
+    
     public int getMinX(){
         return minX;
     }
@@ -319,16 +384,16 @@ public class Basin extends Object{
         return maxY;
     }
     
-    public float[] getElevations(hydroScalingAPI.io.MetaRaster mr) throws java.io.IOException{
+    public float[] getElevations() throws java.io.IOException{
         
         float[] elevationsBasin=new float[xyBasin[0].length];
-        String currFormat=mr.getFormat();
-        java.io.File currBinLoc=mr.getLocationBinaryFile();
-        mr.restoreOriginalFormat();
-        mr.setLocationBinaryFile(new java.io.File(currBinLoc.getAbsolutePath().subSequence(0, currBinLoc.getAbsolutePath().lastIndexOf("."))+".dem"));
-        float[][] elevations=new hydroScalingAPI.io.DataRaster(mr).getFloat();
-        minZ=Float.MAX_VALUE;
-        maxZ=Float.MIN_VALUE;
+        String currFormat=localMetaRaster.getFormat();
+        java.io.File currBinLoc=localMetaRaster.getLocationBinaryFile();
+        localMetaRaster.setFormat(hydroScalingAPI.tools.ExtensionToFormat.getFormat(".corrDEM"));
+        localMetaRaster.setLocationBinaryFile(new java.io.File(currBinLoc.getAbsolutePath().subSequence(0, currBinLoc.getAbsolutePath().lastIndexOf("."))+".corrDEM"));
+        float[][] elevations=new hydroScalingAPI.io.DataRaster(localMetaRaster).getFloat();
+        localMetaRaster.restoreOriginalFormat();
+        localMetaRaster.setLocationBinaryFile(currBinLoc);
         
         for (int k=0; k < xyBasin[0].length; k++){
             elevationsBasin[k]=elevations[xyBasin[1][k]][xyBasin[0][k]]; 

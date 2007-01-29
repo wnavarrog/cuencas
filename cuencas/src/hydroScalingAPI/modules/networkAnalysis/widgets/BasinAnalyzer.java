@@ -662,7 +662,7 @@ public class BasinAnalyzer extends javax.swing.JDialog{
     private void plotHypCurve() throws RemoteException, VisADException,java.io.IOException{
         displayHC.removeAllReferences();
         
-        float[] eleBasin=myCuenca.getElevations(metaDatos);
+        float[] eleBasin=myCuenca.getElevations();
         java.util.Arrays.sort(eleBasin);
         float localMinElev=eleBasin[0];
         float localMaxElev=eleBasin[eleBasin.length-1];
