@@ -60,7 +60,6 @@ public class ImportUSGS_StateGazetteer {
      * <blockquote>
      * <p><span class="bold">airport</span> - manmade facility maintained for the use
      *  of aircraft (airfield, airstrip, landing field, landing strip). </p>
-     * 
      * <p><a name="arch"></a><span class="bold">arch</span> - natural arch-like opening
      *  in a rock mass (bridge, natural bridge, sea arch). </p>
      * <p><a name="area"></a><span class="bold">area</span> - any one of several areally
@@ -73,7 +72,6 @@ public class ImportUSGS_StateGazetteer {
      *  reef, sandbar, shoal, spit). </p>
      * <p><a name="basin"></a><span class="bold">basin</span> - natural depression or
      *  relatively low area enclosed by higher land (amphitheater, cirque, pit, sink). </p>
-     * 
      * <p><a name="bay"></a><span class="bold">bay</span> - indentation of a coastline
      *  or shoreline enclosing a part of a body of water; a body of water partly surrounded
      *  by land (arm, bight, cove, estuary, gulf, inlet, sound). </p>
@@ -89,7 +87,6 @@ public class ImportUSGS_StateGazetteer {
      * <p><a name="bridge"></a><span class="bold">bridge</span> - manmade structure
      *  carrying a trail, road, or other transportation system across a body of water
      *  or depression (causeway, overpass, trestle). </p>
-     * 
      * <p><a name="building"></a><span class="bold">building</span> - a manmade structure
      *  with walls and a roof for protection of people and (or) materials, but not
      *  including church, hospital, or school. </p>
@@ -101,7 +98,6 @@ public class ImportUSGS_StateGazetteer {
      *  or chamber, or a hollowed out cavity in the side of a cliff (cavern, grotto). </p>
      * <p><a name="cemetery"></a><span class="bold">cemetery</span> - a place or area
      *  for burying the dead (burial, burying ground, grave, memorial garden). </p>
-     * 
      * <p><a name="channel"></a><span class="bold">channel</span> - linear deep part
      *  of a body of water through which the main volume of water flows and is frequently
      *  used as aroute for watercraft (passage, reach, strait, thoroughfare, throughfare). </p>
@@ -117,7 +113,6 @@ public class ImportUSGS_StateGazetteer {
      *  at the summit of a volcanic cone or one on the surface of the land caused by
      *  the impact of a meteorite; a manmade depression caused by an explosion (caldera,
      *  lua). </p>
-     * 
      * <p><a name="crossing"></a><span class="bold">crossing</span> - a place where
      *  two or more routes of transportation form a junction or intersection (overpass,
      *  underpass). </p>
@@ -131,7 +126,6 @@ public class ImportUSGS_StateGazetteer {
      * <p><a name="forest"></a><span class="bold">forest</span> - bounded area of woods,
      *  forest, or grassland under the administration of a political agency (see &quot;woods&quot;)
      *  (national forest, national grasslands, State forest). </p>
-     * 
      * <p><a name="gap"></a><span class="bold">gap</span> - low point or opening between
      *  hills or mountains or in a ridge or mountain range (col, notch, pass, saddle,
      *  water gap, wind gap). </p>
@@ -147,7 +141,6 @@ public class ImportUSGS_StateGazetteer {
      * <p><a name="harbor"></a><span class="bold">harbor</span> - sheltered area of
      *  water where ships or other watercraft can anchor or dock (hono, port, roads,
      *  roadstead). </p>
-     * 
      * <p><a name="hospital"></a><span class="bold">hospital</span> - building where
      *  the sick or injured may receive medical or surgical attention (infirmary). </p>
      * <p><a name="island"></a><span class="bold">island</span> - area of dry or relatively
@@ -160,7 +153,6 @@ public class ImportUSGS_StateGazetteer {
      * <p><a name="lava"></a><span class="bold">lava</span> - formations resulting from
      *  the consolidation of molten rock on the surface of the Earth (kepula, lava
      *  flow). </p>
-     * 
      * <p><a name="levee"></a><span class="bold">levee</span> - natural or manmade embankment
      *  flanking a stream (bank, berm). </p>
      * <p><a name="locale"></a><span class="bold">locale</span> - place at which there
@@ -174,7 +166,6 @@ public class ImportUSGS_StateGazetteer {
      *  or facility formerly used for various aspects of or relating to military activity. </p>
      * <p><a name="oilfield"></a><span class="bold">oilfield</span> - area where petroleum
      *  is or was removed from the Earth. </p>
-     * 
      * <p><a name="other"></a><span class="bold">other</span> - category for miscellaneous
      *  named entities that cannot readily be placed in the other feature classes listed
      *  here. </p>
@@ -192,7 +183,6 @@ public class ImportUSGS_StateGazetteer {
      * <p><a name="po"></a><span class="bold">Post Office</span> - (Formerly abbreviated
      *  as PO) an official facility of the U.S. Postal Service used for processing
      *  and distributing mail and other postal material. </p>
-     * 
      * <p><a name="ppl"></a><span class="bold">Populated Place</span> - (Formerly abbreviated
      *  as ppl) place or area with clustered or scattered buildings and a permanent
      *  human population (city, settlement, town, village). </p>
@@ -204,7 +194,6 @@ public class ImportUSGS_StateGazetteer {
      *  set aside for a specific use (does not include forests, civil divisions, parks). </p>
      * <p><a name="reservoir"></a><span class="bold">reservoir</span> - artificially
      *  impounded body of water (lake, tank). </p>
-     * 
      * <p><a name="ridge"></a><span class="bold">ridge</span> - elevation with a narrow,
      *  elongated crest which can be part of a hill or mountain (crest, cuesta, escarpment,
      *  hogback, lae, rim, spur). </p>
@@ -217,7 +206,6 @@ public class ImportUSGS_StateGazetteer {
      *  of the Earth's surface (grade, pitch). </p>
      * <p><a name="spring"></a><span class="bold">spring</span> - place where underground
      *  water flows naturally to the surface of the Earth (seep). </p>
-     * 
      * <p><a name="stream"></a><span class="bold">stream</span> - linear body of water
      *  flowing on the Earth's surface (anabranch, awawa, bayou, branch, brook, creek,
      *  distributary, fork, kill, pup, rio, river, run, slough). </p>
@@ -235,7 +223,6 @@ public class ImportUSGS_StateGazetteer {
      * <p><a name="trail"></a><span class="bold">trail</span> - route for passage from
      *  one point to another; does not include roads or highways (jeep trail, path,
      *  ski trail). </p>
-     * 
      * <p><a name="tunnel"></a><span class="bold">tunnel</span> - linear underground
      *  passageway open at both ends. </p>
      * <p><a name="unknown"></a><a name="valley"></a><span class="bold">valley</span> -
