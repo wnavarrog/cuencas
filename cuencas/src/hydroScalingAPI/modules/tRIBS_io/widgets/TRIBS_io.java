@@ -49,6 +49,9 @@ public class TRIBS_io extends java.awt.Dialog {
     
     private visad.java3d.DisplayRendererJ3D dr;
     
+    private byte[][] directionsKey={{1,2,3},{4,5,6},{7,8,9}};
+    private int numPointsBasin=0;
+    
     /**
      * Creates new form TRIBS_io
      */
@@ -62,7 +65,7 @@ public class TRIBS_io extends java.awt.Dialog {
         magnitudes=magnit;
         
         //Set up general interface
-        setBounds(0,0, 780, 500);
+        setBounds(0,0, 950, 700);
         java.awt.Rectangle marcoParent=mainFrame.getBounds();
         java.awt.Rectangle thisMarco=this.getBounds();
         setBounds(marcoParent.x+marcoParent.width/2-thisMarco.width/2,marcoParent.y+marcoParent.height/2-thisMarco.height/2,thisMarco.width,thisMarco.height);
@@ -119,12 +122,16 @@ public class TRIBS_io extends java.awt.Dialog {
             }
         });
         
-        plotPoints();
+        initializePoints();
         jPanel1.add("Center",display_TIN.getComponent());
         
     }
     
-    private void plotPoints() throws RemoteException, VisADException, java.io.IOException {
+    private void plotPoints(float Zr) throws RemoteException, VisADException{
+        
+    }
+    
+    private void initializePoints() throws RemoteException, VisADException, java.io.IOException {
         
         float[][] lonLatsBasin=myCuenca.getLonLatBasin();
         int[][] xyBasin=myCuenca.getXYBasin();
@@ -133,62 +140,146 @@ public class TRIBS_io extends java.awt.Dialog {
         float[][] lonLatsDivide=myCuenca.getLonLatBasinDivide();
         int[][] xyDivide=myCuenca.getXYBasinDivide();
         
-//        byte[][] prunedDir=matDir.clone();
-//        for(int i=0;i<prunedDir.length;i++) for(int j=0;j<prunedDir[0].length;j++)  if(magnitudes[i][j] < 1) prunedDir[i][j]=0 ;
-//        
-//        myCuenca.findNetworkDivide(prunedDir);
-//        float[][] lonLatsDivideNet=myCuenca.getLonLatNetworkDivide();
-//        int[][] xyDivideNet=myCuenca.getXYNetworkDivide();
+        java.util.Vector pointsInTriangulation=new java.util.Vector();
+        java.util.Vector typeOfPoint=new java.util.Vector();
         
-        int numPoints=xyBasin[0].length+lonLatsDivide[0].length-1;
-
-        float[][] xyLinkValues=new float[3][numPoints];
-        
-        Gdc_Coord_3d gdc[] = new Gdc_Coord_3d[numPoints];
-        Utm_Coord_3d utm[] = new Utm_Coord_3d[numPoints];
-        
+        //adding points inside the basin
         for (int i = 0;i<xyBasin[0].length;i++){
-            gdc[i] = new Gdc_Coord_3d(lonLatsBasin[1][i]+metaDatos.getResLat()/3600.0/2.0,lonLatsBasin[0][i]+metaDatos.getResLon()/3600.0/2.0,corrDEM[0]);
-            utm[i] = new Utm_Coord_3d();
-        }
-        for(int i=0;i<lonLatsDivide[0].length-1;i++){
-            gdc[i+xyBasin[0].length] = new Gdc_Coord_3d((lonLatsDivide[1][i]+lonLatsDivide[1][i+1])/2.0,(lonLatsDivide[0][i]+lonLatsDivide[0][i+1])/2.0,corrDEM[0]);
-            utm[i+xyBasin[0].length] = new Utm_Coord_3d();
-        }
-
-        Gdc_To_Utm_Converter.Init(new WE_Ellipsoid());
-        Gdc_To_Utm_Converter.Convert(gdc,utm);
-        
-        for(int i=0;i<xyBasin[0].length;i++){
-            if(magnitudes[xyBasin[1][i]][xyBasin[0][i]] > 0){
-                xyLinkValues[0][i]=(float)utm[i].x;
-                xyLinkValues[1][i]=(float)utm[i].y;
-                xyLinkValues[2][i]=0;
-            } else {
-                xyLinkValues[0][i]=(float)utm[i].x;
-                xyLinkValues[1][i]=(float)utm[i].y;
-                xyLinkValues[2][i]=3;
+            if(magnitudes[xyBasin[1][i]][xyBasin[0][i]] <= 0){
+                pointsInTriangulation.add(new Gdc_Coord_3d(lonLatsBasin[1][i]+metaDatos.getResLat()/3600.0/2.0,lonLatsBasin[0][i]+metaDatos.getResLon()/3600.0/2.0,corrDEM[0]));
+                typeOfPoint.add(new int[] {3});
+                numPointsBasin++;
             }
         }
         
+        float bfs=0.8f;
+        
+        //adding points along the river network
+        for (int i = 0;i<xyBasin[0].length;i++){
+            if(magnitudes[xyBasin[1][i]][xyBasin[0][i]] > 0){
+                int yP=xyBasin[1][i];
+                int xP=xyBasin[0][i];
+                
+                double latP=lonLatsBasin[1][i]+metaDatos.getResLat()/3600.0/2.0;
+                double lonP=lonLatsBasin[0][i]+metaDatos.getResLon()/3600.0/2.0;
+                
+                pointsInTriangulation.add(new Gdc_Coord_3d(latP,lonP,corrDEM[0]));
+                typeOfPoint.add(new int[] {0});
+                if (i>0){
+                    int delta_yP=((matDir[(int)yP][xP]-1)/3)-1;
+                    int delta_xP=((matDir[yP][xP]-1)%3)-1;
+
+                    double nLatP=latP+delta_yP*metaDatos.getResLat()/3600.0*1.0/4.0;
+                    double nLonP=lonP+delta_xP*metaDatos.getResLon()/3600.0*1.0/4.0;
+
+                    pointsInTriangulation.add(new Gdc_Coord_3d(nLatP,nLonP,corrDEM[0]));
+                    typeOfPoint.add(new int[] {0});
+                    
+//                        nLatP=latP+(1*delta_yP-bfs*delta_xP)*metaDatos.getResLat()/3600.0/4.0;
+//                        nLonP=lonP+(1*delta_xP+bfs*delta_yP)*metaDatos.getResLon()/3600.0/4.0;
+//
+//                        pointsInTriangulation.add(new Gdc_Coord_3d(nLatP,nLonP,corrDEM[0]));
+//                        typeOfPoint.add(new int[] {2});
+//
+//                        nLatP=latP+(1*delta_yP+bfs*delta_xP)*metaDatos.getResLat()/3600.0/4.0;
+//                        nLonP=lonP+(1*delta_xP-bfs*delta_yP)*metaDatos.getResLon()/3600.0/4.0;
+//
+//                        pointsInTriangulation.add(new Gdc_Coord_3d(nLatP,nLonP,corrDEM[0]));
+//                        typeOfPoint.add(new int[] {2});
+                    
+                    nLatP=latP+delta_yP*metaDatos.getResLat()/3600.0*2.0/4.0;
+                    nLonP=lonP+delta_xP*metaDatos.getResLon()/3600.0*2.0/4.0;
+                    
+                    pointsInTriangulation.add(new Gdc_Coord_3d(nLatP,nLonP,corrDEM[0]));
+                    typeOfPoint.add(new int[] {0});
+                    
+                        nLatP=latP+(2*delta_yP-bfs*delta_xP)*metaDatos.getResLat()/3600.0/4.0;
+                        nLonP=lonP+(2*delta_xP+bfs*delta_yP)*metaDatos.getResLon()/3600.0/4.0;
+
+                        pointsInTriangulation.add(new Gdc_Coord_3d(nLatP,nLonP,corrDEM[0]));
+                        typeOfPoint.add(new int[] {2});
+
+                        nLatP=latP+(2*delta_yP+bfs*delta_xP)*metaDatos.getResLat()/3600.0/4.0;
+                        nLonP=lonP+(2*delta_xP-bfs*delta_yP)*metaDatos.getResLon()/3600.0/4.0;
+
+                        pointsInTriangulation.add(new Gdc_Coord_3d(nLatP,nLonP,corrDEM[0]));
+                        typeOfPoint.add(new int[] {2});
+
+                    nLatP=latP+delta_yP*metaDatos.getResLat()/3600.0*3.0/4.0;
+                    nLonP=lonP+delta_xP*metaDatos.getResLon()/3600.0*3.0/4.0;
+
+                    pointsInTriangulation.add(new Gdc_Coord_3d(nLatP,nLonP,corrDEM[0]));
+                    typeOfPoint.add(new int[] {0});
+                    
+//                        nLatP=latP+(3*delta_yP-bfs*delta_xP)*metaDatos.getResLat()/3600.0/4.0;
+//                        nLonP=lonP+(3*delta_xP+bfs*delta_yP)*metaDatos.getResLon()/3600.0/4.0;
+//
+//                        pointsInTriangulation.add(new Gdc_Coord_3d(nLatP,nLonP,corrDEM[0]));
+//                        typeOfPoint.add(new int[] {2});
+//
+//                        nLatP=latP+(3*delta_yP+bfs*delta_xP)*metaDatos.getResLat()/3600.0/4.0;
+//                        nLonP=lonP+(3*delta_xP-bfs*delta_yP)*metaDatos.getResLon()/3600.0/4.0;
+//
+//                        pointsInTriangulation.add(new Gdc_Coord_3d(nLatP,nLonP,corrDEM[0]));
+//                        typeOfPoint.add(new int[] {2});
+                    
+                    if(magnitudes[xyBasin[1][i]-delta_xP][xyBasin[0][i]+delta_yP] <= 0 || matDir[xyBasin[1][i]-delta_xP][xyBasin[0][i]+delta_yP] != 10-directionsKey[1-delta_xP][1+delta_yP]){
+                        nLatP=latP-delta_xP*metaDatos.getResLat()/3600.0*bfs/4.0;
+                        nLonP=lonP+delta_yP*metaDatos.getResLon()/3600.0*bfs/4.0;
+
+                        pointsInTriangulation.add(new Gdc_Coord_3d(nLatP,nLonP,corrDEM[0]));
+                        typeOfPoint.add(new int[] {2});
+                    }
+                    
+                    if(magnitudes[xyBasin[1][i]+delta_xP][xyBasin[0][i]-delta_yP] <= 0 || matDir[xyBasin[1][i]+delta_xP][xyBasin[0][i]-delta_yP] != 10-directionsKey[1+delta_xP][1-delta_yP]){
+                        nLatP=latP+delta_xP*metaDatos.getResLat()/3600.0*bfs/4.0;
+                        nLonP=lonP-delta_yP*metaDatos.getResLon()/3600.0*bfs/4.0;
+
+                        pointsInTriangulation.add(new Gdc_Coord_3d(nLatP,nLonP,corrDEM[0]));
+                        typeOfPoint.add(new int[] {2});
+                    }
+                    
+                }
+            }
+        }
+        //adding points in the basin divide
         for(int i=0;i<lonLatsDivide[0].length-1;i++){
-            xyLinkValues[0][i+xyBasin[0].length]=(float)utm[i+xyBasin[0].length].x;
-            xyLinkValues[1][i+xyBasin[0].length]=(float)utm[i+xyBasin[0].length].y;
-            xyLinkValues[2][i+xyBasin[0].length]=2;
+            pointsInTriangulation.add(new Gdc_Coord_3d((lonLatsDivide[1][i]+lonLatsDivide[1][i+1])/2.0,(lonLatsDivide[0][i]+lonLatsDivide[0][i+1])/2.0,corrDEM[0]));
+                typeOfPoint.add(new int[] {2});
         }
 
-        xyLinkValues[2][xyBasin[0].length+lonLatsDivide[0].length-2]=1;
-        
-        hydroScalingAPI.tools.Stats eastStats=new hydroScalingAPI.tools.Stats(xyLinkValues[0]);
-        hydroScalingAPI.tools.Stats nortStats=new hydroScalingAPI.tools.Stats(xyLinkValues[1]);
+        hydroScalingAPI.tools.Stats eastStats=new hydroScalingAPI.tools.Stats(lonLatsDivide[0]);
+        hydroScalingAPI.tools.Stats nortStats=new hydroScalingAPI.tools.Stats(lonLatsDivide[1]);
         
         ProjectionControl pc = display_TIN.getProjectionControl();
         pc.setAspectCartesian(new double[] {1, Math.max((eastStats.maxValue-eastStats.minValue),(nortStats.maxValue-nortStats.minValue))/Math.min((eastStats.maxValue-eastStats.minValue),(nortStats.maxValue-nortStats.minValue))});        
         
         
+        int numPoints=pointsInTriangulation.size();
+        Gdc_Coord_3d[] gdc=new Gdc_Coord_3d[numPoints];
+        Utm_Coord_3d[] utm=new Utm_Coord_3d[numPoints];
+        
+        for(int i=0;i<numPoints;i++){
+            gdc[i]=(Gdc_Coord_3d)pointsInTriangulation.get(i);
+            utm[i]=new Utm_Coord_3d();
+        }
+        
+        Gdc_To_Utm_Converter.Init(new WE_Ellipsoid());
+        Gdc_To_Utm_Converter.Convert(gdc,utm);
+        
+        float[][] xyLinkValues=new float[3][numPoints];
+        
+        for(int i=0;i<numPoints;i++){
+            xyLinkValues[0][i]=(float)utm[i].x;
+            xyLinkValues[1][i]=(float)utm[i].y;
+            xyLinkValues[2][i]=(float)((int[])typeOfPoint.get(i))[0];
+        }
+
+        xyLinkValues[2][numPoints-1]=1;
+        
         float[][] linkAccumAVal=new float[1][xyLinkValues[1].length];
         for(int i=0;i<xyLinkValues[0].length;i++){
-            linkAccumAVal[0][i]=xyLinkValues[0][i];
+            linkAccumAVal[0][i]=(float)i;//xyLinkValues[0][i];
         }
         
         Irregular1DSet xVarIndex=new Irregular1DSet(xIndex,linkAccumAVal);
@@ -205,6 +296,18 @@ public class TRIBS_io extends java.awt.Dialog {
                                         new ConstantMap( 4.50f, Display.PointSize)};
             
         display_TIN.addReference( data_refLi,pointsCMap );
+        
+        
+        float[][] samples=new float[2][];
+        samples[0]=xyLinkValues[0];
+        samples[1]=xyLinkValues[1];
+        System.out.println("the DelaunayFast algorithm.");
+        long start = System.currentTimeMillis();
+        Delaunay delaun = (Delaunay) new DelaunayFast(samples);
+        long end = System.currentTimeMillis();
+        float time = (end - start) / 1000f;
+        System.out.println("Triangulation took " + time + " seconds.");
+        
     }
     
     /** This method is called from within the constructor to
