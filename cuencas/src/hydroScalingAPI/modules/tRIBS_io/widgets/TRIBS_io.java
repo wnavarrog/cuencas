@@ -50,7 +50,9 @@ public class TRIBS_io extends java.awt.Dialog {
     private visad.java3d.DisplayRendererJ3D dr;
     
     private byte[][] directionsKey={{1,2,3},{4,5,6},{7,8,9}};
+    private java.util.Vector pointsInTriangulation,typeOfPoint;
     private int numPointsBasin=0;
+    private DataReferenceImpl data_refLi;
     
     /**
      * Creates new form TRIBS_io
@@ -129,6 +131,42 @@ public class TRIBS_io extends java.awt.Dialog {
     
     private void plotPoints(float Zr) throws RemoteException, VisADException{
         
+        java.util.Vector originalPointsInTriangulation=(java.util.Vector)pointsInTriangulation.clone();
+        java.util.Vector originalPointsType=(java.util.Vector)typeOfPoint.clone();
+        
+        int numToElim=(int)(Zr/100.0*numPointsBasin);
+        for(int i=0;i<numToElim;i++){
+            int pToRemove=(int)((numPointsBasin-i)*Math.random());
+            pointsInTriangulation.remove(pToRemove);
+            typeOfPoint.remove(pToRemove);
+        }
+        
+        int numPoints=pointsInTriangulation.size();
+        float[][] xyLinkValues=new float[3][numPoints];
+        for(int i=0;i<numPoints;i++){
+            Utm_Coord_3d utmLocal=(Utm_Coord_3d)pointsInTriangulation.get(i);
+            xyLinkValues[0][i]=(float)utmLocal.x;
+            xyLinkValues[1][i]=(float)utmLocal.y;
+            xyLinkValues[2][i]=(float)((int[])typeOfPoint.get(i))[0];
+        }
+
+        xyLinkValues[2][numPoints-1]=1;
+        
+        float[][] linkAccumAVal=new float[1][xyLinkValues[1].length];
+        for(int i=0;i<xyLinkValues[0].length;i++){
+            linkAccumAVal[0][i]=(float)i;//xyLinkValues[0][i];
+        }
+        
+        Irregular1DSet xVarIndex=new Irregular1DSet(xIndex,linkAccumAVal);
+        
+        FlatField vals_ff_Li = new FlatField( func_xEasting_yNorthing, xVarIndex);
+        vals_ff_Li.setSamples( xyLinkValues );
+        
+        data_refLi.setData(vals_ff_Li);
+        
+        pointsInTriangulation=originalPointsInTriangulation;
+        typeOfPoint=originalPointsType;
+        
     }
     
     private void initializePoints() throws RemoteException, VisADException, java.io.IOException {
@@ -140,8 +178,8 @@ public class TRIBS_io extends java.awt.Dialog {
         float[][] lonLatsDivide=myCuenca.getLonLatBasinDivide();
         int[][] xyDivide=myCuenca.getXYBasinDivide();
         
-        java.util.Vector pointsInTriangulation=new java.util.Vector();
-        java.util.Vector typeOfPoint=new java.util.Vector();
+        pointsInTriangulation=new java.util.Vector();
+        typeOfPoint=new java.util.Vector();
         
         //adding points inside the basin
         for (int i = 0;i<xyBasin[0].length;i++){
@@ -245,7 +283,7 @@ public class TRIBS_io extends java.awt.Dialog {
         //adding points in the basin divide
         for(int i=0;i<lonLatsDivide[0].length-1;i++){
             pointsInTriangulation.add(new Gdc_Coord_3d((lonLatsDivide[1][i]+lonLatsDivide[1][i+1])/2.0,(lonLatsDivide[0][i]+lonLatsDivide[0][i+1])/2.0,corrDEM[0]));
-                typeOfPoint.add(new int[] {2});
+            typeOfPoint.add(new int[] {2});
         }
 
         hydroScalingAPI.tools.Stats eastStats=new hydroScalingAPI.tools.Stats(lonLatsDivide[0]);
@@ -267,12 +305,15 @@ public class TRIBS_io extends java.awt.Dialog {
         Gdc_To_Utm_Converter.Init(new WE_Ellipsoid());
         Gdc_To_Utm_Converter.Convert(gdc,utm);
         
-        float[][] xyLinkValues=new float[3][numPoints];
+        pointsInTriangulation.removeAllElements();
+        hydroScalingAPI.util.probability.UniformDistribution rUn=new hydroScalingAPI.util.probability.UniformDistribution(-0.1f,0.1f);
         
+        float[][] xyLinkValues=new float[3][numPoints];
         for(int i=0;i<numPoints;i++){
-            xyLinkValues[0][i]=(float)utm[i].x;
-            xyLinkValues[1][i]=(float)utm[i].y;
+            xyLinkValues[0][i]=(float)utm[i].x+rUn.sample();
+            xyLinkValues[1][i]=(float)utm[i].y+rUn.sample();
             xyLinkValues[2][i]=(float)((int[])typeOfPoint.get(i))[0];
+            pointsInTriangulation.add(utm[i]);
         }
 
         xyLinkValues[2][numPoints-1]=1;
@@ -287,7 +328,7 @@ public class TRIBS_io extends java.awt.Dialog {
         FlatField vals_ff_Li = new FlatField( func_xEasting_yNorthing, xVarIndex);
         vals_ff_Li.setSamples( xyLinkValues );
         
-        DataReferenceImpl data_refLi = new DataReferenceImpl("data_ref_LINK");
+        data_refLi = new DataReferenceImpl("data_ref_LINK");
         data_refLi.setData(vals_ff_Li);
         
         ConstantMap[] pointsCMap = {    //new ConstantMap( 1.0f, Display.Red),
@@ -298,15 +339,15 @@ public class TRIBS_io extends java.awt.Dialog {
         display_TIN.addReference( data_refLi,pointsCMap );
         
         
-        float[][] samples=new float[2][];
-        samples[0]=xyLinkValues[0];
-        samples[1]=xyLinkValues[1];
-        System.out.println("the DelaunayFast algorithm.");
-        long start = System.currentTimeMillis();
-        Delaunay delaun = (Delaunay) new DelaunayFast(samples);
-        long end = System.currentTimeMillis();
-        float time = (end - start) / 1000f;
-        System.out.println("Triangulation took " + time + " seconds.");
+//        float[][] samples=new float[2][];
+//        samples[0]=xyLinkValues[0];
+//        samples[1]=xyLinkValues[1];
+//        System.out.println("the DelaunayWatson algorithm.");
+//        long start = System.currentTimeMillis();
+//        Delaunay delaun = (Delaunay) new DelaunayWatson(samples);
+//        long end = System.currentTimeMillis();
+//        float time = (end - start) / 1000f;
+//        System.out.println("Triangulation took " + time + " seconds.");
         
     }
     
@@ -336,7 +377,12 @@ public class TRIBS_io extends java.awt.Dialog {
 
         zrSlider.setFont(new java.awt.Font("Lucida Grande", 0, 10));
         zrSlider.setValue(0);
-        zrSlider.setName("null");
+        zrSlider.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                zrSliderMouseReleased(evt);
+            }
+        });
+
         jPanel2.add(zrSlider, java.awt.BorderLayout.CENTER);
 
         jLabel1.setFont(new java.awt.Font("Lucida Grande", 0, 10));
@@ -362,6 +408,16 @@ public class TRIBS_io extends java.awt.Dialog {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void zrSliderMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_zrSliderMouseReleased
+        try{
+            plotPoints(zrSlider.getValue());
+        } catch (VisADException v){
+            System.out.print(v);
+        }catch (RemoteException r){
+            System.out.print(r);
+        }
+    }//GEN-LAST:event_zrSliderMouseReleased
 
     private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
 //        try{
@@ -421,8 +477,8 @@ public class TRIBS_io extends java.awt.Dialog {
      */
     public static void main(String args[]) {
         try{
-            java.io.File theFile=new java.io.File("/Users/ricardo/Documents/databases/Test_DB/Rasters/Topography/58447060.metaDEM");
-            //java.io.File theFile=new java.io.File("/hidrosigDataBases/Test_DB/Rasters/Topography/58447060.metaDEM");
+            //java.io.File theFile=new java.io.File("/Users/ricardo/Documents/databases/Test_DB/Rasters/Topography/58447060.metaDEM");
+            java.io.File theFile=new java.io.File("/hidrosigDataBases/Test_DB/Rasters/Topography/58447060.metaDEM");
             hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster (theFile);
             metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".dir"));
             
