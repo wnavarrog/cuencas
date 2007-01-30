@@ -93,7 +93,7 @@ public class MetaDLG {
         utm.z=0;
         utm.hemisphere_north=true;
 
-        geotransform.transforms.Utm_To_Gdc_Converter.Init(new geotransform.ellipsoids.CD_Ellipsoid());
+        geotransform.transforms.Utm_To_Gdc_Converter.Init(new geotransform.ellipsoids.WE_Ellipsoid());
         geotransform.transforms.Utm_To_Gdc_Converter.Convert(utm,gdc);
         
         verticalCorrectionFactor=minYLL-(float)gdc.latitude;
@@ -129,7 +129,7 @@ public class MetaDLG {
                 utm.z=0;
                 utm.hemisphere_north=true;
                 
-                geotransform.transforms.Utm_To_Gdc_Converter.Init(new geotransform.ellipsoids.CD_Ellipsoid());
+                geotransform.transforms.Utm_To_Gdc_Converter.Init(new geotransform.ellipsoids.WE_Ellipsoid());
 
                 for (int j=0;j<myNodes/3;j++){
                     
