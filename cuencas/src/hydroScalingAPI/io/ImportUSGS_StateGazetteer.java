@@ -27,7 +27,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.io;
 
 /**
- * This class populates the site database using data from the online source at http://cuencas.colorado.edu/
+ * This class populates the site database using data from the online source at 
+ * http://cuencas.colorado.edu/
  * @author Ricardo Mantilla
  */
 public class ImportUSGS_StateGazetteer {
@@ -235,8 +236,9 @@ public class ImportUSGS_StateGazetteer {
      * a dense growth of trees; does not include an area of trees under the administration
      * of a political agency (see &quot;forest&quot;).
      * </blockquote>
-     * @param outputDir 
-     * @param limits 
+     * @param outputDir The directory where the sites should be allocated
+     * @param limits A four element array indicating the geographic limits for the search.  The array
+     * elements are {minLatitude, maxLatitude, minLongitude, maxLongitude}.
      */
     public ImportUSGS_StateGazetteer(String state,String[] validFeatures, String outputDir, float[] limits) {
         
@@ -259,7 +261,7 @@ public class ImportUSGS_StateGazetteer {
                 
                 USGS_LocationProperties thisLocation=new USGS_LocationProperties(state);
                 thisLocation.StateAlphaCode=locProps[3];
-                thisLocation.State=hydroScalingAPI.tools.StateName.StateName(state);
+                thisLocation.State=hydroScalingAPI.tools.StateName.CodeOrNameToStandardName(state);
                 thisLocation.Name=locProps[1];
                 thisLocation.Type=locProps[2];
                 thisLocation.County=locProps[5];
@@ -335,6 +337,7 @@ public class ImportUSGS_StateGazetteer {
     }
     
     /**
+     * Tests for the class.
      * @param args the command line arguments
      */
     public static void main(String[] args) {

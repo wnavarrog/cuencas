@@ -42,7 +42,7 @@ public class ImportVisitedPointsASCII {
                 GpsLocationProperties thisLocation=new GpsLocationProperties("KS");
                 java.util.StringTokenizer tokens=new java.util.StringTokenizer(locationInfo,"\t");
                 
-                thisLocation.State=hydroScalingAPI.tools.StateName.StateName("KS");
+                thisLocation.State=hydroScalingAPI.tools.StateName.CodeOrNameToStandardName("KS");
                 thisLocation.Type="Hydraulic Geometry Measurement";
                 thisLocation.Name="GPS-"+tokens.nextToken()+"-Order"+"-"+tokens.nextToken()+"-"+tokens.nextToken();
                 System.out.println(thisLocation.Name);

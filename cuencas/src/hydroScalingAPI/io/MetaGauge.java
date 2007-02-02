@@ -21,8 +21,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.io;
 
 /**
- *
- * @author  Ricardo Mantilla
+ * Manages the Gauge-type data object
+ * @author Ricardo Mantilla
  */
 public class MetaGauge extends Object implements Comparable{
     
@@ -45,31 +45,80 @@ public class MetaGauge extends Object implements Comparable{
                                 
     private double firstYearInSeries=0;
     
-    /** Creates a new instance of MetaGauge */
+    /**
+     * Creates a new instance of MetaGauge
+     * @param register Takes in a registry created by the {@hydroScalingAPI.io.GaugeReader}
+     */
     public MetaGauge(hydroScalingAPI.util.database.DB_Register register) {
         gaugeRegister=register;
     }
     
+    /**
+     * Returns the desired property.  Available properties are:
+     * <blockquote>
+     * <p>[code]</p>
+     * <p>[agency]</p>
+     * <p>[type]</p>
+     * <p>[site name]</p>
+     * <p>[stream name]</p>
+     * <p>[county]</p>
+     * <p>[state]</p>
+     * <p>[data source]</p>
+     * <p>[latitude (deg:min:sec)]</p>
+     * <p>[longitude (deg:min:sec)]</p>
+     * <p>[altitude ASL (m)]</p>
+     * <p>[drainage area (km^2)]</p>
+     * <p>[data units]</p>
+     * <p>[data accuracy]</p>
+     * <p>[file location]</p>
+     * </blockquote>
+     * Note: the brackets must be included.
+     * @param key The desired property
+     * @return An object that contains the information requested
+     */
     public Object getProperty(String key){
         return gaugeRegister.getProperty(key);
     }
     
+    /**
+     * Returns a description of the Gauge.
+     * @return A String describing some gauge properties
+     */
     public String toString(){
         return (String)gaugeRegister.getProperty("[code]")+" - "+(String)gaugeRegister.getProperty("[site name]")+" - "+(String)gaugeRegister.getProperty("[type]");
     }
     
+    /**
+     * The comparison method
+     * @param obj The object to be compared with
+     * @return -1, 0 or 1 for smaller, equal or less than
+     */
     public int compareTo(Object obj) {
         return (this.toString()).compareToIgnoreCase(obj.toString());
     }
     
+    /**
+     * The original Gauge-type file location
+     * @return A {@java.io.File} pointing to the Gauge file
+     */
     public java.io.File getFileLocation(){
         return (java.io.File)gaugeRegister.getProperty("[file location]");
     }
     
+    /**
+     * Returns a string with an identifier code for the Station
+     * @return A String with the gauge code
+     */
     public String getLabel(){
         return (String)gaugeRegister.getProperty("[type]")+" ["+(String)gaugeRegister.getProperty("[data units]")+"]";
     }
     
+    /**
+     * Creates a {@ visad.RealTuple} to be plotted in a {visad.Display}
+     * @return The {@ visad.RealTuple}
+     * @throws visad.VisADException Captures errors while creating the {@ visad.RealTuple}
+     * @throws java.rmi.RemoteException Captures errors while creating the {@ visad.RealTuple}
+     */
     public visad.RealTuple getPositionTuple() throws visad.VisADException, java.rmi.RemoteException{
         double xx=((Double)gaugeRegister.getProperty("[longitude (deg:min:sec)]")).doubleValue();
         double yy=((Double)gaugeRegister.getProperty("[latitude (deg:min:sec)]")).doubleValue();
@@ -78,6 +127,13 @@ public class MetaGauge extends Object implements Comparable{
         return new visad.RealTuple(rtd1);
     }
     
+    /**
+     * Creates a {@ visad.Tuple} to be plotted in a {visad.Display} containing a text
+     * label
+     * @throws visad.VisADException Captures errors while creating the {@ visad.Tuple}
+     * @throws java.rmi.RemoteException Captures errors while creating the {@ visad.Tuple}
+     * @return The {@ visad.Tuple}
+     */
     public visad.Tuple getTextTuple()  throws visad.VisADException, java.rmi.RemoteException{
         visad.TextType t = visad.TextType.getTextType("text");
         double xx=((Double)gaugeRegister.getProperty("[longitude (deg:min:sec)]")).doubleValue();
@@ -88,6 +144,11 @@ public class MetaGauge extends Object implements Comparable{
         return new visad.Tuple(rtd1);
     }
     
+    /**
+     * Returns a 2 by n array where n is the number of data entries for the Gauge.
+     * @throws java.io.IOException Captures errors while reading the file to retrive the data
+     * @return A double[2][n] with double[0] the dates and double[1] the values
+     */
    public double[][] getTimeAndData() throws java.io.IOException{
         
         float[] factors={1.0f,1.0f/12.0f,1.0f/365.0f};
@@ -128,6 +189,7 @@ public class MetaGauge extends Object implements Comparable{
     }
     
     /**
+     * Tests for the class
      * @param args the command line arguments
      */
     public static void main(String[] args) {

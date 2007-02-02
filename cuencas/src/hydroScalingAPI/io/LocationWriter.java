@@ -27,7 +27,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.io;
 
 /**
- *
+ * This class create Location-type files using a database registry.
  * @author Ricardo Mantilla
  */
 public class LocationWriter {
@@ -44,7 +44,13 @@ public class LocationWriter {
                             "[information]"};
     
     
-    /** Creates a new instance of LocationWriter */
+    /**
+     * Creates a new instance of LocationWriter
+     * @param locationFile The file where the location will be written
+     * @param register The database register ({@link hydroScalingAPI.util.database.DB_Register}) to use
+     * as data template.
+     * @throws java.io.IOException Captures errors during the file writing process
+     */
     public LocationWriter(java.io.File locationFile,Object[] register) throws java.io.IOException{
         
         if (register.length != 10) return;
@@ -136,6 +142,7 @@ public class LocationWriter {
     }
     
     /**
+     * Tests for the class
      * @param args the command line arguments
      */
     public static void main(String[] args) {

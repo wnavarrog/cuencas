@@ -43,7 +43,7 @@ public class ImportMapSourceASCII {
                 GpsLocationProperties thisLocation=new GpsLocationProperties("KS");
                 java.util.StringTokenizer tokens=new java.util.StringTokenizer(locationInfo,"\t");
                 
-                thisLocation.State=hydroScalingAPI.tools.StateName.StateName("KS");
+                thisLocation.State=hydroScalingAPI.tools.StateName.CodeOrNameToStandardName("KS");
                 thisLocation.Type="Width Measurement";
                 tokens.nextToken();
                 thisLocation.Name=tokens.nextToken();

@@ -19,16 +19,30 @@ public class createLaplacianFromDEM {
     public createLaplacianFromDEM(java.io.File metaFile, java.io.File outputDir) throws java.io.IOException{
         
         hydroScalingAPI.io.MetaRaster metaData=new hydroScalingAPI.io.MetaRaster(metaFile);
-        metaData.setLocationBinaryFile(new java.io.File(metaFile.getPath().substring(0,metaFile.getPath().lastIndexOf("."))+".dem"));
-        //metaData.setFormat(hydroScalingAPI.tools.ExtensionToFormat.getFormat(".corrDEM"));
+        metaData.setLocationBinaryFile(new java.io.File(metaFile.getPath().substring(0,metaFile.getPath().lastIndexOf("."))+".corrDEM"));
+        metaData.setFormat(hydroScalingAPI.tools.ExtensionToFormat.getFormat(".corrDEM"));
         float[][] DEM=new hydroScalingAPI.io.DataRaster(metaData).getFloat();
+        metaData.setLocationBinaryFile(new java.io.File(metaFile.getPath().substring(0,metaFile.getPath().lastIndexOf("."))+".dir"));
+        metaData.setFormat(hydroScalingAPI.tools.ExtensionToFormat.getFormat(".dir"));
+        byte[][] DIR=new hydroScalingAPI.io.DataRaster(metaData).getByte();
+        metaData.setLocationBinaryFile(new java.io.File(metaFile.getPath().substring(0,metaFile.getPath().lastIndexOf("."))+".magn"));
+        metaData.setFormat(hydroScalingAPI.tools.ExtensionToFormat.getFormat(".magn"));
+        int[][] MAG=new hydroScalingAPI.io.DataRaster(metaData).getInt();
+        
         float[][] LAP=new float[DEM.length][DEM[0].length];
         
         float counterZeros=0;
         
         for(int i=1;i<DEM.length-1;i++) for(int j=1;j<DEM[0].length-1;j++){
-            LAP[i][j]=(DEM[i-1][j]-2*DEM[i][j]+DEM[i+1][j])/30.0f+(DEM[i][j-1]-2*DEM[i][j]+DEM[i][j+1])/30.0f;
-            if(LAP[i][j] == 0) counterZeros++;
+            if(DIR[i][j] == 1 || DIR[i][j] == 3 ||DIR[i][j] == 7 ||DIR[i][j] == 9)
+                LAP[i][j]=(DEM[i-1][j]-2*DEM[i][j]+DEM[i+1][j])/30.0f+(DEM[i][j-1]-2*DEM[i][j]+DEM[i][j+1])/30.0f;
+            else
+                LAP[i][j]=(DEM[i-1][j-1]-2*DEM[i][j]+DEM[i+1][j+1])/30.0f+(DEM[i-1][j+1]-2*DEM[i][j]+DEM[i+1][j-1])/30.0f;
+            if(Math.abs(LAP[i][j]) < 1e-4) {
+                LAP[i][j]=0;
+                counterZeros++;
+            }
+            if(MAG[i][j] > 0) LAP[i][j]=1;
         }
         System.out.println(counterZeros+" "+(counterZeros/(float)(DEM.length*DEM[0].length)));
         hydroScalingAPI.io.MetaRaster metaOut=new hydroScalingAPI.io.MetaRaster(metaData);

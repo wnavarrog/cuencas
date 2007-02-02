@@ -78,7 +78,7 @@ public class GaugeReader{
         do{
             fullLine=fileMeta.readLine();
         } while (!fullLine.equalsIgnoreCase(parameters[6]));
-        register[6]=hydroScalingAPI.tools.StateName.StateName(fileMeta.readLine());
+        register[6]=hydroScalingAPI.tools.StateName.CodeOrNameToStandardName(fileMeta.readLine());
         
         do{
             fullLine=fileMeta.readLine();
@@ -119,7 +119,7 @@ public class GaugeReader{
     /**
      * Creates a registry to be used in a gauges database engine powered by the {@link
      * hydroScalingAPI.util.database.DataBaseEngine}
-     * @return Returns an database registry {@link hydroScalingAPI.util.database.DB_Register}
+     * @return Returns a database registry {@link hydroScalingAPI.util.database.DB_Register}
      */
     public Object[] getRegisterForDataBase(){
         return register;

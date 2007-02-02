@@ -27,7 +27,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.io;
 
 /**
- *
+ * This class reads DLG files downloaded from the  EROS website at 
+ * <a href="http://edc.usgs.gov/geodata/" target="_blank">http://edc.usgs.gov/geodata/</a>.
  * @author Ricardo Mantilla
  */
 public class MetaDLG {
@@ -39,7 +40,14 @@ public class MetaDLG {
     private visad.RealTupleType domain=new visad.RealTupleType(visad.RealType.Longitude,visad.RealType.Latitude);
     private visad.Gridded2DSet[] streams;
     
-    /** Creates a new instance of MetaDLG */
+    /**
+     * Creates a new instance of MetaDLG
+     * @param fileName The file where the DLG resides
+     * @param desiredRegion The limts of the region of interest given as a {@ java.awt.geom.Rectangle2D}.
+     * @throws java.io.IOException Captures errors while reading the file.
+     * @throws visad.VisADException Captures errors while creating the {@ visad.Gridded2DSet} used to visualize the
+     * vector.
+     */
     public MetaDLG(String fileName,java.awt.geom.Rectangle2D desiredRegion) throws java.io.IOException, visad.VisADException{
         
         java.util.StringTokenizer tokens;
@@ -219,12 +227,18 @@ public class MetaDLG {
         
     }
     
+    /**
+     * Returns a {@ visad.UnionSet} ready to be used inside a {@ visad.Display}
+     * @return The {@ visad.UnionSet}
+     * @throws visad.VisADException Captures errors while creating the {@ visad.UnionSet}
+     */
     public visad.UnionSet getUnionSet() throws visad.VisADException{
         if (streams == null) return null;
         return new visad.UnionSet(domain, streams);
     }
     
     /**
+     * Tests for the class
      * @param args the command line arguments
      */
     public static void main(String[] args) {

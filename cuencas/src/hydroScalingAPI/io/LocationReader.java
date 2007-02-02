@@ -27,8 +27,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.io;
 
 /**
- *
- * @author  Ricardo Mantilla
+ * This Class reads a Location-type site file in the database and creates a data
+ * structure apropriate for
+ * @author Ricardo Mantilla
  */
 public class LocationReader {
     
@@ -45,7 +46,11 @@ public class LocationReader {
                             "[information]"};
     
     
-    /** Creates a new instance of LocationReader */
+    /**
+     * Creates a new instance of LocationReader
+     * @param locationFile The file to be read.
+     * @throws java.io.IOException CAtures errors during the file reading process
+     */
     public LocationReader(java.io.File locationFile) throws java.io.IOException {
         
         register=new Object[parameters.length+1];
@@ -66,7 +71,7 @@ public class LocationReader {
         do{
             fullLine=fileMeta.readLine();
         } while (!fullLine.equalsIgnoreCase(parameters[4]));
-        register[4]=hydroScalingAPI.tools.StateName.StateName(fileMeta.readLine());
+        register[4]=hydroScalingAPI.tools.StateName.CodeOrNameToStandardName(fileMeta.readLine());
         
         for (int i=5;i<7;i++){
             do{
@@ -108,11 +113,17 @@ public class LocationReader {
         
     }
     
+    /**
+     * Creates a registry to be used in a gauges database engine powered by the {@link
+     * hydroScalingAPI.util.database.DataBaseEngine}
+     * @return Returns a database registry {@link hydroScalingAPI.util.database.DB_Register}
+     */
     public Object[] getRegisterForDataBase(){
         return register;
     }
     
     /**
+     * Tests for this class
      * @param args the command line arguments
      */
     public static void main(String[] args) {

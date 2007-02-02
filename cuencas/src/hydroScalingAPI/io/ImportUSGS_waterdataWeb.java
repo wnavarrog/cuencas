@@ -27,7 +27,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.io;
 
 /**
- *
+ * This class was developed to import daily streamflow time series from the USGS
+ * website.  A Gauge-type site is created in the database. Currnently, only
+ * streamflow time series can be imported,  Future implementations will include
+ * flow depth and other variables
  * @author Peter Furey
  */
 public class ImportUSGS_waterdataWeb {
@@ -39,10 +42,21 @@ public class ImportUSGS_waterdataWeb {
     String filesuffix;
     java.util.StringTokenizer str1;
     
+    /**
+     * Creates an instance of the ImportUSGS_waterdataWeb
+     * @param oDir The directory where the ouput file will be stored
+     */
     public ImportUSGS_waterdataWeb(String oDir) {
         output_dir=oDir;
     }
     
+    /**
+     * This method imports streamflow data and creates a Gauge-type site file in the
+     * database
+     * @param state The two letter code for the state (e.g. CO - Colorado, NM - New Mexico)
+     * @param gaugeid The USGS gauge code (e.g. 09430500 for the Gila River at Gila gauge)
+     * @param record_type "H": for historical and "R": for recent.
+     */
     public void StreamFlow(String state, String gaugeid, char record_type) {
         
         try{
@@ -101,7 +115,7 @@ public class ImportUSGS_waterdataWeb {
                         dataout.write('\n');
                         dataout.write('\n');
                         dataout.write("[state]"+'\n');
-                        dataout.write(state+'\n');
+                        dataout.write(hydroScalingAPI.tools.StateName.CodeOrNameToStandardName(state)+'\n');
                         dataout.write('\n');
                         dataout.write("[data source]"+'\n');
                         dataout.write("URL: http://nwis.waterdata.usgs.gov/nm/nwis/inventory"+'\n');
@@ -219,7 +233,10 @@ public class ImportUSGS_waterdataWeb {
         
     }
     
-    /** Creates a new instance of Class */
+    /**
+     * Tests for the class
+     * @param arguments Comand line arguments
+     */
     public static void main(String[ ] arguments) { //throws java.io.IOException IOE{
         
         ImportUSGS_waterdataWeb data = new ImportUSGS_waterdataWeb("C:/Documents and Settings/ricardo/Desktop/databases/Gila River DB/Sites/Gauges/Streamflow/");

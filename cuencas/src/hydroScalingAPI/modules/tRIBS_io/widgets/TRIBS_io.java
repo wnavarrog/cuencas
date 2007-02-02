@@ -41,6 +41,7 @@ public class TRIBS_io extends java.awt.Dialog {
     public hydroScalingAPI.util.geomorphology.objects.LinksAnalysis linksStructure;
     
     private int[][] magnitudes;
+    float[][] DEM;
     public float[] corrDEM;
     
     private hydroScalingAPI.modules.rainfallRunoffModel.objects.LinksInfo thisNetworkGeom;
@@ -73,7 +74,12 @@ public class TRIBS_io extends java.awt.Dialog {
         java.awt.Rectangle thisMarco=this.getBounds();
         setBounds(marcoParent.x+marcoParent.width/2-thisMarco.width/2,marcoParent.y+marcoParent.height/2-thisMarco.height/2,thisMarco.width,thisMarco.height);
         
-        //Get Data concerning the all Rainfall-Runoff module
+        hydroScalingAPI.io.MetaRaster metaData=new hydroScalingAPI.io.MetaRaster(metaDatos);
+        metaData.setLocationBinaryFile(new java.io.File(metaDatos.getLocationMeta().getPath().substring(0,metaDatos.getLocationMeta().getPath().lastIndexOf("."))+".corrDEM"));
+        metaData.setFormat(hydroScalingAPI.tools.ExtensionToFormat.getFormat(".corrDEM"));
+        DEM=new hydroScalingAPI.io.DataRaster(metaData).getFloat();
+        
+        //Get Data concerning the module
         
         myCuenca=new hydroScalingAPI.util.geomorphology.objects.Basin(x,y,matDir,metaDatos);
         linksStructure=new hydroScalingAPI.util.geomorphology.objects.LinksAnalysis(myCuenca, metaDatos, matDir);
@@ -130,16 +136,57 @@ public class TRIBS_io extends java.awt.Dialog {
         
     }
     
+    private float pointLaplacian(int x,int y){
+        
+        int i=y;
+        int j=x;
+        
+        float LAP;
+
+        if(matDir[i][j] == 1 || matDir[i][j] == 3 ||matDir[i][j] == 7 ||matDir[i][j] == 9)
+            LAP=(DEM[i-1][j]-2*DEM[i][j]+DEM[i+1][j])/30.0f+(DEM[i][j-1]-2*DEM[i][j]+DEM[i][j+1])/30.0f;
+        else
+            LAP=(DEM[i-1][j-1]-2*DEM[i][j]+DEM[i+1][j+1])/30.0f+(DEM[i-1][j+1]-2*DEM[i][j]+DEM[i+1][j-1])/30.0f;
+        if(Math.abs(LAP) < 1e-4) {
+            LAP=0;
+        }
+        
+        return LAP;
+    }
+    
     private void plotPoints(float Zr) throws RemoteException, VisADException{
+        
+        int[][] xyBasin=myCuenca.getXYBasin();
+        byte[][] basMask=myCuenca.getBasinMask();
         
         java.util.Vector originalPointsInTriangulation=(java.util.Vector)pointsInTriangulation.clone();
         java.util.Vector originalPointsType=(java.util.Vector)typeOfPoint.clone();
         
-        int numToElim=(int)(Zr/100.0*numPointsBasin);
-        for(int i=0;i<numToElim;i++){
-            int pToRemove=(int)((numPointsBasin-i)*Math.random());
-            pointsInTriangulation.remove(pToRemove);
-            typeOfPoint.remove(pToRemove);
+        int numPRemoved=0;
+        int pB=0;
+        for(int i=0;i<xyBasin[0].length;i++){
+            if(magnitudes[xyBasin[1][i]][xyBasin[0][i]] <= 0){
+                boolean neigh=false;
+                for (int k=0; k <= 8; k++){
+                    int jj=xyBasin[1][i]+(k/3)-1;
+                    int ii=xyBasin[0][i]+(k%3)-1;
+                    //if (magnitudes[jj][ii] > 0 || basMask[jj][ii] == 0){
+                    if (basMask[jj][ii] == 0){
+                        neigh=true;
+                    }
+                }
+                //if(!neigh && Math.random()*100.0 < Zr){
+                if(!neigh){
+                    if(Math.abs(pointLaplacian(xyBasin[0][i],xyBasin[1][i]))<1e-4) {
+                    //if(pointLaplacian(xyBasin[0][i],xyBasin[1][i])<1e-4) {
+                        int pToRemove=(int)(pB-numPRemoved);
+                        pointsInTriangulation.remove(pToRemove);
+                        typeOfPoint.remove(pToRemove);
+                        numPRemoved++;
+                    }
+                }
+                pB++;
+            }
         }
         
         int numPoints=pointsInTriangulation.size();
@@ -171,6 +218,7 @@ public class TRIBS_io extends java.awt.Dialog {
             samples[1]=xyLinkValues[1];
             System.out.println("the DelaunayClarkson algorithm.");
             long start = System.currentTimeMillis();
+            Delaunay.perturb(samples,0.1f,false);
             Delaunay delaun = (Delaunay) new DelaunayClarkson(samples);
             long end = System.currentTimeMillis();
             float time = (end - start) / 1000f;
@@ -190,7 +238,35 @@ public class TRIBS_io extends java.awt.Dialog {
             UnionSet allTriang=new UnionSet(domainXLYL,triangles);
             
             data_refTr.setData(allTriang);
+            
+            for(int j=0;j<10;j++) {
+                float[][] lines1=new float[2][delaun.Vertices[j].length];
+                for(int i=0;i<delaun.Vertices[j].length;i++){
+                    for(int k=0;k<3;k++){
+                        lines1[0][i]+=samples[0][delaun.Tri[delaun.Vertices[j][i]][k]];
+                        lines1[1][i]+=samples[1][delaun.Tri[delaun.Vertices[j][i]][k]];
+                    }
+                    lines1[0][i]/=3.0;
+                    lines1[1][i]/=3.0;
+                    
+                }
+                System.out.println();
+                
+                DataReferenceImpl data_ref = new DataReferenceImpl("data_ref_"+j);
+                data_ref.setData(new Gridded2DSet(domainXLYL,lines1,lines1[0].length));
+                ConstantMap[] linesCMap = {     new ConstantMap( 1.0f, Display.Red),
+                                                new ConstantMap( 0.0f, Display.Green),
+                                                new ConstantMap( 1.0f, Display.Blue),
+                                                new ConstantMap( 1.50f, Display.LineWidth)};
+
+                display_TIN.addReference( data_ref,linesCMap );
+            }
+            
         }
+        
+        System.out.println(pointsInTriangulation.size()/(float)originalPointsInTriangulation.size());
+        System.out.println((1-(numPointsBasin-numPRemoved)/(float)numPointsBasin));
+        
         
         pointsInTriangulation=originalPointsInTriangulation;
         typeOfPoint=originalPointsType;
@@ -536,8 +612,8 @@ public class TRIBS_io extends java.awt.Dialog {
             
             hydroScalingAPI.mainGUI.ParentGUI tempFrame=new hydroScalingAPI.mainGUI.ParentGUI();
             
-            new TRIBS_io(tempFrame, 85, 42,matDirs,magnitudes,metaModif).setVisible(true);
-            //new TRIBS_io(tempFrame, 293, 137,matDirs,magnitudes,metaModif).setVisible(true);
+            //new TRIBS_io(tempFrame, 85, 42,matDirs,magnitudes,metaModif).setVisible(true);
+            new TRIBS_io(tempFrame, 310, 131,matDirs,magnitudes,metaModif).setVisible(true);
         } catch (java.io.IOException IOE){
             System.out.print(IOE);
             System.exit(0);
