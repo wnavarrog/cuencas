@@ -158,6 +158,31 @@ public class TRIBS_io extends java.awt.Dialog {
         
     }
     
+    private void sortTriangles(Delaunay delaun,float[][] samples){
+        for(int j=0;j<delaun.Vertices.length;j++) {
+            float[][] lines1=new float[3][delaun.Vertices[j].length];
+            for(int i=0;i<delaun.Vertices[j].length;i++){
+                for(int k=0;k<3;k++){
+                    lines1[0][i]+=samples[0][delaun.Tri[delaun.Vertices[j][i]][k]];
+                    lines1[1][i]+=samples[1][delaun.Tri[delaun.Vertices[j][i]][k]];
+                }
+                lines1[0][i]/=3.0;
+                lines1[1][i]/=3.0;
+                double delX=lines1[0][i]-samples[0][j];
+                double delY=lines1[1][i]-samples[1][j];
+                lines1[2][i]=(float)(((delX>0&delY<0)?360:0)+(delX>0?0:180)+(delX==0?-90*delY/Math.abs(delY):Math.atan(delY/delX)/2.0/Math.PI*360));
+            }
+            float[] sortedAngles=lines1[2].clone();
+            java.util.Arrays.sort(sortedAngles);
+            int[] sortedTriList=new int[delaun.Vertices[j].length];
+            for(int i=0;i<delaun.Vertices[j].length;i++) {
+                int indexLocated=java.util.Arrays.binarySearch(sortedAngles,lines1[2][i]);
+                sortedTriList[indexLocated]=delaun.Vertices[j][i];
+            }
+            delaun.Vertices[j]=sortedTriList;
+        }
+    }
+    
     private void plotPoints(float Zr) throws RemoteException, VisADException{
         
         int[][] xyBasin=myCuenca.getXYBasin();
@@ -229,14 +254,14 @@ public class TRIBS_io extends java.awt.Dialog {
             System.out.println("Triangulation took " + time + " seconds.");
             
             
-            System.out.println(delaun.NumEdges);
-            
-            for(int j=0;j<delaun.Edges.length;j++){
-                for(int i=0;i<delaun.Edges[j].length;i++){
-                    System.out.print(delaun.Edges[j][i]+"\t\t");
-                }
-                System.out.println();
-            }
+//            System.out.println(delaun.NumEdges);
+//            
+//            for(int j=0;j<delaun.Edges.length;j++){
+//                for(int i=0;i<delaun.Edges[j].length;i++){
+//                    System.out.print(delaun.Edges[j][i]+"\t\t");
+//                }
+//                System.out.println();
+//            }
             
             Gridded2DSet[] triangles=new Gridded2DSet[delaun.Tri.length];
             float[][] lines=new float[2][4];
@@ -253,27 +278,42 @@ public class TRIBS_io extends java.awt.Dialog {
             
             data_refTr.setData(allTriang);
             
-            for(int j=0;j<10;j++) {
-                float[][] lines1=new float[2][delaun.Vertices[j].length];
-                for(int i=0;i<delaun.Vertices[j].length;i++){
-                    for(int k=0;k<3;k++){
-                        lines1[0][i]+=samples[0][delaun.Tri[delaun.Vertices[j][i]][k]];
-                        lines1[1][i]+=samples[1][delaun.Tri[delaun.Vertices[j][i]][k]];
-                    }
-                    lines1[0][i]/=3.0;
-                    lines1[1][i]/=3.0;
-                    
-                }
-
-                DataReferenceImpl data_ref = new DataReferenceImpl("data_ref_"+j);
-                data_ref.setData(new Gridded2DSet(domainXLYL,lines1,lines1[0].length));
-                ConstantMap[] linesCMap = {     new ConstantMap( 1.0f, Display.Red),
-                                                new ConstantMap( 0.0f, Display.Green),
-                                                new ConstantMap( 1.0f, Display.Blue),
-                                                new ConstantMap( 1.50f, Display.LineWidth)};
-
-                display_TIN.addReference( data_ref,linesCMap );
+            sortTriangles(delaun,samples);
+            int numValidPoints=0;
+            for(int j=0;j<xyLinkValues[2].length;j++) {
+                if(xyLinkValues[2][j] != 2 ) numValidPoints++;
             }
+            
+            Gridded2DSet[] polygons=new Gridded2DSet[numValidPoints];
+            int kp=0;
+            for(int j=0;j<xyLinkValues[2].length;j++) {
+                if(xyLinkValues[2][j] != 2 ){
+                    float[][] lines1=new float[2][delaun.Vertices[j].length+1];
+                    for(int i=0;i<delaun.Vertices[j].length;i++){
+                        for(int k=0;k<3;k++){
+                            lines1[0][i]+=samples[0][delaun.Tri[delaun.Vertices[j][i]][k]];
+                            lines1[1][i]+=samples[1][delaun.Tri[delaun.Vertices[j][i]][k]];
+                        }
+                        lines1[0][i]/=3.0;
+                        lines1[1][i]/=3.0;
+
+                    }
+                    lines1[0][delaun.Vertices[j].length]=lines1[0][0];
+                    lines1[1][delaun.Vertices[j].length]=lines1[1][0];
+                    
+                    polygons[kp++]=new Gridded2DSet(domainXLYL,lines1,lines1[0].length);
+                }
+            }
+            System.out.println(kp);
+            UnionSet allPoly=new UnionSet(domainXLYL,polygons);
+            DataReferenceImpl data_ref = new DataReferenceImpl("data_ref_poly");
+            data_ref.setData(allPoly);
+            ConstantMap[] linesCMap = {     new ConstantMap( 1.0f, Display.Red),
+                                            new ConstantMap( 0.0f, Display.Green),
+                                            new ConstantMap( 1.0f, Display.Blue),
+                                            new ConstantMap( 1.50f, Display.LineWidth)};
+
+            display_TIN.addReference( data_ref,linesCMap );
             
         }
         
@@ -349,13 +389,13 @@ public class TRIBS_io extends java.awt.Dialog {
                         nLonP=lonP+(2*delta_xP+bfs*delta_yP)*metaDatos.getResLon()/3600.0/4.0;
 
                         pointsInTriangulation.add(new Gdc_Coord_3d(nLatP,nLonP,corrDEM[0]));
-                        typeOfPoint.add(new int[] {2});
+                        typeOfPoint.add(new int[] {3});
 
                         nLatP=latP+(2*delta_yP+bfs*delta_xP)*metaDatos.getResLat()/3600.0/4.0;
                         nLonP=lonP+(2*delta_xP-bfs*delta_yP)*metaDatos.getResLon()/3600.0/4.0;
 
                         pointsInTriangulation.add(new Gdc_Coord_3d(nLatP,nLonP,corrDEM[0]));
-                        typeOfPoint.add(new int[] {2});
+                        typeOfPoint.add(new int[] {3});
 
                     nLatP=latP+delta_yP*metaDatos.getResLat()/3600.0*3.0/4.0;
                     nLonP=lonP+delta_xP*metaDatos.getResLon()/3600.0*3.0/4.0;
@@ -380,7 +420,7 @@ public class TRIBS_io extends java.awt.Dialog {
                         nLonP=lonP+delta_yP*metaDatos.getResLon()/3600.0*bfs/4.0;
 
                         pointsInTriangulation.add(new Gdc_Coord_3d(nLatP,nLonP,corrDEM[0]));
-                        typeOfPoint.add(new int[] {2});
+                        typeOfPoint.add(new int[] {3});
                     }
                     
                     if(magnitudes[xyBasin[1][i]+delta_xP][xyBasin[0][i]-delta_yP] <= 0 || matDir[xyBasin[1][i]+delta_xP][xyBasin[0][i]-delta_yP] != 10-directionsKey[1+delta_xP][1-delta_yP]){
@@ -388,7 +428,7 @@ public class TRIBS_io extends java.awt.Dialog {
                         nLonP=lonP-delta_yP*metaDatos.getResLon()/3600.0*bfs/4.0;
 
                         pointsInTriangulation.add(new Gdc_Coord_3d(nLatP,nLonP,corrDEM[0]));
-                        typeOfPoint.add(new int[] {2});
+                        typeOfPoint.add(new int[] {3});
                     }
                     
                 }
@@ -607,8 +647,8 @@ public class TRIBS_io extends java.awt.Dialog {
      */
     public static void main(String args[]) {
         try{
-            java.io.File theFile=new java.io.File("/Users/ricardo/Documents/databases/Test_DB/Rasters/Topography/58447060.metaDEM");
-            //java.io.File theFile=new java.io.File("/hidrosigDataBases/Test_DB/Rasters/Topography/58447060.metaDEM");
+            //java.io.File theFile=new java.io.File("/Users/ricardo/Documents/databases/Test_DB/Rasters/Topography/58447060.metaDEM");
+            java.io.File theFile=new java.io.File("/hidrosigDataBases/Test_DB/Rasters/Topography/58447060.metaDEM");
             hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster (theFile);
             metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".dir"));
             
@@ -623,7 +663,7 @@ public class TRIBS_io extends java.awt.Dialog {
             hydroScalingAPI.mainGUI.ParentGUI tempFrame=new hydroScalingAPI.mainGUI.ParentGUI();
             
             //new TRIBS_io(tempFrame, 85, 42,matDirs,magnitudes,metaModif).setVisible(true);
-            new TRIBS_io(tempFrame, 310, 132,matDirs,magnitudes,metaModif).setVisible(true);
+            new TRIBS_io(tempFrame, 310, 131,matDirs,magnitudes,metaModif).setVisible(true);
         } catch (java.io.IOException IOE){
             System.out.print(IOE);
             System.exit(0);

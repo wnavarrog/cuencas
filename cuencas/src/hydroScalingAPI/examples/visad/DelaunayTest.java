@@ -51,6 +51,12 @@ public class DelaunayTest {
     public static void main(String[] argv) throws VisADException,
             RemoteException {
         
+        double delX=-0.1;
+        double delY=-0.1;
+        System.out.println(Math.atan(delY/delX)/2.0/Math.PI*360);
+        System.out.println(((delX>0&delY<0)?360:0)+(delX>0?0:180)+(delX==0?-90*delY/Math.abs(delY):Math.atan(delY/delX)/2.0/Math.PI*360));
+        System.exit(0);
+        
         argv=new String[] {"2","10","1","3"};
         
         boolean problem = false;
@@ -389,10 +395,20 @@ public class DelaunayTest {
                 }
                 lines1[0][i]/=3.0;
                 lines1[1][i]/=3.0;
-                lines1[2][i]=(float)Math.asin((lines1[1][i]-samples[1][j])/(lines1[0][i]-samples[0][j]));
-                System.out.println("From Vertex "+j+" Angle for T-"+delaun.Vertices[j][i]+" is "+lines1[2][i]/2.0/Math.PI*180);
+                double delX=lines1[0][i]-samples[0][j];
+                double delY=lines1[1][i]-samples[1][j];
+                lines1[2][i]=(float)(((delX>0&delY<0)?360:0)+(delX>0?0:180)+(delX==0?90:Math.atan(delY/delX)/2.0/Math.PI*360));
+                
+                
+                System.out.println(delX+" "+delY+" From Vertex "+j+" Angle for T-"+delaun.Vertices[j][i]+" is "+lines1[2][i]);
+                
             }
             System.out.println();
+            float[] sortedAngles=lines1[2].clone();
+            java.util.Arrays.sort(sortedAngles);
+            int[] sortedTriList=new int[delaun.Vertices[j].length];
+            for(int i=0;i<delaun.Vertices[j].length;i++) sortedTriList[i]=delaun.Vertices[j][java.util.Arrays.binarySearch(sortedAngles,lines1[2][i])];
+            delaun.Vertices[j]=sortedTriList;
         }
     }
     
