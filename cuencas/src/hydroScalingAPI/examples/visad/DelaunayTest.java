@@ -51,7 +51,7 @@ public class DelaunayTest {
     public static void main(String[] argv) throws VisADException,
             RemoteException {
         
-        argv=new String[] {"3","500","1","1"};
+        argv=new String[] {"2","10","1","3"};
         
         boolean problem = false;
         int numpass = 0;
@@ -123,7 +123,10 @@ public class DelaunayTest {
                 samp2[i] = (float) (500 * Math.random());
             }
         }
-        visTriang(makeTriang(samples, type, numpass, test), samples, l);
+        Delaunay delaun=makeTriang(samples, type, numpass, test);
+        visTriang(delaun, samples, l);
+        sortTriangles(delaun,samples);
+        writeTriangulation(delaun,samples);
     }
     
     /**
@@ -240,11 +243,15 @@ public class DelaunayTest {
                             int t2 = tri[i][2];
                             int avgX = (int) ((s0[t0] + s0[t1] + s0[t2])/3);
                             int avgY = (int) ((s1[t0] + s1[t1] + s1[t2])/3);
-                            gr.drawString(String.valueOf(i), avgX-4, avgY);
+                            gr.drawString("T-"+String.valueOf(i), avgX-4, avgY);
+                            
+                        }
+                        for (int i=0; i<s0.length; i++) {
+                            gr.drawString("V-" + i, (int) s0[i], (int) s1[i]);
                         }
                     } else if (label == 4) {   // vertex numbers
                         for (int i=0; i<s0.length; i++) {
-                            gr.drawString("" + i, (int) s0[i], (int) s1[i]);
+                            gr.drawString("V-" + i, (int) s0[i], (int) s1[i]);
                         }
                     }
                 }
@@ -368,6 +375,29 @@ public class DelaunayTest {
         frame.setSize(new Dimension(510, 530));
         frame.setTitle("Triangulation results");
         frame.setVisible(true);
+        
+        
+    }
+    
+    public static void sortTriangles(Delaunay delaun,float[][] samples){
+        for(int j=0;j<delaun.Vertices.length;j++) {
+            float[][] lines1=new float[3][delaun.Vertices[j].length];
+            for(int i=0;i<delaun.Vertices[j].length;i++){
+                for(int k=0;k<3;k++){
+                    lines1[0][i]+=samples[0][delaun.Tri[delaun.Vertices[j][i]][k]];
+                    lines1[1][i]+=samples[1][delaun.Tri[delaun.Vertices[j][i]][k]];
+                }
+                lines1[0][i]/=3.0;
+                lines1[1][i]/=3.0;
+                lines1[2][i]=(float)Math.asin((lines1[1][i]-samples[1][j])/(lines1[0][i]-samples[0][j]));
+                System.out.println("From Vertex "+j+" Angle for T-"+delaun.Vertices[j][i]+" is "+lines1[2][i]/2.0/Math.PI*180);
+            }
+            System.out.println();
+        }
+    }
+    
+    public static void writeTriangulation(Delaunay delaun,float[][] samples){
+        
     }
     
 }

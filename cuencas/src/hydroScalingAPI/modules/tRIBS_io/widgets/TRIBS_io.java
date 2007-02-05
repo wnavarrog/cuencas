@@ -52,7 +52,7 @@ public class TRIBS_io extends java.awt.Dialog {
     private visad.java3d.DisplayRendererJ3D dr;
     
     private byte[][] directionsKey={{1,2,3},{4,5,6},{7,8,9}};
-    private java.util.Vector pointsInTriangulation,typeOfPoint;
+    private java.util.Vector pointsInTriangulation,typeOfPoint,filteredPointsInTriangulation,filteredTypeOfPoint;
     private int numPointsBasin=0;
     private DataReferenceImpl data_refLi,data_refTr;
     
@@ -154,13 +154,17 @@ public class TRIBS_io extends java.awt.Dialog {
         return LAP;
     }
     
+    private void writeTriangulation(Delaunay delaun){
+        
+    }
+    
     private void plotPoints(float Zr) throws RemoteException, VisADException{
         
         int[][] xyBasin=myCuenca.getXYBasin();
         byte[][] basMask=myCuenca.getBasinMask();
         
-        java.util.Vector originalPointsInTriangulation=(java.util.Vector)pointsInTriangulation.clone();
-        java.util.Vector originalPointsType=(java.util.Vector)typeOfPoint.clone();
+        filteredPointsInTriangulation=(java.util.Vector)pointsInTriangulation.clone();
+        filteredTypeOfPoint=(java.util.Vector)typeOfPoint.clone();
         
         int numPRemoved=0;
         int pB=0;
@@ -180,8 +184,8 @@ public class TRIBS_io extends java.awt.Dialog {
                     if(Math.abs(pointLaplacian(xyBasin[0][i],xyBasin[1][i]))<1e-4) {
                     //if(pointLaplacian(xyBasin[0][i],xyBasin[1][i])<1e-4) {
                         int pToRemove=(int)(pB-numPRemoved);
-                        pointsInTriangulation.remove(pToRemove);
-                        typeOfPoint.remove(pToRemove);
+                        filteredPointsInTriangulation.remove(pToRemove);
+                        filteredTypeOfPoint.remove(pToRemove);
                         numPRemoved++;
                     }
                 }
@@ -189,13 +193,13 @@ public class TRIBS_io extends java.awt.Dialog {
             }
         }
         
-        int numPoints=pointsInTriangulation.size();
+        int numPoints=filteredPointsInTriangulation.size();
         float[][] xyLinkValues=new float[3][numPoints];
         for(int i=0;i<numPoints;i++){
-            Utm_Coord_3d utmLocal=(Utm_Coord_3d)pointsInTriangulation.get(i);
+            Utm_Coord_3d utmLocal=(Utm_Coord_3d)filteredPointsInTriangulation.get(i);
             xyLinkValues[0][i]=(float)utmLocal.x;
             xyLinkValues[1][i]=(float)utmLocal.y;
-            xyLinkValues[2][i]=(float)((int[])typeOfPoint.get(i))[0];
+            xyLinkValues[2][i]=(float)((int[])filteredTypeOfPoint.get(i))[0];
         }
 
         xyLinkValues[2][numPoints-1]=1;
@@ -224,6 +228,16 @@ public class TRIBS_io extends java.awt.Dialog {
             float time = (end - start) / 1000f;
             System.out.println("Triangulation took " + time + " seconds.");
             
+            
+            System.out.println(delaun.NumEdges);
+            
+            for(int j=0;j<delaun.Edges.length;j++){
+                for(int i=0;i<delaun.Edges[j].length;i++){
+                    System.out.print(delaun.Edges[j][i]+"\t\t");
+                }
+                System.out.println();
+            }
+            
             Gridded2DSet[] triangles=new Gridded2DSet[delaun.Tri.length];
             float[][] lines=new float[2][4];
             for(int j=0;j<delaun.Tri.length;j++){
@@ -250,8 +264,7 @@ public class TRIBS_io extends java.awt.Dialog {
                     lines1[1][i]/=3.0;
                     
                 }
-                System.out.println();
-                
+
                 DataReferenceImpl data_ref = new DataReferenceImpl("data_ref_"+j);
                 data_ref.setData(new Gridded2DSet(domainXLYL,lines1,lines1[0].length));
                 ConstantMap[] linesCMap = {     new ConstantMap( 1.0f, Display.Red),
@@ -264,12 +277,9 @@ public class TRIBS_io extends java.awt.Dialog {
             
         }
         
-        System.out.println(pointsInTriangulation.size()/(float)originalPointsInTriangulation.size());
+        System.out.println(filteredPointsInTriangulation.size()/(float)pointsInTriangulation.size());
         System.out.println((1-(numPointsBasin-numPRemoved)/(float)numPointsBasin));
-        
-        
-        pointsInTriangulation=originalPointsInTriangulation;
-        typeOfPoint=originalPointsType;
+
         
     }
     
@@ -613,7 +623,7 @@ public class TRIBS_io extends java.awt.Dialog {
             hydroScalingAPI.mainGUI.ParentGUI tempFrame=new hydroScalingAPI.mainGUI.ParentGUI();
             
             //new TRIBS_io(tempFrame, 85, 42,matDirs,magnitudes,metaModif).setVisible(true);
-            new TRIBS_io(tempFrame, 310, 131,matDirs,magnitudes,metaModif).setVisible(true);
+            new TRIBS_io(tempFrame, 310, 132,matDirs,magnitudes,metaModif).setVisible(true);
         } catch (java.io.IOException IOE){
             System.out.print(IOE);
             System.exit(0);
