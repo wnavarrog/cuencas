@@ -295,7 +295,8 @@ public class ExtractionOptions extends javax.swing.JDialog {
     }
     
     
-    private void initComponents() {//GEN-BEGIN:initComponents
+    // <editor-fold defaultstate="collapsed" desc=" Generated Code ">//GEN-BEGIN:initComponents
+    private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
         jTabbedPane1 = new javax.swing.JTabbedPane();
@@ -399,7 +400,7 @@ public class ExtractionOptions extends javax.swing.JDialog {
         jPanelTareas.setPreferredSize(new java.awt.Dimension(507, 78));
         jPanelTerasInt.setLayout(new java.awt.GridLayout(4, 1));
 
-        jPanelTerasInt.setBorder(new javax.swing.border.TitledBorder(""));
+        jPanelTerasInt.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
         jCheckBoxDIR.setFont(new java.awt.Font("Arial", 0, 12));
         jCheckBoxDIR.setText("Get the directions matrix");
         jCheckBoxDIR.addActionListener(new java.awt.event.ActionListener() {
@@ -438,7 +439,7 @@ public class ExtractionOptions extends javax.swing.JDialog {
 
         jPanelGetGeo.setLayout(new java.awt.GridLayout(2, 1));
 
-        jPanelGetGeo.setBorder(new javax.swing.border.TitledBorder(null, "Geomophology Algorithm", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Dialog", 0, 12)));
+        jPanelGetGeo.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Geomophology Algorithm", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Dialog", 0, 12)));
         jRadioButton14.setFont(new java.awt.Font("Arial", 0, 12));
         jRadioButton14.setText("Hard Disk Based Algorithm");
         jRadioButton14.addActionListener(new java.awt.event.ActionListener() {
@@ -468,7 +469,7 @@ public class ExtractionOptions extends javax.swing.JDialog {
 
         jPanel18.setLayout(new java.awt.GridBagLayout());
 
-        jPanel18.setBorder(new javax.swing.border.TitledBorder(null, "Human Intervention on Sinks :", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Dialog", 0, 12)));
+        jPanel18.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Human Intervention on Sinks :", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Dialog", 0, 12)));
         jPanel18.setPreferredSize(new java.awt.Dimension(507, 118));
         jPanel19.setLayout(new java.awt.GridBagLayout());
 
@@ -630,7 +631,7 @@ public class ExtractionOptions extends javax.swing.JDialog {
 
         jPanel13.setLayout(new java.awt.GridBagLayout());
 
-        jPanel13.setBorder(new javax.swing.border.TitledBorder(null, "Cut Sinks Every Time That :", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Dialog", 0, 12)));
+        jPanel13.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Cut Sinks Every Time That :", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Dialog", 0, 12)));
         jPanel16.setLayout(new java.awt.GridBagLayout());
 
         jLabel11.setFont(new java.awt.Font("Arial", 0, 12));
@@ -740,7 +741,7 @@ public class ExtractionOptions extends javax.swing.JDialog {
         jPanelRedRas.setPreferredSize(new java.awt.Dimension(507, 78));
         jPanelIniCanales.setLayout(new java.awt.GridBagLayout());
 
-        jPanelIniCanales.setBorder(new javax.swing.border.TitledBorder(""));
+        jPanelIniCanales.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
         jPanel3.setLayout(new java.awt.GridBagLayout());
 
         jTextField1.setFont(new java.awt.Font("SansSerif", 0, 12));
@@ -877,7 +878,7 @@ public class ExtractionOptions extends javax.swing.JDialog {
 
         jTextFieldCeldasConv.setFont(new java.awt.Font("SansSerif", 0, 12));
         jTextFieldCeldasConv.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        jTextFieldCeldasConv.setText("3");
+        jTextFieldCeldasConv.setText("2");
         jTextFieldCeldasConv.setMinimumSize(new java.awt.Dimension(40, 15));
         jTextFieldCeldasConv.setPreferredSize(new java.awt.Dimension(40, 20));
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -916,7 +917,7 @@ public class ExtractionOptions extends javax.swing.JDialog {
 
         jPaneLAzules.setLayout(new java.awt.GridBagLayout());
 
-        jPaneLAzules.setBorder(new javax.swing.border.TitledBorder(""));
+        jPaneLAzules.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
         jCheckBoxLAzules.setFont(new java.awt.Font("Dialog", 0, 12));
         jCheckBoxLAzules.setText("Use a Blue Lines Map to Guide Network Extraction");
         jCheckBoxLAzules.addActionListener(new java.awt.event.ActionListener() {
@@ -969,7 +970,7 @@ public class ExtractionOptions extends javax.swing.JDialog {
 
         jPanelOp_AreaPend.setLayout(new java.awt.GridLayout(2, 1));
 
-        jPanelOp_AreaPend.setBorder(new javax.swing.border.TitledBorder(""));
+        jPanelOp_AreaPend.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
         jPanelOp_AreaPend.setMinimumSize(new java.awt.Dimension(200, 62));
         jCheckBoxAreaPend_c.setFont(new java.awt.Font("Dialog", 0, 12));
         jCheckBoxAreaPend_c.setText("Load pre-existing Area-Slope Analysis");
@@ -1134,7 +1135,7 @@ public class ExtractionOptions extends javax.swing.JDialog {
 
         getContentPane().add(jPanel28, java.awt.BorderLayout.SOUTH);
 
-    }//GEN-END:initComponents
+    }// </editor-fold>//GEN-END:initComponents
     
   private void jTextFieldCeldasConvActionPerformed (java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldCeldasConvActionPerformed
       // Add your handling code here:

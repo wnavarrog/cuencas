@@ -53,8 +53,10 @@ public class TRIBS_io extends java.awt.Dialog {
     
     private byte[][] directionsKey={{1,2,3},{4,5,6},{7,8,9}};
     private java.util.Vector pointsInTriangulation,typeOfPoint,filteredPointsInTriangulation,filteredTypeOfPoint;
+    private Delaunay delaun;
     private int numPointsBasin=0;
-    private DataReferenceImpl data_refLi,data_refTr;
+    private DataReferenceImpl data_refPoints,data_refTr,data_refPoly;
+    private ConstantMap[] pointsCMap,linesCMap,linesCMap1;
     
     /**
      * Creates new form TRIBS_io
@@ -154,11 +156,139 @@ public class TRIBS_io extends java.awt.Dialog {
         return LAP;
     }
     
-    private void writeTriangulation(Delaunay delaun){
+    private void writeTriangulation(Delaunay delaun,float[][] samples,java.io.File outputLocation) throws java.io.IOException{
+        
+        float[] s0 = samples[0];
+        float[] s1 = samples[1];
+        
+        int[][] tri = delaun.Tri;
+        int[][] edges = delaun.Edges;
+        int numedges = delaun.NumEdges;
+        int[][] walk=delaun.Walk;
+        int[][] vert=delaun.Vertices;
+        
+        System.out.println("Edges File");
+        java.util.Hashtable edges_order_map=new java.util.Hashtable();
+        java.util.Vector edges_ef=new java.util.Vector();
+        int runningID=0;
+        for(int k=0;k<vert.length;k++){
+            java.util.Vector localEdges=new java.util.Vector();
+            for (int j=0; j<vert[k].length; j++) {
+                int i=vert[k][j];
+                float v1X=s0[tri[i][1]]-s0[tri[i][0]];
+                float v1Y=s1[tri[i][1]]-s1[tri[i][0]];
+                float v2X=s0[tri[i][2]]-s0[tri[i][0]];
+                float v2Y=s1[tri[i][2]]-s1[tri[i][0]];
+
+                float kComp=v1X*v2Y-v2X*v1Y;
+                
+                int pPos=0;
+                for (int l=1; l<3; l++) if(k == tri[i][l]) pPos=l;
+                //System.out.println("P"+k+" In Triang("+(kComp>0?"+":"-")+"):"+" P"+tri[i][0]+" P"+tri[i][1]+" P"+tri[i][2]+" pPos "+pPos);
+                int L1pos=(pPos+1+(kComp>0?0:1))%3;
+                int L2pos=(pPos+1+(kComp>0?1:0))%3;
+                //System.out.println("    L1 is: E"+k+"-"+tri[i][L1pos]);
+                //System.out.println("    L2 is: E"+k+"-"+tri[i][L2pos]);
+                if(!localEdges.contains("E"+k+"-"+tri[i][L1pos])) localEdges.add("E"+k+"-"+tri[i][L1pos]);
+                if(!localEdges.contains("E"+k+"-"+tri[i][L2pos])) localEdges.add("E"+k+"-"+tri[i][L2pos]);
+                
+            }
+            localEdges.add(localEdges.firstElement());
+            Object[] myEdges=localEdges.toArray();
+            for (int j=1; j<myEdges.length; j++) {
+                edges_ef.add(myEdges[j]+" "+k+" "+((String)myEdges[j]).substring(((String)myEdges[j]).indexOf("-")+1)+" "+myEdges[j-1]);
+                if(edges_order_map.get((String)myEdges[j]) == null){
+                    edges_order_map.put((String)myEdges[j],""+(2*runningID));
+                    String inverseEdge=((String)myEdges[j]).substring(1);
+                    String[] elementsIE=inverseEdge.split("-");
+                    inverseEdge="E"+elementsIE[1]+"-"+elementsIE[0];
+                    edges_order_map.put(inverseEdge,""+(2*runningID+1));
+                    runningID++;
+                } 
+            }
+            
+        }
+        int totEdges=edges_ef.size();
+        //System.out.println(totEdges+" "+edges_order_map.size());
+        java.util.Enumeration en=edges_order_map.keys();
+//        while(en.hasMoreElements()) {
+//            Object tttt=en.nextElement();
+//            System.out.println(tttt+" "+edges_order_map.get(tttt));
+//        }
+        String[] edges_ef_ready=new String[totEdges];
+        for(int i=0;i<totEdges;i++){
+            String[] toPrint=((String)edges_ef.get(i)).split(" ");
+            //System.out.println(i+" "+edges_ef.get(i));
+            //System.out.println(edges_order_map.get(toPrint[0])+" "+toPrint[1]+" "+toPrint[2]+" "+edges_order_map.get(toPrint[3]));
+            edges_ef_ready[Integer.parseInt((String)edges_order_map.get(toPrint[0]))]=edges_order_map.get(toPrint[0])+" "+toPrint[1]+" "+toPrint[2]+" "+edges_order_map.get(toPrint[3]);
+        }
+        for(int i=0;i<totEdges;i++){
+            System.out.println(edges_ef_ready[i]);
+        }
+        
+        System.out.println("Nodes File");
+        java.util.Vector nodes_nf=new java.util.Vector();
+        java.util.Vector edges_nf=new java.util.Vector();
+        java.util.Vector codes_nf=new java.util.Vector();
+        
+        
+        for (int i=0; i<edges.length; i++) {
+            for (int j=0; j<3; j++) {
+                if(!nodes_nf.contains("P"+tri[i][j])){
+                    nodes_nf.add("P"+tri[i][j]);
+                    edges_nf.add("E"+tri[i][j]+"-"+tri[i][(j+1)%3]);
+                }
+            }
+        }
+        for(int i=0;i<vert.length;i++){
+            int pointID=Integer.parseInt(((String)nodes_nf.get(i)).substring(1));
+            System.out.println(samples[0][pointID]+" "+samples[1][pointID]+" "+edges_order_map.get(edges_nf.get(i))+" "+"BC-XX");
+        }
+        
+        System.out.println("Triangles File");
+        for (int i=0; i<edges.length; i++) {
+            float v1X=s0[tri[i][1]]-s0[tri[i][0]];
+            float v1Y=s1[tri[i][1]]-s1[tri[i][0]];
+            float v2X=s0[tri[i][2]]-s0[tri[i][0]];
+            float v2Y=s1[tri[i][2]]-s1[tri[i][0]];
+
+            float kComp=v1X*v2Y-v2X*v1Y;
+            //System.out.print("T("+i+(kComp>0?"+":"-")+")");
+            if(kComp>0){
+                System.out.print(tri[i][2]+" "+tri[i][1]+" "+tri[i][0]);
+                System.out.print(" "+walk[i][0]+" "+walk[i][2]+" "+walk[i][1]);
+                System.out.print(" "+(String)edges_order_map.get("E"+tri[i][2]+"-"+tri[i][0])+
+                                 " "+(String)edges_order_map.get("E"+tri[i][1]+"-"+tri[i][2])+
+                                 " "+(String)edges_order_map.get("E"+tri[i][0]+"-"+tri[i][1]));
+            } else {
+                System.out.print(tri[i][0]+" "+tri[i][1]+" "+tri[i][2]);
+                System.out.print(" "+walk[i][1]+" "+walk[i][2]+" "+walk[i][0]);
+                System.out.print(" "+(String)edges_order_map.get("E"+tri[i][0]+"-"+tri[i][2])+
+                                 " "+(String)edges_order_map.get("E"+tri[i][1]+"-"+tri[i][0])+
+                                 " "+(String)edges_order_map.get("E"+tri[i][2]+"-"+tri[i][1]));
+            }
+            System.out.println();
+        }
         
     }
     
-    private void sortTriangles(Delaunay delaun,float[][] samples){
+    public double[] intersection(double x1, double y1, double x2, double y2,double x3, double y3, double x4, double y4){
+        double b1=x1*y2-y1*x2;
+        double b2=x3*y4-y3*x4;
+        
+        double U1=(x3-x4)*b1-(x1-x2)*b2;
+        double U2=(y3-y4)*b1-(y1-y2)*b2;
+        double BG=(x1-x2)*(y3-y4)-(x3-x4)*(y1-y2);
+        
+        double xi=U1/BG;
+        double yi=U2/BG;
+        
+        double[] answ={xi,yi};
+        
+        return answ;
+    }
+    
+    public void sortTriangles(Delaunay delaun,float[][] samples){
         for(int j=0;j<delaun.Vertices.length;j++) {
             float[][] lines1=new float[3][delaun.Vertices[j].length];
             for(int i=0;i<delaun.Vertices[j].length;i++){
@@ -170,15 +300,13 @@ public class TRIBS_io extends java.awt.Dialog {
                 lines1[1][i]/=3.0;
                 double delX=lines1[0][i]-samples[0][j];
                 double delY=lines1[1][i]-samples[1][j];
-                lines1[2][i]=(float)(((delX>0&delY<0)?360:0)+(delX>0?0:180)+(delX==0?-90*delY/Math.abs(delY):Math.atan(delY/delX)/2.0/Math.PI*360));
+                lines1[2][i]=(float)(((delX>0&delY<0)?360:0)+(delX>0?0:180)+(delX==0?90:Math.atan(delY/delX)/2.0/Math.PI*360));
+                
             }
             float[] sortedAngles=lines1[2].clone();
             java.util.Arrays.sort(sortedAngles);
             int[] sortedTriList=new int[delaun.Vertices[j].length];
-            for(int i=0;i<delaun.Vertices[j].length;i++) {
-                int indexLocated=java.util.Arrays.binarySearch(sortedAngles,lines1[2][i]);
-                sortedTriList[indexLocated]=delaun.Vertices[j][i];
-            }
+            for(int i=0;i<delaun.Vertices[j].length;i++) sortedTriList[java.util.Arrays.binarySearch(sortedAngles,lines1[2][i])]=delaun.Vertices[j][i];
             delaun.Vertices[j]=sortedTriList;
         }
     }
@@ -239,19 +367,21 @@ public class TRIBS_io extends java.awt.Dialog {
         FlatField vals_ff_Li = new FlatField( func_xEasting_yNorthing, xVarIndex);
         vals_ff_Li.setSamples( xyLinkValues );
         
-        data_refLi.setData(vals_ff_Li);
+        data_refPoints.setData(vals_ff_Li);
         
         if(Zr > 70){
             float[][] samples=new float[2][];
-            samples[0]=xyLinkValues[0];
-            samples[1]=xyLinkValues[1];
+            samples[0]=xyLinkValues[0].clone();
+            samples[1]=xyLinkValues[1].clone();
             System.out.println("the DelaunayClarkson algorithm.");
             long start = System.currentTimeMillis();
             Delaunay.perturb(samples,0.1f,false);
-            Delaunay delaun = (Delaunay) new DelaunayClarkson(samples);
+            delaun = (Delaunay) new DelaunayClarkson(samples);
             long end = System.currentTimeMillis();
             float time = (end - start) / 1000f;
             System.out.println("Triangulation took " + time + " seconds.");
+            samples[0]=xyLinkValues[0].clone();
+            samples[1]=xyLinkValues[1].clone();
             
             
 //            System.out.println(delaun.NumEdges);
@@ -262,6 +392,8 @@ public class TRIBS_io extends java.awt.Dialog {
 //                }
 //                System.out.println();
 //            }
+            sortTriangles(delaun,samples);
+            
             
             Gridded2DSet[] triangles=new Gridded2DSet[delaun.Tri.length];
             float[][] lines=new float[2][4];
@@ -278,42 +410,87 @@ public class TRIBS_io extends java.awt.Dialog {
             
             data_refTr.setData(allTriang);
             
-            sortTriangles(delaun,samples);
+            
             int numValidPoints=0;
             for(int j=0;j<xyLinkValues[2].length;j++) {
                 if(xyLinkValues[2][j] != 2 ) numValidPoints++;
             }
             
-            Gridded2DSet[] polygons=new Gridded2DSet[numValidPoints];
+            float[] s0 = samples[0];
+            float[] s1 = samples[1];
+            
+            Gridded2DSet[] polygons=new Gridded2DSet[numValidPoints-1];
             int kp=0;
-            for(int j=0;j<xyLinkValues[2].length;j++) {
-                if(xyLinkValues[2][j] != 2 ){
-                    float[][] lines1=new float[2][delaun.Vertices[j].length+1];
-                    for(int i=0;i<delaun.Vertices[j].length;i++){
-                        for(int k=0;k<3;k++){
-                            lines1[0][i]+=samples[0][delaun.Tri[delaun.Vertices[j][i]][k]];
-                            lines1[1][i]+=samples[1][delaun.Tri[delaun.Vertices[j][i]][k]];
+            for(int k=0;k<xyLinkValues[2].length;k++) {
+            //for(int k=0;k<5;k++) {    
+                if(xyLinkValues[2][k] != 2 && xyLinkValues[2][k] != 1){
+                    float[][] lines1=new float[2][delaun.Vertices[k].length+1];
+                    for(int j=0;j<delaun.Vertices[k].length;j++){
+                        
+                        int i=delaun.Vertices[k][j];
+                        float v1X=s0[delaun.Tri[i][1]]-s0[delaun.Tri[i][0]];
+                        float v1Y=s1[delaun.Tri[i][1]]-s1[delaun.Tri[i][0]];
+                        float v2X=s0[delaun.Tri[i][2]]-s0[delaun.Tri[i][0]];
+                        float v2Y=s1[delaun.Tri[i][2]]-s1[delaun.Tri[i][0]];
+
+                        float kComp=v1X*v2Y-v2X*v1Y;
+
+                        int pPos=0;
+                        for (int l=1; l<3; l++) if(k == delaun.Tri[i][l]) pPos=l;
+                        //System.out.println("P"+k+" In Triang("+(kComp>0?"+":"-")+"):"+" P"+tri[i][0]+" P"+tri[i][1]+" P"+tri[i][2]+" pPos "+pPos);
+                        int L1pos=(pPos+1+(kComp>0?0:1))%3;
+                        int L2pos=(pPos+1+(kComp>0?1:0))%3;
+                        
+                        double xs1=s0[delaun.Tri[i][pPos]];
+                        double ys1=s1[delaun.Tri[i][pPos]];
+                        
+                        double xs2=s0[delaun.Tri[i][L2pos]];
+                        double ys2=s1[delaun.Tri[i][L2pos]];
+                        
+                        double xa1=(xs1+xs2)/2.0f;
+                        double ya1=(ys1+ys2)/2.0f;
+                        double xb1=0;
+                        double yb1;
+                        if(ys2-ys1 != 0)
+                            yb1=ya1+(xs2-xs1)/(ys2-ys1)*xa1;
+                        else{
+                            xb1=xa1;
+                            yb1=0;
                         }
-                        lines1[0][i]/=3.0;
-                        lines1[1][i]/=3.0;
+                        
+                        double xs3=s0[delaun.Tri[i][L1pos]];
+                        double ys3=s1[delaun.Tri[i][L1pos]];
+                        
+                        double xa2=(xs1+xs3)/2.0f;
+                        double ya2=(ys1+ys3)/2.0f;
+                        double xb2=0;
+                        double yb2;
+                        if(ys3-ys1 != 0)
+                            yb2=ya2+(xs3-xs1)/(ys3-ys1)*xa2;
+                        else{
+                            xb2=xa1;
+                            yb2=0;
+                        }
+                        
+                        double[] result=intersection(xa1,ya1,xb1,yb1,xa2,ya2,xb2,yb2);
+
+                        double xvoi=result[0];
+                        double yvoi=result[1];
+                        
+                        lines1[0][j]=(float)xvoi;
+                        lines1[1][j]=(float)yvoi;
 
                     }
-                    lines1[0][delaun.Vertices[j].length]=lines1[0][0];
-                    lines1[1][delaun.Vertices[j].length]=lines1[1][0];
+                    lines1[0][delaun.Vertices[k].length]=lines1[0][0];
+                    lines1[1][delaun.Vertices[k].length]=lines1[1][0];
                     
                     polygons[kp++]=new Gridded2DSet(domainXLYL,lines1,lines1[0].length);
                 }
             }
-            System.out.println(kp);
             UnionSet allPoly=new UnionSet(domainXLYL,polygons);
-            DataReferenceImpl data_ref = new DataReferenceImpl("data_ref_poly");
-            data_ref.setData(allPoly);
-            ConstantMap[] linesCMap = {     new ConstantMap( 1.0f, Display.Red),
-                                            new ConstantMap( 0.0f, Display.Green),
-                                            new ConstantMap( 1.0f, Display.Blue),
-                                            new ConstantMap( 1.50f, Display.LineWidth)};
-
-            display_TIN.addReference( data_ref,linesCMap );
+            //Gridded2DSet allPoly=polygons[1];
+            data_refPoly.setData(allPoly);
+            
             
         }
         
@@ -482,23 +659,26 @@ public class TRIBS_io extends java.awt.Dialog {
         FlatField vals_ff_Li = new FlatField( func_xEasting_yNorthing, xVarIndex);
         vals_ff_Li.setSamples( xyLinkValues );
         
-        data_refLi = new DataReferenceImpl("data_ref_LINK");
-        data_refLi.setData(vals_ff_Li);
+        data_refPoints = new DataReferenceImpl("data_ref_LINK");
+        data_refPoints.setData(vals_ff_Li);
         
-        ConstantMap[] pointsCMap = {    //new ConstantMap( 1.0f, Display.Red),
-                                        //new ConstantMap( 1.0f, Display.Green),
-                                        //new ConstantMap( 0.0f, Display.Blue),
-                                        new ConstantMap( 10.50f, Display.PointSize)};
-            
-        display_TIN.addReference( data_refLi,pointsCMap );
+        pointsCMap = new ConstantMap[] {new ConstantMap( 10.50f, Display.PointSize)};
+
+        display_TIN.addReference( data_refPoints,pointsCMap );
         
         data_refTr = new DataReferenceImpl("data_ref_TRIANG");
-        ConstantMap[] linesCMap = {    //new ConstantMap( 1.0f, Display.Red),
-                                        //new ConstantMap( 1.0f, Display.Green),
-                                        //new ConstantMap( 0.0f, Display.Blue),
-                                        new ConstantMap( 0.50f, Display.LineWidth)};
+        linesCMap = new ConstantMap[] {new ConstantMap( 0.50f, Display.LineWidth)};
 
         display_TIN.addReference( data_refTr,linesCMap );
+        
+        data_refPoly = new DataReferenceImpl("data_ref_poly");
+        linesCMap1 = new ConstantMap[] {    new ConstantMap( 1.0f, Display.Red),
+                                            new ConstantMap( 0.0f, Display.Green),
+                                            new ConstantMap( 1.0f, Display.Blue),
+                                            new ConstantMap( 1.50f, Display.LineWidth)};
+
+        display_TIN.addReference( data_refPoly,linesCMap1 );
+            
         
 //        float[][] samples=new float[2][];
 //        samples[0]=xyLinkValues[0];
@@ -534,6 +714,10 @@ public class TRIBS_io extends java.awt.Dialog {
         zrSlider = new javax.swing.JSlider();
         jLabel1 = new javax.swing.JLabel();
         exportButton = new javax.swing.JButton();
+        jPanel3 = new javax.swing.JPanel();
+        pointsCheckBox = new javax.swing.JCheckBox();
+        trianglesCheckBox = new javax.swing.JCheckBox();
+        voronoiCheckBox = new javax.swing.JCheckBox();
 
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
@@ -572,12 +756,115 @@ public class TRIBS_io extends java.awt.Dialog {
 
         jPanel1.add(jPanel2, java.awt.BorderLayout.SOUTH);
 
+        jPanel3.setLayout(new java.awt.GridLayout(1, 3));
+
+        pointsCheckBox.setFont(new java.awt.Font("Lucida Grande", 0, 10));
+        pointsCheckBox.setSelected(true);
+        pointsCheckBox.setText("Show Points");
+        pointsCheckBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        pointsCheckBox.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        pointsCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pointsCheckBoxActionPerformed(evt);
+            }
+        });
+
+        jPanel3.add(pointsCheckBox);
+
+        trianglesCheckBox.setFont(new java.awt.Font("Lucida Grande", 0, 10));
+        trianglesCheckBox.setSelected(true);
+        trianglesCheckBox.setText("Show Triangles");
+        trianglesCheckBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        trianglesCheckBox.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        trianglesCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                trianglesCheckBoxActionPerformed(evt);
+            }
+        });
+
+        jPanel3.add(trianglesCheckBox);
+
+        voronoiCheckBox.setFont(new java.awt.Font("Lucida Grande", 0, 10));
+        voronoiCheckBox.setSelected(true);
+        voronoiCheckBox.setText("Show Voronoi Polygons");
+        voronoiCheckBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        voronoiCheckBox.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        voronoiCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                voronoiCheckBoxActionPerformed(evt);
+            }
+        });
+
+        jPanel3.add(voronoiCheckBox);
+
+        jPanel1.add(jPanel3, java.awt.BorderLayout.NORTH);
+
         panelOpciones.addTab("TIN", jPanel1);
 
         add(panelOpciones, java.awt.BorderLayout.CENTER);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void voronoiCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_voronoiCheckBoxActionPerformed
+        if(voronoiCheckBox.isSelected()){
+            try {
+                display_TIN.addReference(data_refPoly,linesCMap1);
+            } catch (RemoteException ex) {
+                ex.printStackTrace();
+            } catch (VisADException ex) {
+                ex.printStackTrace();
+            }
+        } else{
+            try {
+                display_TIN.removeReference(data_refPoly);
+            } catch (RemoteException ex) {
+                ex.printStackTrace();
+            } catch (VisADException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }//GEN-LAST:event_voronoiCheckBoxActionPerformed
+
+    private void trianglesCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_trianglesCheckBoxActionPerformed
+        if(trianglesCheckBox.isSelected()){
+            try {
+                display_TIN.addReference(data_refTr,linesCMap);
+            } catch (RemoteException ex) {
+                ex.printStackTrace();
+            } catch (VisADException ex) {
+                ex.printStackTrace();
+            }
+        } else{
+            try {
+                display_TIN.removeReference(data_refTr);
+            } catch (RemoteException ex) {
+                ex.printStackTrace();
+            } catch (VisADException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }//GEN-LAST:event_trianglesCheckBoxActionPerformed
+
+    private void pointsCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pointsCheckBoxActionPerformed
+        if(pointsCheckBox.isSelected()){
+            try {
+                display_TIN.addReference(data_refPoints,pointsCMap);
+            } catch (RemoteException ex) {
+                ex.printStackTrace();
+            } catch (VisADException ex) {
+                ex.printStackTrace();
+            }
+        } else{
+            try {
+                display_TIN.removeReference(data_refPoints);
+            } catch (RemoteException ex) {
+                ex.printStackTrace();
+            } catch (VisADException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }//GEN-LAST:event_pointsCheckBoxActionPerformed
 
     private void zrSliderMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_zrSliderMouseReleased
         try{
@@ -590,50 +877,34 @@ public class TRIBS_io extends java.awt.Dialog {
     }//GEN-LAST:event_zrSliderMouseReleased
 
     private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
-//        try{
-//            javax.swing.JFileChooser fc=new javax.swing.JFileChooser(mainFrame.getInfoManager().dataBasePolygonsPath);
-//            fc.setFileSelectionMode(fc.FILES_ONLY);
-//            fc.setDialogTitle("Directory Selection");
-//            javax.swing.filechooser.FileFilter mdtFilter = new visad.util.ExtensionFileFilter("points","Points File");
-//            fc.addChoosableFileFilter(mdtFilter);
-//            fc.showSaveDialog(this);
-//
-//            //if (fc.getSelectedFile() == null) return;
-//            
-//            java.io.File theFile=metaDatos.getLocationBinaryFile();
-//            metaDatos.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".redRas"));
-//            metaDatos.setFormat(hydroScalingAPI.tools.ExtensionToFormat.getFormat(".redRas"));
-//            byte[][] rasterNet=new hydroScalingAPI.io.DataRaster(metaDatos).getByte();
-//            
-//            metaDatos.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".corrDEM"));
-//            metaDatos.setFormat(hydroScalingAPI.tools.ExtensionToFormat.getFormat(".corrDEM"));
-//            double[][] fixedDem=new hydroScalingAPI.io.DataRaster(metaDatos).getDouble();
-//            
-//        
-//            hydroScalingAPI.util.geomorphology.objects.Basin myCuenca=new hydroScalingAPI.util.geomorphology.objects.Basin(xOut,yOut,matDir,metaDatos);
-//            float[][] lonLatsDivide=myCuenca.getLonLatBasinDivide();
-//            int[][] xyDivide=myCuenca.getXYBasinDivide();
-//            float[][] lonLatsBasin=myCuenca.getLonLatBasin();
-//            int[][] xyBasin=myCuenca.getXYBasin();
-//            
-//            System.out.println((lonLatsDivide[0].length+lonLatsBasin[0].length-1));
-//            System.out.println((lonLatsBasin[0][0]+metaDatos.getResLon()/2.0)+" "+(lonLatsBasin[1][0]+metaDatos.getResLat()/2.0)+" "+fixedDem[xyBasin[1][0]][xyBasin[0][0]]+" "+2);
-//            
-//            for(int i=0;i<xyBasin[0].length;i++){
-//                if(rasterNet[xyBasin[1][i]][xyBasin[0][i]] != 1)
-//                    System.out.println((lonLatsBasin[0][i]+metaDatos.getResLon()/2.0)+" "+(lonLatsBasin[1][i]+metaDatos.getResLat()/2.0)+" "+fixedDem[xyBasin[1][i]][xyBasin[0][i]]+" "+0);
-//                else
-//                    System.out.println((lonLatsBasin[0][i]+metaDatos.getResLon()/2.0)+" "+(lonLatsBasin[1][i]+metaDatos.getResLat()/2.0)+" "+fixedDem[xyBasin[1][i]][xyBasin[0][i]]+" "+3);
-//                
-//            }
-//            for(int i=0;i<lonLatsDivide[0].length-1;i++) System.out.println(((lonLatsDivide[0][i]+lonLatsDivide[0][i+1])/2.0)+" "+((lonLatsDivide[1][i]+lonLatsDivide[1][i+1])/2.0)+" "+fixedDem[xyDivide[1][i]][xyDivide[0][i]]+" "+1);
-//            mainFrame.setUpGUI(true);
-//            
-//            closeDialog(null);
-//        } catch (java.io.IOException IOE){
-//            System.err.println("Failed creating polygon file for this basin. "+xOut+" "+yOut);
-//            System.err.println(IOE);
-//        }
+        try{
+            javax.swing.JFileChooser fc=new javax.swing.JFileChooser();
+            fc.setFileSelectionMode(fc.FILES_ONLY);
+            fc.setDialogTitle("Directory Selection");
+            javax.swing.filechooser.FileFilter mdtFilter = new visad.util.ExtensionFileFilter("nodes","Nodes File");
+            fc.addChoosableFileFilter(mdtFilter);
+            fc.showSaveDialog(this);
+
+            if (fc.getSelectedFile() == null) return;
+            int numPoints=filteredPointsInTriangulation.size();
+            float[][] xyLinkValues=new float[3][numPoints];
+            for(int i=0;i<numPoints;i++){
+                Utm_Coord_3d utmLocal=(Utm_Coord_3d)filteredPointsInTriangulation.get(i);
+                xyLinkValues[0][i]=(float)utmLocal.x;
+                xyLinkValues[1][i]=(float)utmLocal.y;
+                xyLinkValues[2][i]=(float)((int[])filteredTypeOfPoint.get(i))[0];
+            }
+
+            xyLinkValues[2][numPoints-1]=1;
+        
+            float[][] samples=new float[2][];
+            samples[0]=xyLinkValues[0].clone();
+            samples[1]=xyLinkValues[1].clone();
+            writeTriangulation(delaun,samples,fc.getSelectedFile());
+        } catch (java.io.IOException IOE){
+            System.err.println("Failed writing triangulation files for this basin.");
+            IOE.printStackTrace();
+        }
     }//GEN-LAST:event_exportButtonActionPerformed
     
     /** Closes the dialog */
@@ -682,7 +953,11 @@ public class TRIBS_io extends java.awt.Dialog {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JTabbedPane panelOpciones;
+    private javax.swing.JCheckBox pointsCheckBox;
+    private javax.swing.JCheckBox trianglesCheckBox;
+    private javax.swing.JCheckBox voronoiCheckBox;
     private javax.swing.JSlider zrSlider;
     // End of variables declaration//GEN-END:variables
     

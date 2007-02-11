@@ -55,9 +55,20 @@ public class DelaunayTest {
         double delY=-0.1;
         System.out.println(Math.atan(delY/delX)/2.0/Math.PI*360);
         System.out.println(((delX>0&delY<0)?360:0)+(delX>0?0:180)+(delX==0?-90*delY/Math.abs(delY):Math.atan(delY/delX)/2.0/Math.PI*360));
-        System.exit(0);
+        float    x1=686414.2f,
+                 y1=4214126.0f,
+                 x2=0.0f,
+                 y2=3.8191632E7f,
+                 x3=686407.8f,
+                 y3=4214138.0f,
+                 x4=0.0f,
+                 y4=4550338.0f;
+        float[] result=intersection(x1,y1,x2,y2,x3,y3,x4,y4);
+        System.out.println(result[0]+" "+result[1]);
+        //System.exit(0);
+
         
-        argv=new String[] {"2","10","1","3"};
+        argv=new String[] {"2","1000","1","3"};
         
         boolean problem = false;
         int numpass = 0;
@@ -121,12 +132,12 @@ public class DelaunayTest {
         if (dim == 3) samp2 = samples[2];
         
         for (int i=0; i<points; i++) {
-            samp0[i] = (float) (500 * Math.random());
-            samp1[i] = (float) (500 * Math.random());
+            samp0[i] = (float) (1000 * Math.random());
+            samp1[i] = (float) (1000 * Math.random());
         }
         if (dim == 3) {
             for (int i=0; i<points; i++) {
-                samp2[i] = (float) (500 * Math.random());
+                samp2[i] = (float) (1000 * Math.random());
             }
         }
         Delaunay delaun=makeTriang(samples, type, numpass, test);
@@ -205,6 +216,7 @@ public class DelaunayTest {
         final int[][] tri = delaun.Tri;
         final int[][] edges = delaun.Edges;
         final int numedges = delaun.NumEdges;
+        final int[][] walk=delaun.Walk;
         
         // set up frame
         JFrame frame = new JFrame();
@@ -254,6 +266,37 @@ public class DelaunayTest {
                         }
                         for (int i=0; i<s0.length; i++) {
                             gr.drawString("V-" + i, (int) s0[i], (int) s1[i]);
+                        }
+                        for (int i=0; i<edges.length; i++) {
+                            float v1X=s0[tri[i][1]]-s0[tri[i][0]];
+                            float v1Y=s1[tri[i][1]]-s1[tri[i][0]];
+                            float v2X=s0[tri[i][2]]-s0[tri[i][0]];
+                            float v2Y=s1[tri[i][2]]-s1[tri[i][0]];
+                            
+                            float kComp=v1X*v2Y-v2X*v1Y;
+                            
+                            gr.drawString("E-" + edges[i][0], (int) (s0[tri[i][0]]+s0[tri[i][1]])/2, (int) (s1[tri[i][0]]+s1[tri[i][1]])/2);
+                            gr.drawString("E-" + edges[i][1], (int) (s0[tri[i][1]]+s0[tri[i][2]])/2, (int) (s1[tri[i][1]]+s1[tri[i][2]])/2);
+                            gr.drawString("E-" + edges[i][2], (int) (s0[tri[i][2]]+s0[tri[i][0]])/2, (int) (s1[tri[i][2]]+s1[tri[i][0]])/2);
+                        }
+                        for (int i=0; i<walk.length; i++) {
+                            int t0 = tri[i][0];
+                            int t1 = tri[i][1];
+                            int t2 = tri[i][2];
+                            int avgX = (int) ((s0[t0] + s0[t1] + s0[t2])/3);
+                            int avgY = (int) ((s1[t0] + s1[t1] + s1[t2])/3);
+                            for(int j=0;j<3;j++){
+                                if(walk[i][j%3] != -1){
+                                    int t00 = tri[walk[i][j%3]][0];
+                                    int t10 = tri[walk[i][j%3]][1];
+                                    int t20 = tri[walk[i][j%3]][2];
+                                    int avgXX = (int) ((s0[t00] + s0[t10] + s0[t20])/3);
+                                    int avgYY = (int) ((s1[t00] + s1[t10] + s1[t20])/3);
+                                    gr.setColor(new Color(50*j));
+                                    gr.drawLine(avgX,avgY,avgXX,avgYY);
+                                }
+                            }
+                            
                         }
                     } else if (label == 4) {   // vertex numbers
                         for (int i=0; i<s0.length; i++) {
@@ -378,11 +421,27 @@ public class DelaunayTest {
             panel.add(display.getComponent());
             frame.getContentPane().add(panel);
         }
-        frame.setSize(new Dimension(510, 530));
+        frame.setBounds(500,0,1010,1030);
         frame.setTitle("Triangulation results");
         frame.setVisible(true);
         
         
+    }
+    
+    public static float[] intersection(float x1, float y1, float x2, float y2,float x3, float y3, float x4, float y4){
+        float b1=x1*y2-y1*x2;
+        float b2=x3*y4-y3*x4;
+        
+        float U1=(x3-x4)*b1-(x1-x2)*b2;
+        float U2=(y3-y4)*b1-(y1-y2)*b2;
+        float BG=(x1-x2)*(y3-y4)-(x3-x4)*(y1-y2);
+        
+        float xi=U1/BG;
+        float yi=U2/BG;
+        
+        float[] answ={xi,yi};
+        
+        return answ;
     }
     
     public static void sortTriangles(Delaunay delaun,float[][] samples){
@@ -399,20 +458,131 @@ public class DelaunayTest {
                 double delY=lines1[1][i]-samples[1][j];
                 lines1[2][i]=(float)(((delX>0&delY<0)?360:0)+(delX>0?0:180)+(delX==0?90:Math.atan(delY/delX)/2.0/Math.PI*360));
                 
-                
-                System.out.println(delX+" "+delY+" From Vertex "+j+" Angle for T-"+delaun.Vertices[j][i]+" is "+lines1[2][i]);
-                
             }
-            System.out.println();
             float[] sortedAngles=lines1[2].clone();
             java.util.Arrays.sort(sortedAngles);
             int[] sortedTriList=new int[delaun.Vertices[j].length];
-            for(int i=0;i<delaun.Vertices[j].length;i++) sortedTriList[i]=delaun.Vertices[j][java.util.Arrays.binarySearch(sortedAngles,lines1[2][i])];
+            for(int i=0;i<delaun.Vertices[j].length;i++) sortedTriList[java.util.Arrays.binarySearch(sortedAngles,lines1[2][i])]=delaun.Vertices[j][i];
             delaun.Vertices[j]=sortedTriList;
+            
+            
+            
         }
     }
     
     public static void writeTriangulation(Delaunay delaun,float[][] samples){
+        
+        float[] s0 = samples[0];
+        float[] s1 = samples[1];
+        
+        int[][] tri = delaun.Tri;
+        int[][] edges = delaun.Edges;
+        int numedges = delaun.NumEdges;
+        int[][] walk=delaun.Walk;
+        int[][] vert=delaun.Vertices;
+        
+        System.out.println("Edges File");
+        java.util.Hashtable edges_order_map=new java.util.Hashtable();
+        java.util.Vector edges_ef=new java.util.Vector();
+        int runningID=0;
+        for(int k=0;k<vert.length;k++){
+            java.util.Vector localEdges=new java.util.Vector();
+            for (int j=0; j<vert[k].length; j++) {
+                int i=vert[k][j];
+                float v1X=s0[tri[i][1]]-s0[tri[i][0]];
+                float v1Y=s1[tri[i][1]]-s1[tri[i][0]];
+                float v2X=s0[tri[i][2]]-s0[tri[i][0]];
+                float v2Y=s1[tri[i][2]]-s1[tri[i][0]];
+
+                float kComp=v1X*v2Y-v2X*v1Y;
+                
+                int pPos=0;
+                for (int l=1; l<3; l++) if(k == tri[i][l]) pPos=l;
+                //System.out.println("P"+k+" In Triang("+(kComp>0?"+":"-")+"):"+" P"+tri[i][0]+" P"+tri[i][1]+" P"+tri[i][2]+" pPos "+pPos);
+                int L1pos=(pPos+1+(kComp>0?0:1))%3;
+                int L2pos=(pPos+1+(kComp>0?1:0))%3;
+                //System.out.println("    L1 is: E"+k+"-"+tri[i][L1pos]);
+                //System.out.println("    L2 is: E"+k+"-"+tri[i][L2pos]);
+                if(!localEdges.contains("E"+k+"-"+tri[i][L1pos])) localEdges.add("E"+k+"-"+tri[i][L1pos]);
+                if(!localEdges.contains("E"+k+"-"+tri[i][L2pos])) localEdges.add("E"+k+"-"+tri[i][L2pos]);
+                
+            }
+            localEdges.add(localEdges.firstElement());
+            Object[] myEdges=localEdges.toArray();
+            for (int j=1; j<myEdges.length; j++) {
+                edges_ef.add(myEdges[j]+" "+k+" "+((String)myEdges[j]).substring(((String)myEdges[j]).indexOf("-")+1)+" "+myEdges[j-1]);
+                if(edges_order_map.get((String)myEdges[j]) == null){
+                    edges_order_map.put((String)myEdges[j],""+(2*runningID));
+                    String inverseEdge=((String)myEdges[j]).substring(1);
+                    String[] elementsIE=inverseEdge.split("-");
+                    inverseEdge="E"+elementsIE[1]+"-"+elementsIE[0];
+                    edges_order_map.put(inverseEdge,""+(2*runningID+1));
+                    runningID++;
+                } 
+            }
+            
+        }
+        int totEdges=edges_ef.size();
+        //System.out.println(totEdges+" "+edges_order_map.size());
+        java.util.Enumeration en=edges_order_map.keys();
+//        while(en.hasMoreElements()) {
+//            Object tttt=en.nextElement();
+//            System.out.println(tttt+" "+edges_order_map.get(tttt));
+//        }
+        String[] edges_ef_ready=new String[totEdges];
+        for(int i=0;i<totEdges;i++){
+            String[] toPrint=((String)edges_ef.get(i)).split(" ");
+            //System.out.println(i+" "+edges_ef.get(i));
+            //System.out.println(edges_order_map.get(toPrint[0])+" "+toPrint[1]+" "+toPrint[2]+" "+edges_order_map.get(toPrint[3]));
+            edges_ef_ready[Integer.parseInt((String)edges_order_map.get(toPrint[0]))]=edges_order_map.get(toPrint[0])+" "+toPrint[1]+" "+toPrint[2]+" "+edges_order_map.get(toPrint[3]);
+        }
+        for(int i=0;i<totEdges;i++){
+            System.out.println(edges_ef_ready[i]);
+        }
+        
+        System.out.println("Nodes File");
+        java.util.Vector nodes_nf=new java.util.Vector();
+        java.util.Vector edges_nf=new java.util.Vector();
+        java.util.Vector codes_nf=new java.util.Vector();
+        
+        
+        for (int i=0; i<edges.length; i++) {
+            for (int j=0; j<3; j++) {
+                if(!nodes_nf.contains("P"+tri[i][j])){
+                    nodes_nf.add("P"+tri[i][j]);
+                    edges_nf.add("E"+tri[i][j]+"-"+tri[i][(j+1)%3]);
+                }
+            }
+        }
+        for(int i=0;i<vert.length;i++){
+            int pointID=Integer.parseInt(((String)nodes_nf.get(i)).substring(1));
+            System.out.println(samples[0][pointID]+" "+samples[1][pointID]+" "+edges_order_map.get(edges_nf.get(i))+" "+"BC-XX");
+        }
+        
+        System.out.println("Triangles File");
+        for (int i=0; i<edges.length; i++) {
+            float v1X=s0[tri[i][1]]-s0[tri[i][0]];
+            float v1Y=s1[tri[i][1]]-s1[tri[i][0]];
+            float v2X=s0[tri[i][2]]-s0[tri[i][0]];
+            float v2Y=s1[tri[i][2]]-s1[tri[i][0]];
+
+            float kComp=v1X*v2Y-v2X*v1Y;
+            //System.out.print("T("+i+(kComp>0?"+":"-")+")");
+            if(kComp>0){
+                System.out.print(tri[i][2]+" "+tri[i][1]+" "+tri[i][0]);
+                System.out.print(" "+walk[i][0]+" "+walk[i][2]+" "+walk[i][1]);
+                System.out.print(" "+(String)edges_order_map.get("E"+tri[i][2]+"-"+tri[i][0])+
+                                 " "+(String)edges_order_map.get("E"+tri[i][1]+"-"+tri[i][2])+
+                                 " "+(String)edges_order_map.get("E"+tri[i][0]+"-"+tri[i][1]));
+            } else {
+                System.out.print(tri[i][0]+" "+tri[i][1]+" "+tri[i][2]);
+                System.out.print(" "+walk[i][1]+" "+walk[i][2]+" "+walk[i][0]);
+                System.out.print(" "+(String)edges_order_map.get("E"+tri[i][0]+"-"+tri[i][2])+
+                                 " "+(String)edges_order_map.get("E"+tri[i][1]+"-"+tri[i][0])+
+                                 " "+(String)edges_order_map.get("E"+tri[i][2]+"-"+tri[i][1]));
+            }
+            System.out.println();
+        }
         
     }
     

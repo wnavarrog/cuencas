@@ -72,7 +72,7 @@ public class NetworkExtractionModule implements Runnable {
                 unPixPod=0, 
                 unPixAP=0, 
                 npuntosAP=6, 
-                nCeldasConv=3;
+                nCeldasConv=2;
     
     public boolean  archPro=false,
                     lAzules=false, 
