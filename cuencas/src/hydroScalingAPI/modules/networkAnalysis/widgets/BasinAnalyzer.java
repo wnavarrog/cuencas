@@ -211,6 +211,20 @@ public class BasinAnalyzer extends javax.swing.JDialog{
         myBasinResults=new hydroScalingAPI.util.geomorphology.objects.HortonAnalysis(myCuenca, metaDatos, matDir);
         
         myLinksStructure=new hydroScalingAPI.util.geomorphology.objects.LinksAnalysis(myCuenca, metaDatos, matDir);
+ 
+//        SAMPLE CODE FOR CHUCHO
+//        THEN CHECK THE 
+//        for(int i=2;i<3;i++) {
+//            for(int j=0;j<myBasinResults.contactsArray[i].length;j++) {
+//                //System.out.print(myBasinResults.contactsArray[i][j]+" ");
+//                int xxx=(int)(myBasinResults.contactsArray[i][j]%metaDatos.getNumCols());
+//                int yyy=(int)(myBasinResults.contactsArray[i][j]/metaDatos.getNumCols());
+//                hydroScalingAPI.util.geomorphology.objects.Basin theCuenca=new hydroScalingAPI.util.geomorphology.objects.Basin(xxx,yyy,direcc,metaDatos);
+//                System.out.print(theCuenca.getXYBasin()[0].length+" ");
+//            }
+//            System.out.println(myBasinResults.contactsArray[i].length);
+//        }
+//        System.exit(0);
         
         minRegOrderSlider.setMinimum(1);
         minRegOrderSlider.setMaximum(myBasinResults.getBasinOrder());
