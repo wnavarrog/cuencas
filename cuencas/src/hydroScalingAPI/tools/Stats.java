@@ -120,6 +120,18 @@ public class Stats{
         
     }
     
+    public String toString(){
+        String text=      "Mean Value: "+   meanValue+"\n"+
+                          "Standard Deviation: "+   standardDeviation+"\n"+
+                          "Skewness: "+   skewness+"\n"+
+                          "Kurtosis: "+   kurtosis+"\n"+
+                          "Max Value: "+   maxValue+"\n"+
+                          "Min Value: "+   minValue+"\n"+
+                          "Total: "+   total+"\n"+
+                          "Data Count: "+   dataCount+"\n";
+        return text;
+    }
+    
     public static void main (String args[]) {
         float[][] estat={{1.0f,2.0f,3.0f,4.0f,5.0f,6.0f,7.0f,8.0f,9.0f},
                          {1.0f,2.0f,3.0f,4.0f,5.0f,6.0f,7.0f,8.0f,9.0f},
