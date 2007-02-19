@@ -27,7 +27,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.io;
 
 /**
- *
+ * This class interacts with *.poly files.  It reads their contents and produce
+ * appropriate outputs for graphic and other purposes.
  * @author Ricardo Mantilla
  */
 public class MetaPolygon {
@@ -40,23 +41,37 @@ public class MetaPolygon {
     
     private java.util.Hashtable properties;
 
-    public String[] parameters= { 
+    private String[] parameters= { 
                                     "[name]",
-                                    "[coordinates lat/lon (deg)]",
+                                    "[coordinates lon/lat (deg)]",
                                     "[information]"
                                     
                                 };
-    /** Creates a new instance of MetaPolygon */
+    /**
+     * Creates a new instance of MetaPolygon with an empty set of properties
+     */
     public MetaPolygon() {
         
         properties=new java.util.Hashtable();
         
     }
     
+    /**
+     *  Creates a new instance of MetaPolygon with a set of properties determined by a
+     * file
+     * @param file A String with the path to the file that contains the properties of the Polygon
+     * @throws java.io.IOException Errors while reading the *.poly file
+     */
     public MetaPolygon(String file) throws java.io.IOException{
         this(new java.io.File(file));
     }
     
+    /**
+     *  Creates a new instance of MetaPolygon with a set of properties determined by a
+     * file
+     * @param file The file that contains the properties of the Polygon
+     * @throws java.io.IOException Errors while reading the *.poly file
+     */
     public MetaPolygon(java.io.File file) throws java.io.IOException{
 
         locationMeta=file;
@@ -101,7 +116,7 @@ public class MetaPolygon {
         fileMeta.close();
     }
 
-    public boolean checkParameters(java.io.File file) throws java.io.IOException{
+    private boolean checkParameters(java.io.File file) throws java.io.IOException{
         
         fileMeta = new java.io.BufferedReader(new java.io.FileReader(file));
 
@@ -120,10 +135,20 @@ public class MetaPolygon {
 
     }
     
+    /**
+     * Returns the value of the property.  Available properties are [name] and [information].
+     * @param prop The desired property
+     * @return Returns the value of the property
+     */
     public String getProperty(String prop){
         return (String) properties.get(prop);
     }
     
+    /**
+     * Creates and returns a visad.Gridded2DSet ready to be added into a visad.Display
+     * @return The Gridded2DSet
+     * @throws visad.VisADException Captures errors while creating the Gidded2DSet
+     */
     public visad.Gridded2DSet getPolygon() throws visad.VisADException {
         
         float[][] xyContour=(float[][])properties.get("[coordinates lat/lon (deg)]");
@@ -134,34 +159,68 @@ public class MetaPolygon {
         return polygonCountour;
     }
     
+    /**
+     * Returns a float array with the longitudes and latitudes of the points that
+     * describe the polygon
+     * @return A float[2][Number of Points]
+     */
     public float[][] getLonLatPolygon(){
-        return (float[][])properties.get("[coordinates lat/lon (deg)]");
+        return (float[][])properties.get("[coordinates lon/lat (deg)]");
     }
     
+    /**
+     * Returns the Name associated with the polygon
+     * @return The Name of the polygon
+     */
     public String getName(){
         return (String) properties.get("[name]");
     }
     
+    /**
+     * Returns the File with information used to create the MetaPolygon
+     * @return A File descriptor of the origin data
+     */
     public java.io.File getLocationMeta(){
         return locationMeta;
     }
     
+    /**
+     * Returns a string describing this MetaPolygon
+     * @return A string describing the MetaPolygon
+     */
     public String toString(){
         return getName()+" - "+getLocationMeta().getName();
     }
     
+    /**
+     * Sets the [name] property to the specified value
+     * @param newName The value to assign to the [name] field
+     */
     public void setName(String newName){
         properties.put("[name]",newName);
     }
     
+    /**
+     * Sets the coordinates of the polygon to using a float array
+     * @param newXYCoords The array with coordinates
+     */
     public void setCoordinates(float[][] newXYCoords){
-        properties.put("[coordinates lat/lon (deg)]",newXYCoords);
+        properties.put("[coordinates lon/lat (deg)]",newXYCoords);
     }
     
+    /**
+     * Sets the [information] property to the specified value
+     * @param newInformation The value to assign to the [information] field
+     */
     public void setInformation(String newInformation){
         properties.put("[information]",newInformation);
     }
     
+    /**
+     * Writes an *.poly file in the specified path
+     * @param newMetaLocation The File descriptor where the information will be written.
+     * @throws java.io.IOException Captures errors while writing the file
+     */
     public void writePolygon(java.io.File newMetaLocation) throws java.io.IOException{
         
         java.io.BufferedWriter writerMeta = new java.io.BufferedWriter(new java.io.FileWriter(newMetaLocation));
@@ -186,6 +245,7 @@ public class MetaPolygon {
     }
     
     /**
+     * Tests for the class
      * @param args the command line arguments
      */
     public static void main(String[] args) {

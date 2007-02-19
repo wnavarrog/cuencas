@@ -687,7 +687,7 @@ public class BasinAnalyzer extends javax.swing.JDialog{
         for(int i=0;i<eleBasin.length;i++){
             float eleToTest=localMinElev+k/99.0f*(localMaxElev-localMinElev);
             if(eleBasin[i] >= eleToTest) {
-                keyElev[0][keyElev[0].length-1-k]=eleToTest;
+                keyElev[0][keyElev[0].length-1-k]=(eleToTest-localMinElev)/(localMaxElev-localMinElev);
                 accumElev[0][k]=i/(float)eleBasin.length;
                 k++;
                 i--;

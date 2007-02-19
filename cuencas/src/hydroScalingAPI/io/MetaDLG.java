@@ -43,9 +43,9 @@ public class MetaDLG {
     /**
      * Creates a new instance of MetaDLG
      * @param fileName The file where the DLG resides
-     * @param desiredRegion The limts of the region of interest given as a {@ java.awt.geom.Rectangle2D}.
+     * @param desiredRegion The limts of the region of interest given as a {@link java.awt.geom.Rectangle2D}.
      * @throws java.io.IOException Captures errors while reading the file.
-     * @throws visad.VisADException Captures errors while creating the {@ visad.Gridded2DSet} used to visualize the
+     * @throws visad.VisADException Captures errors while creating the {@link visad.Gridded2DSet} used to visualize the
      * vector.
      */
     public MetaDLG(String fileName,java.awt.geom.Rectangle2D desiredRegion) throws java.io.IOException, visad.VisADException{
@@ -228,9 +228,9 @@ public class MetaDLG {
     }
     
     /**
-     * Returns a {@ visad.UnionSet} ready to be used inside a {@ visad.Display}
-     * @return The {@ visad.UnionSet}
-     * @throws visad.VisADException Captures errors while creating the {@ visad.UnionSet}
+     * Returns a {@link visad.UnionSet} ready to be used inside a {@link visad.Display}
+     * @return The {@link visad.UnionSet}
+     * @throws visad.VisADException Captures errors while creating the {@link visad.UnionSet}
      */
     public visad.UnionSet getUnionSet() throws visad.VisADException{
         if (streams == null) return null;

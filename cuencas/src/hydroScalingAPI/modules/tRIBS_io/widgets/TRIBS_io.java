@@ -273,22 +273,34 @@ public class TRIBS_io extends java.awt.Dialog {
         java.io.BufferedWriter writerNodes = new java.io.BufferedWriter(new java.io.FileWriter(nodesFileLocation));
         writerNodes.write("0.0000\n");
         writerNodes.write(vert.length+"\n");
-        for(int i=0;i<vert.length;i++){
-            int pointID=Integer.parseInt(((String)nodes_nf.get(i)).substring(1));
-            System.out.println(samples[0][pointID]+" "+samples[1][pointID]+" "+edges_order_map.get(edges_nf.get(i))+" "+"BC-XX");
-            writerNodes.write(samples[0][pointID]+" "+samples[1][pointID]+" "+edges_order_map.get(edges_nf.get(i))+" "+(int)samples[2][pointID]+"\n");
-        }
-        writerNodes.close();
         
         java.io.File zFileLocation=new java.io.File(outputLocation.getPath()+".z");
         java.io.BufferedWriter writerZ = new java.io.BufferedWriter(new java.io.FileWriter(zFileLocation));
         writerZ.write("0.0000\n");
         writerZ.write(vert.length+"\n");
+        
+        
         for(int i=0;i<vert.length;i++){
-            float pointZ=((Double)filteredElevationOfPoint.get(i)).floatValue();
+            int pointID=Integer.parseInt(((String)nodes_nf.get(i)).substring(1));
+            System.out.println(samples[0][pointID]+" "+samples[1][pointID]+" "+edges_order_map.get(edges_nf.get(i))+" "+"BC-XX");
+            writerNodes.write(samples[0][pointID]+" "+samples[1][pointID]+" "+edges_order_map.get(edges_nf.get(i))+" "+(int)samples[2][pointID]+"\n");
+
+            float pointZ=((Double)filteredElevationOfPoint.get(pointID)).floatValue();
+            int pointT=(int)samples[2][pointID];
+            if (pointT == 1){
+                pointZ+=4;
+            }
+            if (pointT == 3){
+                pointZ-=.1;
+            }
+            if (pointT == 2){
+                pointZ-=2;
+            }
             System.out.println(pointZ);
             writerZ.write(pointZ+"\n");
+            
         }
+        writerNodes.close();
         writerZ.close();
         
         System.out.println("Triangles File");
@@ -332,6 +344,26 @@ public class TRIBS_io extends java.awt.Dialog {
             writerTri.write("\n");
         }
         writerTri.close();
+        
+    }
+    
+    private void writePoints(float[][] samples,java.io.File outputLocation) throws java.io.IOException{
+        
+        System.out.println("Points File");
+
+        java.io.File nodesFileLocation=new java.io.File(outputLocation.getPath()+".points");
+        java.io.BufferedWriter writerNodes = new java.io.BufferedWriter(new java.io.FileWriter(nodesFileLocation));
+        writerNodes.write(samples[0].length+"\n");
+        
+        
+        for (int i=0; i<samples[0].length; i++){
+            writerNodes.write(samples[0][i]+" ");
+            writerNodes.write(samples[1][i]+" ");
+            writerNodes.write(samples[2][i]+" ");
+            writerNodes.write((int)samples[3][i]+"\n");
+        }
+        
+        writerNodes.close();
         
     }
     
@@ -420,8 +452,6 @@ public class TRIBS_io extends java.awt.Dialog {
             xyLinkValues[1][i]=(float)utmLocal.y;
             xyLinkValues[2][i]=(float)((int[])filteredTypeOfPoint.get(i))[0];
         }
-
-        xyLinkValues[2][numPoints-1]=1;
         
         float[][] linkAccumAVal=new float[1][xyLinkValues[1].length];
         for(int i=0;i<xyLinkValues[0].length;i++){
@@ -443,6 +473,7 @@ public class TRIBS_io extends java.awt.Dialog {
             long start = System.currentTimeMillis();
             Delaunay.perturb(samples,1.5f,false);
             delaun = (Delaunay) new DelaunayClarkson(samples);
+            delaun.improve(samples,1);
             long end = System.currentTimeMillis();
             float time = (end - start) / 1000f;
             System.out.println("Triangulation took " + time + " seconds.");
@@ -452,6 +483,9 @@ public class TRIBS_io extends java.awt.Dialog {
             vals_ff_Li.setSamples( xyLinkValues );
         
             data_refPoints.setData(vals_ff_Li);
+            
+            
+            
             
 //            System.out.println(delaun.NumEdges);
 //            
@@ -482,7 +516,7 @@ public class TRIBS_io extends java.awt.Dialog {
             
             int numValidPoints=0;
             for(int j=0;j<xyLinkValues[2].length;j++) {
-                if(xyLinkValues[2][j] != 2 ) numValidPoints++;
+                if(xyLinkValues[2][j] != 1 ) numValidPoints++;
             }
             
             float[] s0 = samples[0];
@@ -492,7 +526,7 @@ public class TRIBS_io extends java.awt.Dialog {
             int kp=0;
             for(int k=0;k<xyLinkValues[2].length;k++) {
             //for(int k=0;k<5;k++) {    
-                if(xyLinkValues[2][k] != 2 && xyLinkValues[2][k] != 1){
+                if(xyLinkValues[2][k] != 1 && xyLinkValues[2][k] != 2){
                     float[][] lines1=new float[2][delaun.Vertices[k].length+1];
                     for(int j=0;j<delaun.Vertices[k].length;j++){
                         
@@ -595,7 +629,7 @@ public class TRIBS_io extends java.awt.Dialog {
                 locElev=spotValue.getValues()[0];
 
                 pointsInTriangulation.add(new Gdc_Coord_3d(latP,lonP,locElev));
-                typeOfPoint.add(new int[] {3});
+                typeOfPoint.add(new int[] {0});
                 elevationOfPoint.add(locElev);
                 numPointsBasin++;
             }
@@ -617,23 +651,33 @@ public class TRIBS_io extends java.awt.Dialog {
                 locElev=spotValue.getValues()[0];
 
                 pointsInTriangulation.add(new Gdc_Coord_3d(latP,lonP,locElev));
-                typeOfPoint.add(new int[] {0});
+                typeOfPoint.add(new int[] {3});
                 elevationOfPoint.add(locElev);
+                
+                int delta_yP=((matDir[(int)yP][xP]-1)/3)-1;
+                int delta_xP=((matDir[yP][xP]-1)%3)-1;
+                
+                nLatP=latP+delta_yP*metaDatos.getResLat()/3600.0;
+                nLonP=lonP+delta_xP*metaDatos.getResLon()/3600.0;
+                
+                spotValue=(visad.RealTuple) demField.evaluate(new visad.RealTuple(domain, new double[] {nLonP,nLatP}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
+                
+                double currentElev=locElev;
+                double forwardElev=spotValue.getValues()[0];
+                
                 if (i>0){
-                    int delta_yP=((matDir[(int)yP][xP]-1)/3)-1;
-                    int delta_xP=((matDir[yP][xP]-1)%3)-1;
                     
                     //A new point a quarter of the way forward
 
                     nLatP=latP+delta_yP*metaDatos.getResLat()/3600.0*1.0/4.0;
                     nLonP=lonP+delta_xP*metaDatos.getResLon()/3600.0*1.0/4.0;
 
-                    spotValue=(visad.RealTuple) demField.evaluate(new visad.RealTuple(domain, new double[] {nLonP,nLatP}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
+                    spotValue=(visad.RealTuple) demField.evaluate(new visad.RealTuple(domain, new double[] {lonP,latP}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
                 
-                    locElev=spotValue.getValues()[0];
+                    locElev=(3*currentElev+forwardElev)/4.0;
 
                     pointsInTriangulation.add(new Gdc_Coord_3d(nLatP,nLonP,locElev));
-                    typeOfPoint.add(new int[] {0});
+                    typeOfPoint.add(new int[] {3});
                     elevationOfPoint.add(locElev);
 
                     //A new point half way forward
@@ -641,12 +685,12 @@ public class TRIBS_io extends java.awt.Dialog {
                     nLatP=latP+delta_yP*metaDatos.getResLat()/3600.0*2.0/4.0;
                     nLonP=lonP+delta_xP*metaDatos.getResLon()/3600.0*2.0/4.0;
                     
-                    spotValue=(visad.RealTuple) demField.evaluate(new visad.RealTuple(domain, new double[] {nLonP,nLatP}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
+                    spotValue=(visad.RealTuple) demField.evaluate(new visad.RealTuple(domain, new double[] {lonP,latP}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
                 
-                    locElev=spotValue.getValues()[0];
+                    locElev=(2*currentElev+2*forwardElev)/4.0;
 
                     pointsInTriangulation.add(new Gdc_Coord_3d(nLatP,nLonP,locElev));
-                    typeOfPoint.add(new int[] {0});
+                    typeOfPoint.add(new int[] {3});
                     elevationOfPoint.add(locElev);
 
                         //New points creating a buffer for the river
@@ -654,23 +698,23 @@ public class TRIBS_io extends java.awt.Dialog {
                         nLatP=latP+(2*delta_yP-bfs*delta_xP)*metaDatos.getResLat()/3600.0/4.0;
                         nLonP=lonP+(2*delta_xP+bfs*delta_yP)*metaDatos.getResLon()/3600.0/4.0;
 
-                        spotValue=(visad.RealTuple) demField.evaluate(new visad.RealTuple(domain, new double[] {nLonP,nLatP}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
+                        spotValue=(visad.RealTuple) demField.evaluate(new visad.RealTuple(domain, new double[] {lonP,latP}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
                 
                         locElev=spotValue.getValues()[0];
 
                         pointsInTriangulation.add(new Gdc_Coord_3d(nLatP,nLonP,locElev));
-                        typeOfPoint.add(new int[] {3});
+                        typeOfPoint.add(new int[] {0});
                         elevationOfPoint.add(locElev);
 
                         nLatP=latP+(2*delta_yP+bfs*delta_xP)*metaDatos.getResLat()/3600.0/4.0;
                         nLonP=lonP+(2*delta_xP-bfs*delta_yP)*metaDatos.getResLon()/3600.0/4.0;
 
-                        spotValue=(visad.RealTuple) demField.evaluate(new visad.RealTuple(domain, new double[] {nLonP,nLatP}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
+                        spotValue=(visad.RealTuple) demField.evaluate(new visad.RealTuple(domain, new double[] {lonP,latP}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
                 
                         locElev=spotValue.getValues()[0];
 
                         pointsInTriangulation.add(new Gdc_Coord_3d(nLatP,nLonP,locElev));
-                        typeOfPoint.add(new int[] {3});
+                        typeOfPoint.add(new int[] {0});
                         elevationOfPoint.add(locElev);
 
                     //A new point three quarters of the way forward
@@ -678,12 +722,12 @@ public class TRIBS_io extends java.awt.Dialog {
                     nLatP=latP+delta_yP*metaDatos.getResLat()/3600.0*3.0/4.0;
                     nLonP=lonP+delta_xP*metaDatos.getResLon()/3600.0*3.0/4.0;
 
-                    spotValue=(visad.RealTuple) demField.evaluate(new visad.RealTuple(domain, new double[] {nLonP,nLatP}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
+                    spotValue=(visad.RealTuple) demField.evaluate(new visad.RealTuple(domain, new double[] {lonP,latP}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
                 
-                    locElev=spotValue.getValues()[0];
+                    locElev=(currentElev+3*forwardElev)/4.0;
 
                     pointsInTriangulation.add(new Gdc_Coord_3d(nLatP,nLonP,locElev));
-                    typeOfPoint.add(new int[] {0});
+                    typeOfPoint.add(new int[] {3});
                     elevationOfPoint.add(locElev);
                     
                     //Two new points acting as buffer for the initial network point
@@ -693,12 +737,12 @@ public class TRIBS_io extends java.awt.Dialog {
                         nLatP=latP-delta_xP*metaDatos.getResLat()/3600.0*bfs/4.0;
                         nLonP=lonP+delta_yP*metaDatos.getResLon()/3600.0*bfs/4.0;
 
-                        spotValue=(visad.RealTuple) demField.evaluate(new visad.RealTuple(domain, new double[] {nLonP,nLatP}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
+                        spotValue=(visad.RealTuple) demField.evaluate(new visad.RealTuple(domain, new double[] {lonP,latP}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
                 
                         locElev=spotValue.getValues()[0];
 
                         pointsInTriangulation.add(new Gdc_Coord_3d(nLatP,nLonP,locElev));
-                        typeOfPoint.add(new int[] {3});
+                        typeOfPoint.add(new int[] {0});
                         elevationOfPoint.add(locElev);
                     }
                     
@@ -706,12 +750,12 @@ public class TRIBS_io extends java.awt.Dialog {
                         nLatP=latP+delta_xP*metaDatos.getResLat()/3600.0*bfs/4.0;
                         nLonP=lonP-delta_yP*metaDatos.getResLon()/3600.0*bfs/4.0;
 
-                        spotValue=(visad.RealTuple) demField.evaluate(new visad.RealTuple(domain, new double[] {nLonP,nLatP}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
+                        spotValue=(visad.RealTuple) demField.evaluate(new visad.RealTuple(domain, new double[] {lonP,latP}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
                 
                         locElev=spotValue.getValues()[0];
 
                         pointsInTriangulation.add(new Gdc_Coord_3d(nLatP,nLonP,locElev));
-                        typeOfPoint.add(new int[] {3});
+                        typeOfPoint.add(new int[] {0});
                         elevationOfPoint.add(locElev);
                     }
                     
@@ -728,10 +772,14 @@ public class TRIBS_io extends java.awt.Dialog {
             locElev=spotValue.getValues()[0];
 
             pointsInTriangulation.add(new Gdc_Coord_3d(latP,lonP,locElev));
-            typeOfPoint.add(new int[] {2});
+            typeOfPoint.add(new int[] {1});
             elevationOfPoint.add(locElev);
+            
         }
-
+        int lastElemIndex=typeOfPoint.size()-2;
+        typeOfPoint.setElementAt(new int[] {2},lastElemIndex);
+        System.out.println(elevationOfPoint.get(lastElemIndex));
+        
         hydroScalingAPI.tools.Stats eastStats=new hydroScalingAPI.tools.Stats(lonLatsDivide[0]);
         hydroScalingAPI.tools.Stats nortStats=new hydroScalingAPI.tools.Stats(lonLatsDivide[1]);
         
@@ -760,8 +808,6 @@ public class TRIBS_io extends java.awt.Dialog {
             xyLinkValues[2][i]=(float)((int[])typeOfPoint.get(i))[0];
             pointsInTriangulation.add(utm[i]);
         }
-
-        xyLinkValues[2][numPoints-1]=1;
         
         float[][] linkAccumAVal=new float[1][xyLinkValues[1].length];
         for(int i=0;i<xyLinkValues[0].length;i++){
@@ -827,7 +873,9 @@ public class TRIBS_io extends java.awt.Dialog {
         jPanel2 = new javax.swing.JPanel();
         zrSlider = new javax.swing.JSlider();
         jLabel1 = new javax.swing.JLabel();
-        exportButton = new javax.swing.JButton();
+        jPanel5 = new javax.swing.JPanel();
+        exportTriButton = new javax.swing.JButton();
+        exportPoiButton = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         pointsCheckBox = new javax.swing.JCheckBox();
         trianglesCheckBox = new javax.swing.JCheckBox();
@@ -860,14 +908,27 @@ public class TRIBS_io extends java.awt.Dialog {
         jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jPanel2.add(jLabel1, java.awt.BorderLayout.WEST);
 
-        exportButton.setText("Export");
-        exportButton.addActionListener(new java.awt.event.ActionListener() {
+        jPanel5.setLayout(new java.awt.GridLayout(2, 1));
+
+        exportTriButton.setText("Export Trinangulation");
+        exportTriButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                exportButtonActionPerformed(evt);
+                exportTriButtonActionPerformed(evt);
             }
         });
 
-        jPanel2.add(exportButton, java.awt.BorderLayout.EAST);
+        jPanel5.add(exportTriButton);
+
+        exportPoiButton.setText("Export Points");
+        exportPoiButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                exportPoiButtonActionPerformed(evt);
+            }
+        });
+
+        jPanel5.add(exportPoiButton);
+
+        jPanel2.add(jPanel5, java.awt.BorderLayout.EAST);
 
         jPanel1.add(jPanel2, java.awt.BorderLayout.SOUTH);
 
@@ -922,6 +983,33 @@ public class TRIBS_io extends java.awt.Dialog {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void exportPoiButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportPoiButtonActionPerformed
+        try{
+            javax.swing.JFileChooser fc=new javax.swing.JFileChooser();
+            fc.setFileSelectionMode(fc.FILES_ONLY);
+            fc.setDialogTitle("Directory Selection");
+            javax.swing.filechooser.FileFilter mdtFilter = new visad.util.ExtensionFileFilter("nodes","Nodes File");
+            fc.addChoosableFileFilter(mdtFilter);
+            fc.showSaveDialog(this);
+
+            if (fc.getSelectedFile() == null) return;
+            int numPoints=filteredPointsInTriangulation.size();
+            float[][] xyLinkValues=new float[4][numPoints];
+            for(int i=0;i<numPoints;i++){
+                Utm_Coord_3d utmLocal=(Utm_Coord_3d)filteredPointsInTriangulation.get(i);
+                xyLinkValues[0][i]=(float)utmLocal.x;
+                xyLinkValues[1][i]=(float)utmLocal.y;
+                xyLinkValues[2][i]=(float)((int[])filteredTypeOfPoint.get(i))[0];
+                xyLinkValues[3][i]=(float)((int[])filteredTypeOfPoint.get(i))[0];
+            }
+        
+            writePoints(xyLinkValues,fc.getSelectedFile());
+        } catch (java.io.IOException IOE){
+            System.err.println("Failed writing triangulation files for this basin.");
+            IOE.printStackTrace();
+        }
+    }//GEN-LAST:event_exportPoiButtonActionPerformed
 
     private void voronoiCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_voronoiCheckBoxActionPerformed
         if(voronoiCheckBox.isSelected()){
@@ -993,7 +1081,7 @@ public class TRIBS_io extends java.awt.Dialog {
         }
     }//GEN-LAST:event_zrSliderMouseReleased
 
-    private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
+    private void exportTriButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportTriButtonActionPerformed
         try{
             javax.swing.JFileChooser fc=new javax.swing.JFileChooser();
             fc.setFileSelectionMode(fc.FILES_ONLY);
@@ -1011,15 +1099,13 @@ public class TRIBS_io extends java.awt.Dialog {
                 xyLinkValues[1][i]=(float)utmLocal.y;
                 xyLinkValues[2][i]=(float)((int[])filteredTypeOfPoint.get(i))[0];
             }
-
-            xyLinkValues[2][numPoints-1]=1;
         
             writeTriangulation(delaun,xyLinkValues,fc.getSelectedFile());
         } catch (java.io.IOException IOE){
             System.err.println("Failed writing triangulation files for this basin.");
             IOE.printStackTrace();
         }
-    }//GEN-LAST:event_exportButtonActionPerformed
+    }//GEN-LAST:event_exportTriButtonActionPerformed
     
     /** Closes the dialog */
     private void closeDialog(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_closeDialog
@@ -1032,7 +1118,7 @@ public class TRIBS_io extends java.awt.Dialog {
      */
     public static void main(String args[]) {
         try{
-            java.io.File theFile=new java.io.File("/Users/ricardo/Documents/databases/Test_DB/Rasters/Topography/58447060.metaDEM");
+            java.io.File theFile=new java.io.File("/Users/ricardo/Documents/databases/Smallbasin_DB/Rasters/Topography/1_Arcsec/NED_06075640.metaDEM");
             //java.io.File theFile=new java.io.File("/hidrosigDataBases/Test_DB/Rasters/Topography/58447060.metaDEM");
             hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster (theFile);
             metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".dir"));
@@ -1047,8 +1133,8 @@ public class TRIBS_io extends java.awt.Dialog {
             
             hydroScalingAPI.mainGUI.ParentGUI tempFrame=new hydroScalingAPI.mainGUI.ParentGUI();
             
-            //new TRIBS_io(tempFrame, 85, 42,matDirs,magnitudes,metaModif).setVisible(true);
-            new TRIBS_io(tempFrame, 310, 132,matDirs,magnitudes,metaModif).setVisible(true);
+            new TRIBS_io(tempFrame, 54,81,matDirs,magnitudes,metaModif).setVisible(true);
+            //new TRIBS_io(tempFrame, 111,80,matDirs,magnitudes,metaModif).setVisible(true);
         } catch (java.io.IOException IOE){
             System.out.print(IOE);
             System.exit(0);
@@ -1063,12 +1149,14 @@ public class TRIBS_io extends java.awt.Dialog {
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton exportButton;
+    private javax.swing.JButton exportPoiButton;
+    private javax.swing.JButton exportTriButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
     private javax.swing.JTabbedPane panelOpciones;
     private javax.swing.JCheckBox pointsCheckBox;
     private javax.swing.JCheckBox trianglesCheckBox;

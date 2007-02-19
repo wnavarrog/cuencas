@@ -343,8 +343,9 @@ public abstract class GetGeomorphologyRAM extends Object {
             }
         }*/
         
-        for(int i=1;i<Proc.DIR.length-1;i++) for(int j=1;j<Proc.DIR[0].length-1;j++){
-            if(Proc.RedRas[i][j] == 1 && Proc.DIR[i-1+(Proc.DIR[i][j]-1)/3][j-1+(Proc.DIR[i][j]-1)%3] <= 0) {
+        for(int i=2;i<Proc.DIR.length-2;i++) for(int j=2;j<Proc.DIR[0].length-2;j++){
+            //if(Proc.RedRas[i][j] == 1 && Proc.DIR[i-1+(Proc.DIR[i][j]-1)/3][j-1+(Proc.DIR[i][j]-1)%3] <= 0) {
+            if(Proc.DIR[i-1+(Proc.DIR[i][j]-1)/3][j-1+(Proc.DIR[i][j]-1)%3] <= 0) {
                 TDO[i][j]=1;
                 toMark=new int[][] {{i,j}};
                 
@@ -391,6 +392,7 @@ public abstract class GetGeomorphologyRAM extends Object {
                                         break;
                         }
 
+                        
                         GDO[iIndex][jIndex]=dist+GDO[iIndex-1+(Proc.DIR[iIndex][jIndex]-1)/3][jIndex-1+(Proc.DIR[iIndex][jIndex]-1)%3];
                         TDO[iIndex][jIndex]+=TDO[iIndex-1+(Proc.DIR[iIndex][jIndex]-1)/3][jIndex-1+(Proc.DIR[iIndex][jIndex]-1)%3];
                         if(pcambio > 1) {
@@ -399,7 +401,8 @@ public abstract class GetGeomorphologyRAM extends Object {
                         }
 
                         for (byte k=0; k <= 8; k++){
-                            if (Proc.RedRas[iIndex+(k/3)-1][jIndex+(k%3)-1] == 1 && Proc.DIR[iIndex+(k/3)-1][jIndex+(k%3)-1]==9-k){
+                            //if (Proc.RedRas[iIndex+(k/3)-1][jIndex+(k%3)-1] == 1 && Proc.DIR[iIndex+(k/3)-1][jIndex+(k%3)-1]==9-k){
+                            if (Proc.DIR[iIndex+(k/3)-1][jIndex+(k%3)-1]==9-k){
                                 tribsVector.add(new int[] {iIndex+(k/3)-1,jIndex+(k%3)-1});
                             }
                         }
@@ -437,14 +440,14 @@ public abstract class GetGeomorphologyRAM extends Object {
                 outs[k] = new java.io.DataOutputStream(buffOuts[k]);
             }
             for (int i=1; i <= Proc.metaDEM.getNumRows(); i++) for (int j=1; j <= Proc.metaDEM.getNumCols() ;j++){
-                if (Proc.RedRas[i][j]!=1){
-                    outs[0].writeFloat(-10);
-                    outs[1].writeInt(-10);
-                }
-                else{
+//                if (Proc.RedRas[i][j]!=1){
+//                    outs[0].writeFloat(-10);
+//                    outs[1].writeInt(-10);
+//                }
+//                else{
                     outs[0].writeFloat((float)GDO[i][j]);
                     outs[1].writeInt(TDO[i][j]);
-                }
+//                }
             }
             for(int k=0 ; k<destinations.length ; k++)
                 buffOuts[k].close() ;

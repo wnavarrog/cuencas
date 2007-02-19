@@ -21,8 +21,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.io;
 
 /**
- *
- * @author  Ricardo Mantilla
+ * This class reads a *.metaDEM or *.metaVHC and creates an object that descibes
+ * associated binary files
+ * @author Ricardo Mantilla
  */
 public class MetaRaster{
     
@@ -37,7 +38,7 @@ public class MetaRaster{
     private java.util.Hashtable properties;
     private java.util.Hashtable categories;
 
-    public String[] parameters= { 
+    private String[] parameters= { 
                                     "[Name]",
                                     "[Southernmost Latitude]",
                                     "[Westernmost Longitude]",
@@ -52,7 +53,10 @@ public class MetaRaster{
                                     "[Information]"
                                 };
 
-    /** Creates new metaMdt */
+    /**
+     * Creates new MetaRaster using another metaRaster as a template
+     * @param mr The MetaRaster to be used as template
+     */
                                 
     public MetaRaster(MetaRaster mr){
         
@@ -60,12 +64,20 @@ public class MetaRaster{
         
     }
     
+    /**
+     * Creates an empty MetaRaster instance
+     */
     public MetaRaster(){
         
         properties=new java.util.Hashtable();
         
     }
     
+    /**
+     * Creates a MetaRaster instance using the information on a file
+     * @param file The file that contains the information that describes associated binary files
+     * @throws java.io.IOException Captures errors while reading the meta file
+     */
     public MetaRaster(java.io.File file) throws java.io.IOException{
 
         locationMeta=file;
@@ -186,7 +198,7 @@ public class MetaRaster{
         fileMeta.close();
     }
 
-    public boolean checkParameters(java.io.File file) throws java.io.IOException{
+    private boolean checkParameters(java.io.File file) throws java.io.IOException{
         
         fileMeta = new java.io.BufferedReader(new java.io.FileReader(file));
 

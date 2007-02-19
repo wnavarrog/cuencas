@@ -21,8 +21,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.io;
 
 /**
- *
- * @author  Ricardo Mantilla
+ * Manages the Gauge-type data object
+ * @author Ricardo Mantilla
  */
 public class MetaLocation extends Object implements Comparable{
     
@@ -39,27 +39,66 @@ public class MetaLocation extends Object implements Comparable{
                                 "[information]",
                                 "[file location]"};
     
-    /** Creates a new instance of MetaLocation */
+    /**
+     * Creates a new instance of MetaLocation
+     * @param register Takes in a registry created by the {@link hydroScalingAPI.io.LocationReader}
+     */
     public MetaLocation(hydroScalingAPI.util.database.DB_Register register) {
         locationRegister=register;
     }
     
+    /**
+     * Returns the desired property.  Available properties are:
+     * <blockquote>
+     * <p>[type]</p>
+     * <p>[site name]</p>
+     * <p>[stream name]</p>
+     * <p>[county]</p>
+     * <p>[state]</p>
+     * <p>[data source]</p>
+     * <p>[latitude (deg:min:sec)]</p>
+     * <p>[longitude (deg:min:sec)]</p>
+     * <p>[altitude ASL (m)]</p>
+     * <p>[images]</p>
+     * <p>[information]</p>
+     * </blockquote>
+     * Note: the brackets must be included.
+     * @param key The desired property
+     * @return An object that contains the information requested
+     */
     public Object getProperty(String key){
         return locationRegister.getProperty(key);
     }
     
+    /**
+     * A String describing the Location
+     * @return A String describing the location
+     */
     public String toString(){
         return (String)locationRegister.getProperty("[site name]")+" - "+(String)locationRegister.getProperty("[type]");
     }
     
+    /**
+     * The comparison criteria
+     * @param obj The object to compare to
+     * @return -1 if smaller 0 if equal and 1 if larger
+     */
     public int compareTo(Object obj) {
         return (this.toString()).compareToIgnoreCase(obj.toString());
     }
     
+    /**
+     * Provides additional information associated with the location
+     * @return A String with information describing the location
+     */
     public String getInformation(){
         return (String)locationRegister.getProperty("[information]");
     }
     
+    /**
+     * True if it has associated images
+     * @return A boolean indication whether there are images associated with the location
+     */
     public boolean hasImages(){
         String locationPath=((java.io.File)locationRegister.getProperty("[file location]")).getParent();
         java.util.Vector imagesVector=(java.util.Vector)locationRegister.getProperty("[images]");
@@ -69,6 +108,12 @@ public class MetaLocation extends Object implements Comparable{
         return true;
     }
     
+    /**
+     * Returns and array of {@link java.util.Vector}.  Each Vector in the array has two
+     * elements.  The first element is the path or URL to the image and the second
+     * element is a description of the image.
+     * @return An array of Vectors with information describing the image
+     */
     public java.util.Vector[] getImagesList(){
         String locationPath=((java.io.File)locationRegister.getProperty("[file location]")).getParent();
         java.util.Vector imagesVector=(java.util.Vector)locationRegister.getProperty("[images]");
@@ -94,6 +139,12 @@ public class MetaLocation extends Object implements Comparable{
         return imagesNameAndInfo;
     }
     
+    /**
+     * Returns an {@link visad.RealTuple}
+     * @throws visad.VisADException Captures VisAD Exceptions
+     * @throws java.rmi.RemoteException Captures Remote Exceptions
+     * @return A visad Data type
+     */
     public visad.RealTuple getPositionTuple() throws visad.VisADException, java.rmi.RemoteException{
         double xx=((Double)locationRegister.getProperty("[longitude (deg:min:sec)]")).doubleValue();
         double yy=((Double)locationRegister.getProperty("[latitude (deg:min:sec)]")).doubleValue();
@@ -102,6 +153,12 @@ public class MetaLocation extends Object implements Comparable{
         return new visad.RealTuple(rtd1);
     }
     
+    /**
+     * Returns an {@link visad.Tuple}
+     * @return Returns a visad Data object indicating a location and text associated to it
+     * @throws visad.VisADException Captures Visad Exceptions
+     * @throws java.rmi.RemoteException Captures Remote Exceptions
+     */
     public visad.Tuple getTextTuple()  throws visad.VisADException, java.rmi.RemoteException{
         visad.TextType t = visad.TextType.getTextType("text");
         double xx=((Double)locationRegister.getProperty("[longitude (deg:min:sec)]")).doubleValue();
@@ -112,13 +169,5 @@ public class MetaLocation extends Object implements Comparable{
         return new visad.Tuple(rtd1);
     }
     
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        
-        
-        
-    }
     
 }

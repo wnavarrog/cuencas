@@ -27,7 +27,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.io;
 
 /**
- *
+ * This Class reads the set of files with extensions *.point, *.link and *.stream
+ * created the the CUENCAS Network Extraction Module.  These files describe the
+ * network connection structure.  See the Cuencas Developer's Guide for more
+ * details.
  * @author Ricardo Mantilla
  */
 public class MetaNetwork {
@@ -39,7 +42,12 @@ public class MetaNetwork {
     
     private int largestOrder;
     
-    /** Creates a new instance of MetaNetwork */
+    /**
+     * Creates a new instance of MetaNetwork
+     * @param md A MetaRaster with information about the raster DEM from which the vectorial
+     * network was derived
+     * @throws java.io.IOException Captures error while reading the *.point, *.link or *.stream files
+     */
     public MetaNetwork(hydroScalingAPI.io.MetaRaster md)  throws java.io.IOException{
         metaData=md;
         
@@ -105,22 +113,64 @@ public class MetaNetwork {
         
     }
     
+    /**
+     * Returns the largest order present in the DEM river network
+     * @return An integer with the largest order present in the DEM river network
+     */
     public int getLargestOrder(){
         return largestOrder;
     }
     
+    /**
+     * Returns an Array of integers int[Number of Streams][6] with information about
+     * the stream.  The 6 positions per stream indicate: Head_ID, Contact_ID, Tail_ID, Order,
+     * Ini_link, Num_link.  The ID is calculated from the i,j position in the
+     * DEM as ID=j*nc+i, where nc is the number of columns of the DEM.  Thus the
+     * Head_ID is the position where the link originates, Contact_ID is the position
+     * before the junction and Tail_ID is the position of the junction itself. Order
+     * refers to the Strahler order of the stream and Ini_link and Num_link are
+     * pointers into the *.links file indicating the position of the first link in the
+     * stream and the number of links that it contains.
+     * @return The array of integers.
+     */
     public int[][] getStreamRecord(){
         return streamRecord;
     }
     
+    /**
+     * Returns an Array of integers int[Number of Links][6] with information about
+     * the links.  The 6 positions per link indicate: Magnitude, Head_ID, Contact_ID,
+     * Tail_ID, Ini_point, Num_point.  The ID is calculated from the i,j position in the
+     * DEM as ID=j*nc+i, where nc is the number of columns of the DEM.  Thus the
+     * Head_ID is the position where the link originates, Contact_ID is the position
+     * before the junction and Tail_ID is the position of the junction itself. 
+     * Magnitude is the link magnitude as defined by Shreve (1969).  Ini_point and Num_point
+     * are pointers into the *.point file indicating the position of the first pixel
+     * where the link originates and the number of points that it contains.
+     * @return An array of integers describing the links
+     */
     public int[][] getLinkRecord(){
         return linkRecord;
     }
     
+    /**
+     * An array with indexes of points in the river network.  The value of the position
+     * if the point ID calculated from the i,j position in the DEM as ID=j*nc+i, where nc
+     * is the number of columns of the DEM.
+     * @return An array of integers.
+     */
     public int[] getPointRecord(){
         return pointRecord;
     }
     
+    /**
+     * Returns a visad Data Type called an {@link visad.UnionSet} which is a collection
+     * of {@link visad.Gridded2DSet}.  Each gridded set is a line describing a stream. 
+     * This is usefull for ploting purposes.
+     * @param orderRequested The order of the streams that must be contained in the UnionSet
+     * @return A visad.UnionSet ready to be added into a visad.Display
+     * @throws visad.VisADException Captures errors while creating the visad.UnionSet
+     */
     public visad.UnionSet getUnionSet(int orderRequested) throws visad.VisADException{
         
         visad.RealTupleType domain=new visad.RealTupleType(visad.RealType.Longitude,visad.RealType.Latitude);
@@ -167,6 +217,17 @@ public class MetaNetwork {
         return new visad.UnionSet(domain,griddedStreams);
     }
     
+    /**
+     * Returns a visad Data Type called an {@link visad.UnionSet} which is a collection
+     * of {@link visad.Gridded2DSet}.  Each gridded set is a line describing a stream. 
+     * This is usefull for ploting purposes.  Only the streams contained inside the
+     * basin Mask are returned.
+     * @param orderRequested The order of the streams that must be contained in the UnionSet
+     * @param basinMask A byte array with 1s in the positions contained inside the basin and 0s
+     * otherwise
+     * @return The visad.UnionSet filtered by the desired basin mask
+     * @throws visad.VisADException Captures errors while creating the visad.UnionSet
+     */
     public visad.UnionSet getUnionSet(int orderRequested, byte[][] basinMask) throws visad.VisADException{
         
         visad.RealTupleType domain=new visad.RealTupleType(visad.RealType.Longitude,visad.RealType.Latitude);
@@ -220,7 +281,12 @@ public class MetaNetwork {
         return new visad.UnionSet(domain,griddedStreams);
     }
     
-    public void printXYsFile(int orderRequested) throws java.io.IOException{
+    /**
+     * Prints to the standard ouput the sequence of i,j indexes that make up the
+     * stream.
+     * @param orderRequested The order of the streams to be printed
+     */
+    public void printXYsFile(int orderRequested){
         
         double demMinLon=metaData.getMinLon();
         double demMinLat=metaData.getMinLat();
@@ -263,7 +329,14 @@ public class MetaNetwork {
         
     }
     
-    public void printXYsFile(int orderRequested, byte[][] basinMask) throws java.io.IOException{
+    /**
+     * Prints to the standard ouput the sequence of i,j indexes that make up the
+     * stream.  Only those streams contained in the basin as determined by the basin
+     * mask are printed
+     * @param orderRequested The order of the streams to be printed
+     * @param basinMask The byte array that will serve as filter
+     */
+    public void printXYsFile(int orderRequested, byte[][] basinMask){
         
         double demMinLon=metaData.getMinLon();
         double demMinLat=metaData.getMinLat();
@@ -314,6 +387,7 @@ public class MetaNetwork {
     }
     
     /**
+     * Various tests for the class
      * @param args the command line arguments
      */
     public static void main(String[] args) {

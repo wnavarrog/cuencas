@@ -28,6 +28,9 @@ public class createLaplacianFromDEM {
         metaData.setLocationBinaryFile(new java.io.File(metaFile.getPath().substring(0,metaFile.getPath().lastIndexOf("."))+".magn"));
         metaData.setFormat(hydroScalingAPI.tools.ExtensionToFormat.getFormat(".magn"));
         int[][] MAG=new hydroScalingAPI.io.DataRaster(metaData).getInt();
+        metaData.setLocationBinaryFile(new java.io.File(metaFile.getPath().substring(0,metaFile.getPath().lastIndexOf("."))+".gdo"));
+        metaData.setFormat(hydroScalingAPI.tools.ExtensionToFormat.getFormat(".gdo"));
+        float[][] GDO=new hydroScalingAPI.io.DataRaster(metaData).getFloat();
         
         float[][] LAP=new float[DEM.length][DEM[0].length];
         
@@ -89,6 +92,79 @@ public class createLaplacianFromDEM {
         
         hydroScalingAPI.tools.Stats statLap=new hydroScalingAPI.tools.Stats(LAP);
         System.out.println(statLap.toString());
+        
+        float[][] dToOROrRH=GDO;
+        for(int i=1;i<DEM.length-1;i++) for(int j=1;j<DEM[0].length-1;j++){
+            if(MAG[i][j] <= 0){
+                int iPn = i-1+(DIR[i][j]-1)/3;
+                int jPn = j-1+(DIR[i][j]-1)%3;
+                
+                int iPv=i;
+                int jPv=j;
+                
+                while(MAG[iPn][jPn] <=0 && DIR[iPn][jPn] !=0){
+                    iPn = iPv-1+(DIR[iPv][jPv]-1)/3;
+                    jPn = jPv-1+(DIR[iPv][jPv]-1)%3;
+                    iPv=iPn;
+                    jPv=jPn;
+                }
+                GDO[i][j]-=GDO[iPn][jPn];
+                
+            }
+        }
+        
+        metaOut.setLocationMeta(new java.io.File(outputDir+"/"+metaData.getLocationMeta().getName().substring(0,metaData.getLocationMeta().getName().lastIndexOf("."))+"_KeyDistances.metaVHC"));
+        saveFile=new java.io.File(outputDir+"/"+metaData.getLocationMeta().getName().substring(0,metaData.getLocationMeta().getName().lastIndexOf("."))+"_KeyDistances.vhc");
+        metaOut.setLocationBinaryFile(saveFile);
+        metaOut.setFormat("Float");
+        metaOut.writeMetaRaster(metaOut.getLocationMeta());
+        
+        writer = new java.io.DataOutputStream(new java.io.BufferedOutputStream(new java.io.FileOutputStream(saveFile)));
+        
+        for(int i=0;i<DEM.length;i++) for(int j=0;j<DEM[0].length;j++){
+            writer.writeFloat(GDO[i][j]);
+        }
+        
+        writer.close();
+
+        float m1=0.5f;
+        float m2=0.5f;
+        
+        float[][] fakeDEM=DEM.clone();
+        for(int i=1;i<DEM.length-1;i++) for(int j=1;j<DEM[0].length-1;j++){
+            if(MAG[i][j] <= 0){
+                int iPn = i-1+(DIR[i][j]-1)/3;
+                int jPn = j-1+(DIR[i][j]-1)%3;
+                
+                int iPv=i;
+                int jPv=j;
+                
+                while(MAG[iPn][jPn] <=0 && DIR[iPn][jPn] !=0){
+                    iPn = iPv-1+(DIR[iPv][jPv]-1)/3;
+                    jPn = jPv-1+(DIR[iPv][jPv]-1)%3;
+                    iPv=iPn;
+                    jPv=jPn;
+                }
+                fakeDEM[i][j]=(float)(40*Math.pow(GDO[i][j]/0.2,m2))+(float)(1000*Math.pow(GDO[iPn][jPn]/1000.0,m1));
+            } else{
+                fakeDEM[i][j]=(float)(1000*Math.pow(GDO[i][j]/1000.0,m1));
+            }
+        }
+        
+        metaOut.setLocationMeta(new java.io.File(outputDir+"/"+metaData.getLocationMeta().getName().substring(0,metaData.getLocationMeta().getName().lastIndexOf("."))+"_FakeDEM.metaDEM"));
+        saveFile=new java.io.File(outputDir+"/"+metaData.getLocationMeta().getName().substring(0,metaData.getLocationMeta().getName().lastIndexOf("."))+"_FakeDEM.dem");
+        metaOut.setLocationBinaryFile(saveFile);
+        metaOut.setFormat("Float");
+        metaOut.writeMetaRaster(metaOut.getLocationMeta());
+        
+        writer = new java.io.DataOutputStream(new java.io.BufferedOutputStream(new java.io.FileOutputStream(saveFile)));
+        
+        for(int i=0;i<DEM.length;i++) for(int j=0;j<DEM[0].length;j++){
+            writer.writeFloat(fakeDEM[i][j]);
+        }
+        
+        writer.close();
+        
         
     }
     

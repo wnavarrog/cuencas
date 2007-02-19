@@ -47,7 +47,7 @@ public class MetaGauge extends Object implements Comparable{
     
     /**
      * Creates a new instance of MetaGauge
-     * @param register Takes in a registry created by the {@hydroScalingAPI.io.GaugeReader}
+     * @param register Takes in a registry created by the {@link hydroScalingAPI.io.GaugeReader}
      */
     public MetaGauge(hydroScalingAPI.util.database.DB_Register register) {
         gaugeRegister=register;
@@ -99,7 +99,7 @@ public class MetaGauge extends Object implements Comparable{
     
     /**
      * The original Gauge-type file location
-     * @return A {@java.io.File} pointing to the Gauge file
+     * @return A {@link java.io.File} pointing to the Gauge file
      */
     public java.io.File getFileLocation(){
         return (java.io.File)gaugeRegister.getProperty("[file location]");
@@ -114,10 +114,10 @@ public class MetaGauge extends Object implements Comparable{
     }
     
     /**
-     * Creates a {@ visad.RealTuple} to be plotted in a {visad.Display}
-     * @return The {@ visad.RealTuple}
-     * @throws visad.VisADException Captures errors while creating the {@ visad.RealTuple}
-     * @throws java.rmi.RemoteException Captures errors while creating the {@ visad.RealTuple}
+     * Creates a {@link visad.RealTuple} to be plotted in a {@link visad.Display}
+     * @return The {@link visad.RealTuple}
+     * @throws visad.VisADException Captures errors while creating the {@link visad.RealTuple}
+     * @throws java.rmi.RemoteException Captures errors while creating the {@link visad.RealTuple}
      */
     public visad.RealTuple getPositionTuple() throws visad.VisADException, java.rmi.RemoteException{
         double xx=((Double)gaugeRegister.getProperty("[longitude (deg:min:sec)]")).doubleValue();
@@ -128,11 +128,11 @@ public class MetaGauge extends Object implements Comparable{
     }
     
     /**
-     * Creates a {@ visad.Tuple} to be plotted in a {visad.Display} containing a text
+     * Creates a {@link visad.Tuple} to be plotted in a {@link visad.Display} containing a text
      * label
-     * @throws visad.VisADException Captures errors while creating the {@ visad.Tuple}
-     * @throws java.rmi.RemoteException Captures errors while creating the {@ visad.Tuple}
-     * @return The {@ visad.Tuple}
+     * @throws visad.VisADException Captures errors while creating the {@link visad.Tuple}
+     * @throws java.rmi.RemoteException Captures errors while creating the {@link visad.Tuple}
+     * @return The {@link visad.Tuple}
      */
     public visad.Tuple getTextTuple()  throws visad.VisADException, java.rmi.RemoteException{
         visad.TextType t = visad.TextType.getTextType("text");
