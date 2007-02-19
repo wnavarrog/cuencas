@@ -52,9 +52,9 @@ public abstract class GetRasterNetwork extends Object {
         for (int i=1; i<Proc.DIR.length-1; i++){
             for (int j=1; j<Proc.DIR[0].length-1; j++){
                 if ((Proc.Areas[i][j] > areaPodado) || (critOrd && Proc.GEO[i][j].orden > ordPodado))
-                    Proc.RedRas[i][j]=1;
+                    Proc.RedRas[i][j]*=1;
                 else
-                    Proc.RedRas[i][j]=0;
+                    Proc.RedRas[i][j]*=0;
             }
         }
     }
@@ -76,16 +76,32 @@ public abstract class GetRasterNetwork extends Object {
         if (Proc.printDebug) System.out.println(">>> Calulating Laplacian - 2 "+m);
         for (int i=2; i<Proc.DIR.length-2; i++){
             for (int j=2; j<Proc.DIR[0].length-2; j++){
-                int llegan=0;
-                if(Proc.RedRas[i][j]>0){
+                
+                if(Proc.RedRas[i][j] == 1){
+                    int iPn = i-1+(Proc.DIR[i][j]-1)/3;
+                    int jPn = j-1+(Proc.DIR[i][j]-1)%3;
+
+                    int llegan=0;
+                    int lleganForward=0;
+
                     for (int k=0; k <= 8; k++){
-                        if (Proc.DIR[i+(k/3)-1][j+(k%3)-1]==9-k)
-                            llegan++;
+                        if (Proc.DIR[i+(k/3)-1][j+(k%3)-1]==9-k) llegan++;
+                        if (Proc.DIR[iPn+(k/3)-1][jPn+(k%3)-1]==9-k) lleganForward++;
                     }
-                    if(llegan>m) Proc.RedRas[i][j]=1;
+                    
+                    double pointLap;
+                    
+                    if(Proc.DIR[i][j] == 1 || Proc.DIR[i][j] == 3 ||Proc.DIR[i][j] == 7 ||Proc.DIR[i][j] == 9)
+                        pointLap=(Proc.DEM[i-1][j]-2*Proc.DEM[i][j]+Proc.DEM[i+1][j])+(Proc.DEM[i][j-1]-2*Proc.DEM[i][j]+Proc.DEM[i][j+1]);
+                    else
+                        pointLap=(Proc.DEM[i-1][j-1]-2*Proc.DEM[i][j]+Proc.DEM[i+1][j+1])+(Proc.DEM[i-1][j+1]-2*Proc.DEM[i][j]+Proc.DEM[i+1][j-1]);
+                    
+                    if(llegan>m && lleganForward>m && pointLap > 0) Proc.RedRas[i][j]=1;
                     else Proc.RedRas[i][j] = 0;
+                    
                 }
-                else Proc.RedRas[i][j] = 0;
+                
+
             }
         }
     }
