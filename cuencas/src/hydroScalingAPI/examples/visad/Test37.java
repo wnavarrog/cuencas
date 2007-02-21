@@ -35,7 +35,7 @@ import visad.*;
 
 import visad.java3d.DisplayImplJ3D;
 import visad.util.ContourWidget;
-import visad.util.LabeledRGBAWidget;
+import visad.util.LabeledColorWidget;
 
 public class Test37
   extends TestSkeleton
@@ -72,8 +72,8 @@ public class Test37
   {
     RealType[] types = {RealType.Latitude, RealType.Longitude, RealType.Altitude};
     RealTupleType earth_location = new RealTupleType(types);
-    RealType vis_radiance = new RealType("vis_radiance", null, null);
-    RealType ir_radiance = new RealType("ir_radiance", null, null);
+    RealType vis_radiance = RealType.getRealType("vis_radiance", null, null);
+    RealType ir_radiance = RealType.getRealType("ir_radiance", null, null);
     RealType[] types2 = {vis_radiance, ir_radiance};
     RealTupleType radiance = new RealTupleType(types2);
     FunctionType image_tuple = new FunctionType(earth_location, radiance);
@@ -170,7 +170,7 @@ public class Test37
     jframe2.pack();
     jframe2.setVisible(true);
 
-    LabeledRGBAWidget caw = new LabeledRGBAWidget(rgbaMap);
+    LabeledColorWidget caw = new LabeledColorWidget(rgbaMap);
     JPanel big_panel2 = new JPanel();
     big_panel2.setLayout(new BorderLayout());
     big_panel2.add("Center", caw);

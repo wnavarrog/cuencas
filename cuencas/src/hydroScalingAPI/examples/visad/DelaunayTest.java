@@ -204,7 +204,7 @@ public class DelaunayTest {
      *
      * @param delaun The triangulation to visualize
      * @param samples The samples corresponding to the triangulation
-     * @param label One of NONE, BOXES, TRIANGLES, VERTICES
+     * @param labels One of NONE, BOXES, TRIANGLES, VERTICES
      */
     public static void visTriang(Delaunay delaun, float[][] samples,
             int labels) throws VisADException, RemoteException {

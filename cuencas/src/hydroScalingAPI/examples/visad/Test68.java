@@ -181,7 +181,7 @@ public class Test68
     Container widgets = display1.getWidgetPanel();
     widgetFrame.setContentPane(widgets);
     widgetFrame.pack();
-    widgetFrame.show();
+    widgetFrame.setVisible(true);
   }
 
   String getFrameTitle() { return "SocketSlaveDisplay server"; }

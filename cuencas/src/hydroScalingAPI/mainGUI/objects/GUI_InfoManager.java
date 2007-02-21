@@ -27,7 +27,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.mainGUI.objects;
 
 /**
- *
+ * This class manages the information needed by the main CUENCAS GUI created by {@link
+ * hydroScalingAPI.mainGUI.ParentGUI}
  * @author Ricardo Mantilla
  */
 public class GUI_InfoManager {

@@ -27,7 +27,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.mainGUI.objects;
 
 /**
- *
+ * Creates a class that digs recursively for sub-directories into a specified directory
  * @author Ricardo Mantilla
  */
 public class BuildFilesTree extends java.lang.Thread{
@@ -36,14 +36,21 @@ public class BuildFilesTree extends java.lang.Thread{
     private java.io.FileFilter treeFilter;
     private java.io.File rootFile;
     
-    /** Creates a new instance of buildFilesTree */
+    /**
+     * Creates a new instance of buildFilesTree
+     * @param topNode The {@link javax.swing.tree.DefaultMutableTreeNode} to which the new found
+     * subdirectories and files will be attached.
+     * @param rf The path to be explored
+     * @param filter A {@link java.io.FileFilter} that indicates the files to look for in the
+     * recursive search
+     */
     public BuildFilesTree(javax.swing.tree.DefaultMutableTreeNode topNode, java.io.File rf, java.io.FileFilter filter) {
         mainNode=topNode;
         treeFilter=filter;
         rootFile=rf;
     }
     
-    public void treeDigger(java.io.File fileToDig, javax.swing.tree.DefaultMutableTreeNode upperNode){
+    private void treeDigger(java.io.File fileToDig, javax.swing.tree.DefaultMutableTreeNode upperNode){
         
         java.io.File[] dirsToDig=fileToDig.listFiles(new hydroScalingAPI.util.fileUtilities.DirFilter());
         java.util.Arrays.sort(dirsToDig);
@@ -58,11 +65,15 @@ public class BuildFilesTree extends java.lang.Thread{
         }
     }
     
+    /**
+     * The run() method
+     */
     public void run(){
         treeDigger(rootFile,mainNode);
     }
     
     /**
+     * Tests for the class
      * @param args the command line arguments
      */
     public static void main(String[] args) {

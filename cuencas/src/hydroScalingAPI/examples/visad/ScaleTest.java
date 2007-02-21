@@ -171,7 +171,7 @@ public class ScaleTest extends JFrame {
         throws Exception
     {
         ScaleTest frame = new ScaleTest(args.length > 0);
-        frame.show();
+        frame.setVisible(true);
     }
 
     /**

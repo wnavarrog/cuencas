@@ -22,7 +22,7 @@ package hydroScalingAPI.io;
 
 /**
  * This class reads a *.metaDEM or *.metaVHC and creates an object that descibes
- * associated binary files
+ * an associated binary files.
  * @author Ricardo Mantilla
  */
 public class MetaRaster{
@@ -74,7 +74,9 @@ public class MetaRaster{
     }
     
     /**
-     * Creates a MetaRaster instance using the information on a file
+     * Creates a MetaRaster instance using the information on a file.  The file must
+     * contain tags and information for each tag.  File formats are descibed in the
+     * Developer's Manual.
      * @param file The file that contains the information that describes associated binary files
      * @throws java.io.IOException Captures errors while reading the meta file
      */
@@ -217,135 +219,293 @@ public class MetaRaster{
 
     }
     
+    /**
+     * Creates a String that describes the information in the meta file
+     * @return A string describing the information
+     */
     public String toString(){
         return getName()+" - "+getLocationMeta().getName();
     }
     
+    /**
+     * Sets the path where the metaFile resides.  This method is useful when an empty
+     * MetaRaster is created and it is necesary to sprcify the path where the meta file
+     * will be writen
+     * @param file The file where the meta file resides
+     */
     public void setLocationMeta(java.io.File file){
         locationMeta=file;
     }
     
+    /**
+     * Sets the path of the binary file assicitated with the information of the
+     * MetaRaster.
+     * @param file The path to the binary file
+     */
     public void setLocationBinaryFile(java.io.File file){
         locationBinaryFile=file;
     }
     
+    /**
+     * Sets the value for the [Name] tag
+     * @param newName The new name to assign to the information
+     */
     public void setName(String newName){
         properties.put("[Name]",newName);
     }
     
+    /**
+     * Sets the value for the [Southernmost Latitude] tag
+     * @param newMinLat A properly formated string DD:MM:SS.SS [N/S]. See {@link hydroScalingAPI.tools.DegreesToDMS}
+     * for a static methods format geographic position descriptors.
+     */
     public void setMinLat(String newMinLat){
         properties.put("[Southernmost Latitude]",newMinLat);
     }
     
+    /**
+     * Sets the value for the [Westernmost Longitude] tag
+     * @param newMinLon A properly formated string DD:MM:SS.SS [N/S]. See {@link hydroScalingAPI.tools.DegreesToDMS}
+     * for a static methods format geographic position descriptors.
+     */
     public void setMinLon(String newMinLon){
         properties.put("[Westernmost Longitude]",newMinLon);
     }
     
+    /**
+     * Sets the value for the [Latitudinal Resolution (ArcSec)] tag
+     * @param newResLat A double precision number indicating the Latitudinal resolution (vertical pixel
+     * size) in ArcSeconds
+     */
     public void setResLat(double newResLat){
         properties.put("[Latitudinal Resolution (ArcSec)]",new Double(newResLat));
     }
     
+    /**
+     * Sets the value for the [Longitudinal Resolution (ArcSec)] tag
+     * @param newResLon A double precision number indicating the Longitudinal resolution (vertical pixel
+     * size) in ArcSeconds
+     */
     public void setResLon(double newResLon){
         properties.put("[Longitudinal Resolution (ArcSec)]",new Double(newResLon));
     }
     
+    /**
+     * Sets the value for the [# Columns] tag
+     * @param newNumCols A integer indicating the number of Columns in the raster binary file
+     */
     public void setNumCols(int newNumCols){
         properties.put("[# Columns]",new Integer(newNumCols));
     }
     
+    /**
+     * Sets the value for the [# Rows] tag
+     * @param newNumRows A integer indicating the number of Rows in the raster binary file
+     */
     public void setNumRows(int newNumRows){
         properties.put("[# Rows]",new Integer(newNumRows));
     }
     
+    /**
+     * Sets the value for the [Format] tag
+     * @param newFormat A String indicating the format of the raster binary file.  Available formats
+     * are: Byte, Integer, Float and Double.
+     */
     public void setFormat(String newFormat){
         properties.put("[Format]",newFormat);
     }
     
+    /**
+     * Sets the value for the [Missing] tag
+     * @param newMissinng A number indicating missing information in the binary file
+     */
     public void setMissing(String newMissinng){
         properties.put("[Missing]",newMissinng);
     }
     
+    /**
+     * Restores the value of the [Format] tag to its original value if it has been
+     * modified using the setFormat(String format) method
+     */
     public void restoreOriginalFormat(){
         properties.put("[Format]",originalFormat);
     }
     
+    /**
+     * Sets the value for the [Temporal Resolution] tag
+     * @param tempScale A string describing the temporal resolution.  It can be Fix for spatial
+     * variables with no temporal variability (e.g. a digital elevation model) or a
+     * number followed by a time descriptor (e.g. 1-minute, 20-hours, 1-year, etc)
+     */
     public void setTemporalScale(String tempScale){
         properties.put("[Temporal Resolution]",tempScale);
     }
     
+    /**
+     * Sets the value of the [Units] tag
+     * @param newUnits A string describing the units of the information
+     */
     public void setUnits(String newUnits){
         properties.put("[Units]",newUnits);
     }
     
+    /**
+     * Sets the value of the [Information] tag
+     * @param newInformation A string describing the information
+     */
     public void setInformation(String newInformation){
         properties.put("[Information]",newInformation);
     }
     
+    /**
+     * Returns a java.io.File object pointing to the location of the meta file
+     * @return A java.io.File
+     */
     public java.io.File getLocationMeta(){
         return locationMeta;
     }
     
+    /**
+     * Returns a java.io.File object pointing to the location of the binary file
+     * described by this MetaRaster
+     * @return a java.io.File
+     */
     public java.io.File getLocationBinaryFile(){
         return locationBinaryFile;
     }
     
+    /**
+     * Returs the value of a property of the MetaRaster.  Available properites are:<br>
+     * <p>[Name]</p>
+     * <p>[Southernmost Latitude]</p>
+     * <p>[Westernmost Longitude]</p>
+     * <p>[Longitudinal Resolution (ArcSec)]</p>
+     * <p>[Latitudinal Resolution (ArcSec)]</p>
+     * <p>[# Columns][# Rows]</p>
+     * <p>[Format]</p>
+     * <p>[Missing]</p>
+     * <p>[Temporal Resolution]</p>
+     * <p>[Units]</p>
+     * <p>[Information] </p>
+     * @param prop The tag of the desired property
+     * @return The value of the property
+     */
     public String getProperty(String prop){
         return (String) properties.get(prop);
     }
     
+    /**
+     * Returns the value associated to the [Missing] tag
+     * @return A String that can be parsed into the same format of the data
+     */
     public String getMissing(){
         return (String) properties.get("[Missing]");
     }
     
+    /**
+     * Returns the value associated to the [Format] tag
+     * @return A string with the format of the variable
+     */
     public String getFormat(){
         return (String) properties.get("[Format]");
     }
     
+    /**
+     * Returns the value associated to the [Units] tag
+     * @return A string with the units of the variable
+     */
     public String getUnits(){
         return (String) properties.get("[Units]");
     }
     
+    /**
+     * Returns the lable associated to a category type
+     * @param catToFind The category to find
+     * @return A string desciging the category type
+     */
     public String getCategory(String catToFind){
         return (String) categories.get(catToFind);
     }
     
+    /**
+     * Returns the value associated to the [# Rows] tag
+     * @return An integer number with the number of Rows
+     */
     public int getNumRows(){
         return ((Integer)  properties.get("[# Rows]")).intValue();
     }
     
+    /**
+     * Returns the value associated to the [# Columns] tag
+     * @return An integer number with the number of Columns
+     */
     public int getNumCols(){
         return ((Integer)  properties.get("[# Columns]")).intValue();
     }
     
+    /**
+     * Returns the value associated to the [Southernmost Latitude] tag.  This method
+     * uses the {@link hydroScalingAPI.tools.DMSToDegrees} static method
+     * @return A double with the suthermost latitude in degrees
+     */
     public double getMinLat(){
         return hydroScalingAPI.tools.DMSToDegrees.getDegrees((String) properties.get("[Southernmost Latitude]"));
     }
     
+    /**
+     * Returns the value associated to the [Westernmost Longitude] tag.  This method
+     * uses the {@link hydroScalingAPI.tools.DMSToDegrees} static method
+     * @return A double with the Westernmost Longitude in degrees
+     */
     public double getMinLon(){
         return hydroScalingAPI.tools.DMSToDegrees.getDegrees((String) properties.get("[Westernmost Longitude]"));
     }
     
+    /**
+     * Returns the value associated to the [Latitudinal Resolution (ArcSec)] tag
+     * @return A double with the latitudinal resolution
+     */
     public double getResLat(){
         return ((Double) properties.get("[Latitudinal Resolution (ArcSec)]")).doubleValue();
     }
     
+    /**
+     * Returns the value associated to the [Longitudinal Resolution (ArcSec)] tag
+     * @return A double with the longitudinal resolution
+     */
     public double getResLon(){
         return ((Double) properties.get("[Longitudinal Resolution (ArcSec)]")).doubleValue();
     }
     
+    /**
+     * Calculates and returns the maximum latitude
+     * @return A double with the northermost latitude in degrees
+     */
     public double getMaxLat(){
         return this.getMinLat()+this.getNumRows()*this.getResLat()/3600.0;
     }
     
     
+    /**
+     * Calculates and returns the maximum longitude
+     * @return A double with the easternrnmost longitude in degrees
+     */
     public double getMaxLon(){
         return this.getMinLon()+this.getNumCols()*this.getResLon()/3600.0;
     }
     
+    /**
+     * Returns the value associated to the [Name] tag
+     * @return A string with map name
+     */
     public String getName(){
         return (String) properties.get("[Name]");
     }
     
+    /**
+     * Returns the value associated to the [Temporal Resolution] tag in milliseconds or -1 if "fix"
+     * @return A double indicating the time resolution in milliseconds
+     */
     public int getTemporalScale(){
         int milliseconsTemporal=0;
         String temporalScale=(String) properties.get("[Temporal Resolution]");
@@ -359,10 +519,21 @@ public class MetaRaster{
         return milliseconsTemporal;
     }
     
+    /**
+     * Returns a float[][] array with the infomation contained in the binary file
+     * @throws java.io.IOException Captures errors while reading the binary file
+     * @return A float[numRows][numCols]
+     */
     public float[][] getArray() throws java.io.IOException{
         return new hydroScalingAPI.io.DataRaster(this).getFloat();
     }
     
+    /**
+     * Returns visad.FlatField appropriate for a visad.Display
+     * @throws visad.VisADException Captures errors while creating the visad Data object
+     * @throws java.io.IOException Captures errors while reading the information
+     * @return A visad.FlatField
+     */
     public visad.FlatField getField() throws visad.VisADException, java.io.IOException{
         
         hydroScalingAPI.io.DataRaster theData = new hydroScalingAPI.io.DataRaster(this);
@@ -389,6 +560,11 @@ public class MetaRaster{
         return theField;    
     }
     
+    /**
+     * Writes the information in the MetaRaster to the specified path
+     * @param newMetaLocation The path where the metafile must be writen
+     * @throws java.io.IOException Captures errors while writing the information
+     */
     public void writeMetaRaster(java.io.File newMetaLocation) throws java.io.IOException{
         
         java.io.BufferedWriter writerMeta = new java.io.BufferedWriter(new java.io.FileWriter(newMetaLocation));
@@ -422,12 +598,20 @@ public class MetaRaster{
         
     }
     
+    /**
+     * clones the {@link java.util.Hashtable} that contains the MetaRaster properties
+     * @return A {@link java.util.Hashtable}
+     */
     public java.util.Hashtable cloneProperties(){
         
         return (java.util.Hashtable) properties.clone();
 
     }
     
+    /**
+     * Tests for the class
+     * @param args Command line arguments
+     */
     public static void main (String args[]) {
         try{
             hydroScalingAPI.io.MetaRaster metaRaster1=new hydroScalingAPI.io.MetaRaster (new java.io.File("/hidrosigDataBases/Continental_US_database/Rasters/Topography/Dd_Basins_30_ArcSec/B_11/08975896.metaDEM"));

@@ -206,8 +206,9 @@ public class MapProjectionDisplay extends DisplayImplJ3D
 
     /**
      * Test with 'java -Xmx64m MapProjectionDisplay <do3D> <image>'.
-     * @param do3D   "true" if you want a 3D display, X for 2D
-     * @param image  image for MapProjection (file or ADDE URL)
+     * @param args A string array with two entries
+     * args[0] is do3D   "true" if you want a 3D display, X for 2D
+     * args[1] image for MapProjection (file or ADDE URL)
      */
     public static void main(String[] args)
         throws Exception
@@ -232,7 +233,7 @@ public class MapProjectionDisplay extends DisplayImplJ3D
         frame.getContentPane().add(display.getComponent());
         frame.getContentPane().add("South", display.getLocationIndicator());
         frame.pack();
-        frame.show();
+        frame.setVisible(true);
     }
 
     /**

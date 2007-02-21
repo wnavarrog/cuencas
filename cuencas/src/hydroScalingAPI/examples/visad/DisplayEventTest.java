@@ -143,7 +143,7 @@ public class DisplayEventTest {
     });
     frame.pack();
     Util.centerWindow(frame);
-    frame.show();
+    frame.setVisible(true);
 
     display.getComponent().requestFocus();
   }

@@ -176,11 +176,11 @@ public class createLaplacianFromDEM {
 //            new createLaplacianFromDEM(new java.io.File("/Users/ricardo/Documents/databases/Test_DB/Rasters/Topography/58447060.metaDEM"),
 //                                       new java.io.File("/Users/ricardo/Documents/databases/Test_DB/Rasters/Hydrology/"));
             
-//            new createLaplacianFromDEM(new java.io.File("/Users/ricardo/Documents/databases/Smallbasin_DB/Rasters/Topography/1_Arcsec/NED_06075640.metaDEM"),
-//                                       new java.io.File("/Users/ricardo/Documents/databases/Smallbasin_DB/Rasters/Hydrology/"));
-            
-            new createLaplacianFromDEM(new java.io.File("/Users/ricardo/Documents/databases/Smallbasin_DB/Rasters/Topography/0.3_Arcsec/89893806.metaDEM"),
+            new createLaplacianFromDEM(new java.io.File("/Users/ricardo/Documents/databases/Smallbasin_DB/Rasters/Topography/1_Arcsec/NED_06075640.metaDEM"),
                                        new java.io.File("/Users/ricardo/Documents/databases/Smallbasin_DB/Rasters/Hydrology/"));
+            
+//            new createLaplacianFromDEM(new java.io.File("/Users/ricardo/Documents/databases/Smallbasin_DB/Rasters/Topography/0.3_Arcsec/89893806.metaDEM"),
+//                                       new java.io.File("/Users/ricardo/Documents/databases/Smallbasin_DB/Rasters/Hydrology/"));
             
         } catch(java.io.IOException ioe){
             System.err.println(ioe);

@@ -431,8 +431,9 @@ public class TRIBS_io extends java.awt.Dialog {
                 //if(!neigh && Math.random()*100.0 < Zr){
                 if(!neigh){
                     //if(pointLaplacian(xyBasin[0][i],xyBasin[1][i])>-10.1) {
-                    //if(pointLaplacian(xyBasin[0][i],xyBasin[1][i])<1e-4) {
-                    if(pointIncoming(xyBasin[0][i],xyBasin[1][i])>0) {
+                    //if(pointLaplacian(xyBasin[0][i],xyBasin[1][i])==0) {
+                    //if(pointIncoming(xyBasin[0][i],xyBasin[1][i])>0) {
+                    if(Math.random()*100.0 < Zr){
                         int pToRemove=(int)(pB-numPRemoved);
                         filteredPointsInTriangulation.remove(pToRemove);
                         filteredTypeOfPoint.remove(pToRemove);
@@ -471,7 +472,7 @@ public class TRIBS_io extends java.awt.Dialog {
             samples[1]=xyLinkValues[1];//.clone();
             System.out.println("the DelaunayClarkson algorithm.");
             long start = System.currentTimeMillis();
-            Delaunay.perturb(samples,1.5f,false);
+            Delaunay.perturb(samples,0.1f,false);
             delaun = (Delaunay) new DelaunayClarkson(samples);
             delaun.improve(samples,1);
             long end = System.currentTimeMillis();
@@ -1133,7 +1134,7 @@ public class TRIBS_io extends java.awt.Dialog {
             
             hydroScalingAPI.mainGUI.ParentGUI tempFrame=new hydroScalingAPI.mainGUI.ParentGUI();
             
-            new TRIBS_io(tempFrame, 54,81,matDirs,magnitudes,metaModif).setVisible(true);
+            new TRIBS_io(tempFrame, 61,75,matDirs,magnitudes,metaModif).setVisible(true);
             //new TRIBS_io(tempFrame, 111,80,matDirs,magnitudes,metaModif).setVisible(true);
         } catch (java.io.IOException IOE){
             System.out.print(IOE);

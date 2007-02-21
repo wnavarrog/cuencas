@@ -116,7 +116,7 @@ public class ReflectionTest {
     f.pack();
     r.setVar("f", f);
     r.exec("Util.centerWindow(f)");
-    f.show();
+    f.setVisible(true);
   }
 
 }

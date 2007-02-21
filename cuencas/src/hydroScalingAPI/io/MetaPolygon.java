@@ -151,7 +151,7 @@ public class MetaPolygon {
      */
     public visad.Gridded2DSet getPolygon() throws visad.VisADException {
         
-        float[][] xyContour=(float[][])properties.get("[coordinates lat/lon (deg)]");
+        float[][] xyContour=(float[][])properties.get("[coordinates lon/lat (deg)]");
         
         visad.RealTupleType domain=new visad.RealTupleType(visad.RealType.Longitude,visad.RealType.Latitude);
         visad.Gridded2DSet polygonCountour=new visad.Gridded2DSet(domain,xyContour,xyContour[0].length);
@@ -222,6 +222,8 @@ public class MetaPolygon {
      * @throws java.io.IOException Captures errors while writing the file
      */
     public void writePolygon(java.io.File newMetaLocation) throws java.io.IOException{
+        String testName=newMetaLocation.getName();
+        if(!testName.contains(".poly")) newMetaLocation=new java.io.File(newMetaLocation.getPath()+".poly");
         
         java.io.BufferedWriter writerMeta = new java.io.BufferedWriter(new java.io.FileWriter(newMetaLocation));
         
@@ -230,7 +232,7 @@ public class MetaPolygon {
         writerMeta.write("\n");
         
         writerMeta.write(parameters[1]+"\n");
-        float[][] xyContour=(float[][])properties.get("[coordinates lat/lon (deg)]");
+        float[][] xyContour=(float[][])properties.get("[coordinates lon/lat (deg)]");
         for (int i=0;i<xyContour[0].length;i++){
             writerMeta.write(xyContour[0][i]+"\t"+xyContour[1][i]+"\n");
         }

@@ -27,8 +27,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.mainGUI;
 
 /**
- *
- * @author  Ricardo Mantilla
+ * This class creates the main Graphical User Iterface to the GIS component of
+ * CUENCAS
+ * @author Ricardo Mantilla
  */
 
 public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.InternalFrameListener{
@@ -48,12 +49,23 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         this(new hydroScalingAPI.mainGUI.objects.GUI_InfoManager());
     }
     
+    /**
+     * Creates new form parentGUI using a given GUI_InfoManager to manage the GUI
+     * parameters
+     * @param gui_info A {@link hydroScalingAPI.mainGUI.objects.GUI_InfoManager}
+     */
     public ParentGUI(hydroScalingAPI.mainGUI.objects.GUI_InfoManager gui_info) {
         localInfoManager=gui_info;
         initComponents();
         setUpGUI(false);
     }
     
+    /**
+     * Checks or updates the information in the database (like directories, files, etc)
+     * to be reflected by the GUI
+     * @param justUpdate A boolean indicating if the GUI needs to be updated (true) or created for the
+     * first time (false)
+     */
     public void setUpGUI(boolean justUpdate){
         
         if(!justUpdate){
@@ -255,18 +267,38 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         
     }
     
+    /**
+     * Returns the {@link hydroScalingAPI.mainGUI.objects.GUI_InfoManager} associated
+     * with the GUI
+     * @return A {@link hydroScalingAPI.mainGUI.objects.GUI_InfoManager}
+     */
     public hydroScalingAPI.mainGUI.objects.GUI_InfoManager getInfoManager(){
         return localInfoManager;
     }
     
+    /**
+     * Returns the {@link hydroScalingAPI.mainGUI.objects.GaugesManager} used by the
+     * GUI to manage Gauge-type information in the database
+     * @return A {@link hydroScalingAPI.mainGUI.objects.GaugesManager}
+     */
     public hydroScalingAPI.mainGUI.objects.GaugesManager getGaugesManager(){
         return localGaugesManager;
     }
     
+    /**
+     * Returns the {@link hydroScalingAPI.mainGUI.objects.LocationsManager} used by the
+     * GUI to manage Location-type information in the database
+     * @return A {@link hydroScalingAPI.mainGUI.objects.LocationsManager}
+     */
     public hydroScalingAPI.mainGUI.objects.LocationsManager getLocationsManager(){
         return localLocationsManager;
     }
     
+    /**
+     * Activates the Locations Panel in the GUI.  This is done after the database has
+     * been fully read by an independent thread
+     * @param enabled A boolean used as an On/Off switch for the Locations panel
+     */
     public void LocationsPanelEnabled(boolean enabled){
         launchLocationViewer.setEnabled(enabled);
         locationsToDisplay.setEnabled(enabled);
@@ -276,6 +308,11 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         showLocationName.setEnabled(enabled);
     }
     
+    /**
+     * Activates the Gauges Panel in the GUI.  This is done after the database has
+     * been fully read by an independent thread
+     * @param enabled A boolean used as an On/Off switch for the Gauges panel
+     */
     public void GaugesPanelEnabled(boolean enabled){
         ts_analysis.setEnabled(enabled);
         launchTSAnalyzer.setEnabled(enabled);
@@ -286,6 +323,11 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         showGaugeCode.setEnabled(enabled);
     }
     
+    /**
+     * Returns an array containing the Gauges that the user wants to visualize over the
+     * raster maps
+     * @return An Object[] Array.  Each object can be casted into an {@link hydroScalingAPI.io.MetaGauge}
+     */
     public Object[] getActiveGauges(){
         activeGaugesContainer.setSelectionInterval(0,activeGaugesContainer.getModel().getSize()-1);
         Object[] actGauges=activeGaugesContainer.getSelectedValues();
@@ -293,6 +335,12 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         return actGauges;
     }
     
+    /**
+     * Returns an array containing the Locations that the user wants to visualize over the
+     * raster maps
+     * @return An Object[] Array.  Each object can be casted into an {@link
+     * hydroScalingAPI.io.MetaLocation}
+     */
     public Object[] getActiveLocations(){
         activeLocationsContainer.setSelectionInterval(0,activeLocationsContainer.getModel().getSize()-1);
         Object[] actLocs=activeLocationsContainer.getSelectedValues();
@@ -300,6 +348,14 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         return actLocs;
     }
     
+    /**
+     * Returns an array containing the vector data in the CUENCAS database that the user
+     * wants to visualize over the raster maps
+     * @return An Object[] Array.  Each object can be casted into an {@link
+     * javax.swing.JCheckBox}.  The name of the checkBox is the file name which can be
+     * used to read the vector to visualize (The list includes both Shapefile and DLG
+     * files)
+     */
     public Object[] getActiveVectors(){
         Object[] theVectors=new Object[shapesContainer.getComponentCount()+dlgsContainer.getComponentCount()];
         for (int i=0;i<shapesContainer.getComponentCount();i++){
@@ -311,6 +367,13 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         return theVectors;
     }
     
+    /**
+     * Returns an array containing the polygon data in the CUENCAS database that the user
+     * wants to visualize over the raster maps
+     * @return An Object[] Array.  Each object can be casted into an {@link
+     * javax.swing.JCheckBox}.  The name of the checkBox is the file name which can be
+     * used to read the polygon to visualize (The list includes *.poly files)
+     */
     public Object[] getActivePolygons(){
         Object[] thePolygons=new Object[polygonContainer.getComponentCount()];
         for (int i=0;i<polygonContainer.getComponentCount();i++){
@@ -319,9 +382,19 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         return thePolygons;
     }
     
+    /**
+     * Returns a Boolean indicating whether the user wants the Gauge name to be writen
+     * next to the point indicating the Gauge position.
+     * @return A boolean
+     */
     public boolean nameOnGauges(){
         return showGaugeCode.isSelected();
     }
+    /**
+     * Returns a boolean indicating whether the user wants the Location name to be writen
+     * next to the point indicating the Location position.
+     * @return A boolean
+     */
     public boolean nameOnLocations(){
         return showLocationName.isSelected();
     }
@@ -1806,6 +1879,7 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
     }//GEN-LAST:event_exitForm
     
     /**
+     * Creates a new instance of the class
      * @param args the command line arguments
      */
     public static void main(String args[]) {
@@ -1954,6 +2028,10 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
     // End of variables declaration//GEN-END:variables
     
     
+    /**
+     * Responds to the user menu File -> Open File -> Open DEM
+     * @param selectedFile The metaDEM file describing the DEM
+     */
     public void openDEM(java.io.File selectedFile){
         try{
             hydroScalingAPI.io.MetaRaster metaDEM=new  hydroScalingAPI.io.MetaRaster(selectedFile);
@@ -1990,6 +2068,10 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         
     }
     
+    /**
+     * Responds to the user menu File -> Open File -> Open HydroClimatic
+     * @param selectedFile The metaVHC file describing the HydroClimatic variable
+     */
     public void openVHC(java.io.File selectedFile){
         try{
             hydroScalingAPI.io.MetaRaster metaVHC=new  hydroScalingAPI.io.MetaRaster(selectedFile);
@@ -2092,6 +2174,10 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         refreshAllWindowsReferences();
     }
     
+    /**
+     * Informs the GUI about a newly created Location
+     * @param theEditor The {@link hydroScalingAPI.subGUIs.widgets.LocationsEditor} used to create the Location
+     */
     public void addNewLocationInteractively(hydroScalingAPI.subGUIs.widgets.LocationsEditor theEditor){
         if(theEditor.wroteNewLocation()){
             String[] locInfo=theEditor.writtenOrModifiedLocation();
@@ -2107,9 +2193,50 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         }
     }
     
+    /**
+     * Unused event
+     * @param internalFrameEvent Not Used
+     */
     public void internalFrameActivated(javax.swing.event.InternalFrameEvent internalFrameEvent) {
+        //Unused Event
     }
     
+    /**
+     * Unused event
+     * @param internalFrameEvent Unused
+     */
+    public void internalFrameClosing(javax.swing.event.InternalFrameEvent internalFrameEvent) {
+        //Unused Event
+    }
+    
+    /**
+     * Unused event
+     * @param internalFrameEvent Unused
+     */
+    public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent internalFrameEvent) {
+        //Unused Event
+    }
+    
+    /**
+     * Unused event
+     * @param internalFrameEvent Unused
+     */
+    public void internalFrameDeiconified(javax.swing.event.InternalFrameEvent internalFrameEvent) {
+        //Unused Event
+    }
+    
+    /**
+     * Unused event
+     * @param internalFrameEvent Unused
+     */
+    public void internalFrameIconified(javax.swing.event.InternalFrameEvent internalFrameEvent) {
+        //Unused Event
+    }
+    
+    /**
+     * Informs the GUI that a an internal visualization window has closed.
+     * @param internalFrameEvent The Internal frame that was closed
+     */
     public void internalFrameClosed(javax.swing.event.InternalFrameEvent internalFrameEvent) {
         String stringId=((hydroScalingAPI.subGUIs.widgets.RasterViewer)internalFrameEvent.getInternalFrame()).getIdentifier();
         openWindows.remove(stringId);
@@ -2118,18 +2245,10 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         openWindowsIdentifiers.remove(stringId);
     }
     
-    public void internalFrameClosing(javax.swing.event.InternalFrameEvent internalFrameEvent) {
-    }
-    
-    public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent internalFrameEvent) {
-    }
-    
-    public void internalFrameDeiconified(javax.swing.event.InternalFrameEvent internalFrameEvent) {
-    }
-    
-    public void internalFrameIconified(javax.swing.event.InternalFrameEvent internalFrameEvent) {
-    }
-    
+    /**
+     * Informs the GUI that a an internal visualization window has opened.
+     * @param internalFrameEvent The internal frame that was opened
+     */
     public void internalFrameOpened(javax.swing.event.InternalFrameEvent internalFrameEvent) {
         hydroScalingAPI.subGUIs.widgets.RasterViewer rv=(hydroScalingAPI.subGUIs.widgets.RasterViewer)internalFrameEvent.getInternalFrame();
         String windowIdentifier=rv.getTitle();
