@@ -119,8 +119,8 @@ public class RsnStructure {
     
     public RsnStructure(int generations, hydroScalingAPI.util.probability.DiscreteDistribution myDis_I, 
                                          hydroScalingAPI.util.probability.DiscreteDistribution myDis_E, 
-                                         hydroScalingAPI.util.probability.ContinuumDistribution myDis_Areas_E,
-                                         hydroScalingAPI.util.probability.ContinuumDistribution myDis_Areas_I) {
+                                         hydroScalingAPI.util.probability.ContinuousDistribution myDis_Areas_E,
+                                         hydroScalingAPI.util.probability.ContinuousDistribution myDis_Areas_I) {
         
         java.text.NumberFormat labelFormat = java.text.NumberFormat.getNumberInstance();
         labelFormat.setGroupingUsed(false);
@@ -438,8 +438,8 @@ public class RsnStructure {
         float Elae=0.1f;
         float SDlae=0.2f;
 
-        hydroScalingAPI.util.probability.ContinuumDistribution myLinkAreaDistro_E=new hydroScalingAPI.util.probability.LogGaussianDistribution(Elae,SDlae);
-        hydroScalingAPI.util.probability.ContinuumDistribution myLinkAreaDistro_I=new hydroScalingAPI.util.probability.LogGaussianDistribution(0.01f+0.88f*Elae,0.04f+0.85f*SDlae);
+        hydroScalingAPI.util.probability.ContinuousDistribution myLinkAreaDistro_E=new hydroScalingAPI.util.probability.LogGaussianDistribution(Elae,SDlae);
+        hydroScalingAPI.util.probability.ContinuousDistribution myLinkAreaDistro_I=new hydroScalingAPI.util.probability.LogGaussianDistribution(0.01f+0.88f*Elae,0.04f+0.85f*SDlae);
                         
         //RsnStructure myRsnStruc=new RsnStructure(5,myUD_I,myUD_E, myLinkAreaDistro_E, myLinkAreaDistro_I);
         RsnStructure myRsnStruc=new RsnStructure(6,myUD_I,myUD_E);

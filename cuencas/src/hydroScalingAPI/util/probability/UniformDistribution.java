@@ -30,7 +30,7 @@ package hydroScalingAPI.util.probability;
  *
  * @author Ricardo Mantilla
  */
-public class UniformDistribution implements hydroScalingAPI.util.probability.ContinuumDistribution{
+public class UniformDistribution implements hydroScalingAPI.util.probability.ContinuousDistribution{
     
     private float lowerLimit, upperLimit;
     

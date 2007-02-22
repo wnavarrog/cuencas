@@ -19,7 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 
 /*
- * ContinuumDistribution.java
+ * ContinuousDistribution.java
  *
  * Created on July 11, 2005, 9:57 AM
  */
@@ -30,7 +30,7 @@ package hydroScalingAPI.util.probability;
  *
  * @author Ricardo Mantilla
  */
-public interface ContinuumDistribution {
+public interface ContinuousDistribution {
     
     public float sample();
     

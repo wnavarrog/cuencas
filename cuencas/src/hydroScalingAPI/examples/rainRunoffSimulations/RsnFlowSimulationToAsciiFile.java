@@ -329,8 +329,8 @@ public class RsnFlowSimulationToAsciiFile extends java.lang.Object {
                         float Elae=0.1f;
                         float SDlae=0.2f;
                         
-                        hydroScalingAPI.util.probability.ContinuumDistribution myLinkAreaDistro_E=new hydroScalingAPI.util.probability.LogGaussianDistribution(Elae,SDlae);
-                        hydroScalingAPI.util.probability.ContinuumDistribution myLinkAreaDistro_I=new hydroScalingAPI.util.probability.LogGaussianDistribution(0.01f+0.88f*Elae,0.04f+0.85f*SDlae);
+                        hydroScalingAPI.util.probability.ContinuousDistribution myLinkAreaDistro_E=new hydroScalingAPI.util.probability.LogGaussianDistribution(Elae,SDlae);
+                        hydroScalingAPI.util.probability.ContinuousDistribution myLinkAreaDistro_I=new hydroScalingAPI.util.probability.LogGaussianDistribution(0.01f+0.88f*Elae,0.04f+0.85f*SDlae);
 
                         hydroScalingAPI.modules.rsnFlowSymulations.objects.RsnStructure myRSN=new hydroScalingAPI.modules.rsnFlowSymulations.objects.RsnStructure(sofi-1,myUD_I,myUD_E,myLinkAreaDistro_E,myLinkAreaDistro_I);
                         RsnFlowSimulationToAsciiFile rsnfs=new RsnFlowSimulationToAsciiFile(myRSN,0,1,experiment,2,new java.io.File(outDir+"p_i"+labelFormat.format(p_i)+"p_e"+labelFormat.format(p_e)+"/ord_"+sofi));

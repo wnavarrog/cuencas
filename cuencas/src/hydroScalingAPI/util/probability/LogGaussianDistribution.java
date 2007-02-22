@@ -30,7 +30,7 @@ package hydroScalingAPI.util.probability;
  *
  * @author Ricardo Mantilla
  */
-public class LogGaussianDistribution implements hydroScalingAPI.util.probability.ContinuumDistribution{
+public class LogGaussianDistribution implements hydroScalingAPI.util.probability.ContinuousDistribution{
     
     private float mean, stdev;
     private java.util.Random rn;
