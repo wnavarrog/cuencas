@@ -54,11 +54,11 @@ public class Stats{
     public Stats(double[] data) {
         
         for (int j=0;j<data.length;j++){
-            
-                    maxValue = (float)Math.max(maxValue,data[j]);
-                    meanValue += (float)data[j];
-                    standardDeviation+= (float) Math.pow(data[j],2);
-                    dataCount++;
+            minValue = (float) Math.min(minValue,data[j]);
+            maxValue = (float)Math.max(maxValue,data[j]);
+            meanValue += (float)data[j];
+            standardDeviation+= (float) Math.pow(data[j],2);
+            dataCount++;
       
             
         }
@@ -107,10 +107,11 @@ public class Stats{
         
         for (int j=0;j<data.length;j++){
             
-                    maxValue = (float)Math.max(maxValue,data[j]);
-                    meanValue += (float)data[j];
-                    standardDeviation+= (float) Math.pow(data[j],2);
-                    dataCount++;
+            minValue = (float) Math.min(minValue,data[j]);
+            maxValue = (float)Math.max(maxValue,data[j]);
+            meanValue += (float)data[j];
+            standardDeviation+= (float) Math.pow(data[j],2);
+            dataCount++;
       
             
         }

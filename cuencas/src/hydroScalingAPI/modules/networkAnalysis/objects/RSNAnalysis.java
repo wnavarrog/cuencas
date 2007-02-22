@@ -27,7 +27,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.modules.networkAnalysis.objects;
 
 /**
- *
+ * The analogous of {@link hydroScalingAPI.util.geomorphology.objects.LinksAnalysis}
+ * for a network pruned by order.  This class treats the pruned network as a set of
+ * pseudo-links.  See PhD Thesis of Ricardo Mantilla for definitions
  * @author Ricardo Mantilla
  */
 public class RSNAnalysis {
@@ -44,7 +46,11 @@ public class RSNAnalysis {
     private int[][] usIndexes;
     private int[] subOutlets;
     
-    /** Creates a new instance of RSNAnalysis */
+    /**
+     * Creates a new instance of RSNAnalysis
+     * @param mla The LinksAnalysis object asociated to the river network under consideration
+     * @throws java.io.IOException Captures errors while retreiving information
+     */
     public RSNAnalysis(hydroScalingAPI.util.geomorphology.objects.LinksAnalysis mla) throws java.io.IOException {
          
          mylinksAnalysis=mla;

@@ -842,72 +842,6 @@ public abstract class RasterViewer extends javax.swing.JInternalFrame {
         plotTemporaryReferences();
     }
     
-    /*public void removeHeavyReferences(final boolean gaugesWithNames, final boolean locationsWithNames){
-        try {
-            display.removeAllReferences();
-        } catch (visad.VisADException exc) {
-            System.err.println(exc);
-        } catch (java.io.IOException exc) {
-            System.err.println(exc);
-        }
-     
-        plotGuideMarks();
-     
-        if(showSitesLayer.isSelected()) {
-            plotGauges(gaugesWithNames);
-            plotLocations(locationsWithNames);
-        }
-    }
-     
-    private void plotGuideMarks(){
-            Runnable addMarks = new Runnable() {
-                public void run() {
-                    try {
-     
-                        int gridDensity=10; int gridDensitySQ=(int)Math.pow(gridDensity,2);
-     
-                        visad.RealTupleType domain=new visad.RealTupleType(visad.RealType.Longitude,visad.RealType.Latitude);
-                        visad.Gridded2DSet[] marks=new visad.Gridded2DSet[gridDensitySQ*2];
-                        float[][] markCoordH=new float[2][2];
-                        float[][] markCoordV=new float[2][2];
-                        for (int i=0;i<gridDensity;i++){
-                            for (int j=0;j<gridDensity;j++){
-                                markCoordH[0][0]=(float)(metaData.getMinLon()+(j+1)/(gridDensity+1.0)*(metaData.getMaxLon()-metaData.getMinLon())-(metaData.getMaxLon()-metaData.getMinLon())/50.0);
-                                markCoordH[0][1]=(float)(metaData.getMinLon()+(j+1)/(gridDensity+1.0)*(metaData.getMaxLon()-metaData.getMinLon())+(metaData.getMaxLon()-metaData.getMinLon())/50.0);
-     
-                                markCoordH[1][0]=(float)(metaData.getMinLat()+(i+1)/(gridDensity+1.0)*(metaData.getMaxLat()-metaData.getMinLat()));
-                                markCoordH[1][1]=(float)(metaData.getMinLat()+(i+1)/(gridDensity+1.0)*(metaData.getMaxLat()-metaData.getMinLat()));
-     
-                                marks[i*gridDensity+j]=new visad.Gridded2DSet(domain,markCoordH,2);
-     
-                                markCoordV[0][0]=(float)(metaData.getMinLon()+(j+1)/(gridDensity+1.0)*(metaData.getMaxLon()-metaData.getMinLon()));
-                                markCoordV[0][1]=(float)(metaData.getMinLon()+(j+1)/(gridDensity+1.0)*(metaData.getMaxLon()-metaData.getMinLon()));
-     
-                                markCoordV[1][0]=(float)(metaData.getMinLat()+(i+1)/(gridDensity+1.0)*(metaData.getMaxLat()-metaData.getMinLat())-(metaData.getMaxLat()-metaData.getMinLat())/50.0);
-                                markCoordV[1][1]=(float)(metaData.getMinLat()+(i+1)/(gridDensity+1.0)*(metaData.getMaxLat()-metaData.getMinLat())+(metaData.getMaxLat()-metaData.getMinLat())/50.0);
-     
-                                marks[i*gridDensity+j+gridDensitySQ]=new visad.Gridded2DSet(domain,markCoordV,2);
-                            }
-                        }
-     
-                        visad.DataReferenceImpl marksRef = new visad.DataReferenceImpl("text");
-                        marksRef.setData(new visad.UnionSet(domain, marks));
-                        display.addReference(marksRef);
-     
-                    }
-                    catch (visad.VisADException exc) {
-                        System.err.println("Failed showing gauges");
-                        System.err.println(exc);
-                    }
-                    catch (java.io.IOException exc) {
-                        System.err.println("Failed showing gauges");
-                        System.err.println(exc);
-                    }
-                }
-            };
-            new Thread(addMarks).start();
-    }*/
-    
     public void updateRelatedMaps(){
         
         Object[] mapNames=relatedMapsList.keySet().toArray();
@@ -1222,6 +1156,12 @@ public abstract class RasterViewer extends javax.swing.JInternalFrame {
         relatedMaps.setMaximumSize(new java.awt.Dimension(32767, 18));
         relatedMaps.setMinimumSize(new java.awt.Dimension(32, 18));
         relatedMaps.setPreferredSize(new java.awt.Dimension(32, 18));
+        relatedMaps.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                relatedMapsActionPerformed(evt);
+            }
+        });
+
         jPanel4.add(relatedMaps, java.awt.BorderLayout.CENTER);
 
         jPanel3.add(jPanel4);
@@ -1323,8 +1263,11 @@ public abstract class RasterViewer extends javax.swing.JInternalFrame {
         getContentPane().add(layersPanel, java.awt.BorderLayout.SOUTH);
 
         pack();
-    }
-    // </editor-fold>//GEN-END:initComponents
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void relatedMapsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_relatedMapsActionPerformed
+// TODO add your handling code here:
+    }//GEN-LAST:event_relatedMapsActionPerformed
 
     private void cutSubDataSetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cutSubDataSetActionPerformed
     if(cutSubDataSet.isSelected()) {
@@ -1512,6 +1455,9 @@ public abstract class RasterViewer extends javax.swing.JInternalFrame {
                     }
                     try{
                         localField=metaData.getField();
+                        float[][] dataValues=localField.getFloats();
+                        hydroScalingAPI.tools.Stats statsVar=new hydroScalingAPI.tools.Stats(dataValues[0]);
+                        heightMap.setRange(statsVar.minValue,statsVar.maxValue+2*(statsVar.maxValue-statsVar.minValue));
                     } catch (visad.VisADException ve){
                         System.err.println("Failed loading field");
                         System.err.println(ve);

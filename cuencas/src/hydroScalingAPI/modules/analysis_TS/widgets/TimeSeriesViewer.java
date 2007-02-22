@@ -27,7 +27,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.modules.analysis_TS.widgets;
 
 /**
- *
+ * Creates a panel to visualize the time series associated to a Gauge in the
+ * database.  This is a placeholder for a more sofisticated time series analysis
+ * module.
  * @author Ricardo Mantilla
  */
 public class TimeSeriesViewer extends javax.swing.JDialog {
@@ -36,7 +38,11 @@ public class TimeSeriesViewer extends javax.swing.JDialog {
     
     private hydroScalingAPI.util.plot.XYJPanel p;
     
-    /** Creates new form TimeSeriesViewer */
+    /**
+     * Creates new form TimeSeriesViewer
+     * @param parent The main GIS interface
+     * @param oneGauge The {@link hydroScalingAPI.io.MetaGauge} that manages the data
+     */
     public TimeSeriesViewer(hydroScalingAPI.mainGUI.ParentGUI parent, hydroScalingAPI.io.MetaGauge oneGauge) {
         super(parent, true);
         mainFrame=parent;
@@ -83,6 +89,7 @@ public class TimeSeriesViewer extends javax.swing.JDialog {
     }//GEN-LAST:event_closeDialog
     
     /**
+     * Test for the class
      * @param args the command line arguments
      */
     public static void main(String args[]) {

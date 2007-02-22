@@ -550,7 +550,7 @@ public class MetaRaster{
         }
         
         visad.RealTupleType domain=new visad.RealTupleType(visad.RealType.Longitude,visad.RealType.Latitude);
-        visad.RealTupleType range=new visad.RealTupleType(visad.RealType.getRealType("varValue"),visad.RealType.getRealType("varColor"));
+        visad.RealTupleType range=new visad.RealTupleType(visad.RealType.Altitude,visad.RealType.getRealType("varColor"));
         visad.FunctionType  domainToRangeFunction = new visad.FunctionType( domain, range);
         visad.Linear2DSet   domainExtent = new visad.Linear2DSet(domain,getMinLon()+getResLon()/3600.0/2.0,getMinLon()+getNumCols()*getResLon()/3600.0-getResLon()/3600.0/2.0,getNumCols(),
                                                                         getMinLat()+getResLat()/3600.0/2.0,getMinLat()+getNumRows()*getResLat()/3600.0-getResLat()/3600.0/2.0,getNumRows());

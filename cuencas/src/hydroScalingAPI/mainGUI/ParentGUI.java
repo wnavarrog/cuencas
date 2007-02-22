@@ -2042,19 +2042,33 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
                 addToRecentFiles(selectedFile);
                 
                 for (int i=0;i<openDem.getSelectedMetaRasters().length;i++){
+
                     hydroScalingAPI.io.MetaRaster subDemMetaDEM=openDem.getSelectedMetaRasters()[i];
+
+                    if(openDem.is3D()){
+                        
+                        hydroScalingAPI.subGUIs.widgets.DemViewer3D thisDemViewer=new hydroScalingAPI.subGUIs.widgets.DemViewer3D(this,subDemMetaDEM,openDem.getRelatedMaps());
+                        subGUIs_container.add(thisDemViewer, javax.swing.JLayeredPane.DEFAULT_LAYER);
+                        try{
+                            thisDemViewer.setSelected(true);
+                        } catch (java.beans.PropertyVetoException PVE){
+                            System.err.println(PVE);
+                        }
+
+                        thisDemViewer.setBounds(25*(openWindows.size()-1), 25*(openWindows.size()-1), thisDemViewer.getWidth()+5, thisDemViewer.getHeight()+5);
+                        
+                    } else {
                     
-                    hydroScalingAPI.subGUIs.widgets.DemViewer2D thisDemViewer=new hydroScalingAPI.subGUIs.widgets.DemViewer2D(this,subDemMetaDEM,openDem.getRelatedMaps());
-                    
-                    subGUIs_container.add(thisDemViewer, javax.swing.JLayeredPane.DEFAULT_LAYER);
-                    try{
-                        thisDemViewer.setSelected(true);
-                    } catch (java.beans.PropertyVetoException PVE){
-                        System.err.println(PVE);
+                        hydroScalingAPI.subGUIs.widgets.DemViewer2D thisDemViewer=new hydroScalingAPI.subGUIs.widgets.DemViewer2D(this,subDemMetaDEM,openDem.getRelatedMaps());
+                        subGUIs_container.add(thisDemViewer, javax.swing.JLayeredPane.DEFAULT_LAYER);
+                        try{
+                            thisDemViewer.setSelected(true);
+                        } catch (java.beans.PropertyVetoException PVE){
+                            System.err.println(PVE);
+                        }
+
+                        thisDemViewer.setBounds(25*(openWindows.size()-1), 25*(openWindows.size()-1), thisDemViewer.getWidth()+5, thisDemViewer.getHeight()+5);
                     }
-                    
-                    thisDemViewer.setBounds(25*(openWindows.size()-1), 25*(openWindows.size()-1), thisDemViewer.getWidth()+5, thisDemViewer.getHeight()+5);
-                    
                 }
                 
             }
@@ -2079,29 +2093,30 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
             openVhc.setVisible(true);
             if(openVhc.mapsSelected()){
                 addToRecentFiles(selectedFile);
-            }
-            
-            if(openVhc.isMultiple()){
-            } else {
-                
-                for (int i=0;i<openVhc.getSelectedMetaRasters().length;i++){
-                    hydroScalingAPI.io.MetaRaster subVhcMetaDEM=openVhc.getSelectedMetaRasters()[i];
-                    
-                    hydroScalingAPI.subGUIs.widgets.HydroClimateViewer2D thisVhcViewer=new hydroScalingAPI.subGUIs.widgets.HydroClimateViewer2D(this,subVhcMetaDEM,openVhc.getRelatedMaps());
-                    
-                    subGUIs_container.add(thisVhcViewer, javax.swing.JLayeredPane.DEFAULT_LAYER);
-                    try{
-                        thisVhcViewer.setSelected(true);
-                    } catch (java.beans.PropertyVetoException PVE){
-                        System.err.println(PVE);
+                if(openVhc.isMultiple()){
+                } else {
+
+                    for (int i=0;i<openVhc.getSelectedMetaRasters().length;i++){
+                        hydroScalingAPI.io.MetaRaster subVhcMetaDEM=openVhc.getSelectedMetaRasters()[i];
+
+                        hydroScalingAPI.subGUIs.widgets.HydroClimateViewer2D thisVhcViewer=new hydroScalingAPI.subGUIs.widgets.HydroClimateViewer2D(this,subVhcMetaDEM,openVhc.getRelatedMaps());
+
+                        subGUIs_container.add(thisVhcViewer, javax.swing.JLayeredPane.DEFAULT_LAYER);
+                        try{
+                            thisVhcViewer.setSelected(true);
+                        } catch (java.beans.PropertyVetoException PVE){
+                            System.err.println(PVE);
+                        }
+
+                        thisVhcViewer.setBounds(25*(openWindows.size()-1), 25*(openWindows.size()-1), thisVhcViewer.getWidth()+5, thisVhcViewer.getHeight()+5);
+
                     }
-                    
-                    thisVhcViewer.setBounds(25*(openWindows.size()-1), 25*(openWindows.size()-1), thisVhcViewer.getWidth()+5, thisVhcViewer.getHeight()+5);
-                    
                 }
+            
             }
             
             
+                       
         } catch (java.io.IOException ioe){
             System.err.println("Failed building HydroClimateViewer2D");
             System.err.println(ioe);

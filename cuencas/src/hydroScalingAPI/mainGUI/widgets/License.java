@@ -27,12 +27,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.mainGUI.widgets;
 
 /**
- *
- * @author  ricardo
+ * Creates a {@link java.awt.Dialog} that displays the CUENCAS License agreement
+ * @author ricardo
  */
 public class License extends java.awt.Dialog {
     
-    /** Creates new form License */
+    /**
+     * Creates new form License
+     * @param parent The {@link hydroScalingAPI.mainGUI.ParentGUI} associated to the Dialog
+     */
     public License(hydroScalingAPI.mainGUI.ParentGUI parent) {
         super(parent, true);
         initComponents();
@@ -93,20 +96,7 @@ public class License extends java.awt.Dialog {
         dispose();
     }//GEN-LAST:event_closeDialog
     
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
         
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                hydroScalingAPI.mainGUI.ParentGUI tempFrame=new hydroScalingAPI.mainGUI.ParentGUI();
-                new License(tempFrame).setVisible(true);
-            }
-        });
-    }
-    
-    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton doneButton;
     private javax.swing.JScrollPane jScrollPane1;

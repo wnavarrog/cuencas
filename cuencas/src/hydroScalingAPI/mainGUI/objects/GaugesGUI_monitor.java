@@ -27,7 +27,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.mainGUI.objects;
 
 /**
- *
+ * An independent thread that waits for the {@link hydroScalingAPI.mainGUI.objects.GaugesManager}
+ * to load all the information related to gauges before turning on the Gauges panel
+ * in the CUENCAS GUI.
  * @author Ricardo Mantilla
  */
 public class GaugesGUI_monitor extends Thread{
@@ -35,7 +37,10 @@ public class GaugesGUI_monitor extends Thread{
     private hydroScalingAPI.mainGUI.objects.GaugesManager dialogManager;
     
     
-    /** Creates new form GaugesOpenDialog */
+    /**
+     * Creates new Creates new instance of GaugesGUI_monitor
+     * @param parent The {@link hydroScalingAPI.mainGUI.ParentGUI} to update
+     */
     public GaugesGUI_monitor(hydroScalingAPI.mainGUI.ParentGUI parent) {
         
         mainFrame=parent;
@@ -43,6 +48,9 @@ public class GaugesGUI_monitor extends Thread{
         
     }
     
+    /**
+     * Thread actions
+     */
     public void run() {
         
         while(!dialogManager.isLoaded()){

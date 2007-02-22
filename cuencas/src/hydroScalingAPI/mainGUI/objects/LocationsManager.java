@@ -27,7 +27,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.mainGUI.objects;
 
 /**
- *
+ * This class manages all the information related to Locations in the database.  It
+ * runs independent threads that read the information from the Location-type files
  * @author Ricardo Mantilla
  */
 public class LocationsManager {
@@ -61,7 +62,13 @@ public class LocationsManager {
                                         "object",
                                         "object"};
     
-    /** Creates a new instance of LocationsManager */
+    /**
+     * Creates a new instance of LocationsManager
+     * @param infoManager The {@link hydroScalingAPI.mainGUI.objects.GUI_InfoManager} to which the
+     * GaugesManager is associated
+     * @param dataBase The {@link hydroScalingAPI.util.database.DataBaseEngine} that stores and manages
+     * the data
+     */
     public LocationsManager(hydroScalingAPI.mainGUI.objects.GUI_InfoManager infoManager,hydroScalingAPI.util.database.DataBaseEngine dataBase) {
         informationManager=infoManager;
         mainDataBase=dataBase;
@@ -70,11 +77,23 @@ public class LocationsManager {
         loaderDigerThread.start();
     }
     
+    /**
+     * Pushes data into the {@link hydroScalingAPI.util.database.DataBaseEngine}
+     * @param thisRegister The register to be added to the database
+     */
     public void addData(Object[] thisRegister){
         String registerIndex=(String)thisRegister[2]+"."+(String)thisRegister[0];
         mainDataBase.addData("Locations",registerIndex,thisRegister);
     }
     
+    /**
+     * Retereives a particual Location from the {@link
+     * hydroScalingAPI.util.database.DataBaseEngine}. Note that the code and the type
+     * uniquely characterize a Location.
+     * @param code The code of the location to retreive
+     * @param type The type of the location to retreive
+     * @return A {@link hydroScalingAPI.io.MetaLocation}
+     */
     public hydroScalingAPI.io.MetaLocation getLocation(String code, String type) {
         hydroScalingAPI.util.database.DB_Register matchedValue = mainDataBase.getRegisterByMainIndex("Locations",code+"."+type);
         
@@ -87,6 +106,13 @@ public class LocationsManager {
         
     }
     
+    /**
+     * Retereives a group of locations from the {@link
+     * hydroScalingAPI.util.database.DataBaseEngine}. Note that the several types
+     * of Location can be associated to a given code.
+     * @param code The code of the locations to retreive
+     * @return A array of {@link hydroScalingAPI.io.MetaLocation}s
+     */
     public hydroScalingAPI.io.MetaLocation[] getLocation(String code) {
         java.util.Vector locationsResultVector=new java.util.Vector();
         java.util.Vector localTypes=getTypes();
@@ -103,6 +129,15 @@ public class LocationsManager {
         
     }
     
+    /**
+     * Query to the {@link hydroScalingAPI.util.database.DataBaseEngine} for Locations
+     * that meet a specified group of conditions
+     * @param categories The categories to use in the search
+     * @param values The value assiciated to the category
+     * @param conditions The condition to match (e.g. equal to, greater than, smaller than, etc)
+     * @return The group of {@link hydroScalingAPI.util.database.DB_Register} that match the
+     * query
+     */
     public hydroScalingAPI.io.MetaLocation[] findLocations(java.util.Vector categories,java.util.Vector values,java.util.Vector conditions) {
         String[] cats=new String[categories.size()];
         Object[] vals=new Object[values.size()];
@@ -126,43 +161,98 @@ public class LocationsManager {
         
     }
     
+    /**
+     * Query to the {@link hydroScalingAPI.util.database.DataBaseEngine} for unique
+     * Location names
+     * @return A {@link java.util.Vector} listing unique names
+     */
     public java.util.Vector getNames(){
         return mainDataBase.getUniqueValues("Locations",locatTags[2]);
     }
     
+    /**
+     * Query to the {@link hydroScalingAPI.util.database.DataBaseEngine} for unique
+     * Location agencies
+     * @return A {@link java.util.Vector} listing unique agencies
+     */
     public java.util.Vector getAgencies(){
         return mainDataBase.getUniqueValues("Locations",locatTags[1]);
     }
     
+    /**
+     * Query to the {@link hydroScalingAPI.util.database.DataBaseEngine} for unique
+     * Location types
+     * @return A {@link java.util.Vector} listing unique types
+     */
     public java.util.Vector getTypes(){
         return mainDataBase.getUniqueValues("Locations",locatTags[0]);
     }
     
+    /**
+     * Query to the {@link hydroScalingAPI.util.database.DataBaseEngine} for unique
+     * Location counties
+     * @return A {@link java.util.Vector} listing unique counties
+     */
     public java.util.Vector getCounties(){
         return mainDataBase.getUniqueValues("Locations",locatTags[3]);
     }
     
+    /**
+     * Query to the {@link hydroScalingAPI.util.database.DataBaseEngine} for unique
+     * Location states
+     * @return A {@link java.util.Vector} listing unique states
+     */
     public java.util.Vector getStates(){
         return mainDataBase.getUniqueValues("Locations",locatTags[4]);
     }
     
+    /**
+     * Query to the {@link hydroScalingAPI.util.database.DataBaseEngine} for the
+     * southernmost latitude of the locations in the CUENCAS database
+     * @return A Double
+     */
     public Double getSouthernmostLat(){
         return mainDataBase.getMinValue("Locations",locatTags[5]);
     }
+    /**
+     * Query to the {@link hydroScalingAPI.util.database.DataBaseEngine} for the
+     * northernmost latitude of the locations in the CUENCAS database
+     * @return A Double
+     */
     public Double getNorthernmostLat(){
         return mainDataBase.getMaxValue("Locations",locatTags[5]);
     }
+    /**
+     * Query to the {@link hydroScalingAPI.util.database.DataBaseEngine} for the
+     * westernmost longitude of the locations in the CUENCAS database
+     * @return A Double
+     */
     public Double getWesternmostLat(){
         return mainDataBase.getMinValue("Locations",locatTags[6]);
     }
+    /**
+     * Query to the {@link hydroScalingAPI.util.database.DataBaseEngine} for the
+     * easternmost longitude of the locations in the CUENCAS database
+     * @return A Double
+     */
     public Double getEasternmostLat(){
         return mainDataBase.getMaxValue("Locations",locatTags[6]);
     }
     
+    /**
+     * Updates the status of a Thread.  Notice that each Location file is read by an
+     * independent Thread.
+     * @param threadName The Thread name to be checked
+     * @param status the 
+     */
     public void threadReport(String threadName,String status){
         threadsRegistry.put(threadName,status);
     }
     
+    /**
+     * Indcates if the LocationsManager has completed loading infomation
+     * @return A boolean indicating the status of the data load process
+     */
     public boolean isLoaded(){
         
         if ((threadsRegistry.size() != 0) && !threadsRegistry.containsValue("working")){
@@ -174,6 +264,7 @@ public class LocationsManager {
     }
     
     /**
+     * Test for the class
      * @param args the command line arguments
      */
     public static void main(String[] args) {

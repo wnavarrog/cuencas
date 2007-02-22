@@ -27,14 +27,17 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.mainGUI.widgets;
 
 /**
- *
+ * Creates a Frame that displays the CUENCAS splash screen
  * @author Ricardo Mantilla
  */
 public class Splash extends javax.swing.JFrame {
     
     visad.java3d.DisplayImplJ3D display;
     
-    /** Creates new form spalsh */
+    /**
+     * Creates new form spalsh
+     * @param logoDB A *.jpg file with the Logo associated to the database to be loaded
+     */
     public Splash(java.io.File logoDB) {
         initComponents();
         if (logoDB != null)
@@ -100,6 +103,9 @@ public class Splash extends javax.swing.JFrame {
             
     }
         
+    /**
+     * Changes the projection properties of the 3D DEM shown in the splash screen
+     */
     public void animate(){
         
         visad.java3d.ProjectionControlJ3D pc =     
@@ -191,6 +197,7 @@ public class Splash extends javax.swing.JFrame {
     }//GEN-LAST:event_exitForm
     
     /**
+     * Test of the class
      * @param args the command line arguments
      */
     public static void main(String args[]) {

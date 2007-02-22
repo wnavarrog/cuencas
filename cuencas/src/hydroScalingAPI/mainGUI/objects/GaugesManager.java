@@ -27,7 +27,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.mainGUI.objects;
 
 /**
- *
+ * This class manages all the information related to Gauges in the database.  It
+ * runs independent threads that read the information from the Gauge-type files
  * @author Ricardo Mantilla
  */
 public class GaugesManager {
@@ -69,7 +70,13 @@ public class GaugesManager {
                                         "object",
                                         "object"};
     
-    /** Creates a new instance of GaugesManager */
+    /**
+     * Creates a new instance of GaugesManager
+     * @param infoManager The {@link hydroScalingAPI.mainGUI.objects.GUI_InfoManager} to which the
+     * GaugesManager is associated
+     * @param dataBase The {@link hydroScalingAPI.util.database.DataBaseEngine} that stores and manages
+     * the data
+     */
     public GaugesManager(hydroScalingAPI.mainGUI.objects.GUI_InfoManager infoManager,hydroScalingAPI.util.database.DataBaseEngine dataBase) {
         informationManager=infoManager;
         mainDataBase=dataBase;
@@ -78,11 +85,23 @@ public class GaugesManager {
         loaderDigerThread.start();
     }
     
+    /**
+     * Pushes data into the {@link hydroScalingAPI.util.database.DataBaseEngine}
+     * @param thisRegister The register to be added to the database
+     */
     public void addData(Object[] thisRegister){
         String registerIndex=(String)thisRegister[0]+"."+(String)thisRegister[2];
         mainDataBase.addData("Gauges",registerIndex,thisRegister);
     }
     
+    /**
+     * Retereives a particual Gauge from the {@link
+     * hydroScalingAPI.util.database.DataBaseEngine}. Note that the code and the type
+     * uniquely characterize a Gauge.
+     * @param code The code of the gauge to retreive
+     * @param type The type of the gauge to retreive
+     * @return A {@link hydroScalingAPI.io.MetaGauge}
+     */
     public hydroScalingAPI.io.MetaGauge getGauge(String code, String type) {
         hydroScalingAPI.util.database.DB_Register matchedValue = mainDataBase.getRegisterByMainIndex("Gauges",code+"."+type);
         
@@ -95,6 +114,13 @@ public class GaugesManager {
         
     }
     
+    /**
+     * Retereives a group of gauges from the {@link
+     * hydroScalingAPI.util.database.DataBaseEngine}. Note that the several types
+     * of Gauge can be associated to a given code.
+     * @param code The code of the gauges to retreive
+     * @return A array of {@link hydroScalingAPI.io.MetaGauge}s
+     */
     public hydroScalingAPI.io.MetaGauge[] getGauge(String code) {
         java.util.Vector gaugesResultVector=new java.util.Vector();
         java.util.Vector localTypes=getTypes();
@@ -110,6 +136,15 @@ public class GaugesManager {
         return gaugesResult;
     }
     
+    /**
+     * Query to the {@link hydroScalingAPI.util.database.DataBaseEngine} for Gauges
+     * that meet a specified group of conditions
+     * @param categories The categories to use in the search
+     * @param values The value assiciated to the category
+     * @param conditions The condition to match (e.g. equal to, greater than, smaller than, etc)
+     * @return The group of {@link hydroScalingAPI.util.database.DB_Register} that match the
+     * query
+     */
     public hydroScalingAPI.io.MetaGauge[] findGauges(java.util.Vector categories,java.util.Vector values,java.util.Vector conditions) {
         String[] cats=new String[categories.size()];
         Object[] vals=new Object[values.size()];
@@ -133,47 +168,107 @@ public class GaugesManager {
         
     }
     
+    /**
+     * Query to the {@link hydroScalingAPI.util.database.DataBaseEngine} for unique
+     * Gauge codes
+     * @return A {@link java.util.Vector} listing unique codes
+     */
     public java.util.Vector getCodes(){
         return mainDataBase.getUniqueValues("Gauges",gaugeTags[0]);
     }
     
+    /**
+     * Query to the {@link hydroScalingAPI.util.database.DataBaseEngine} for unique
+     * Gauge agencies
+     * @return A {@link java.util.Vector} listing unique agencies
+     */
     public java.util.Vector getAgencies(){
         return mainDataBase.getUniqueValues("Gauges",gaugeTags[1]);
     }
     
+    /**
+     * Query to the {@link hydroScalingAPI.util.database.DataBaseEngine} for unique
+     * Gauge Types
+     * @return A {@link java.util.Vector} listing unique types
+     */
     public java.util.Vector getTypes(){
         return mainDataBase.getUniqueValues("Gauges",gaugeTags[2]);
     }
     
+    /**
+     * Query to the {@link hydroScalingAPI.util.database.DataBaseEngine} for unique
+     * Gauge associated streams
+     * @return A {@link java.util.Vector} listing unique streams
+     */
     public java.util.Vector getStreams(){
         return mainDataBase.getUniqueValues("Gauges",gaugeTags[4]);
     }
     
+    /**
+     * Query to the {@link hydroScalingAPI.util.database.DataBaseEngine} for unique
+     * Gauge county
+     * @return A {@link java.util.Vector} listing unique counties
+     */
     public java.util.Vector getCounties(){
         return mainDataBase.getUniqueValues("Gauges",gaugeTags[5]);
     }
     
+    /**
+     * Query to the {@link hydroScalingAPI.util.database.DataBaseEngine} for unique
+     * Gauge state
+     * @return A {@link java.util.Vector} listing unique states
+     */
     public java.util.Vector getStates(){
         return mainDataBase.getUniqueValues("Gauges",gaugeTags[6]);
     }
     
+    /**
+     * Query to the {@link hydroScalingAPI.util.database.DataBaseEngine} for the
+     * southernmost latitude of the gauges in the CUENCAS database
+     * @return A Double
+     */
     public Double getSouthernmostLat(){
         return mainDataBase.getMinValue("Gauges",gaugeTags[8]);
     }
+    /**
+     * Query to the {@link hydroScalingAPI.util.database.DataBaseEngine} for the
+     * northernmost latitude of the gauges in the CUENCAS database
+     * @return A Double
+     */
     public Double getNorthernmostLat(){
         return mainDataBase.getMaxValue("Gauges",gaugeTags[8]);
     }
+    /**
+     * Query to the {@link hydroScalingAPI.util.database.DataBaseEngine} for the
+     * westernmost longitude of the gauges in the CUENCAS database
+     * @return A Double
+     */
     public Double getWesternmostLat(){
         return mainDataBase.getMinValue("Gauges",gaugeTags[9]);
     }
+    /**
+     * Query to the {@link hydroScalingAPI.util.database.DataBaseEngine} for the
+     * easternmost longitude of the gauges in the CUENCAS database
+     * @return A Double
+     */
     public Double getEasternmostLat(){
         return mainDataBase.getMaxValue("Gauges",gaugeTags[9]);
     }
     
+    /**
+     * Updates the status of a Thread.  Notice that each Gauge file is read by an
+     * independent Thread.
+     * @param threadName The Thread name to be checked
+     * @param status the 
+     */
     public void threadReport(String threadName,String status){
         threadsRegistry.put(threadName,status);
     }
     
+    /**
+     * Indcates if the GaugesManager has completed loading infomation
+     * @return A boolean indicating the status of the data load process
+     */
     public boolean isLoaded(){
         
         if ((threadsRegistry.size() != 0) && !threadsRegistry.containsValue("working")){
@@ -185,6 +280,7 @@ public class GaugesManager {
     }
     
     /**
+     * Test for the class
      * @param args the command line arguments
      */
     public static void main(String[] args) {
@@ -267,7 +363,7 @@ class GaugeDataLoader extends Thread {
         }catch(java.io.IOException IOE){
             threadManager.threadReport(fileToLoad.getName(),"failed");
             System.err.println("Failed trying to load File "+fileToLoad);
-            System.err.println(IOE);
+            IOE.printStackTrace();
         }
         
         return;

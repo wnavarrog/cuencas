@@ -99,7 +99,7 @@ public class Rainfall_Runoff_Model extends javax.swing.JDialog implements Displa
         blue=   mainFrame.getInfoManager().getNetworkBlue();
         
         //Set up general interface
-        setBounds(0,0, 780, 500);
+        setBounds(0,0, 950, 700);
         java.awt.Rectangle marcoParent=mainFrame.getBounds();
         java.awt.Rectangle thisMarco=this.getBounds();
         setBounds(marcoParent.x+marcoParent.width/2-thisMarco.width/2,marcoParent.y+marcoParent.height/2-thisMarco.height/2,thisMarco.width,thisMarco.height);
@@ -248,6 +248,8 @@ public class Rainfall_Runoff_Model extends javax.swing.JDialog implements Displa
         hydroScalingAPI.subGUIs.widgets.RasterPalettesManager myLabeledColorWidget=new hydroScalingAPI.subGUIs.widgets.RasterPalettesManager(varMapDEM);
         jPanel7.add(myLabeledColorWidget);
         
+        addWheelFunctionality(displayDEM);
+        
         //Set up interface for Hill-Slope System
         
         displayMap = new DisplayImplJ3D("displayMap",new visad.java3d.TwoDDisplayRendererJ3D());
@@ -267,7 +269,7 @@ public class Rainfall_Runoff_Model extends javax.swing.JDialog implements Displa
         latMap.setRange(metaDatos.getMinLat()+(myCuenca.getMinY()-1)*metaDatos.getResLat()/3600.0,metaDatos.getMinLat()+(myCuenca.getMaxY()+2)*metaDatos.getResLat()/3600.0);
         
         
-        maxColor=linksStructure.contactsArray.length+1;
+        maxColor=2*linksStructure.contactsArray.length+1;
         float[][] estaTabla=new float[3][maxColor];
         
         for (int i=1;i<estaTabla[0].length;i++){
@@ -290,6 +292,8 @@ public class Rainfall_Runoff_Model extends javax.swing.JDialog implements Displa
         
         
         plotNetwork(displayMap);
+        
+        addWheelFunctionality(displayMap);
         
         //Set up interface for Channel Network
         
@@ -315,6 +319,8 @@ public class Rainfall_Runoff_Model extends javax.swing.JDialog implements Displa
         
         plotNetwork(displayNet);
         
+        addWheelFunctionality(displayNet);
+        
         //Set up interface for Storm Analysis
         
         displayStorm = new DisplayImplJ3D("displayStorm",new visad.java3d.TwoDDisplayRendererJ3D());
@@ -337,6 +343,8 @@ public class Rainfall_Runoff_Model extends javax.swing.JDialog implements Displa
         
         ProjectionControl pcStorm = displayStorm.getProjectionControl();
         pcStorm.setAspectCartesian(new double[] {1.0, (double) (matrizPintada.length/(double) matrizPintada[0].length)});
+        
+        addWheelFunctionality(displayStorm);
         
         displayPlot= new DisplayImplJ3D("displayPlot",new visad.java3d.TwoDDisplayRendererJ3D());
         
@@ -362,11 +370,43 @@ public class Rainfall_Runoff_Model extends javax.swing.JDialog implements Displa
         
         jSplitPane1.setDividerLocation(380);
         
+        
+        
         //Add an Initial display
         
         jPanel2.add("Center",displayDEM.getComponent());
         firstTouchTab[0]=true;
         
+    }
+    
+    private void addWheelFunctionality(final visad.java3d.DisplayImplJ3D display){
+        final visad.java3d.DisplayRendererJ3D dr=(visad.java3d.DisplayRendererJ3D)display.getDisplayRenderer();
+        display.getComponent().addMouseWheelListener(new java.awt.event.MouseWheelListener() {
+                public void mouseWheelMoved(java.awt.event.MouseWheelEvent e) {
+                    int rot = e.getWheelRotation();
+                    try{
+                        visad.ProjectionControl pc = display.getProjectionControl();
+                        double[] scaleMatrix = dr.getMouseBehavior().make_matrix(0.0, 0.0, 0.0,
+                                1.0, 1.0, 1.0,
+                                0.0, 0.0, 0.0);
+                        double[] currentMatrix = pc.getMatrix();
+                        // Zoom in
+                        if (rot < 0){
+                            scaleMatrix = dr.getMouseBehavior().make_matrix(0.0, 0.0, 0.0,
+                                                                            1.1, 1.1, 1.1,
+                                                                            0.0, 0.0, 0.0);
+                        }
+                        // Zoom out
+                        if (rot > 0){
+                            scaleMatrix = dr.getMouseBehavior().make_matrix(0.0, 0.0, 0.0,
+                                                                            0.9, 0.9, 0.9,
+                                                                            0.0, 0.0, 0.0);
+                        }
+                        scaleMatrix = dr.getMouseBehavior().multiply_matrix(scaleMatrix,currentMatrix);
+                        pc.setMatrix(scaleMatrix);
+                    } catch (java.rmi.RemoteException re) {} catch (visad.VisADException ve) {}
+                }
+            });
     }
     
     private void plotNetwork(DisplayImpl display) throws java.io.IOException, TypeException, VisADException{

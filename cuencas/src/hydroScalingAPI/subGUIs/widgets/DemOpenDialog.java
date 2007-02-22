@@ -41,7 +41,7 @@ public class DemOpenDialog extends javax.swing.JDialog {
     private hydroScalingAPI.io.MetaRaster[] listOfMetaRasters;
     private java.util.Vector elemDeriv;
     
-    public String[] units={ "",
+    private String[] units={ "",
                             "",
                             "*",
                             "km^2",
@@ -73,7 +73,7 @@ public class DemOpenDialog extends javax.swing.JDialog {
                                   ".dtopo",
                                   ".redRas"};
                                   
-    public String[] derivedName={     " Digital Elevation Model",
+    private String[] derivedName={     " Digital Elevation Model",
                                       " Fixed Elevation Model",
                                       " Drainage Directions",
                                       " Accumulated Area",
@@ -88,7 +88,7 @@ public class DemOpenDialog extends javax.swing.JDialog {
                                       " Gradient Value",
                                       " Topologic Diameter",
                                       " Raster Drainage Network"};
-    public String[] extraInfo={   "",
+    private String[] extraInfo={   "",
                                   " Fixed Digital Elevation Model - ",
                                   " Drainage Directions - ",
                                   " Accumulated Area - ",
@@ -152,6 +152,10 @@ public class DemOpenDialog extends javax.swing.JDialog {
 
         listDEM_subproducts.setListData(elemDeriv);
         listDEM_subproducts.setSelectedIndex(0);
+    }
+    
+    public boolean is3D(){
+        return option3D.isSelected();
     }
     
     public boolean mapsSelected(){

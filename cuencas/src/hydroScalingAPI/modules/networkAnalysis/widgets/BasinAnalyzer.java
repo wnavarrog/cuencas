@@ -32,8 +32,8 @@ import java.rmi.RemoteException;
 import java.awt.Font;
 
 /**
- *
- * @author  Ricardo Mantilla
+ * Creates the Network Analysis Module
+ * @author Ricardo Mantilla
  */
 public class BasinAnalyzer extends javax.swing.JDialog{
     
@@ -44,10 +44,11 @@ public class BasinAnalyzer extends javax.swing.JDialog{
     private hydroScalingAPI.mainGUI.ParentGUI mainFrame;
     
     private hydroScalingAPI.util.geomorphology.objects.Basin myCuenca;
+    
     public hydroScalingAPI.io.MetaRaster metaDatos;
     public byte[][] matDir;
     private byte[][] netMask;
-    public hydroScalingAPI.util.geomorphology.objects.HortonAnalysis myBasinResults;
+    public hydroScalingAPI.util.geomorphology.objects.HortonAnalysis myHortonStructure;
     public hydroScalingAPI.util.geomorphology.objects.LinksAnalysis myLinksStructure;
     public hydroScalingAPI.modules.networkAnalysis.objects.RSNAnalysis myRSNAnalysis;
     
@@ -183,7 +184,17 @@ public class BasinAnalyzer extends javax.swing.JDialog{
     private float minXVarValue,maxXVarValue,minYVarValue,maxYVarValue;
     private float minXVarValueCurrent,maxXVarValueCurrent,minYVarValueCurrent,maxYVarValueCurrent;
     
-    /** Creates new form basinAnalyzer */
+    /**
+     * Creates new form basinAnalyzer
+     * @param parent The master GUI that launches the Module
+     * @param x The x location of the basin outlet
+     * @param y The x location of the basin outlet
+     * @param direcc The direction Matrix associated with this basin
+     * @param md The meta information
+     * @throws java.rmi.RemoteException Captures remote exceptions
+     * @throws visad.VisADException Captures VisAD Exeptions
+     * @throws java.io.IOException Captures I/O Execptions
+     */
     public BasinAnalyzer(hydroScalingAPI.mainGUI.ParentGUI parent, int x, int y, byte[][] direcc, hydroScalingAPI.io.MetaRaster md) throws RemoteException, VisADException, java.io.IOException{
         
         //elementos de la interfaz y del modulo
@@ -199,7 +210,7 @@ public class BasinAnalyzer extends javax.swing.JDialog{
         initComponents();
         pack();
         
-        setBounds(0,0, 780, 450);
+        setBounds(0,0, 950, 700);
         java.awt.Rectangle marcoParent=mainFrame.getBounds();
         java.awt.Rectangle thisMarco=this.getBounds();
         setBounds(marcoParent.x+marcoParent.width/2-thisMarco.width/2,marcoParent.y+marcoParent.height/2-thisMarco.height/2,thisMarco.width,thisMarco.height);
@@ -208,43 +219,43 @@ public class BasinAnalyzer extends javax.swing.JDialog{
         
         netMask=myCuenca.getBasinMask();
         
-        myBasinResults=new hydroScalingAPI.util.geomorphology.objects.HortonAnalysis(myCuenca, metaDatos, matDir);
+        myHortonStructure=new hydroScalingAPI.util.geomorphology.objects.HortonAnalysis(myCuenca, metaDatos, matDir);
         
         myLinksStructure=new hydroScalingAPI.util.geomorphology.objects.LinksAnalysis(myCuenca, metaDatos, matDir);
  
 //        SAMPLE CODE FOR CHUCHO
 //        THEN CHECK THE 
 //        for(int i=2;i<3;i++) {
-//            for(int j=0;j<myBasinResults.contactsArray[i].length;j++) {
-//                //System.out.print(myBasinResults.contactsArray[i][j]+" ");
-//                int xxx=(int)(myBasinResults.contactsArray[i][j]%metaDatos.getNumCols());
-//                int yyy=(int)(myBasinResults.contactsArray[i][j]/metaDatos.getNumCols());
+//            for(int j=0;j<myHortonStructure.contactsArray[i].length;j++) {
+//                //System.out.print(myHortonStructure.contactsArray[i][j]+" ");
+//                int xxx=(int)(myHortonStructure.contactsArray[i][j]%metaDatos.getNumCols());
+//                int yyy=(int)(myHortonStructure.contactsArray[i][j]/metaDatos.getNumCols());
 //                hydroScalingAPI.util.geomorphology.objects.Basin theCuenca=new hydroScalingAPI.util.geomorphology.objects.Basin(xxx,yyy,direcc,metaDatos);
 //                System.out.print(theCuenca.getXYBasin()[0].length+" ");
 //            }
-//            System.out.println(myBasinResults.contactsArray[i].length);
+//            System.out.println(myHortonStructure.contactsArray[i].length);
 //        }
 //        System.exit(0);
         
         minRegOrderSlider.setMinimum(1);
-        minRegOrderSlider.setMaximum(myBasinResults.getBasinOrder());
+        minRegOrderSlider.setMaximum(myHortonStructure.getBasinOrder());
         minRegOrderSlider.setValue(1);
         minRegOrderLabel.setText(""+1);
         
         maxRegOrderSlider.setMinimum(1);
-        maxRegOrderSlider.setMaximum(myBasinResults.getBasinOrder());
-        maxRegOrderSlider.setValue(myBasinResults.getBasinOrder());
-        maxRegOrderLabel.setText(""+myBasinResults.getBasinOrder());
+        maxRegOrderSlider.setMaximum(myHortonStructure.getBasinOrder());
+        maxRegOrderSlider.setValue(myHortonStructure.getBasinOrder());
+        maxRegOrderLabel.setText(""+myHortonStructure.getBasinOrder());
         
         minRegOrderHortonianSlider.setMinimum(1);
-        minRegOrderHortonianSlider.setMaximum(myBasinResults.getBasinOrder());
+        minRegOrderHortonianSlider.setMaximum(myHortonStructure.getBasinOrder());
         minRegOrderHortonianSlider.setValue(1);
         minRegOrderHortonianLabel.setText(""+1);
         
         maxRegOrderHortonianSlider.setMinimum(1);
-        maxRegOrderHortonianSlider.setMaximum(myBasinResults.getBasinOrder());
-        maxRegOrderHortonianSlider.setValue(myBasinResults.getBasinOrder());
-        maxRegOrderHortonianLabel.setText(""+myBasinResults.getBasinOrder());
+        maxRegOrderHortonianSlider.setMaximum(myHortonStructure.getBasinOrder());
+        maxRegOrderHortonianSlider.setValue(myHortonStructure.getBasinOrder());
+        maxRegOrderHortonianLabel.setText(""+myHortonStructure.getBasinOrder());
         
         //creo la estructura grafica para los graficos de Horton
         
@@ -285,11 +296,11 @@ public class BasinAnalyzer extends javax.swing.JDialog{
         displayCDF.addMap( posVarArrayMap );
         posVarArrayMap.setScalarName("X");
         
-        jPanel19.setLayout(new java.awt.GridLayout(myBasinResults.getBasinOrder()/6+1, 5));
+        jPanel19.setLayout(new java.awt.GridLayout(myHortonStructure.getBasinOrder()/6+1, 5));
         
-        checkBoxperOrder0=new javax.swing.JCheckBox[myBasinResults.getBasinOrder()];
+        checkBoxperOrder0=new javax.swing.JCheckBox[myHortonStructure.getBasinOrder()];
         
-        for (int i=0;i<myBasinResults.getBasinOrder();i++){
+        for (int i=0;i<myHortonStructure.getBasinOrder();i++){
             
             checkBoxperOrder0[i]= new javax.swing.JCheckBox();
             
@@ -372,8 +383,8 @@ public class BasinAnalyzer extends javax.swing.JDialog{
         latMapRSN.setRange(metaDatos.getMinLat()+(myCuenca.getMinY()-1)*metaDatos.getResLat()/3600.0,metaDatos.getMinLat()+(myCuenca.getMaxY()+2)*metaDatos.getResLat()/3600.0);
         
         rsnScaleSlider.setMinimum(2);
-        rsnScaleSlider.setMaximum(myBasinResults.getBasinOrder());
-        rsnScaleSlider.setValue(myBasinResults.getBasinOrder()-1);
+        rsnScaleSlider.setMaximum(myHortonStructure.getBasinOrder());
+        rsnScaleSlider.setValue(myHortonStructure.getBasinOrder()-1);
         
         pc = displayMap_RSNs.getProjectionControl();
         pc.setAspectCartesian(new double[] {1.0, (double) ((myCuenca.getMaxY()-myCuenca.getMinY()+3)/(double) (myCuenca.getMaxX()-myCuenca.getMinX()+3))});
@@ -382,8 +393,8 @@ public class BasinAnalyzer extends javax.swing.JDialog{
         displayMap_RSNs.addReference(data_ref_RSNTiles);
         
         myRSNAnalysis=new hydroScalingAPI.modules.networkAnalysis.objects.RSNAnalysis(myLinksStructure);
-        plotRSNTiles(myBasinResults.getBasinOrder()-1);
-        plotNetwork(displayMap_RSNs,myBasinResults.getBasinOrder()-1);
+        plotRSNTiles(myHortonStructure.getBasinOrder()-1);
+        plotNetwork(displayMap_RSNs,myHortonStructure.getBasinOrder()-1);
         
         //Inicio los Hilos que cargan datos en la Interfaz
         
@@ -421,13 +432,13 @@ public class BasinAnalyzer extends javax.swing.JDialog{
         display_Hortonian_Dists.addMap( exedProbabMap_Hortonian );
         display_Hortonian_Dists.addMap( posVarArrayMap_Hortonian );
         
-        jPanel42.setLayout(new java.awt.GridLayout(myBasinResults.getBasinOrder()/6+1, 5));
-        jPanel27.setLayout(new java.awt.GridLayout(myBasinResults.getBasinOrder()/6+1, 5));
+        jPanel42.setLayout(new java.awt.GridLayout(myHortonStructure.getBasinOrder()/6+1, 5));
+        jPanel27.setLayout(new java.awt.GridLayout(myHortonStructure.getBasinOrder()/6+1, 5));
         
-        checkBoxperOrder1=new javax.swing.JCheckBox[myBasinResults.getBasinOrder()];
-        checkBoxperOrder2=new javax.swing.JCheckBox[myBasinResults.getBasinOrder()];
+        checkBoxperOrder1=new javax.swing.JCheckBox[myHortonStructure.getBasinOrder()];
+        checkBoxperOrder2=new javax.swing.JCheckBox[myHortonStructure.getBasinOrder()];
         
-        for (int i=0;i<myBasinResults.getBasinOrder();i++){
+        for (int i=0;i<myHortonStructure.getBasinOrder();i++){
             
             checkBoxperOrder1[i]= new javax.swing.JCheckBox();
             
@@ -757,8 +768,8 @@ public class BasinAnalyzer extends javax.swing.JDialog{
         
         //Mode Horton
         if(mode == 1){
-            data_refHDd=new DataReferenceImpl[myBasinResults.getBasinOrder()];
-            for(int j=0;j<myBasinResults.getBasinOrder();j++){
+            data_refHDd=new DataReferenceImpl[myHortonStructure.getBasinOrder()];
+            for(int j=0;j<myHortonStructure.getBasinOrder();j++){
                 float[] linkAccumL=totalGeomLengthDist[j];
                 float[] linkAccumA=areasDist[j];
 
@@ -786,9 +797,9 @@ public class BasinAnalyzer extends javax.swing.JDialog{
                 displayDD.addReference( data_refHDd[j], pointsCMap);
             }
             
-            float ddMeasuredValue=totalGeomLengthDist[myBasinResults.getBasinOrder()-1][0]/areasDist[myBasinResults.getBasinOrder()-1][0];
+            float ddMeasuredValue=totalGeomLengthDist[myHortonStructure.getBasinOrder()-1][0]/areasDist[myHortonStructure.getBasinOrder()-1][0];
             
-            Linear1DSet extremeAreaValues=new Linear1DSet(logAreaValue,-3,Math.log(areasDist[myBasinResults.getBasinOrder()-1][0]),2);
+            Linear1DSet extremeAreaValues=new Linear1DSet(logAreaValue,-3,Math.log(areasDist[myHortonStructure.getBasinOrder()-1][0]),2);
             
             double[][] ddFinalValue=new double[][] {{ddMeasuredValue,ddMeasuredValue}};
             
@@ -810,10 +821,10 @@ public class BasinAnalyzer extends javax.swing.JDialog{
         ratioLabel.setText("Ratio = "+Math.round(Math.exp(Math.abs(ratios[0]))*1000)/1000.);
         rSquareLabel.setText("R^2 = "+Math.round(ratios[2]*1000)/1000.);
         
-        Linear1DSet orders = new Linear1DSet(streamOrder,1, myBasinResults.getBasinOrder(),2);
+        Linear1DSet orders = new Linear1DSet(streamOrder,1, myHortonStructure.getBasinOrder(),2);
         
         float[][] linePoints=new float[1][2]; linePoints[0][0]=(float) ratios[0]*1+ratios[1];
-        linePoints[0][1]=(float) ratios[0]*myBasinResults.getBasinOrder()+ratios[1];
+        linePoints[0][1]=(float) ratios[0]*myHortonStructure.getBasinOrder()+ratios[1];
         
         FlatField vals_ff_LF = new FlatField( func_order_hortonVar, orders);
         vals_ff_LF.setSamples( linePoints );
@@ -821,7 +832,7 @@ public class BasinAnalyzer extends javax.swing.JDialog{
         DataReferenceImpl refeLineFit=new DataReferenceImpl("lineFit");
         refeLineFit.setData(vals_ff_LF);
         
-        float[][] NLvsOrder=new float[2][myBasinResults.getBasinOrder()];
+        float[][] NLvsOrder=new float[2][myHortonStructure.getBasinOrder()];
         NLvsOrder[1]=VARvsOrder;
         
         for (int i=0;i<NLvsOrder[0].length;i++){
@@ -829,7 +840,7 @@ public class BasinAnalyzer extends javax.swing.JDialog{
             NLvsOrder[1][i]=(float) Math.log(NLvsOrder[1][i]);
         }
         
-        orders = new Linear1DSet(index,1, myBasinResults.getBasinOrder(),myBasinResults.getBasinOrder());
+        orders = new Linear1DSet(index,1, myHortonStructure.getBasinOrder(),myHortonStructure.getBasinOrder());
         
         vals_ff_H = new FlatField( func_index_hortonVar, orders);
         vals_ff_H.setSamples( NLvsOrder );
@@ -842,7 +853,7 @@ public class BasinAnalyzer extends javax.swing.JDialog{
         horFitMap.setRange(NLvsOrder[1][0]-1,NLvsOrder[1][NLvsOrder[1].length-1]+1);
         horFitMap.setScalarName(ytitle);
         
-        orderMap.setRange(0,myBasinResults.getBasinOrder()+1);
+        orderMap.setRange(0,myHortonStructure.getBasinOrder()+1);
         
         
         ConstantMap[] pointsCMap = {    new ConstantMap( 1.0f, Display.Red),
@@ -859,68 +870,68 @@ public class BasinAnalyzer extends javax.swing.JDialog{
     private void updateHortonPlots(){
         try{
             if (jRadioButtonBranching.isSelected()){
-                float[] ratios=myBasinResults.getBranchingRatio(minRegOrderSlider.getValue(),maxRegOrderSlider.getValue(),branchingValues);
+                float[] ratios=myHortonStructure.getBranchingRatio(minRegOrderSlider.getValue(),maxRegOrderSlider.getValue(),branchingValues);
                 plotHortonGraph(ratios,(float[])branchingValues.clone(),"Log(# of Streams)");
             }
             
             if (jRadioButtonLengthGeom.isSelected()){
-                float[] ratios=myBasinResults.getLengthRatio(minRegOrderSlider.getValue(),maxRegOrderSlider.getValue(),geomLengthDist);
-                float[] NLvsOrder=myBasinResults.getLengthPerOrder(geomLengthDist);
+                float[] ratios=myHortonStructure.getLengthRatio(minRegOrderSlider.getValue(),maxRegOrderSlider.getValue(),geomLengthDist);
+                float[] NLvsOrder=myHortonStructure.getLengthPerOrder(geomLengthDist);
                 plotHortonGraph(ratios,NLvsOrder,"Log(Geometric Length)");
             }
             if (jRadioButtonLengthTopol.isSelected()){
-                float[] ratios=myBasinResults.getLengthRatio(minRegOrderSlider.getValue(),maxRegOrderSlider.getValue(),topolLengthDist);
-                float[] NLvsOrder=myBasinResults.getLengthPerOrder(topolLengthDist);
+                float[] ratios=myHortonStructure.getLengthRatio(minRegOrderSlider.getValue(),maxRegOrderSlider.getValue(),topolLengthDist);
+                float[] NLvsOrder=myHortonStructure.getLengthPerOrder(topolLengthDist);
                 plotHortonGraph(ratios,NLvsOrder,"Log(Topologic Length)");
             }
             
             if (jRadioButtonArea.isSelected()){
-                float[] ratios=myBasinResults.getQuantityRatio(minRegOrderSlider.getValue(),maxRegOrderSlider.getValue(),areasDist);
-                float[] NLvsOrder=myBasinResults.getQuantityPerOrder(areasDist);
+                float[] ratios=myHortonStructure.getQuantityRatio(minRegOrderSlider.getValue(),maxRegOrderSlider.getValue(),areasDist);
+                float[] NLvsOrder=myHortonStructure.getQuantityPerOrder(areasDist);
                 plotHortonGraph(ratios,NLvsOrder,"Log(Mean Stream Area)");
             }
             if (jRadioButtonMagnitude.isSelected()){
-                float[] ratios=myBasinResults.getQuantityRatio(minRegOrderSlider.getValue(),maxRegOrderSlider.getValue(),magnDist);
-                float[] NLvsOrder=myBasinResults.getQuantityPerOrder(magnDist);
+                float[] ratios=myHortonStructure.getQuantityRatio(minRegOrderSlider.getValue(),maxRegOrderSlider.getValue(),magnDist);
+                float[] NLvsOrder=myHortonStructure.getQuantityPerOrder(magnDist);
                 plotHortonGraph(ratios,NLvsOrder,"Log(Mean Stream Magnitude)");
             }
             if (jRadioButtonMaxLengthGeom.isSelected()){
-                float[] ratios=myBasinResults.getQuantityRatio(minRegOrderSlider.getValue(),maxRegOrderSlider.getValue(),mainGeomLengthDist);
-                float[] NLvsOrder=myBasinResults.getQuantityPerOrder(mainGeomLengthDist);
+                float[] ratios=myHortonStructure.getQuantityRatio(minRegOrderSlider.getValue(),maxRegOrderSlider.getValue(),mainGeomLengthDist);
+                float[] NLvsOrder=myHortonStructure.getQuantityPerOrder(mainGeomLengthDist);
                 plotHortonGraph(ratios,NLvsOrder,"Log(Mean Max Geometric Stream Length)");
             }
             if (jRadioButtonMaxLengthTopol.isSelected()){
-                float[] ratios=myBasinResults.getQuantityRatio(minRegOrderSlider.getValue(),maxRegOrderSlider.getValue(),mainTopolLengthDist);
-                float[] NLvsOrder=myBasinResults.getQuantityPerOrder(mainTopolLengthDist);
+                float[] ratios=myHortonStructure.getQuantityRatio(minRegOrderSlider.getValue(),maxRegOrderSlider.getValue(),mainTopolLengthDist);
+                float[] NLvsOrder=myHortonStructure.getQuantityPerOrder(mainTopolLengthDist);
                 plotHortonGraph(ratios,NLvsOrder,"Log(Mean Max Topologic Stream Length)");
             }
             if (jRadioButtonTotalLengthGeom.isSelected()){
-                float[] ratios=myBasinResults.getQuantityRatio(minRegOrderSlider.getValue(),maxRegOrderSlider.getValue(),totalGeomLengthDist);
-                float[] NLvsOrder=myBasinResults.getQuantityPerOrder(totalGeomLengthDist);
+                float[] ratios=myHortonStructure.getQuantityRatio(minRegOrderSlider.getValue(),maxRegOrderSlider.getValue(),totalGeomLengthDist);
+                float[] NLvsOrder=myHortonStructure.getQuantityPerOrder(totalGeomLengthDist);
                 plotHortonGraph(ratios,NLvsOrder,"Log(Mean Total Geometric Stream Length)");
             }
             
             if (jRadioButtonSlopes.isSelected()){
-                float[] ratios=myBasinResults.getQuantityRatio(minRegOrderSlider.getValue(),maxRegOrderSlider.getValue(),slopesDist);
-                float[] NLvsOrder=myBasinResults.getQuantityPerOrder(slopesDist);
+                float[] ratios=myHortonStructure.getQuantityRatio(minRegOrderSlider.getValue(),maxRegOrderSlider.getValue(),slopesDist);
+                float[] NLvsOrder=myHortonStructure.getQuantityPerOrder(slopesDist);
                 plotHortonGraph(ratios,NLvsOrder,"Log(Stream Slopes)");
             }
             
             if (jRadioButtonTotalDrop.isSelected()){
-                float[] ratios=myBasinResults.getQuantityRatio(minRegOrderSlider.getValue(),maxRegOrderSlider.getValue(),totalDropDist);
-                float[] NLvsOrder=myBasinResults.getQuantityPerOrder(totalDropDist);
+                float[] ratios=myHortonStructure.getQuantityRatio(minRegOrderSlider.getValue(),maxRegOrderSlider.getValue(),totalDropDist);
+                float[] NLvsOrder=myHortonStructure.getQuantityPerOrder(totalDropDist);
                 plotHortonGraph(ratios,NLvsOrder,"Log(Total Channel Drop)");
             }
             
             if (jRadioButtonMaxDrop.isSelected()){
-                float[] ratios=myBasinResults.getQuantityRatio(minRegOrderSlider.getValue(),maxRegOrderSlider.getValue(),maxDropDist);
-                float[] NLvsOrder=myBasinResults.getQuantityPerOrder(maxDropDist);
+                float[] ratios=myHortonStructure.getQuantityRatio(minRegOrderSlider.getValue(),maxRegOrderSlider.getValue(),maxDropDist);
+                float[] NLvsOrder=myHortonStructure.getQuantityPerOrder(maxDropDist);
                 plotHortonGraph(ratios,NLvsOrder,"Log(Maximum Channel Drop)");
             }
             
             if (jRadioButtonStreamDrop.isSelected()){
-                float[] ratios=myBasinResults.getQuantityRatio(minRegOrderSlider.getValue(),maxRegOrderSlider.getValue(),streamDropDist);
-                float[] NLvsOrder=myBasinResults.getQuantityPerOrder(streamDropDist);
+                float[] ratios=myHortonStructure.getQuantityRatio(minRegOrderSlider.getValue(),maxRegOrderSlider.getValue(),streamDropDist);
+                float[] NLvsOrder=myHortonStructure.getQuantityPerOrder(streamDropDist);
                 plotHortonGraph(ratios,NLvsOrder,"Log(Stream Drop)");
             }
 
@@ -1101,7 +1112,7 @@ public class BasinAnalyzer extends javax.swing.JDialog{
         
     }
     
-    public void plotLinksVarHistogram(Float bin) throws RemoteException, VisADException, java.io.IOException{
+    private void plotLinksVarHistogram(Float bin) throws RemoteException, VisADException, java.io.IOException{
         float binsize=0;
 
         if(bin == null) {
@@ -1194,10 +1205,10 @@ public class BasinAnalyzer extends javax.swing.JDialog{
         display_Links.addReference( data_refLi );
         
     }
-    public void rePlotXYvalues(){
+    private void rePlotXYvalues(){
         rePlotXYvalues(false);
     }
-    public void rePlotXYvalues(boolean reset){
+    private void rePlotXYvalues(boolean reset){
         
         try{
             if(reset){
@@ -1235,7 +1246,7 @@ public class BasinAnalyzer extends javax.swing.JDialog{
         }
     }
     
-    public void plotXYvalues() throws RemoteException, VisADException, java.io.IOException{
+    private void plotXYvalues() throws RemoteException, VisADException, java.io.IOException{
         
         try{
             display_Links.removeMap(binsMap);
@@ -1296,6 +1307,11 @@ public class BasinAnalyzer extends javax.swing.JDialog{
             
     }
     
+    /**
+     * Informes the Module if the independent Threads have finished calculating
+     * distributions for a given spatial variable
+     * @param state A boolean indicating is the action has completed
+     */
     public void loadSpatialVariableState(boolean state){
         loadSpatialVariable.setEnabled(state);
     }
@@ -1304,10 +1320,10 @@ public class BasinAnalyzer extends javax.swing.JDialog{
         
         display_Hortonian_Means.removeAllReferences();
         
-        Linear1DSet orders = new Linear1DSet(streamOrder,1, myBasinResults.getBasinOrder(),2);
+        Linear1DSet orders = new Linear1DSet(streamOrder,1, myHortonStructure.getBasinOrder(),2);
         
         float[][] linePoints=new float[1][2]; linePoints[0][0]=(float) ratios[0]*1+ratios[1];
-        linePoints[0][1]=(float) ratios[0]*myBasinResults.getBasinOrder()+ratios[1];
+        linePoints[0][1]=(float) ratios[0]*myHortonStructure.getBasinOrder()+ratios[1];
         
         FlatField vals_ff_LF = new FlatField( func_order_hortonVar, orders);
         vals_ff_LF.setSamples( linePoints );
@@ -1315,7 +1331,7 @@ public class BasinAnalyzer extends javax.swing.JDialog{
         DataReferenceImpl refeLineFit=new DataReferenceImpl("lineFit");
         refeLineFit.setData(vals_ff_LF);
         
-        float[][] NLvsOrder=new float[2][myBasinResults.getBasinOrder()];
+        float[][] NLvsOrder=new float[2][myHortonStructure.getBasinOrder()];
         NLvsOrder[1]=VARvsOrder;
         
         System.out.println("Accumulated Value: "+NLvsOrder[1][NLvsOrder[0].length-1]+" Average Value: "+NLvsOrder[1][NLvsOrder[0].length-1]/(myCuenca.getXYBasin())[0].length);
@@ -1325,7 +1341,7 @@ public class BasinAnalyzer extends javax.swing.JDialog{
             NLvsOrder[1][i]=(float) Math.log(NLvsOrder[1][i]);
         }
         
-        orders = new Linear1DSet(index,1, myBasinResults.getBasinOrder(),myBasinResults.getBasinOrder());
+        orders = new Linear1DSet(index,1, myHortonStructure.getBasinOrder(),myHortonStructure.getBasinOrder());
         
         vals_ff_H = new FlatField( func_index_hortonVar, orders);
         vals_ff_H.setSamples( NLvsOrder );
@@ -1338,7 +1354,7 @@ public class BasinAnalyzer extends javax.swing.JDialog{
         horFitMap_Hortonian.setRange(NLvsOrder[1][0]-1,NLvsOrder[1][NLvsOrder[1].length-1]+1);
         horFitMap_Hortonian.setScalarName(ytitle);
         
-        orderMap_Hortonian.setRange(0,myBasinResults.getBasinOrder()+1);
+        orderMap_Hortonian.setRange(0,myHortonStructure.getBasinOrder()+1);
         
         
         ConstantMap[] pointsCMap = {     new ConstantMap( 1.0f, Display.Red),
@@ -1479,7 +1495,7 @@ public class BasinAnalyzer extends javax.swing.JDialog{
             
                 hydroScalingAPI.io.MetaNetwork localNetwork=new hydroScalingAPI.io.MetaNetwork(metaDatos);
             
-                int basOrder=myBasinResults.getBasinOrder();
+                int basOrder=myHortonStructure.getBasinOrder();
 
                 refeElemVec=new visad.DataReferenceImpl[basOrder];
                 
@@ -1491,7 +1507,7 @@ public class BasinAnalyzer extends javax.swing.JDialog{
                 }
             } 
             
-            int basOrder=myBasinResults.getBasinOrder();
+            int basOrder=myHortonStructure.getBasinOrder();
             for(int orderRequested=1;orderRequested<=basOrder;orderRequested++){
                 try{
                     display.removeReference(refeElemVec[orderRequested-1]);
@@ -2893,8 +2909,8 @@ public class BasinAnalyzer extends javax.swing.JDialog{
           
           getSpatialVarDist(valores);
           
-          float[] ratios=myBasinResults.getQuantityRatio(minRegOrderSlider.getValue(),maxRegOrderSlider.getValue(),spatialVarDist);
-          float[] NLvsOrder=myBasinResults.getLengthPerOrder(spatialVarDist);
+          float[] ratios=myHortonStructure.getQuantityRatio(minRegOrderSlider.getValue(),maxRegOrderSlider.getValue(),spatialVarDist);
+          float[] NLvsOrder=myHortonStructure.getLengthPerOrder(spatialVarDist);
           plotHortonDistributionHortonian(spatialVarDist);
           plotHortonGraphHortonian(ratios,NLvsOrder,"Log(Spatial Variable)");
           
@@ -2953,7 +2969,7 @@ public class BasinAnalyzer extends javax.swing.JDialog{
               if (!firstTouchTab[2]){
                   HortonDistributionSplitPanel.setDividerLocation(0.65);
                   try{
-                      float[][] varDistrib=myBasinResults.getLengthDistributionPerOrder(0);
+                      float[][] varDistrib=myHortonStructure.getLengthDistributionPerOrder(0);
                       plotHortonDistribution(varDistrib);
                   } catch (RemoteException r){
                       System.err.print(r);
@@ -3223,6 +3239,7 @@ public class BasinAnalyzer extends javax.swing.JDialog{
     }//GEN-LAST:event_closeDialog
     
     /**
+     * Tests for the class
      * @param args the command line arguments
      */
     public static void main(String args[]) {
@@ -3406,7 +3423,7 @@ public class BasinAnalyzer extends javax.swing.JDialog{
     private void getSpatialVarDist(FlatField valores){
         
         try{
-            spatialVarDist=new float[myBasinResults.getBasinOrder()][];
+            spatialVarDist=new float[myHortonStructure.getBasinOrder()][];
             
             RealTupleType campo=new RealTupleType(RealType.Longitude,RealType.Latitude);
             
@@ -3415,11 +3432,11 @@ public class BasinAnalyzer extends javax.swing.JDialog{
             
             numCols=metaDatos.getNumCols();
             
-            for(int i=0;i<myBasinResults.headsArray.length;i++){
-                spatialVarDist[i]=new float[myBasinResults.headsArray[i].length];
-                for(int j=0;j<myBasinResults.headsArray[i].length;j++){
-                    MatX=myBasinResults.contactsArray[i][j]%numCols;
-                    MatY=myBasinResults.contactsArray[i][j]/numCols;
+            for(int i=0;i<myHortonStructure.headsArray.length;i++){
+                spatialVarDist[i]=new float[myHortonStructure.headsArray[i].length];
+                for(int j=0;j<myHortonStructure.headsArray[i].length;j++){
+                    MatX=myHortonStructure.contactsArray[i][j]%numCols;
+                    MatY=myHortonStructure.contactsArray[i][j]/numCols;
                     
                     misCoordenadas=new hydroScalingAPI.util.geomorphology.objects.Basin(MatX,MatY,matDir,metaDatos).getLonLatBasin();
                     for(int k=0;k<misCoordenadas[0].length;k++) {
@@ -3435,6 +3452,11 @@ public class BasinAnalyzer extends javax.swing.JDialog{
         
     }
     
+    /**
+     * Allows external Threads to inform the Module if the Horton analysis for a given
+     * variable has been completed
+     * @param i The radioButton to activate
+     */
     public void enableRadioButton(int i){
         switch(i){
             case 0:
@@ -3560,20 +3582,20 @@ class ExtractSubBasins extends Thread{
         
         try{
             
-            parentAnalyzer.data_refSubBasins=new DataReferenceImpl[parentAnalyzer.myBasinResults.headsArray.length];
+            parentAnalyzer.data_refSubBasins=new DataReferenceImpl[parentAnalyzer.myHortonStructure.headsArray.length];
             
             RealTupleType campo=new RealTupleType(RealType.Longitude,RealType.Latitude);
             
             int numCols=parentAnalyzer.metaDatos.getNumCols();
             
-            for (int i=0;i<parentAnalyzer.myBasinResults.headsArray.length;i++){
+            for (int i=0;i<parentAnalyzer.myHortonStructure.headsArray.length;i++){
                 
-                Gridded2DSet[] thisOrderSubBasins=new Gridded2DSet[parentAnalyzer.myBasinResults.headsArray[i].length];
+                Gridded2DSet[] thisOrderSubBasins=new Gridded2DSet[parentAnalyzer.myHortonStructure.headsArray[i].length];
                 
-                for (int j=0;j<parentAnalyzer.myBasinResults.headsArray[i].length;j++){
+                for (int j=0;j<parentAnalyzer.myHortonStructure.headsArray[i].length;j++){
                     
-                    int MatX=parentAnalyzer.myBasinResults.contactsArray[i][j]%numCols;
-                    int MatY=parentAnalyzer.myBasinResults.contactsArray[i][j]/numCols;
+                    int MatX=parentAnalyzer.myHortonStructure.contactsArray[i][j]%numCols;
+                    int MatY=parentAnalyzer.myHortonStructure.contactsArray[i][j]/numCols;
                     
                     thisOrderSubBasins[j]=new hydroScalingAPI.util.geomorphology.objects.Basin(MatX,MatY,parentAnalyzer.matDir,parentAnalyzer.metaDatos).getBasinDivide();
                 }
@@ -3610,39 +3632,39 @@ class CaptureDistributions extends Thread{
         try{
             //leer distribucion, actualizar la varible del basinAnalizer y activar el boton
             
-            parentAnalyzer.branchingValues=parentAnalyzer.myBasinResults.getBranchingPerOrder();
+            parentAnalyzer.branchingValues=parentAnalyzer.myHortonStructure.getBranchingPerOrder();
             parentAnalyzer.enableRadioButton(0);
             
-            parentAnalyzer.areasDist=parentAnalyzer.myBasinResults.getQuantityDistributionPerOrder(0);
+            parentAnalyzer.areasDist=parentAnalyzer.myHortonStructure.getQuantityDistributionPerOrder(0);
             parentAnalyzer.enableRadioButton(3);
             
-            parentAnalyzer.magnDist=parentAnalyzer.myBasinResults.getQuantityDistributionPerOrder(1);
+            parentAnalyzer.magnDist=parentAnalyzer.myHortonStructure.getQuantityDistributionPerOrder(1);
             parentAnalyzer.enableRadioButton(4);
             
-            parentAnalyzer.mainGeomLengthDist=parentAnalyzer.myBasinResults.getQuantityDistributionPerOrder(2);
+            parentAnalyzer.mainGeomLengthDist=parentAnalyzer.myHortonStructure.getQuantityDistributionPerOrder(2);
             parentAnalyzer.enableRadioButton(5);
             
-            parentAnalyzer.mainTopolLengthDist=parentAnalyzer.myBasinResults.getQuantityDistributionPerOrder(3);
+            parentAnalyzer.mainTopolLengthDist=parentAnalyzer.myHortonStructure.getQuantityDistributionPerOrder(3);
             parentAnalyzer.enableRadioButton(6);
             
-            parentAnalyzer.totalGeomLengthDist=parentAnalyzer.myBasinResults.getQuantityDistributionPerOrder(4);
+            parentAnalyzer.totalGeomLengthDist=parentAnalyzer.myHortonStructure.getQuantityDistributionPerOrder(4);
             parentAnalyzer.enableRadioButton(7);
             //Also Enable Dd Analysis
             parentAnalyzer.enableRadioButton(100);
             
-            parentAnalyzer.totalDropDist=parentAnalyzer.myBasinResults.getQuantityDistributionPerOrder(6);
+            parentAnalyzer.totalDropDist=parentAnalyzer.myHortonStructure.getQuantityDistributionPerOrder(6);
             parentAnalyzer.enableRadioButton(9);
             
-            parentAnalyzer.maxDropDist=parentAnalyzer.myBasinResults.getQuantityDistributionPerOrder(7);
+            parentAnalyzer.maxDropDist=parentAnalyzer.myHortonStructure.getQuantityDistributionPerOrder(7);
             parentAnalyzer.enableRadioButton(10);
             
-            parentAnalyzer.streamDropDist=parentAnalyzer.myBasinResults.getQuantityDistributionPerOrder(8);
+            parentAnalyzer.streamDropDist=parentAnalyzer.myHortonStructure.getQuantityDistributionPerOrder(8);
             parentAnalyzer.enableRadioButton(11);
             
-            parentAnalyzer.geomLengthDist=parentAnalyzer.myBasinResults.getLengthDistributionPerOrder(0);
+            parentAnalyzer.geomLengthDist=parentAnalyzer.myHortonStructure.getLengthDistributionPerOrder(0);
             parentAnalyzer.enableRadioButton(1);
             
-            parentAnalyzer.topolLengthDist=parentAnalyzer.myBasinResults.getLengthDistributionPerOrder(1);
+            parentAnalyzer.topolLengthDist=parentAnalyzer.myHortonStructure.getLengthDistributionPerOrder(1);
             parentAnalyzer.enableRadioButton(2);
             
             parentAnalyzer.slopesDist=new float[parentAnalyzer.streamDropDist.length][];
@@ -3677,20 +3699,20 @@ class ExtractTiles extends Thread{
         
         try{
             
-            parentAnalyzer.data_refSubBasins=new DataReferenceImpl[parentAnalyzer.myBasinResults.headsArray.length];
+            parentAnalyzer.data_refSubBasins=new DataReferenceImpl[parentAnalyzer.myHortonStructure.headsArray.length];
             
             RealTupleType campo=new RealTupleType(RealType.Longitude,RealType.Latitude);
             
             int numCols=parentAnalyzer.metaDatos.getNumCols();
             
-            for (int i=0;i<parentAnalyzer.myBasinResults.headsArray.length;i++){
+            for (int i=0;i<parentAnalyzer.myHortonStructure.headsArray.length;i++){
                 
-                Gridded2DSet[] thisOrderSubBasins=new Gridded2DSet[parentAnalyzer.myBasinResults.headsArray[i].length];
+                Gridded2DSet[] thisOrderSubBasins=new Gridded2DSet[parentAnalyzer.myHortonStructure.headsArray[i].length];
                 
-                for (int j=0;j<parentAnalyzer.myBasinResults.headsArray[i].length;j++){
+                for (int j=0;j<parentAnalyzer.myHortonStructure.headsArray[i].length;j++){
                     
-                    int MatX=parentAnalyzer.myBasinResults.contactsArray[i][j]%numCols;
-                    int MatY=parentAnalyzer.myBasinResults.contactsArray[i][j]/numCols;
+                    int MatX=parentAnalyzer.myHortonStructure.contactsArray[i][j]%numCols;
+                    int MatY=parentAnalyzer.myHortonStructure.contactsArray[i][j]/numCols;
                     
                     thisOrderSubBasins[j]=new hydroScalingAPI.util.geomorphology.objects.Basin(MatX,MatY,parentAnalyzer.matDir,parentAnalyzer.metaDatos).getBasinDivide();
                 }
