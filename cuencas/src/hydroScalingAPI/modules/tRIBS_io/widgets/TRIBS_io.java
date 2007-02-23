@@ -432,8 +432,8 @@ public class TRIBS_io extends java.awt.Dialog {
                 if(!neigh){
                     //if(pointLaplacian(xyBasin[0][i],xyBasin[1][i])>-10.1) {
                     //if(pointLaplacian(xyBasin[0][i],xyBasin[1][i])==0) {
-                    //if(pointIncoming(xyBasin[0][i],xyBasin[1][i])>0) {
-                    if(Math.random()*100.0 < Zr){
+                    if(pointIncoming(xyBasin[0][i],xyBasin[1][i])>-1) {
+                    //if(Math.random()*100.0 < Zr){
                         int pToRemove=(int)(pB-numPRemoved);
                         filteredPointsInTriangulation.remove(pToRemove);
                         filteredTypeOfPoint.remove(pToRemove);
@@ -781,13 +781,6 @@ public class TRIBS_io extends java.awt.Dialog {
         typeOfPoint.setElementAt(new int[] {2},lastElemIndex);
         System.out.println(elevationOfPoint.get(lastElemIndex));
         
-        hydroScalingAPI.tools.Stats eastStats=new hydroScalingAPI.tools.Stats(lonLatsDivide[0]);
-        hydroScalingAPI.tools.Stats nortStats=new hydroScalingAPI.tools.Stats(lonLatsDivide[1]);
-        
-        ProjectionControl pc = display_TIN.getProjectionControl();
-        pc.setAspectCartesian(new double[] {1, Math.max((eastStats.maxValue-eastStats.minValue),(nortStats.maxValue-nortStats.minValue))/Math.min((eastStats.maxValue-eastStats.minValue),(nortStats.maxValue-nortStats.minValue))});        
-        
-        
         int numPoints=pointsInTriangulation.size();
         Gdc_Coord_3d[] gdc=new Gdc_Coord_3d[numPoints];
         Utm_Coord_3d[] utm=new Utm_Coord_3d[numPoints];
@@ -809,6 +802,13 @@ public class TRIBS_io extends java.awt.Dialog {
             xyLinkValues[2][i]=(float)((int[])typeOfPoint.get(i))[0];
             pointsInTriangulation.add(utm[i]);
         }
+        
+        hydroScalingAPI.tools.Stats eastStats=new hydroScalingAPI.tools.Stats(xyLinkValues[1]);
+        hydroScalingAPI.tools.Stats nortStats=new hydroScalingAPI.tools.Stats(xyLinkValues[0]);
+        
+        ProjectionControl pc = display_TIN.getProjectionControl();
+        
+        pc.setAspectCartesian(new double[] {1, Math.min((eastStats.maxValue-eastStats.minValue),(nortStats.maxValue-nortStats.minValue))/Math.max((eastStats.maxValue-eastStats.minValue),(nortStats.maxValue-nortStats.minValue))});        
         
         float[][] linkAccumAVal=new float[1][xyLinkValues[1].length];
         for(int i=0;i<xyLinkValues[0].length;i++){
@@ -839,6 +839,10 @@ public class TRIBS_io extends java.awt.Dialog {
                                             new ConstantMap( 1.50f, Display.LineWidth)};
 
         display_TIN.addReference( data_refPoly,linesCMap1 );
+        
+        filteredPointsInTriangulation=(java.util.Vector)pointsInTriangulation.clone();
+        filteredTypeOfPoint=(java.util.Vector)typeOfPoint.clone();
+        filteredElevationOfPoint=(java.util.Vector)elevationOfPoint.clone();
             
         
 //        float[][] samples=new float[2][];
@@ -1001,7 +1005,7 @@ public class TRIBS_io extends java.awt.Dialog {
                 Utm_Coord_3d utmLocal=(Utm_Coord_3d)filteredPointsInTriangulation.get(i);
                 xyLinkValues[0][i]=(float)utmLocal.x;
                 xyLinkValues[1][i]=(float)utmLocal.y;
-                xyLinkValues[2][i]=(float)((int[])filteredTypeOfPoint.get(i))[0];
+                xyLinkValues[2][i]=((Double)filteredElevationOfPoint.get(i)).floatValue();
                 xyLinkValues[3][i]=(float)((int[])filteredTypeOfPoint.get(i))[0];
             }
         
@@ -1134,7 +1138,7 @@ public class TRIBS_io extends java.awt.Dialog {
             
             hydroScalingAPI.mainGUI.ParentGUI tempFrame=new hydroScalingAPI.mainGUI.ParentGUI();
             
-            new TRIBS_io(tempFrame, 61,75,matDirs,magnitudes,metaModif).setVisible(true);
+            new TRIBS_io(tempFrame, 56,79,matDirs,magnitudes,metaModif).setVisible(true);
             //new TRIBS_io(tempFrame, 111,80,matDirs,magnitudes,metaModif).setVisible(true);
         } catch (java.io.IOException IOE){
             System.out.print(IOE);

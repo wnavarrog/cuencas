@@ -1457,7 +1457,11 @@ public abstract class RasterViewer extends javax.swing.JInternalFrame {
                         localField=metaData.getField();
                         float[][] dataValues=localField.getFloats();
                         hydroScalingAPI.tools.Stats statsVar=new hydroScalingAPI.tools.Stats(dataValues[0]);
-                        heightMap.setRange(statsVar.minValue,statsVar.maxValue+2*(statsVar.maxValue-statsVar.minValue));
+                        System.out.println(dataValues[0].length);
+                        System.out.println(statsVar.maxValue);
+                        System.out.println(statsVar.minValue);
+                        
+                        if(heightMap != null) heightMap.setRange(statsVar.minValue,statsVar.maxValue+2*(statsVar.maxValue-statsVar.minValue));
                     } catch (visad.VisADException ve){
                         System.err.println("Failed loading field");
                         System.err.println(ve);

@@ -392,6 +392,8 @@ public class BasinAnalyzer extends javax.swing.JDialog{
         data_ref_RSNTiles = new DataReferenceImpl("data_ref_RSNTiles");
         displayMap_RSNs.addReference(data_ref_RSNTiles);
         
+        addWheelFunctionality(displayMap_RSNs);
+        
         myRSNAnalysis=new hydroScalingAPI.modules.networkAnalysis.objects.RSNAnalysis(myLinksStructure);
         plotRSNTiles(myHortonStructure.getBasinOrder()-1);
         plotNetwork(displayMap_RSNs,myHortonStructure.getBasinOrder()-1);
@@ -590,6 +592,36 @@ public class BasinAnalyzer extends javax.swing.JDialog{
                                            "<strong>TEST9</strong><br>"
                                            );
         
+    }
+    
+    private void addWheelFunctionality(final visad.DisplayImpl display){
+        final visad.DisplayRenderer dr=display.getDisplayRenderer();
+        display.getComponent().addMouseWheelListener(new java.awt.event.MouseWheelListener() {
+                public void mouseWheelMoved(java.awt.event.MouseWheelEvent e) {
+                    int rot = e.getWheelRotation();
+                    try{
+                        visad.ProjectionControl pc = display.getProjectionControl();
+                        double[] scaleMatrix = dr.getMouseBehavior().make_matrix(0.0, 0.0, 0.0,
+                                1.0, 1.0, 1.0,
+                                0.0, 0.0, 0.0);
+                        double[] currentMatrix = pc.getMatrix();
+                        // Zoom in
+                        if (rot < 0){
+                            scaleMatrix = dr.getMouseBehavior().make_matrix(0.0, 0.0, 0.0,
+                                                                            1.1, 1.1, 1.1,
+                                                                            0.0, 0.0, 0.0);
+                        }
+                        // Zoom out
+                        if (rot > 0){
+                            scaleMatrix = dr.getMouseBehavior().make_matrix(0.0, 0.0, 0.0,
+                                                                            0.9, 0.9, 0.9,
+                                                                            0.0, 0.0, 0.0);
+                        }
+                        scaleMatrix = dr.getMouseBehavior().multiply_matrix(scaleMatrix,currentMatrix);
+                        pc.setMatrix(scaleMatrix);
+                    } catch (java.rmi.RemoteException re) {} catch (visad.VisADException ve) {}
+                }
+            });
     }
     
     private void plotWidthFunction(int metric) throws RemoteException, VisADException,java.io.IOException{
@@ -1422,7 +1454,7 @@ public class BasinAnalyzer extends javax.swing.JDialog{
             int[][] matrizPintada=new int[myCuenca.getMaxY()-myCuenca.getMinY()+3][myCuenca.getMaxX()-myCuenca.getMinX()+3];
             int[][] headsTails=myRSNAnalysis.getHeadsAndTails(scale);
             
-            int maxColor=250;
+            int maxColor=5000;
             float[][] estaTabla=new float[3][maxColor];
             
             for (int i=1;i<estaTabla[0].length;i++){

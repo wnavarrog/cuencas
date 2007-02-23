@@ -111,7 +111,7 @@ public class NetworkTools extends javax.swing.JDialog {
         getContentPane().add(BasinDivideToPoly);
 
         TribsInput.setFont(new java.awt.Font("Dialog", 0, 10));
-        TribsInput.setText("tRIBS IO");
+        TribsInput.setText("tRIBS I/O");
         TribsInput.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 TribsInputActionPerformed(evt);
