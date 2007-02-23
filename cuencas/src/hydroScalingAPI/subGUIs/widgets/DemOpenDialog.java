@@ -105,10 +105,10 @@ public class DemOpenDialog extends javax.swing.JDialog {
                                   " Raster Drainage Network - "};
         
     public DemOpenDialog(hydroScalingAPI.mainGUI.ParentGUI parent, hydroScalingAPI.io.MetaRaster md) {
-        this(parent,md,false);
+        this(parent,md,"Open");
     }
     /** Creates new form mdtGeomorCheck */
-    public DemOpenDialog(hydroScalingAPI.mainGUI.ParentGUI parent, hydroScalingAPI.io.MetaRaster md,boolean exporter) {
+    public DemOpenDialog(hydroScalingAPI.mainGUI.ParentGUI parent, hydroScalingAPI.io.MetaRaster md,String actionToDo) {
         super (parent, true);
         initComponents ();
         pack ();
@@ -116,10 +116,11 @@ public class DemOpenDialog extends javax.swing.JDialog {
         myParent=parent;
         metaData=md;
         
-        if(exporter){
-            open.setText("Export");
+        open.setText(actionToDo);
+        if(!actionToDo.equalsIgnoreCase("Open")){
             launch.setEnabled(false);
             jPanel3.removeAll();
+            listDEM_subproducts.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         }
         
         extraInfo[0]=metaData.getProperty("[Information]");

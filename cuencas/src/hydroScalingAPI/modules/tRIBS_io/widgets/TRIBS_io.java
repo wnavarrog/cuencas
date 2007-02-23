@@ -20,7 +20,7 @@ import geotransform.transforms.*;
  *
  * @author  Ricardo Mantilla
  */
-public class TRIBS_io extends java.awt.Dialog {
+public class TRIBS_io extends javax.swing.JDialog {
     
     private RealType    xIndex=RealType.getRealType("xIndex"),
                         xEasting =RealType.getRealType("xEasting"),
@@ -142,7 +142,7 @@ public class TRIBS_io extends java.awt.Dialog {
         });
         
         initializePoints();
-        jPanel1.add("Center",display_TIN.getComponent());
+        jPanel12.add("Center",display_TIN.getComponent());
         
     }
     
@@ -432,7 +432,7 @@ public class TRIBS_io extends java.awt.Dialog {
                 if(!neigh){
                     //if(pointLaplacian(xyBasin[0][i],xyBasin[1][i])>-10.1) {
                     //if(pointLaplacian(xyBasin[0][i],xyBasin[1][i])==0) {
-                    if(pointIncoming(xyBasin[0][i],xyBasin[1][i])>-1) {
+                    if(pointIncoming(xyBasin[0][i],xyBasin[1][i])>0) {
                     //if(Math.random()*100.0 < Zr){
                         int pToRemove=(int)(pB-numPRemoved);
                         filteredPointsInTriangulation.remove(pToRemove);
@@ -873,6 +873,8 @@ public class TRIBS_io extends java.awt.Dialog {
      */
     // <editor-fold defaultstate="collapsed" desc=" Generated Code ">//GEN-BEGIN:initComponents
     private void initComponents() {
+        jTabbedPane1 = new javax.swing.JTabbedPane();
+        jPanel10 = new javax.swing.JPanel();
         panelOpciones = new javax.swing.JTabbedPane();
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
@@ -885,13 +887,23 @@ public class TRIBS_io extends java.awt.Dialog {
         pointsCheckBox = new javax.swing.JCheckBox();
         trianglesCheckBox = new javax.swing.JCheckBox();
         voronoiCheckBox = new javax.swing.JCheckBox();
+        jPanel12 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
+        jPanel6 = new javax.swing.JPanel();
+        jPanel7 = new javax.swing.JPanel();
+        jPanel8 = new javax.swing.JPanel();
+        jPanel9 = new javax.swing.JPanel();
+        jPanel11 = new javax.swing.JPanel();
+        jTabbedPane2 = new javax.swing.JTabbedPane();
 
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 closeDialog(evt);
             }
         });
+
+        jTabbedPane1.setTabLayoutPolicy(javax.swing.JTabbedPane.SCROLL_TAB_LAYOUT);
+        jPanel10.setLayout(new java.awt.BorderLayout());
 
         jPanel1.setLayout(new java.awt.BorderLayout());
 
@@ -980,11 +992,33 @@ public class TRIBS_io extends java.awt.Dialog {
 
         jPanel1.add(jPanel3, java.awt.BorderLayout.NORTH);
 
+        jPanel12.setLayout(new java.awt.BorderLayout());
+
+        jPanel1.add(jPanel12, java.awt.BorderLayout.CENTER);
+
         panelOpciones.addTab("TIN", jPanel1);
 
         panelOpciones.addTab("3D TIN", jPanel4);
 
-        add(panelOpciones, java.awt.BorderLayout.CENTER);
+        panelOpciones.addTab("Land Cover", jPanel6);
+
+        panelOpciones.addTab("Soil Type", jPanel7);
+
+        panelOpciones.addTab("Rainfall", jPanel8);
+
+        panelOpciones.addTab("Input File", jPanel9);
+
+        jPanel10.add(panelOpciones, java.awt.BorderLayout.CENTER);
+
+        jTabbedPane1.addTab("Input Options", jPanel10);
+
+        jPanel11.setLayout(new java.awt.BorderLayout());
+
+        jPanel11.add(jTabbedPane2, java.awt.BorderLayout.CENTER);
+
+        jTabbedPane1.addTab("Output Analysis", jPanel11);
+
+        getContentPane().add(jTabbedPane1, java.awt.BorderLayout.CENTER);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -1158,10 +1192,19 @@ public class TRIBS_io extends java.awt.Dialog {
     private javax.swing.JButton exportTriButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel11;
+    private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
+    private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JTabbedPane jTabbedPane2;
     private javax.swing.JTabbedPane panelOpciones;
     private javax.swing.JCheckBox pointsCheckBox;
     private javax.swing.JCheckBox trianglesCheckBox;

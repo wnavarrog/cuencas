@@ -20,6 +20,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 package hydroScalingAPI.subGUIs.widgets;
 
+import javax.swing.ListSelectionModel;
+
 /**
  *
  * @author Ricardo Mantilla
@@ -39,16 +41,18 @@ public class HydroOpenDialog extends javax.swing.JDialog {
 
     
     public HydroOpenDialog(hydroScalingAPI.mainGUI.ParentGUI parent, hydroScalingAPI.io.MetaRaster md) {
-        this(parent,md,false);
+        this(parent,md,"Open File");
     }
     /** Creates new form varHidrolCheck */
-    public HydroOpenDialog(hydroScalingAPI.mainGUI.ParentGUI parent, hydroScalingAPI.io.MetaRaster md, boolean exporter) {
+    public HydroOpenDialog(hydroScalingAPI.mainGUI.ParentGUI parent, hydroScalingAPI.io.MetaRaster md, String actionToDo) {
         super(parent, true);
         initComponents();
         pack();
         
-        if(exporter){
-            openSingle.setText("Export");
+        openSingle.setText(actionToDo);
+        if(!actionToDo.equalsIgnoreCase("Open File")){
+            jPanel3.removeAll();
+            ChronoFilesList_1.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         }
 
         java.io.File locFile=md.getLocationMeta();

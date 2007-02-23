@@ -26,6 +26,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 package hydroScalingAPI.mainGUI;
 
+import java.io.IOException;
+
 /**
  * This class creates the main Graphical User Iterface to the GIS component of
  * CUENCAS
@@ -406,6 +408,11 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
      */
     // <editor-fold defaultstate="collapsed" desc=" Generated Code ">//GEN-BEGIN:initComponents
     private void initComponents() {
+        mapToolsPopup = new javax.swing.JPopupMenu();
+        jMenuItem2 = new javax.swing.JMenuItem();
+        jMenuItem3 = new javax.swing.JMenuItem();
+        jSeparator5 = new javax.swing.JSeparator();
+        mapEditorItem = new javax.swing.JMenuItem();
         splitPane = new javax.swing.JSplitPane();
         subGUIs_container = new javax.swing.JDesktopPane();
         jPanel2 = new javax.swing.JPanel();
@@ -518,7 +525,6 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         quit = new javax.swing.JMenuItem();
         tools = new javax.swing.JMenu();
         mapCalc = new javax.swing.JMenuItem();
-        mapEditor = new javax.swing.JMenuItem();
         actions = new javax.swing.JMenu();
         options = new javax.swing.JMenu();
         colors = new javax.swing.JMenuItem();
@@ -543,6 +549,26 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         license = new javax.swing.JMenuItem();
         jSeparator11 = new javax.swing.JSeparator();
         about = new javax.swing.JMenuItem();
+
+        jMenuItem2.setFont(new java.awt.Font("Verdana", 0, 10));
+        jMenuItem2.setText("Copy");
+        mapToolsPopup.add(jMenuItem2);
+
+        jMenuItem3.setFont(new java.awt.Font("Verdana", 0, 10));
+        jMenuItem3.setText("Delete");
+        mapToolsPopup.add(jMenuItem3);
+
+        mapToolsPopup.add(jSeparator5);
+
+        mapEditorItem.setFont(new java.awt.Font("Verdana", 0, 10));
+        mapEditorItem.setText("Edit Map");
+        mapEditorItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mapEditorItemActionPerformed(evt);
+            }
+        });
+
+        mapToolsPopup.add(mapEditorItem);
 
         setTitle("Multiscale Hydrology for Ungauged Basins");
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -1187,11 +1213,6 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         mapCalc.setText("Map Calculator");
         tools.add(mapCalc);
 
-        mapEditor.setFont(new java.awt.Font("Verdana", 0, 10));
-        mapEditor.setMnemonic('e');
-        mapEditor.setText("Map Editor");
-        tools.add(mapEditor);
-
         jMenuBar1.add(tools);
 
         actions.setMnemonic('a');
@@ -1314,6 +1335,36 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void mapEditorItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mapEditorItemActionPerformed
+        
+        hydroScalingAPI.modules.mapEditor.widgets.MapEditor thisMapEditor;
+        
+        try {
+            if(localInfoManager.metaFileActive.getName().lastIndexOf("metaDEM") != -1){
+                
+                hydroScalingAPI.subGUIs.widgets.DemOpenDialog openDem=new hydroScalingAPI.subGUIs.widgets.DemOpenDialog(this,new hydroScalingAPI.io.MetaRaster(localInfoManager.metaFileActive),"Edit");
+                openDem.setVisible(true);
+                if (openDem.mapsSelected()){
+                    thisMapEditor=new hydroScalingAPI.modules.mapEditor.widgets.MapEditor(this,openDem.getSelectedMetaRasters()[0]);
+                    thisMapEditor.setVisible(true);
+                }
+            } else {
+                hydroScalingAPI.subGUIs.widgets.HydroOpenDialog openVhc=new hydroScalingAPI.subGUIs.widgets.HydroOpenDialog(this,new hydroScalingAPI.io.MetaRaster(localInfoManager.metaFileActive),"Edit");
+                openVhc.setVisible(true);
+                
+                if (openVhc.mapsSelected()){
+                    thisMapEditor=new hydroScalingAPI.modules.mapEditor.widgets.MapEditor(this,openVhc.getSelectedMetaRasters()[0]);
+                    thisMapEditor.setVisible(true);
+                }
+            }
+            
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } catch (visad.VisADException ex){
+            ex.printStackTrace();
+        }
+    }//GEN-LAST:event_mapEditorItemActionPerformed
+
     private void exportHydroToGRASSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportHydroToGRASSActionPerformed
         javax.swing.JFileChooser fcI=new javax.swing.JFileChooser(localInfoManager.dataBaseRastersHydPath);
         fcI.setFileSelectionMode(fcI.FILES_ONLY);
@@ -1337,7 +1388,7 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         try{
             java.io.File theMetaFile=new java.io.File(fileInput.getPath().substring(0,fileInput.getPath().lastIndexOf("."))+".metaVHC");
             hydroScalingAPI.io.CRasToGrass exporter=new hydroScalingAPI.io.CRasToGrass(theMetaFile,dirOutput);
-            hydroScalingAPI.subGUIs.widgets.HydroOpenDialog openVhc=new hydroScalingAPI.subGUIs.widgets.HydroOpenDialog(this,new hydroScalingAPI.io.MetaRaster(theMetaFile),true);
+            hydroScalingAPI.subGUIs.widgets.HydroOpenDialog openVhc=new hydroScalingAPI.subGUIs.widgets.HydroOpenDialog(this,new hydroScalingAPI.io.MetaRaster(theMetaFile),"Export");
             openVhc.setVisible(true);
             if (openVhc.mapsSelected()){
                 for (int i=0;i<openVhc.getSelectedMetaRasters().length;i++){
@@ -1376,7 +1427,7 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
             String fileName=fileInput.getPath().substring(0,fileInput.getPath().lastIndexOf("."))+".metaDEM";
             java.io.File theMetaFile=new java.io.File(fileName);
             hydroScalingAPI.io.CRasToEsriASCII exporter=new hydroScalingAPI.io.CRasToEsriASCII(theMetaFile,dirOutput);
-            hydroScalingAPI.subGUIs.widgets.DemOpenDialog openDem=new hydroScalingAPI.subGUIs.widgets.DemOpenDialog(this,new hydroScalingAPI.io.MetaRaster(theMetaFile),true);
+            hydroScalingAPI.subGUIs.widgets.DemOpenDialog openDem=new hydroScalingAPI.subGUIs.widgets.DemOpenDialog(this,new hydroScalingAPI.io.MetaRaster(theMetaFile),"Export");
             openDem.setVisible(true);
             if (openDem.mapsSelected()){
                 for (int i=0;i<openDem.getSelectedMetaRasters().length;i++){
@@ -1414,7 +1465,7 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         try{
             java.io.File theMetaFile=new java.io.File(fileInput.getPath().substring(0,fileInput.getPath().lastIndexOf("."))+".metaVHC");
             hydroScalingAPI.io.CRasToEsriASCII exporter=new hydroScalingAPI.io.CRasToEsriASCII(theMetaFile,dirOutput);
-            hydroScalingAPI.subGUIs.widgets.HydroOpenDialog openVhc=new hydroScalingAPI.subGUIs.widgets.HydroOpenDialog(this,new hydroScalingAPI.io.MetaRaster(theMetaFile),true);
+            hydroScalingAPI.subGUIs.widgets.HydroOpenDialog openVhc=new hydroScalingAPI.subGUIs.widgets.HydroOpenDialog(this,new hydroScalingAPI.io.MetaRaster(theMetaFile),"Export");
             openVhc.setVisible(true);
             if (openVhc.mapsSelected()){
                 for (int i=0;i<openVhc.getSelectedMetaRasters().length;i++){
@@ -1534,7 +1585,7 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         
         try{
             hydroScalingAPI.io.CRasToGrass exporter=new hydroScalingAPI.io.CRasToGrass(fileInput,dirOutput);
-            hydroScalingAPI.subGUIs.widgets.DemOpenDialog openDem=new hydroScalingAPI.subGUIs.widgets.DemOpenDialog(this,new hydroScalingAPI.io.MetaRaster(fileInput),true);
+            hydroScalingAPI.subGUIs.widgets.DemOpenDialog openDem=new hydroScalingAPI.subGUIs.widgets.DemOpenDialog(this,new hydroScalingAPI.io.MetaRaster(fileInput),"Export");
             openDem.setVisible(true);
             if (openDem.mapsSelected()){
                 for (int i=0;i<openDem.getSelectedMetaRasters().length;i++){
@@ -1803,14 +1854,24 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
             Object[] directions=selPath.getPath();
             fileToDisplay=localInfoManager.dataBaseRastersHydPath.getPath();
             for(int i=1;i<selPath.getPathCount();i++) fileToDisplay+=("/"+directions[i].toString());
-            
+
             java.io.File selectedFile=new java.io.File(fileToDisplay);
-            
-            if(evt.getClickCount() == 1) {
-                displayMetaFile(selectedFile);
-            } else if(evt.getClickCount() == 2) {
-                openVHC(selectedFile);
+
+            localInfoManager.metaFileActive=selectedFile;
+
+            if(evt.getButton() == 1){
+
+                if(evt.getClickCount() == 1) {
+                    displayMetaFile(selectedFile);
+                } else if(evt.getClickCount() == 2) {
+                    openVHC(selectedFile);
+                }
             }
+
+            if(evt.getButton() == 3){
+                mapToolsPopup.show(evt.getComponent(),evt.getX(),evt.getY());
+            }
+
         }
         
     }//GEN-LAST:event_hydroTreeMouseClicked
@@ -1824,14 +1885,24 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
             Object[] directions=selPath.getPath();
             fileToDisplay=localInfoManager.dataBaseRastersDemPath.getPath();
             for(int i=1;i<selPath.getPathCount();i++) fileToDisplay+=("/"+directions[i].toString());
-            
+
             java.io.File selectedFile=new java.io.File(fileToDisplay);
             
-            if(evt.getClickCount() == 1) {
-                displayMetaFile(selectedFile);
-            } else if(evt.getClickCount() == 2) {
-                openDEM(selectedFile);
+            localInfoManager.metaFileActive=selectedFile;
+
+            if(evt.getButton() == 1){
+
+                if(evt.getClickCount() == 1) {
+                    displayMetaFile(selectedFile);
+                } else if(evt.getClickCount() == 2) {
+                    openDEM(selectedFile);
+                }
             }
+
+            if(evt.getButton() == 3){
+                mapToolsPopup.show(evt.getComponent(),evt.getX(),evt.getY());
+            }
+
         }
         
     }//GEN-LAST:event_topoTreeMouseClicked
@@ -1947,6 +2018,8 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenu jMenuExport;
     private javax.swing.JMenu jMenuImport;
+    private javax.swing.JMenuItem jMenuItem2;
+    private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenu jMenuRecentDB;
     private javax.swing.JMenu jMenuRecentFiles;
     private javax.swing.JPanel jPanel1;
@@ -1975,6 +2048,7 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
     private javax.swing.JSeparator jSeparator4;
+    private javax.swing.JSeparator jSeparator5;
     private javax.swing.JSeparator jSeparator6;
     private javax.swing.JSeparator jSeparator7;
     private javax.swing.JSeparator jSeparator8;
@@ -1989,7 +2063,8 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
     private javax.swing.JPanel locationsPanel;
     private javax.swing.JButton locationsToDisplay;
     private javax.swing.JMenuItem mapCalc;
-    private javax.swing.JMenuItem mapEditor;
+    private javax.swing.JMenuItem mapEditorItem;
+    private javax.swing.JPopupMenu mapToolsPopup;
     private javax.swing.JTextArea metaFileViewer;
     private javax.swing.JMenu modules;
     private javax.swing.JMenuItem networkAnalysis;

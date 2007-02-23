@@ -164,6 +164,12 @@ public class GUI_InfoManager {
     public java.io.File dataBaseLogoPath;
     
     /**
+     * The path to the active metaFile (Used by GUI tools)
+     */
+    public java.io.File metaFileActive;
+    
+    
+    /**
      * The path to the name.txt file in the database
      */
     public String dataBaseName;

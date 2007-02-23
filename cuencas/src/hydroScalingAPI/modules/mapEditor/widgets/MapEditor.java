@@ -145,7 +145,13 @@ public class MapEditor extends javax.swing.JDialog  implements DisplayListener{
 
         getContentPane().setLayout(new java.awt.GridLayout(1, 2));
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
+
         jPanel1.setLayout(new java.awt.BorderLayout());
 
         jPanel4.setLayout(new java.awt.GridLayout(1, 3));
@@ -222,7 +228,6 @@ public class MapEditor extends javax.swing.JDialog  implements DisplayListener{
         dataTable.setAutoCreateColumnsFromModel(false);
         dataTable.setCellSelectionEnabled(true);
         dataTable.setGridColor(new java.awt.Color(0, 0, 0));
-        dataTable.setTableHeader(null);
         dataTable.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
             public void propertyChange(java.beans.PropertyChangeEvent evt) {
                 dataTablePropertyChange(evt);
@@ -273,6 +278,11 @@ public class MapEditor extends javax.swing.JDialog  implements DisplayListener{
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        setVisible(false);
+        dispose();
+    }//GEN-LAST:event_formWindowClosing
 
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
         setVisible(false);
@@ -396,12 +406,6 @@ public class MapEditor extends javax.swing.JDialog  implements DisplayListener{
         }
         
     }
-    
-    /** Closes the dialog */
-    private void closeDialog(java.awt.event.WindowEvent evt) {                             
-        setVisible(false);
-        dispose();
-    } 
     
     /**
      * @param args the command line arguments
