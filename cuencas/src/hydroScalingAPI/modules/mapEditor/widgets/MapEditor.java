@@ -14,7 +14,7 @@ import java.rmi.RemoteException;
 
 /**
  *
- * @author  ricardo
+ * @author  Ricardo Mantilla
  */
 public class MapEditor extends javax.swing.JDialog  implements DisplayListener{
     
@@ -83,7 +83,9 @@ public class MapEditor extends javax.swing.JDialog  implements DisplayListener{
         ref_imaget1.setData(localField);
         display.addReference(ref_imaget1);
         
-        jPanel1.add("Center",display.getComponent());      
+        jPanel1.add("Center",display.getComponent());
+        
+        for(int i=-5;i<6;i++) dataTable.setValueAt("  "+(i>0?"+":"")+i,i+5,0);
         
     }
     
@@ -201,24 +203,24 @@ public class MapEditor extends javax.swing.JDialog  implements DisplayListener{
         dataTable.setFont(new java.awt.Font("Lucida Grande", 0, 8));
         dataTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null, null}
+                {null, null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4", "Title 5", "Title 6", "Title 7", "Title 8", "Title 9", "Title 10", "Title 11"
+                "<>", "-5", "-4", "-3", "-2", "-1", "0", "1", "2", "3", "4", "5"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Float.class, java.lang.Float.class, java.lang.Float.class, java.lang.Float.class, java.lang.Float.class, java.lang.Float.class, java.lang.Float.class, java.lang.Float.class, java.lang.Float.class, java.lang.Float.class, java.lang.Float.class
+                java.lang.Object.class, java.lang.Float.class, java.lang.Float.class, java.lang.Float.class, java.lang.Float.class, java.lang.Float.class, java.lang.Float.class, java.lang.Float.class, java.lang.Float.class, java.lang.Float.class, java.lang.Float.class, java.lang.Float.class
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -330,7 +332,7 @@ public class MapEditor extends javax.swing.JDialog  implements DisplayListener{
         for(int i=MatY-5;i<MatY+6;i++){
             for(int j=MatX-5;j<MatX+6;j++){
                 if(i>=0&&i<matrixData.length && j>=0&&j<matrixData[0].length){
-                    matrixData[i][j]=(Float)dataTable.getValueAt(5-i+MatY,j-MatX+5);
+                    matrixData[i][j]=(Float)dataTable.getValueAt(5-i+MatY,j-MatX+5+1);
                 }
             }
         }
@@ -394,8 +396,8 @@ public class MapEditor extends javax.swing.JDialog  implements DisplayListener{
                 for(int i=MatY-5;i<MatY+6;i++){
                     for(int j=MatX-5;j<MatX+6;j++){
                         if(i>=0&&i<matrixData.length && j>=0&&j<matrixData[0].length){
-                            dataTable.setValueAt(new Float(matrixData[i][j]),5-i+MatY,j-MatX+5);
-                        } else dataTable.setValueAt(new Float(Float.NaN),5-i+MatY,j-MatX+5);
+                            dataTable.setValueAt(new Float(matrixData[i][j]),5-i+MatY,j-MatX+5+1);
+                        } else dataTable.setValueAt(new Float(Float.NaN),5-i+MatY,j-MatX+5+1);
                     }
                 }
                 
