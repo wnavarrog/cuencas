@@ -808,7 +808,7 @@ public class TRIBS_io extends javax.swing.JDialog {
         
         ProjectionControl pc = display_TIN.getProjectionControl();
         
-        pc.setAspectCartesian(new double[] {1, Math.min((eastStats.maxValue-eastStats.minValue),(nortStats.maxValue-nortStats.minValue))/Math.max((eastStats.maxValue-eastStats.minValue),(nortStats.maxValue-nortStats.minValue))});        
+        pc.setAspectCartesian(new double[] {1, (eastStats.maxValue-eastStats.minValue)/(nortStats.maxValue-nortStats.minValue)});        
         
         float[][] linkAccumAVal=new float[1][xyLinkValues[1].length];
         for(int i=0;i<xyLinkValues[0].length;i++){
