@@ -13,8 +13,10 @@ import visad.java3d.DisplayImplJ3D;
 import java.rmi.RemoteException;
 
 /**
- *
- * @author  Ricardo Mantilla
+ * The MapEditor form allows the user to interact with values of a map in the
+ * CUENCAS data base.  The user can overwrite the map with its changes or create a
+ * copy
+ * @author Ricardo Mantilla
  */
 public class MapEditor extends javax.swing.JDialog  implements DisplayListener{
     
@@ -36,7 +38,14 @@ public class MapEditor extends javax.swing.JDialog  implements DisplayListener{
     boolean hasValues;
     
     
-    /** Creates new form MapEditor */
+    /**
+     * Creates new form MapEditor
+     * @param parent The main GIS interface
+     * @param md The MetaRaster asociated with the data to be modified
+     * @throws java.rmi.RemoteException Captures RemoteExpceptions
+     * @throws visad.VisADException Captures VisAD expceptions
+     * @throws java.io.IOException Captures errors while reading/writing information to/from the file
+     */
     public MapEditor(hydroScalingAPI.mainGUI.ParentGUI parent,hydroScalingAPI.io.MetaRaster md)  throws RemoteException, VisADException, java.io.IOException{
         super(parent, true);
         initComponents();
@@ -353,6 +362,13 @@ public class MapEditor extends javax.swing.JDialog  implements DisplayListener{
         valueLabel.setText(valLabel);
     }
     
+    /**
+     * The implementation of the displayChanged method to handle interactions with the
+     * visad.Display
+     * @param DispEvt The interaction event over the visad.Display
+     * @throws visad.VisADException Captures errors while responding the user interaction
+     * @throws java.rmi.RemoteException Captures errors while communicating with VisAD data objects
+     */
     public void displayChanged(visad.DisplayEvent DispEvt) throws visad.VisADException, java.rmi.RemoteException {
         
         int id = DispEvt.getId();
@@ -410,6 +426,7 @@ public class MapEditor extends javax.swing.JDialog  implements DisplayListener{
     }
     
     /**
+     * Tests for the class
      * @param args the command line arguments
      */
     public static void main(String args[]) {

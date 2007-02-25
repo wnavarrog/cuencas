@@ -21,80 +21,279 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.modules.networkExtraction.objects;
 
 /**
- *
+ * This class controls the procedures associated to River Network Extraction from
+ * DEMs.  It comunicates with the GUI and the methods needed to achieve this task
  * @author Jorge Mario Ramirez and Ricardo Mantilla
  */
 public class NetworkExtractionModule implements Runnable {
     
+    /**
+     * The MetaRaster associated with the DEM under analysis
+     */
     public hydroScalingAPI.io.MetaRaster metaDEM;
+    /**
+     * The DEM under analyisis
+     */
     public double[][] DEM;
+    /**
+     * An auxiliary matrix used by the
+     * {@link hydroScalingAPI.modules.networkExtraction.objects.RasterNetworkBlueLines}
+     * module.
+     */
     public double[][] DEMrep;
+    /**
+     * The direction matrix associated to the DEM under analysis
+     */
     public int[][] DIR;
-    public double dy,dxm;
+    /**
+     * The vertical size of the pixel
+     */
+    public double dy;
+    /**
+     * The average horizontal size of the pixel
+     */
+    public double dxm;
+    /**
+     * An array containing the horizontal size of the pixels
+     */
     public double[] dx;
+    /**
+     * The diagonal size of the pixels
+     */
     public double[] dxy;
+    /**
+     * The {@link hydroScalingAPI.modules.networkExtraction.objects.WorkRectangle}
+     * represents the area over which the network extraction algorithm is currently
+     * working
+     */
     public hydroScalingAPI.modules.networkExtraction.objects.WorkRectangle MT;
+    /**
+     * A Vector contining a list of the sinks in the DEM
+     */
     public java.util.Vector Sink_t;
+    /**
+     * The current sink under analysis
+     */
     public int sinkOrder=0;
+    /**
+     * The maximum order of any stream in the DEM
+     */
     public int maxOrder=0;
-    public boolean firstCorrection = true;
+    /**
+     * The GUI used to query the user for tasks to be completed by the
+     * NetworkExtractionModule
+     */
     public hydroScalingAPI.modules.networkExtraction.widgets.ExtractionOptions OpProc;
+    /**
+     * The main GIS interface
+     */
     public hydroScalingAPI.mainGUI.ParentGUI parent;
+    /**
+     * An array containing the upstream area for each pixel in the DEM
+     */
     public float[][] Areas;
+    /**
+     * An array containing the maximum slope for each pixel in the DEM
+     */
     public double[][] MaxPend;
+    /**
+     * An array containing 0s and 1s for each pixel in the DEM.  Each position
+     * determines if there is a channel inside the pixel
+     */
     public byte RedRas[][];
+    /**
+     * An array used by the {@link hydroScalingAPI.modules.networkExtraction.objects.RasterNetworkBlueLines}
+     * to mask the areas where there are blue lines
+     */
     public byte LA[][];
+    /**
+     * A matrix of {@link hydroScalingAPI.modules.networkExtraction.objects.GeomorphCell_1}
+     */
     public GeomorphCell_1 GEO[][];
+    /**
+     * A matrix of {@link
+     * hydroScalingAPI.modules.networkExtraction.objects.GeomorphCell_2}
+     */
     public GeomorphCell_2 GEO2[][];
-    public boolean debug;
+    /**
+     * A boolean indicating if the algorithm fails to converge in an area of the DEM
+     */
     public boolean convergenceAlarmType1;
+    /**
+     * The number of times the algorithm fails to converge
+     */
     public int convergenceAlarmCounter=0;
+    /**
+     * A treshold that indicates a cut in the DEM if the filled number of cells is larger than
+     * cCorte times the number of cells to cut
+     */
+    public float cCorte = 10f;
+    /**
+     * A treshold that indicates a cut in the DEM if more than cAltura meters have to be filled up.
+     */
+    public float cAltura = 20f;
+    /**
+     * A threshold that indicates when the user wants to intervine in the sink
+     * correction algorithm based on the sink size
+     */
+    public float pixManual = Float.POSITIVE_INFINITY;
+    /**
+     * A threshold that indicates when the user wants to intervine in the sink
+     * correction algorithm based on the sink's basin size
+     */
+    public float pixCManual = Float.POSITIVE_INFINITY;
+    /**
+     * The latitude of the location of the sink that the user wants to modify
+     */
+    public float latManual = -100;
+    /**
+     * The longitude of the location of the sink that the user wants to modify
+     */
+    public float lonManual = -100;
+    /**
+     * The area threshold for network pruning
+     */
+    public float pixPodado = 0.01f;
+    /**
+     * The alpha exponent in the Area-Slope based treshold
+     */
+    public float alfa = 0;
+    /**
+     * The C coefficient in the Area-Slope based treshold
+     */
+    public float C = 0;
     
-    //Para las Opciones
-    public float    cCorte = 10f, 
-                    cAltura = 20f,
-                    pixManual=Float.POSITIVE_INFINITY,
-                    pixCManual=Float.POSITIVE_INFINITY,
-                    latManual=-100,
-                    lonManual=-100,
-                    pixPodado=0.01f,
-                    alfa = 0, 
-                    C = 0, 
-                    pixAP = 0;
+    /**
+     * A treshold for calculating the Area-Slope analysis
+     */
+    public float pixAP = 0;
+    /**
+     * A flag that indicates if the sink area threshold is given in km^2 or in number of
+     * pixels
+     */
+    public int unPixM = 0;
+    /**
+     * A flag that indicates if the sink's basin area threshold is given in km^2 or in number of
+     * pixels
+     */
+    public int unPixCM = 0;
+    /**
+     * A flag that indicates if the sink location is given as a latitude or a row
+     * number
+     */
+    public int unFilaM = 1;
+    /**
+     * A flag that indicates if the sink location is given as a longitude or a column
+     * number
+     */
+    public int unColM = 0;
+    /**
+     * The row number of the location of the sink that the user wants to modify
+     */
+    public int filaManual = -100;
+    /**
+     * The column number of the location of the sink that the user wants to modify
+     */
+    public int colManual = -100;
+    /**
+     * The Horton order to use as threshold for pruning based on order
+     */
+    public int ordenMax = Integer.MAX_VALUE;
+    /**
+     * A flag that indicates if the area threshold is given in km^2 or in number of
+     * pixels
+     */
+    public int unPixPod = 0;
+    /**
+     * A flag that indicates if the Area-Slope threshold is given in km^2 or in number of
+     * pixels
+     */
+    public int unPixAP = 0;
+    /**
+     * The number of pixels to use to determine the slope
+     */
+    public int npuntosAP = 6;
     
-    public int  unPixM=0,
-                unPixCM=0,
-                unFilaM=1,
-                unColM=0,
-                filaManual=-100,
-                colManual=-100,
-                ordenMax=Integer.MAX_VALUE,
-                unPixPod=0, 
-                unPixAP=0, 
-                npuntosAP=6, 
-                nCeldasConv=2;
+    /**
+     * The number of cells that need to converge in order to let a river start
+     */
+    public int nCeldasConv=2;
+    /**
+     * A flag that indicates if a ROM-based or RAM-based algorithm must be used to
+     * calculate the geomorphology
+     */
+    public boolean archPro = false;
+    /**
+     * Indicates if a Blue Lines Map is to be used to Guide Network Extraction
+     */
+    public boolean lAzules = false;
+    /**
+     * Indicates if a new Area-Slope analysis is to be created
+     */
+    public boolean areaPend_nuevo = false;
+    /**
+     * Indicates if an existent Area-Slope analysis is to be loaded
+     */
+    public boolean areaPend_cargar = false;
+    /**
+     * Indicates if an Area-Slope analysis is to be created using blue lines
+     */
+    public boolean areaPend_LA = false;
+    /**
+     * Indicates the laplace method is to be used to prune the network
+     */
+    public boolean laplace = true;
+    /**
+     * Indicates if all the points should be considered as network
+     */
+    public boolean todoRed = true;
+    /**
+     * Indicates if an Area-Slope analysis is used as threshold
+     */
+    public boolean umbralAP = false;
+    /**
+     * A boolean stating if the module runs in Debug mode.  It forces the program to
+     * print additional output
+     */
+    public boolean printDebug = true;
+    /**
+     * Indicates if the user wants to perform the Network extraction algorithm
+     * (determines direction matrix)
+     */
+    public boolean  taskDIR=true; 
+    /**
+     * Indicates if the user wants to perform the Network pruning algorithm
+     */
+    public boolean  taskRED=true; 
+    /**
+     * Indicates if the user wants to perform the Geomorphology algorithm
+     */
+    public boolean  taskGEO=true; 
+    /**
+     * Indicates if the user wants to perform the Vectorial network algorithm
+     */
+    public boolean  taskVECT=true;
     
-    public boolean  archPro=false,
-                    lAzules=false, 
-                    areaPend_nuevo=false, 
-                    areaPend_cargar=false, 
-                    areaPend_LA = false,
-                    laplace = true, 
-                    todoRed = true, 
-                    umbralAP = false, 
-                    printDebug = true;
-    
-    public boolean  taskDIR=true, 
-                    taskRED=true, 
-                    taskGEO=true, 
-                    taskVECT=true;
-    
+    /**
+     * The file that contains the blue lines
+     */
     public java.io.File fileLAzules;
     
-    public java.io.OutputStreamWriter newfile;
-    
+    /**
+     * Statstics associated to the DEM
+     */
     public hydroScalingAPI.tools.Stats DEMstats;
     
+    private boolean firstCorrection = true;
+    
+    /**
+     * Creates an instance of the NetworkExtractionModule that uses the {@link
+     * hydroScalingAPI.modules.networkExtraction.widgets.ExtractionOptions} interface
+     * to query for tasks to be performed
+     * @param parent1 The main GIS interface
+     * @param metaDEM1 The MetaRaster associated to the DEM to be processed
+     * @param dataDEM1 The DataRaster associated to the data
+     */
     public NetworkExtractionModule(hydroScalingAPI.mainGUI.ParentGUI parent1, hydroScalingAPI.io.MetaRaster metaDEM1, hydroScalingAPI.io.DataRaster dataDEM1) {
         metaDEM=metaDEM1;
         parent=parent1;
@@ -103,6 +302,12 @@ public class NetworkExtractionModule implements Runnable {
         OpProc.setVisible(true);
     }
     
+    /**
+     * Creates an instance of the NetworkExtractionModule that uses predetermined tasks
+     * to be performed
+     * @param metaDEM1 The MetaRaster associated to the DEM to be processed
+     * @param dataDEM1 The DataRaster associated to the data
+     */
     public NetworkExtractionModule(hydroScalingAPI.io.MetaRaster metaDEM1, hydroScalingAPI.io.DataRaster dataDEM1) {
         //printDebug=false;
         printDebug=true;
@@ -115,6 +320,10 @@ public class NetworkExtractionModule implements Runnable {
         OpProc.dispose();
     }
     
+    /**
+     * Initializes the algorithm parameters
+     * @param dataDEM The DataRaster associated to the data
+     */
     public void inicio(hydroScalingAPI.io.DataRaster dataDEM){
         int ncol = metaDEM.getNumCols();
         int nfila = metaDEM.getNumRows();
@@ -165,6 +374,9 @@ public class NetworkExtractionModule implements Runnable {
         MT = new WorkRectangle(2,nfila-1,2,ncol-1,this);
     }
     
+    /**
+     * The DEM correction algorithm
+     */
     public void corrigeDEM(){
 
         java.util.Calendar iniTime=java.util.Calendar.getInstance();
@@ -264,7 +476,6 @@ public class NetworkExtractionModule implements Runnable {
             }
             if(laplace && !areaPend_nuevo){
                 GetRasterNetwork.laplace2(this,nCeldasConv);
-                GetRasterNetwork.persiga(this);
             }
             
             if(areaPend_nuevo){
@@ -287,10 +498,11 @@ public class NetworkExtractionModule implements Runnable {
                     OpProc.graficaAP(GetRasterNetwork.calculaPromAP(this),true);
                 }
             }
-            if(!areaPend_cargar && !areaPend_nuevo && !areaPend_LA )
-                writeRED(metaDEM.getLocationBinaryFile());
             
             for(int pass=0;pass<2;pass++) GetRasterNetwork.cleanShorts(this);
+            
+            if(!areaPend_cargar && !areaPend_nuevo && !areaPend_LA )
+                writeRED(metaDEM.getLocationBinaryFile());
             
         }
         
@@ -307,6 +519,7 @@ public class NetworkExtractionModule implements Runnable {
                 if (printDebug) System.out.println(">>> Calculating Geormorphology - ROM based Algorithm");
                 GetGeomorphologyRAM.getDistanceToBorder(this);
                 System.gc();
+                
                 new hydroScalingAPI.modules.networkExtraction.objects.GetGeomorphologyROM(metaDEM);
                 
                 
@@ -329,6 +542,9 @@ public class NetworkExtractionModule implements Runnable {
     }
     
     
+    /**
+     * Loops through all the sinks in the DEM and fixes them
+     */
     public void corrigeSink_t(){
         int next_pit = get_nextPit();
         
@@ -349,6 +565,10 @@ public class NetworkExtractionModule implements Runnable {
         
     }
     
+    /**
+     * Gets the next pit to be fixed
+     * @return The sink to be fixed
+     */
     public int get_nextPit(){
         
         if (Sink_t.size() == 0) return -1;
@@ -368,6 +588,9 @@ public class NetworkExtractionModule implements Runnable {
     }
     
     
+    /**
+     * Runs the uniPit algorithm for the entire DEM
+     */
     public void corrigeUniPitFullDEM(){
         
         if (printDebug) System.out.println("    >>> General UniPit Method" );
@@ -438,6 +661,11 @@ public class NetworkExtractionModule implements Runnable {
     
     
     //Calcula el incremento diferencial para la correccion de zonas planas.
+    /**
+     * Calculates the increment to be applied when the DEM flat area is being filled
+     * @param F A Vector with the flat areas
+     * @return The value of the increment
+     */
     public double calculaIncr(java.util.Vector F){
 
         int max_M=0;
@@ -460,8 +688,12 @@ public class NetworkExtractionModule implements Runnable {
 
         return Math.max(Math.pow(10.0,Math.floor(Math.log(min_dif_front/max_M)/2.30258)- 1 ),1E-10);
 
-    }//Metodo calc_incr
+    }
     
+    /**
+     * Writes the .areas, .corrDEM, .slope, an .dir files
+     * @param arch The path where the files will be stored
+     */
     public void writePREL(java.io.File arch){
         String path = arch.getPath();
         if (printDebug) System.out.println(">>> Writing To :"+arch.getParent());
@@ -496,8 +728,12 @@ public class NetworkExtractionModule implements Runnable {
         }catch(java.io.IOException e1){
             System.err.println(e1.toString());
         }
-    }//metodo writePREL
+    }
     
+    /**
+     * Writes the .corrDEM file
+     * @param arch The path where the files will be stored
+     */
     public void writeCorrDem(java.io.File arch){
         String path = arch.getPath();
         if (printDebug) System.out.println(">>> Writing To :"+arch.getParent());
@@ -523,8 +759,12 @@ public class NetworkExtractionModule implements Runnable {
         }catch(java.io.IOException e1){
             System.err.println(e1.toString());
         }
-    }//metodo writeCorrDem
+    }
     
+    /**
+     * Writes the .redRas file
+     * @param arch The path where the files will be stored
+     */
     public void writeRED(java.io.File arch){
         if (printDebug) System.out.println(">>> Writing Raster Network");
         String path = arch.getPath();
@@ -547,10 +787,14 @@ public class NetworkExtractionModule implements Runnable {
             for(int k=0 ; k<destinations.length ; k++)
                 buffOuts[k].close() ;
         }catch(java.io.IOException e1){System.err.println(e1.toString());}
-    }//metodo writeRED
+    }
     
     
     
+    /**
+     * Writes the .redRas, .ltc, .lcp, .horton, .magn, .dtopo, .tcd, and .mcd files
+     * @param arch The path where the files will be stored
+     */
     public void writeGEO(java.io.File arch){
         String path = arch.getPath();
         String[] destinations ={
@@ -609,6 +853,9 @@ public class NetworkExtractionModule implements Runnable {
             
     }//metodo writeGeomorphCell_1
     
+    /**
+     * Reads the DEM, direction matrix and upstream area files
+     */
     public void leeDEM_DIR_AREA_PEND(){
         if (printDebug) System.out.println(">>> Reading DEM & DIR & AREA & SLOPES");
         Areas = new float[DIR.length][DIR[0].length];
@@ -638,6 +885,9 @@ public class NetworkExtractionModule implements Runnable {
         }catch(java.io.IOException e){e.printStackTrace();}
     }
     
+    /**
+     * Reads the raster netowrk file
+     */
     public void leeRED(){
         
         if (printDebug) System.out.println(">>> Reading Raster Network");
@@ -667,6 +917,9 @@ public class NetworkExtractionModule implements Runnable {
     
     
     
+    /**
+     * Reads the original DEM
+     */
     public void leeDEM(){
         try{
             java.io.FileInputStream files[] = new java.io.FileInputStream[1];
@@ -709,11 +962,18 @@ public class NetworkExtractionModule implements Runnable {
     }
     
     
+    /**
+     * The run method
+     */
     public void run(){
         corrigeDEM();
     }
     
     
+    /**
+     * Various tests for the class
+     * @param Arguments The command line arguments
+     */
     public static void main(String[] Arguments){
         
         /*Arguments=new String[] { "/hidrosigDataBases/Continental_US_database/Rasters/Topography/Dd_Basins_30_ArcSec/B_01/84928846.metaDEM",

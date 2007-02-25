@@ -21,13 +21,21 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.modules.networkExtraction.objects;
 
 /**
- *
+ * This class implements the downstream-travel algorithm over the network to
+ * calculate important netwotk features (geomorphical and topological) for all locations
+ * in the DEM.  All the methods in this class are static which makes this class a
+ * toolbox that can be extended to include new analysis
  * @author Jorge Mario Ramirez and Ricardo Mantilla
  */
 public abstract class GetGeomorphologyRAM extends Object {
     
     private static int[][] toMark;
     
+    /**
+     * Uses the corrected DEM and the direction matrix to determine the steepest
+     * gradient
+     * @param Proc The parent {@link hydroScalingAPI.modules.networkExtraction.objects.NetworkExtractionModule}
+     */
     public static void getMaxPend(hydroScalingAPI.modules.networkExtraction.objects.NetworkExtractionModule Proc){
         if (Proc.printDebug) System.out.println(">>> Calculating Slopes");
         Proc.MaxPend = new double[Proc.DIR.length][Proc.DIR[0].length];
@@ -46,6 +54,10 @@ public abstract class GetGeomorphologyRAM extends Object {
         }
     }
     
+    /**
+     * Calculates the upstream area for each pixel in the DEM
+     * @param Proc The parent {@link hydroScalingAPI.modules.networkExtraction.objects.NetworkExtractionModule}
+     */
     public static void getAreas(NetworkExtractionModule Proc){
         if (Proc.printDebug) System.out.println(">>> Calculating Areas");
         int c=0;
@@ -90,6 +102,11 @@ public abstract class GetGeomorphologyRAM extends Object {
             }while(contn < (Proc.DIR.length-1-2+1)*(Proc.DIR[0].length-1-2+1) );
     }
     
+    /**
+     * Calculates the direction of the DEM borders and the directions of the pixels
+     * sorounding a lake or ocean
+     * @param Proc The parent {@link hydroScalingAPI.modules.networkExtraction.objects.NetworkExtractionModule}
+     */
     public static void bordes(NetworkExtractionModule Proc){
         if (Proc.printDebug) System.out.println(">>> Calculating Borders");
         for (int i=2; i <= Proc.DIR.length-3; i++){
@@ -103,7 +120,7 @@ public abstract class GetGeomorphologyRAM extends Object {
                     float areat=0;
                     boolean inercia=false;
                     for(int k=0; k <= 8; k++){
-                        //Si ninguno es m�s bajo, sigue la direcci�n del de mayor �rea que le llegue a �l cuando eso lo saque al faltante
+                        //Si ninguno es mas bajo, sigue la direccion del de mayor area que le llegue a el cuando eso lo saque al faltante
                         if(Proc.DIR[i+(k/3)-1][j+(k%3)-1]==9-k){
                             areat += Proc.Areas[i+(k/3)-1][j+(k%3)-1];
                             if(Proc.DEM[i-1+(Proc.DIR[i+(k/3)-1][j+(k%3)-1]-1)/3][j-1+(Proc.DIR[i+(k/3)-1][j+(k%3)-1]-1)%3]<0 && Proc.Areas[i+(k/3)-1][j+(k%3)-1] > areall){
@@ -124,6 +141,10 @@ public abstract class GetGeomorphologyRAM extends Object {
         }
     }
     
+    /**
+     * Calculates the Horton-Strahler order for every location in the DEM
+     * @param Proc The parent {@link hydroScalingAPI.modules.networkExtraction.objects.NetworkExtractionModule}
+     */
     public static void getORD(NetworkExtractionModule Proc){
         if (Proc.printDebug) System.out.println(">>> Calculating Horton Orders");
         Proc.GEO = new GeomorphCell_1[Proc.DIR.length][Proc.DIR[0].length];
@@ -150,9 +171,9 @@ public abstract class GetGeomorphologyRAM extends Object {
             contn = 0;
             for(int i=2; i<=Proc.DIR.length-3 ; i++){
                 for (int j=2; j<=Proc.DIR[0].length-3; j++){
-                    if (Proc.GEO[i][j].stat < 0)
+                    if (Proc.GEO[i][j].status < 0)
                         contn++;
-                    if (Proc.GEO[i][j].stat == 0){
+                    if (Proc.GEO[i][j].status == 0){
                         ORDcero(Proc,i,j,contn);
                     }
                 }//for j
@@ -160,14 +181,14 @@ public abstract class GetGeomorphologyRAM extends Object {
         }while(contn < (Proc.DIR.length-3-2+1)*(Proc.DIR[0].length-3-2+1) );
     }//metodo
     
-    static void ORDcero(NetworkExtractionModule Proc, int i, int j,int contn){
-        Proc.GEO[i][j].stat = -1;
+    private static void ORDcero(NetworkExtractionModule Proc, int i, int j,int contn){
+        Proc.GEO[i][j].status = -1;
         if (Proc.GEO[i][j].llegan_red == 0){
             Proc.GEO[i][j].orden = 1;
         }
         int x1=i-1+(Proc.DIR[i][j]-1)/3 ; int y1=j-1+(Proc.DIR[i][j]-1)%3;
-        if (Proc.GEO[x1][y1].stat >= 0 ){
-            Proc.GEO[x1][y1].stat--  ;
+        if (Proc.GEO[x1][y1].status >= 0 ){
+            Proc.GEO[x1][y1].status--  ;
         }
         if(Proc.GEO[i][j].llegan_red > 0){
             java.util.Vector ord = new java.util.Vector();
@@ -195,6 +216,11 @@ public abstract class GetGeomorphologyRAM extends Object {
     
     
     
+    /**
+     * Calculates several geomorphical and topological features described by the {@link
+     * hydroScalingAPI.modules.networkExtraction.objects.GeomorphCell_2} cell.
+     * @param Proc The parent {@link hydroScalingAPI.modules.networkExtraction.objects.NetworkExtractionModule}
+     */
     public static void getGEO(NetworkExtractionModule Proc){
         if (Proc.printDebug) System.out.println(">>> Calculating Geomorphology");
         Proc.GEO = new GeomorphCell_1[Proc.DIR.length][Proc.DIR[0].length];
@@ -212,8 +238,8 @@ public abstract class GetGeomorphologyRAM extends Object {
                     Proc.GEO[i][j] = new GeomorphCell_1(llegan);
                     Proc.GEO[i][j].llegan_red = llegan;
                 }
-            }//for j
-        }//for i
+            }
+        }
         
         int contn;
         do{
@@ -223,23 +249,21 @@ public abstract class GetGeomorphologyRAM extends Object {
                     if (Proc.GEO[i][j] == null)
                         contn++;
                     else {
-                        if (Proc.GEO[i][j].stat < 0)
+                        if (Proc.GEO[i][j].status < 0)
                             contn++;
-                        if (Proc.GEO[i][j].stat == 0)
+                        if (Proc.GEO[i][j].status == 0)
                             GEOcero(i,j,contn,Proc);
                     }
                         
-                }//for j
-            }//for i
+                }
+            }
         }while(contn < (Proc.DIR.length-3-2+1)*(Proc.DIR[0].length-3-2+1));
-    }//metodo
+    }
     
-    //-----------------------------------------------------------------------------------------------------------------------
-    
-    static void GEOcero(int i, int j,int contn,NetworkExtractionModule Proc){
+    private static void GEOcero(int i, int j,int contn,NetworkExtractionModule Proc){
         //System.out.println("error "+i+" "+j);
         double[] dist = {Proc.dxy[i],Proc.dy,Proc.dxy[i],Proc.dx[i],1,Proc.dx[i],Proc.dxy[i],Proc.dy,Proc.dxy[i]};
-        Proc.GEO[i][j].stat = -1;
+        Proc.GEO[i][j].status = -1;
         
         Proc.GEO2[i][j].ltc += dist[Proc.DIR[i][j]-1];
         Proc.GEO2[i][j].lcp += dist[Proc.DIR[i][j]-1];
@@ -255,8 +279,8 @@ public abstract class GetGeomorphologyRAM extends Object {
         int x1=i-1+(Proc.DIR[i][j]-1)/3 ; 
         int y1=j-1+(Proc.DIR[i][j]-1)%3;
         
-        if (Proc.GEO[x1][y1] != null && Proc.GEO[x1][y1].stat >= 0 ){
-            Proc.GEO[x1][y1].stat--  ;
+        if (Proc.GEO[x1][y1] != null && Proc.GEO[x1][y1].status >= 0 ){
+            Proc.GEO[x1][y1].status--  ;
             if (Proc.GEO[i][j].llegan_red == 0)
                 Proc.GEO2[x1][y1].magn ++;
             else 
@@ -297,6 +321,12 @@ public abstract class GetGeomorphologyRAM extends Object {
         }
     }
     
+    /**
+     * Uses an upstream search algorithm to calculate the distance from the pixel to the
+     * drainage point (DEM border ,internal lake or ocean).  The matrix produced by
+     * this algorithm allows the rapid calculation of distances along the network
+     * @param Proc The parent {@link hydroScalingAPI.modules.networkExtraction.objects.NetworkExtractionModule}
+     */
     public static void getDistanceToBorder(NetworkExtractionModule Proc){
         
         if (Proc.printDebug) System.out.println(">>> Calculating Distance to Border for Network Points");
@@ -524,6 +554,11 @@ public abstract class GetGeomorphologyRAM extends Object {
         
     }
     
+    /**
+     * Calculates the vectorial network representation.  The format and uses are
+     * described in the Developer's Manual.
+     * @param Proc The parent {@link hydroScalingAPI.modules.networkExtraction.objects.NetworkExtractionModule}
+     */
     public static void getRedVect(NetworkExtractionModule Proc){
         int NPoints; //para rayos4
         int NLinks;  //para rayos4

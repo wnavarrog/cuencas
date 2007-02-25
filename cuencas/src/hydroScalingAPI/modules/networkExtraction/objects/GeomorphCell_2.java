@@ -21,15 +21,34 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.modules.networkExtraction.objects;
 
 /**
- *
+ * A cell object that associates properites to a location in the DEM.  The
+ * properties are used by the GetGeomorphology algorithms.
  * @author Jorge Mario Ramirez
  */
 public class GeomorphCell_2 extends Object {
-    public double lcp; //Longest Channel lenght
-    public int magn; //Magnitude
-    public double ltc; //Total Channel lenght
-    public int d_topo; //Topologic Diameter
-    public double tcd; //Total Channel drop
-    public double mcd; //Max Channel drop
+    /**
+     * The longest channel lenght up th this point
+     */
+    public double lcp;
+    /**
+     * The magnitude of the location
+     */
+    public int magn;
+    /**
+     * The total channel lenght up to this location
+     */
+    public double ltc;
+    /**
+     * The longes topologic distance up to this point (topologic diameter)
+     */
+    public int d_topo;
+    /**
+     * The total drop along the channels
+     */
+    public double tcd;
+    /**
+     * The maximum drop along the channels
+     */
+    public double mcd;
     
 }

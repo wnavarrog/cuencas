@@ -21,12 +21,21 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.modules.networkExtraction.objects;
 
 /**
- *
+ * This class implements a series of mechanisms for Network pruning. The most
+ * succesfull one is the Laplace2 method.  It incorporates several criteria for
+ * determination of the location of the network.  However the criteria are only
+ * valid for high-resolution DEMs (30 m or less).
  * @author Jorge Mario Ramirez
  */
 public abstract class GetRasterNetwork extends Object {
     
     
+    /**
+     * Assigns all to pixels to be part of the network.  This is a good method for low
+     * resolution DEMs (250 m or more) since it is almost guarateed that a pixel
+     * contains a channel
+     * @param Proc The parent {@link hydroScalingAPI.modules.networkExtraction.objects.NetworkExtractionModule}
+     */
     public static void todo_uno(NetworkExtractionModule Proc){
         if (Proc.printDebug) System.out.println(">>> All cells are Network");
         for (int i=1; i<Proc.DIR.length-1; i++){
@@ -37,6 +46,10 @@ public abstract class GetRasterNetwork extends Object {
     }
     
     
+    /**
+     * Applies the Horton order threshold criteria
+     * @param Proc The parent {@link hydroScalingAPI.modules.networkExtraction.objects.NetworkExtractionModule}
+     */
     public static void umbral_Area_Ord(NetworkExtractionModule Proc){
         if (Proc.printDebug) System.out.println(">>> Area-Order Threshold");
         boolean critOrd = (Proc.ordenMax < Integer.MAX_VALUE);
@@ -60,6 +73,11 @@ public abstract class GetRasterNetwork extends Object {
     }
     
     
+    /**
+     * Applies the Area threshold criteria
+     * @param pixUmbral The treshold in number of pixels
+     * @param Proc The parent {@link hydroScalingAPI.modules.networkExtraction.objects.NetworkExtractionModule}
+     */
     public static void umbral_Area(float pixUmbral, NetworkExtractionModule Proc){
         if (Proc.printDebug) System.out.println(">>> Area Threshold");
         double areaPodado = pixUmbral*Proc.dy*Proc.dxm;
@@ -71,6 +89,11 @@ public abstract class GetRasterNetwork extends Object {
         }
     }
     
+    /**
+     * Removes short streams from the raster network.  This is because external channels
+     * that are only one pixel long are usualy errors.
+     * @param Proc The parent {@link hydroScalingAPI.modules.networkExtraction.objects.NetworkExtractionModule}
+     */
     public static void cleanShorts(NetworkExtractionModule Proc){
         if (Proc.printDebug) System.out.println(">>> Cleaning short streams");
         byte[][] cleanRedRas=new byte[Proc.DIR.length][Proc.DIR[0].length];
@@ -90,6 +113,11 @@ public abstract class GetRasterNetwork extends Object {
         }
         Proc.RedRas=cleanRedRas;
     }
+    /**
+     * Applies the convergence and laplacian criteria
+     * @param Proc The parent {@link hydroScalingAPI.modules.networkExtraction.objects.NetworkExtractionModule}
+     * @param m The number of convergent cells required for channel initiation
+     */
     public static void laplace2(NetworkExtractionModule Proc, int m){
         if (Proc.printDebug) System.out.println(">>> Calulating Laplacian - 2 "+m);
         for (int i=2; i<Proc.DIR.length-2; i++){
@@ -122,9 +150,10 @@ public abstract class GetRasterNetwork extends Object {
 
             }
         }
+        persiga(Proc);
     }
     
-    public static void persiga(NetworkExtractionModule Proc){
+    private static void persiga(NetworkExtractionModule Proc){
         for (int i=1; i<Proc.DIR.length-1; i++){
             for (int j=1; j<Proc.DIR[0].length-1; j++){
                 if(Proc.RedRas[i][j]==1){
@@ -141,7 +170,7 @@ public abstract class GetRasterNetwork extends Object {
         }
     }
     
-    public static void persiga(NetworkExtractionModule Proc, int inii, int inij){
+    private static void persiga(NetworkExtractionModule Proc, int inii, int inij){
         int iPv=inii; int jPv=inij;
         int iPn=inii; int jPn=inij;
         do{
@@ -153,7 +182,7 @@ public abstract class GetRasterNetwork extends Object {
     }
     
     
-    public static void persiga(NetworkExtractionModule Proc, int inii, int inij, int endi, int endj){
+    private static void persiga(NetworkExtractionModule Proc, int inii, int inij, int endi, int endj){
         int iPv=inii; int jPv=inij;
         int iPn=inii; int jPn=inij;
         do{
@@ -165,6 +194,11 @@ public abstract class GetRasterNetwork extends Object {
     }
     
     
+    /**
+     * Calculates the Area-Slope for points in the DEM to help the user determine
+     * criteria for and Area-Slope threshold
+     * @param Proc The parent {@link hydroScalingAPI.modules.networkExtraction.objects.NetworkExtractionModule}
+     */
     public static void getArea_Pend(NetworkExtractionModule Proc){
         if (Proc.printDebug) System.out.println(">>> Calculating Area-Slope");
         //primero pongo ceros donde no hay red en la matriz de direcciones (me ahorra preguntas)
@@ -248,6 +282,11 @@ public abstract class GetRasterNetwork extends Object {
     
     
     
+    /**
+     * Bins Areas and Slopes to facilitate the data visualization
+     * @param Proc The parent {@link hydroScalingAPI.modules.networkExtraction.objects.NetworkExtractionModule}
+     * @return The simplified array of areas and slopes
+     */
     public static double[][] calculaPromAP(NetworkExtractionModule Proc){
         Valor[] areaPend = new Valor[0];
         double minPend = Double.MAX_VALUE;
@@ -335,6 +374,10 @@ public abstract class GetRasterNetwork extends Object {
     }
     
     
+    /**
+     * Calculates the Area-Slope analysis over the blue lines
+     * @param Proc The parent {@link hydroScalingAPI.modules.networkExtraction.objects.NetworkExtractionModule}
+     */
     public static void getArea_Pend_Dif(NetworkExtractionModule Proc){
         if (Proc.printDebug) System.out.println(">>> Calculating Area-Slope Relation over Blue Lines");
         try{
@@ -409,7 +452,7 @@ public abstract class GetRasterNetwork extends Object {
     }
     
     
-    public static double[][] getAP_Puntos(NetworkExtractionModule Proc, int c){
+    private static double[][] getAP_Puntos(NetworkExtractionModule Proc, int c){
         java.util.Vector vectorAP = new java.util.Vector();
         for(int i=0; i<Proc.metaDEM.getNumRows(); i++){
             for(int j=0; j<Proc.metaDEM.getNumCols(); j++){
@@ -469,7 +512,7 @@ public abstract class GetRasterNetwork extends Object {
     }
     
     
-    public static double[][] getAP_Fuentes(NetworkExtractionModule Proc){
+    private static double[][] getAP_Fuentes(NetworkExtractionModule Proc){
         java.util.Vector vectorAP = new java.util.Vector();
         for(int i=0; i<Proc.metaDEM.getNumRows(); i++){
             for(int j=0; j<Proc.metaDEM.getNumCols(); j++){
@@ -547,6 +590,10 @@ public abstract class GetRasterNetwork extends Object {
     }
     
     
+    /**
+     * Applies an Area-Slope threshold
+     * @param Proc The parent {@link hydroScalingAPI.modules.networkExtraction.objects.NetworkExtractionModule}
+     */
     public static void umbralASalfa(NetworkExtractionModule Proc){
         if (Proc.printDebug) System.out.println("UMBRAL ASalfa>C");
         //primero pongo ceros donde no hay red en la matriz de direcciones (me ahorra preguntas)
@@ -626,7 +673,7 @@ public abstract class GetRasterNetwork extends Object {
     }
     
     
-    public static void probabCh_Ini(NetworkExtractionModule Proc){
+    private static void probabCh_Ini(NetworkExtractionModule Proc){
         //Constantes
         double densAgua =1, densSuelo = 2.6;
         double gravedad = 9.8;

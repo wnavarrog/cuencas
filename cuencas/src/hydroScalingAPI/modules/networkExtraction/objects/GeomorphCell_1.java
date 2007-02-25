@@ -21,17 +21,34 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.modules.networkExtraction.objects;
 
 /**
- *
+ * A cell object that associates properites to a location in the DEM.  The
+ * properties are used by the GetGeomorphology algorithms.
  * @author Jorge Mario Ramirez
  */
 public class GeomorphCell_1 extends Object {
-    public int stat;
+    /**
+     * The status of the cell acording the the moving downstream algorithm.
+     */
+    public int status;
+    /**
+     * Indicates if this cell is a topologic point of change (a junction)
+     */
     public boolean pcambio;
+    /**
+     * The Strahler order of this cell
+     */
     public int orden;
+    /**
+     * The number of network points that drain into this location
+     */
     public int llegan_red;
     
+    /**
+     * Creates a new GeomophCell_1 object
+     * @param sstat The initial status of the cell
+     */
     public GeomorphCell_1(int sstat) {
-        stat = sstat;
+        status = sstat;
     }
     
 }

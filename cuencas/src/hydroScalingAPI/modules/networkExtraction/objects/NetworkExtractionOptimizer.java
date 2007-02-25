@@ -27,8 +27,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.modules.networkExtraction.objects;
 
 /**
- *
+ * This was a rough attempt to optimize the network extraction code.  However it
+ * was a failure because it leaves traces of the DEM partition.
  * @author Ricardo Mantilla
+ * @deprecated 
  */
 public class NetworkExtractionOptimizer implements Runnable {
     

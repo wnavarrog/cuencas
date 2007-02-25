@@ -32,7 +32,9 @@ import java.rmi.RemoteException;
 import java.awt.Font;
 
 /**
- * Creates the Network Analysis Module
+ * Creates the Network Analysis Module.  This is one of the most important
+ * modules.  It includes novel geomorphic analysis of the river network that are
+ * the result of reaserch by Ricardo Mantilla.
  * @author Ricardo Mantilla
  */
 public class BasinAnalyzer extends javax.swing.JDialog{

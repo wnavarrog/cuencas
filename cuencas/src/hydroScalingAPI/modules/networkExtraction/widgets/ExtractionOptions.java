@@ -746,7 +746,7 @@ public class ExtractionOptions extends javax.swing.JDialog {
 
         jTextField1.setFont(new java.awt.Font("SansSerif", 0, 12));
         jTextField1.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        jTextField1.setText("0.02");
+        jTextField1.setText("0.01");
         jTextField1.setMinimumSize(new java.awt.Dimension(60, 15));
         jTextField1.setPreferredSize(new java.awt.Dimension(70, 20));
         gridBagConstraints = new java.awt.GridBagConstraints();

@@ -27,7 +27,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.modules.networkAnalysis.objects;
 
 /**
- *
+ * This is the analogous of the {@link hydroScalingAPI.util.geomorphology.objects.HillSlope} object for a river
+ * network.
  * @author Ricardo Mantilla
  */
 public class RsnTile extends java.lang.Object {
@@ -41,7 +42,18 @@ public class RsnTile extends java.lang.Object {
     private int thisTileOrder;
     private hydroScalingAPI.io.MetaRaster localMetaRaster;
     
-    /** Creates new hillSlope */
+    /**
+     * Creates new hillSlope
+     * @param xT The x position where the pseudo-hillslope starts
+     * @param yT The y position where the pseudo-hillslope starts
+     * @param xH The x position where the pseudo-hillslope ends
+     * @param yH The y position where the pseudo-hillslope ends
+     * @param fullDirMatrix The direction matrix associated to the river network
+     * @param order A matrix that contains the horton order associated to all the pixels in the
+     * matrix associated to the network
+     * @param mr The MetaRaster associated to the map where the network exists
+     * @param tileScale The pseudo-hillslope scale
+     */
     public RsnTile(int xT, int yT, int xH, int yH, byte[][] fullDirMatrix, byte[][] order, hydroScalingAPI.io.MetaRaster mr,int tileScale) {
         
         //assumes unpruned directions matrix
@@ -83,7 +95,7 @@ public class RsnTile extends java.lang.Object {
         findRsnTileDivide();
     }
     
-    public void getTile(int i,int j,int iEnd, int jEnd, byte [][] fullDirMatrix){
+    private void getTile(int i,int j,int iEnd, int jEnd, byte [][] fullDirMatrix){
         for (int k=0; k <= 8; k++){
             if (fullDirMatrix[i+(k/3)-1][j+(k%3)-1] == 9-k && ((i+(k/3)-1)*fullDirMatrix[0].length+(j+(k%3)-1) != iEnd*fullDirMatrix[0].length+jEnd)){
                 idsTile.add(new int[] {j+(k%3)-1,i+(k/3)-1});
@@ -92,7 +104,7 @@ public class RsnTile extends java.lang.Object {
         }
     }
     
-    public void getHill(int i,int j,byte [][] fullDirMatrix,byte[][] order){
+    private void getHill(int i,int j,byte [][] fullDirMatrix,byte[][] order){
         for (int k=0; k <= 8; k++){
             if (fullDirMatrix[i+(k/3)-1][j+(k%3)-1] == 9-k && order[i+(k/3)-1][j+(k%3)-1] < (thisTileOrder-1)){
                 idsTile.add(new int[] {j+(k%3)-1,i+(k/3)-1});
@@ -101,14 +113,31 @@ public class RsnTile extends java.lang.Object {
         }
     }
     
+    /**
+     * Returns the longitudes and latitudes of the points contained inside the
+     * pseudo-hillslope
+     * @return A float[2][numPoints] array where numPoints is the number of points in the
+     * pseudo-hillslope
+     */
     public float[][] getLonLatRsnTile(){
         return LonLatRsnTile;
     }
     
+    /**
+     * Returns the i,j of the points contained inside the pseudo-hillslope
+     * @return An int[2][numPoints] array where numPoints is the number of points in the
+     * pseudo-hillslope
+     */
     public int[][] getXYRsnTile(){
         return xyRsnTile;
     }
     
+    /**
+     * Returns a visad.Gridded2DSet appropriate to be added into a visad.Display
+     * showing the polygon that sorrounds the pseudo-hillslope
+     * @return A visad.Gridded2DSet
+     * @throws visad.VisADException Captures errors while creating the visad objects
+     */
     public visad.Gridded2DSet getRsnTileDivide() throws visad.VisADException {
         
         visad.RealTupleType domain=new visad.RealTupleType(visad.RealType.Longitude,visad.RealType.Latitude);
@@ -117,7 +146,7 @@ public class RsnTile extends java.lang.Object {
         return tileCountour;
     }
     
-    public void findRsnTileDivide(){
+    private void findRsnTileDivide(){
         
         //Relleno la matriz con 0's y 1's
         
@@ -190,6 +219,7 @@ public class RsnTile extends java.lang.Object {
     }
     
     /**
+     * Tests for the class
      * @param args the command line arguments
      */
     public static void main(String args[]) {

@@ -145,10 +145,23 @@ public class RSNAnalysis {
         
     }
     
+    /**
+     * Returns a simple codification of the RSN structure of the network.
+     * @return A {@link java.util.Vector} where each entry is an int array with three elements.  Where
+     * int[0] = The pseudo-link order; int[1]= The scale to which this pseudo-link
+     * belongs; and int[2]=the number of breaks in this pseudo-link (Generator-type)
+     */
     public java.util.Vector getGeneratorsInfo(){
         return generatorsInfo;
     }
     
+    /**
+     * This method prints the codification given by the getGeneratorsInfo to an ASCII
+     * file.  The authors of the software have developed external code to analyze the
+     * generators structure.
+     * @param outFileName The file where the RSN structure will be writen
+     * @throws java.io.IOException Captures errors while writing the file
+     */
     public void printGeneratorsToFile(String outFileName) throws java.io.IOException{
         
         java.io.File outFile=new java.io.File(outFileName);
@@ -174,6 +187,13 @@ public class RSNAnalysis {
         
     }
     
+    /**
+     * Returns the connection structure for the river network at the requested scale. 
+     * The array returned is an int[numLinks][numConnected]
+     * @param scale The scale at which the network structure is required.  Note that scale 1
+     * corresponds to the original river network.
+     * @return An int[numLinks][numConnected] array
+     */
     public int[][] getConnectionStructure(int scale){
             
         int ncols=mylinksAnalysis.localMetaRaster.getNumCols();
@@ -188,6 +208,16 @@ public class RSNAnalysis {
 
     }
     
+    /**
+     * Returns the IDs of key positions of the pseudo-links.  An integer array is
+     * returned int[4][numLinks] where int[0] contains the ID of the pixel before the
+     * junction of the pseudo-link with another pseudo-link; int[1] contains the ID of the
+     * junction where the pseudo-link ends; int[2] contains the ID of the starting pixel of
+     * the pseudo-link; and int[3] contains a 0 if the pseudo-link is external and 1 if
+     * it is internal
+     * @param scale The scale at which the pseudo-links are required
+     * @return An int[4][numLinks] array
+     */
     public int[][] getHeadsAndTails(int scale){
         
         int[][] HAndT=new int[4][metaLinks[scale-1].size()];
@@ -205,6 +235,26 @@ public class RSNAnalysis {
         return HAndT;
     }
     
+    /**
+     * Returns information about the pseudo-links at a given scale
+     * @param varToGet The code for the variable to get.  Available codes are <br>
+     * <p>0: Meta Link's Hillslope Area. This is done by subtraction of area at head and area at incoming links head</p>
+     * <p>1: Meta Link's Length. This is done by subtraction of total channel length at head and total channel length at incoming links head</p>
+     * <p>2: Meta Link's Upstream area.</p>
+     * <p>3: Meta Link's drop</p>
+     * <p>4: Meta Link's order</p>
+     * <p>5: Total Channel Length</p>
+     * <p>6: Meta Link's Magnitude</p>
+     * <p>7:Meta Link's Distance to Outlet</p>
+     * <p>8: Meta Link's Topologic Distance to Outlet</p>
+     * <p>9: Meta Link's Slope</p>
+     * <p>10: Meta Link's Elevation</p>
+     * <p>11: Meta Link's Longest Channel Length</p>
+     * <p>12: Meta Link's Binary Link Address</p>
+     * @param scale The scale of the pseudo-network
+     * @return A float[1][numLinks] with the requested information
+     * @throws java.io.IOException Captures errors while reading information in the binary files
+     */
     public float[][] getVarValues(int varToGet, int scale) throws java.io.IOException {
         
         
@@ -330,6 +380,10 @@ public class RSNAnalysis {
         return quantityArray;
     }
     
+    /**
+     * Vaerious tests and actual uses for the class
+     * @param args command line arguments
+     */
     public static void main(String[] args) {
         
         //All the subMains are developed to analyze the DD basins
@@ -356,7 +410,7 @@ public class RSNAnalysis {
     /**
      * @param args the command line arguments
      */
-    public static void subMain1(String[] args) {
+    private static void subMain1(String[] args) {
         
         java.util.StringTokenizer tokenizer = new java.util.StringTokenizer(args[0]);
         String path = "/hidrosigDataBases/Continental_US_database/Rasters/";
@@ -481,7 +535,7 @@ public class RSNAnalysis {
         
     }
     
-    public static void subMain2(String[] args) {
+    private static void subMain2(String[] args) {
 
         java.util.StringTokenizer tokenizer = new java.util.StringTokenizer(args[0]);
         String path = "/hidrosigDataBases/Continental_US_database/Rasters/";
@@ -552,7 +606,7 @@ public class RSNAnalysis {
         
     }
     
-    public static void subMain3(String[] args) {
+    private static void subMain3(String[] args) {
         
         java.util.StringTokenizer tokenizer = new java.util.StringTokenizer(args[0]);
         String path = "/hidrosigDataBases/Continental_US_database/Rasters/";
@@ -612,7 +666,7 @@ public class RSNAnalysis {
         
     }
     
-    public static void subMain4(String[] args) {
+    private static void subMain4(String[] args) {
 
         java.util.StringTokenizer tokenizer = new java.util.StringTokenizer(args[0]);
         String path = "/hidrosigDataBases/Continental_US_database/Rasters/";

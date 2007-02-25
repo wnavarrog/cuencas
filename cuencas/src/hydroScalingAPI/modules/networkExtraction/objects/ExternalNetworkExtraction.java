@@ -27,8 +27,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.modules.networkExtraction.objects;
 
 /**
- *
+ * This is the Thread used by the {@link
+ * hydroScalingAPI.modules.networkExtraction.objects.NetworkExtractionOptimizer} to
+ * call external procedures that process pieces of the original DEM
  * @author Ricardo Mantilla
+ * @deprecated 
  */
 public class ExternalNetworkExtraction extends Thread{
     

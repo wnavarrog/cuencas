@@ -21,9 +21,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.modules.networkExtraction.objects;
 
 /**
- *
+ * This class implements a ROM version of the the downstream-travel algorithm over the network to
+ * calculate important netwotk features (geomorphical and topological) for all locations
+ * in the DEM.  All the methods in this class are static which makes this class a
+ * toolbox that can be extended to include new analysis
  * @author Jorge Mario Ramirez and Ricardo Mantilla
-  */
+ */
 public class GetGeomorphologyROM extends Object {
     
     private int GEO[][];
@@ -49,6 +52,10 @@ public class GetGeomorphologyROM extends Object {
     private WorkRectangle M;
     
     
+    /**
+     * Tests for the class
+     * @param arguments the command line arguments
+     */
     public static void main(String[] arguments){
         try{
             
@@ -97,8 +104,8 @@ public class GetGeomorphologyROM extends Object {
                         esc("Dtopo",i,j,false,new Integer(MR.getMissing()).intValue());
                     }
                     else{
-                        esc("Magn",i,j,false,(int)0);
-                        esc("Orden",i,j,false,(byte)0);
+                        esc("Magn",i,j,false,(int)-1);
+                        esc("Orden",i,j,false,(byte)-1);
                         esc("Dtopo",i,j,false,(int)0);
                         esc("Ltc",i,j,false,(float)0.0);
                         esc("Lcp",i,j,false,(float)0.0);
@@ -136,6 +143,10 @@ public class GetGeomorphologyROM extends Object {
     }
     
     //-------------------------------------------------------------------------------------------------------------------------
+    /**
+     * Creates and instance of the ROM based geomorphology class
+     * @param MR1 The MetaRaster of the DEM to be processed
+     */
     public GetGeomorphologyROM(hydroScalingAPI.io.MetaRaster MR1) {
         MR=MR1;
         inicio();
@@ -216,143 +227,6 @@ public class GetGeomorphologyROM extends Object {
             }
         }catch (java.io.IOException e1){
             System.err.println("ERROR** "+e1.getMessage());
-        }
-    }
-    
-    //------------------------------------------------------------------------------------------------------------------------
-    
-    
-    public static void getRedVect(NetworkExtractionModule Proc){
-        int NPoints; //para rayos4
-        int NLinks; //para rayos4
-        java.io.DataOutputStream Dstream; //para rayos4
-        java.io.DataOutputStream Dlink; //para rayos4
-        java.io.DataOutputStream Dpoint; //para rayos4
-        int ncol = Proc.metaDEM.getNumCols();
-        
-        if (Proc.printDebug) System.out.println(">>> Writing Vectorial Network Representation");
-        //primero pongo ceros donde no hay red en la matriz de direcciones (me ahorra preguntas)
-        
-        for(int i=0; i<Proc.metaDEM.getNumRows()+2; i++) for (int j=0; j<Proc.metaDEM.getNumCols()+2; j++){
-            Proc.DIR[i][j]*=Math.abs((Proc.RedRas[i][j]==-10)?0:Proc.RedRas[i][j]);
-        }
-        
-        try{
-            String ruta=(Proc.metaDEM.getLocationBinaryFile()).getPath();
-            java.io.BufferedOutputStream Bstream = new java.io.BufferedOutputStream(new java.io.FileOutputStream(ruta.substring(0, ruta.lastIndexOf(".")) + ".stream"));
-            Dstream = new java.io.DataOutputStream(Bstream);
-            java.io.BufferedOutputStream Blink = new java.io.BufferedOutputStream(new java.io.FileOutputStream(ruta.substring(0, ruta.lastIndexOf(".")) + ".link"));
-            Dlink = new java.io.DataOutputStream(Blink);
-            java.io.BufferedOutputStream Bpoint = new java.io.BufferedOutputStream(new java.io.FileOutputStream(ruta.substring(0, ruta.lastIndexOf(".")) + ".point"));
-            Dpoint = new java.io.DataOutputStream(Bpoint);
-            java.io.BufferedOutputStream BufAP = new java.io.BufferedOutputStream(new java.io.FileOutputStream(ruta.substring(0, ruta.lastIndexOf(".")) + ".ap"));
-            java.io.DataOutputStream DataAP = new java.io.DataOutputStream(BufAP);
-            
-            int PointerPoints=0;
-            int PointerLinks=0;
-            boolean changeLink,changeDir;
-            int ia, ja, iaN, jaN, arroundI, arroundJ;
-            for(int i=2; i<Proc.metaDEM.getNumRows(); i++){
-                for (int j=2; j<Proc.metaDEM.getNumCols(); j++){
-                    if (Proc.RedRas[i][j]==1){
-                        //informacion sobre el punto especifico
-                        int myOrder=Proc.GEO[i][j].orden;
-                        boolean source=true;
-                        //ciclo que determina si es una fuente o un punto de cambio para perseguirlo
-                        for (int k=0; k <= 8; k++){
-                            if (Proc.DIR[i+(k/3)-1][j+(k%3)-1]==9-k){
-                                source=false;
-                            }
-                        }
-                        if (source || Proc.GEO[i][j].pcambio){
-                            
-                            NPoints=1;
-                            NLinks=0;
-                            ia=i;
-                            ja=j;
-                            int outOrder=0;
-                            Dpoint.writeInt((ia-1)*ncol+(ja-1));
-                            int myMagn=Proc.GEO2[ia][ja].magn;
-                            Dlink.writeInt(myMagn);
-                            Dlink.writeInt((ia-1)*ncol+(ja-1));
-                            boolean cambieLink=false;
-                            double cotaini = Proc.DEM[i][j];  double cotafin = 0;  double distLink =0;
-                            double areaLink=0;
-                            do{
-                                if (cambieLink){
-                                    Dpoint.writeInt((ia-1)*ncol+(ja-1));
-                                    myMagn=Proc.GEO2[ia][ja].magn;
-                                    Dlink.writeInt(myMagn);
-                                    Dlink.writeInt((ia-1)*ncol+(ja-1));
-                                    NPoints++;
-                                    cambieLink=false;
-                                    distLink=0;
-                                    cotaini=Proc.DEM[ia][ja];
-                                }
-                                iaN=ia+((Proc.DIR[ia][ja]-1)/3)-1;
-                                jaN=ja+((Proc.DIR[ia][ja]-1)%3)-1;
-                                double[] dist = {Proc.dxy[ia],Proc.dy,Proc.dxy[ia],Proc.dx[ia],1,Proc.dx[ia],Proc.dxy[ia],Proc.dy,Proc.dxy[ia]};
-                                distLink += (dist[Proc.DIR[ia][ja]-1])*1000;
-                                changeDir=false;
-                                try{
-                                    changeDir=Proc.DIR[ia][ja] != Proc.DIR[iaN][jaN];
-                                }catch(ArrayIndexOutOfBoundsException e){System.err.println("error "+"error "+i+" "+j+" "+ia+" "+ja+" "+iaN+" "+jaN); System.exit(0);}
-                                int lleganAca=0;
-                                for (int k=0; k <= 8; k++){
-                                    arroundI=iaN+(k/3)-1;
-                                    arroundJ=jaN+(k%3)-1;
-                                    if (arroundI>0 && arroundI < Proc.metaDEM.getNumRows() && arroundJ>0 && arroundJ < Proc.metaDEM.getNumCols()){
-                                        if (Proc.DIR[iaN+(k/3)-1][jaN+(k%3)-1]==9-k){
-                                            lleganAca++;
-                                        }
-                                    }
-                                }
-                                changeLink=lleganAca>1;
-                                outOrder=Proc.GEO[iaN][jaN].orden;
-                                if (changeLink || outOrder <= 0){
-                                    Dpoint.writeInt((ia-1)*ncol+(ja-1));
-                                    Dpoint.writeInt((iaN-1)*ncol+(jaN-1));
-                                    Dlink.writeInt((ia-1)*ncol+(ja-1));
-                                    Dlink.writeInt((iaN-1)*ncol+(jaN-1));
-                                    
-                                    cotafin=Proc.DEM[iaN][jaN];
-                                    areaLink = (Proc.Areas[ia][ja]+(Proc.dx[ia]*Proc.dy)/2)*1000000;
-                                    //newfile.write(areaLink+" "+((-cotafin+cotaini)/distLink)+System.getProperty("line.separator"));
-                                    DataAP.writeDouble((double) areaLink);
-                                    DataAP.writeDouble((double)((-cotafin+cotaini)/distLink));
-                                    
-                                    if (myOrder != outOrder){
-                                        Dstream.writeInt((i-1)*ncol+(j-1));
-                                        Dstream.writeInt((ia-1)*ncol+(ja-1));
-                                        Dstream.writeInt((iaN-1)*ncol+(jaN-1));
-                                    }
-                                    NPoints+=2;
-                                    Dlink.writeInt(PointerPoints*4);  Dlink.writeInt(NPoints);
-                                    NLinks++;
-                                    PointerPoints+=NPoints;
-                                    NPoints=0;
-                                    cambieLink=true;
-                                } else {
-                                    if (changeDir){
-                                        Dpoint.writeInt((iaN-1)*ncol+(jaN-1));
-                                        NPoints++;
-                                    }
-                                }
-                                ia=iaN; ja=jaN;
-                            } while (myOrder == outOrder);
-                            Dstream.writeInt(myOrder);
-                            Dstream.writeInt(PointerLinks*8);
-                            Dstream.writeInt(NLinks);
-                            PointerLinks+=NLinks;
-                        }
-                    }
-                }
-            }
-            Bstream.close(); Blink.close(); Bpoint.close();
-            BufAP.close();
-            //newfile.close(); bufferout.close();
-        }catch(java.io.IOException e){
-            System.err.println(e.toString());
         }
     }
     

@@ -1156,12 +1156,6 @@ public abstract class RasterViewer extends javax.swing.JInternalFrame {
         relatedMaps.setMaximumSize(new java.awt.Dimension(32767, 18));
         relatedMaps.setMinimumSize(new java.awt.Dimension(32, 18));
         relatedMaps.setPreferredSize(new java.awt.Dimension(32, 18));
-        relatedMaps.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                relatedMapsActionPerformed(evt);
-            }
-        });
-
         jPanel4.add(relatedMaps, java.awt.BorderLayout.CENTER);
 
         jPanel3.add(jPanel4);
@@ -1264,10 +1258,6 @@ public abstract class RasterViewer extends javax.swing.JInternalFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void relatedMapsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_relatedMapsActionPerformed
-// TODO add your handling code here:
-    }//GEN-LAST:event_relatedMapsActionPerformed
 
     private void cutSubDataSetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cutSubDataSetActionPerformed
     if(cutSubDataSet.isSelected()) {
@@ -1456,12 +1446,10 @@ public abstract class RasterViewer extends javax.swing.JInternalFrame {
                     try{
                         localField=metaData.getField();
                         float[][] dataValues=localField.getFloats();
-                        hydroScalingAPI.tools.Stats statsVar=new hydroScalingAPI.tools.Stats(dataValues[0]);
-                        System.out.println(dataValues[0].length);
-                        System.out.println(statsVar.maxValue);
-                        System.out.println(statsVar.minValue);
-                        
-                        if(heightMap != null) heightMap.setRange(statsVar.minValue,statsVar.maxValue+2*(statsVar.maxValue-statsVar.minValue));
+                        if(heightMap != null) {
+                            hydroScalingAPI.tools.Stats statsVar=new hydroScalingAPI.tools.Stats(dataValues[0]);
+                            heightMap.setRange(statsVar.minValue,statsVar.maxValue+2*(statsVar.maxValue-statsVar.minValue));
+                        }
                     } catch (visad.VisADException ve){
                         System.err.println("Failed loading field");
                         System.err.println(ve);

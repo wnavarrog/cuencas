@@ -21,19 +21,38 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.modules.networkExtraction.objects;
 
 /**
- *
+ * A cell object that associates properites to a location in the DEM.  The
+ * properties are used by the NetworkExtraction Module to make decision during the
+ * D8 algorithm
  * @author Jorge Mario Ramirez
  */
 public class GeomorphCell_0 extends Object implements Comparable{
     
+    /**
+     * The row index of the location
+     */
     public int i ;
+    /**
+     * The column index of the location
+     */
     public int j ;
+    /**
+     * The variable that will serve to establis the order critieria for this object. 
+     * Usually the location elevation.
+     */
     public double var_to_compare;
+    /**
+     * The elevation of the location
+     */
     public double height ;
+    /**
+     * The minimum elevation of the adyacent cells (8 neighboors)
+     */
     public double min_ady;
-    public double distopit;
-    public int i_romper;
-    public int j_romper;
+    
+    private double distopit;
+    private int i_romper;
+    private int j_romper;
     
     public GeomorphCell_0(int ii, int jj, double ccota, double mmin_ady){
         i = ii;
