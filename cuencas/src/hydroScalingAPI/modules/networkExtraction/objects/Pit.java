@@ -21,29 +21,73 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.modules.networkExtraction.objects;
 
 /**
- *
+ * This class represent a DEM PIT.  A very important feature of the terrain associated to the
+ * Network Extraction Process.  In escence a Pit is a region of terrain to which
+ * part of the DEM drains into.  This regions are usually artifacts of the data. 
+ * The network extraction algorithm assumes that there are not interal Pits in the
+ * DEM, thus all pits are resolved by filling or cutting the DEM such that they
+ * flow to another region of the DEM or to the DEM borders.  Notice that "actual"
+ * pits can exist on the terrain, such as lakes.  These features must be properly
+ * identified (by -9999 values) in order to stop the algoritm from trying to solve
+ * it.
  * @author Jorge Mario Ramirez and Ricardo Mantilla
  */
 public class Pit extends Object implements Comparable{
     
+    /**
+     * An identifier for assigned to cells that belong (drain into) the Pit.
+     */
     public int grupo ;
+    /**
+     * An index identifying the priority of the Pit with respect to all the other Pits
+     * in the DEM.  The herarchy is usually based on the Pit elevation.
+     */
     public int orden;
-    public int salida;
+    /**
+     * A boolean flag indicating whether an outlet has been assigned for the Pit
+     */
+    public boolean salida;
+    /**
+     * A {@link hydroScalingAPI.modules.networkExtraction.objects.WorkRectangle} object
+     * describing the rectangular region that encloses the Pit
+     */
     public WorkRectangle Mp ;
+    /**
+     * A {@link hydroScalingAPI.modules.networkExtraction.objects.WorkRectangle} object
+     * describing the rectangular region that encloses the Pit's basin (set of cells
+     * that drain into the Pit)
+     */
     public WorkRectangle Mc;
-    public int cant=0;
+    /**
+     * The elevation of the Pit.
+     */
     public double cota ;
-    public int cantC=0;
+    /**
+     * A boolean flag indicating whether the Pit has been resolved
+     */
     public boolean corregido=false;
     private int[][] corr3;
     private double sink_minAdyacente;
     
+    /**
+     * Creates an instance of the Pit element
+     * @param ggrupo The Pit group ID
+     * @param ccota The Pit elevation
+     * @param MMp A {@link hydroScalingAPI.modules.networkExtraction.objects.WorkRectangle} object
+     * describing the rectangular region that encloses the Pit
+     */
     public Pit(int ggrupo, double ccota, WorkRectangle MMp){
         grupo = ggrupo;
         Mp= MMp;
         cota = ccota;
     }
     
+    /**
+     * The comparison method for the Pit
+     * @param p1 The Pit be compared against
+     * @return A negative integer, zero, or a positive integer as this object
+     * is less than, equal to, or greater than the specified object.
+     */
     public int compareTo(java.lang.Object p1) {
         int comp;
         Pit thisPit=(Pit)p1;
@@ -55,12 +99,22 @@ public class Pit extends Object implements Comparable{
         return comp;
     }
     
+    /**
+     * The equal method for the Pit
+     * @param p1 The Pit be compared against
+     * @return A boolean indicating if the equality holds
+     */
     public boolean equals(java.lang.Object p1){
         Pit thisPit=(Pit)p1;
         return((grupo==thisPit.grupo) && (orden==thisPit.orden));
     }
     
     
+    /**
+     * This algorithm fixes the Pit by finding a way out for the cells iside and
+     * draining to the pit
+     * @param Proc The parent NetworkExtractionModule
+     */
     public void corrigePit(NetworkExtractionModule Proc){
         
         Pit Sn = this;
@@ -73,17 +127,15 @@ public class Pit extends Object implements Comparable{
         corr3 = new int[Proc.metaDEM.getNumRows()+2][Proc.metaDEM.getNumCols()+2];
         
         double fondo = Sn.cota;
-        Sn.cant = 0;
         
         java.util.Vector celdas_pit = new java.util.Vector();
         
         java.util.Vector celdas_frontc = new java.util.Vector();
         java.util.Vector celdas_frontcp = new java.util.Vector();
-        Sn.Mc = new WorkRectangle(Sn.Mp.ini_i,Sn.Mp.end_i,Sn.Mp.ini_j,Sn.Mp.end_j,Proc);
-        for (int i=Sn.Mp.ini_i ; i<=Sn.Mp.end_i; i++){
-            for (int j=Sn.Mp.ini_j; j<=Sn.Mp.end_j; j++){
+        Sn.Mc = new WorkRectangle(Sn.Mp.ini_row,Sn.Mp.end_row,Sn.Mp.ini_col,Sn.Mp.end_col,Proc);
+        for (int i=Sn.Mp.ini_row ; i<=Sn.Mp.end_row; i++){
+            for (int j=Sn.Mp.ini_col; j<=Sn.Mp.end_col; j++){
                 if (Proc.DIR[i][j]/100 == Sn.grupo){
-                    Sn.cant++;
                     corr3[i][j] = 1 + (Sn.grupo * 10);
                     /*A las celdas del pit que toquen altos, se les saca la cuenca, estas quedan con 3 en corr3*/
                     if (Proc.DIR[i][j]%100 == 11){
@@ -116,8 +168,8 @@ public class Pit extends Object implements Comparable{
         alguna celda que no esta en el grupo. Si esa que toquen fuera del grupo es mas alta
         que (i,j) entonces es un posible vertedero, luego se le coloca un 8 y se incluye en el
         marco de la cuenca.*/
-        for (int i=Sn.Mc.ini_i; i<=Sn.Mc.end_i; i++){
-            for (int j=Sn.Mc.ini_j; j<=Sn.Mc.end_j; j++){
+        for (int i=Sn.Mc.ini_row; i<=Sn.Mc.end_row; i++){
+            for (int j=Sn.Mc.ini_col; j<=Sn.Mc.end_col; j++){
                 if (corr3[i][j] == 3 + (10*Sn.grupo) || corr3[i][j] == 2 + (10*Sn.grupo)  ){
                     for (int k=0; k <= 8; k++){
                         if (corr3[i+(k/3)-1][j+(k%3)-1]/10 != Sn.grupo && Proc.DEM[i+(k/3)-1][j+(k%3)-1] >= Proc.DEM[i][j]){
@@ -133,8 +185,8 @@ public class Pit extends Object implements Comparable{
             }//for(j)
         }//for(i)
         
-        for (int i=Sn.Mp.ini_i; i<=Sn.Mp.end_i; i++){
-            for (int j=Sn.Mp.ini_j; j<=Sn.Mp.end_j; j++){
+        for (int i=Sn.Mp.ini_row; i<=Sn.Mp.end_row; i++){
+            for (int j=Sn.Mp.ini_col; j<=Sn.Mp.end_col; j++){
                 if (corr3[i][j] == 2 + (Sn.grupo*10)){
                     Loop5:
                         for (int k=0; k <= 8; k++){
@@ -155,8 +207,8 @@ public class Pit extends Object implements Comparable{
         las adyacentes que no sean del grupo. Las con 4 y 8 se llevan al vector front_c y las
         con 5 al front_cp */
 
-        for (int i=Sn.Mc.ini_i; i<=Sn.Mc.end_i; i++){
-            for (int j=Sn.Mc.ini_j; j<=Sn.Mc.end_j; j++){
+        for (int i=Sn.Mc.ini_row; i<=Sn.Mc.end_row; i++){
+            for (int j=Sn.Mc.ini_col; j<=Sn.Mc.end_col; j++){
                 if (corr3[i][j] == 4 + (Sn.grupo*10) || corr3[i][j] == 8 + (Sn.grupo*10) || corr3[i][j] == 5 + (Sn.grupo*10)){
                     double min_ady = Proc.DEM[i][j];
                     for (int k=0; k <= 8; k++){
@@ -256,8 +308,8 @@ public class Pit extends Object implements Comparable{
                 if (Proc.printDebug) System.out.println("    >>> >>> >>> Fix Pit Algorithm problems found");
                 
                 sink_minAdyacente=Double.MAX_VALUE;
-                for (int ic=Sn.Mc.ini_i; ic<=Sn.Mc.end_i; ic++){
-                    for (int jc=Sn.Mc.ini_j; jc<=Sn.Mc.end_j; jc++){
+                for (int ic=Sn.Mc.ini_row; ic<=Sn.Mc.end_row; ic++){
+                    for (int jc=Sn.Mc.ini_col; jc<=Sn.Mc.end_col; jc++){
                         if (Proc.DIR[ic][jc]/100 == Sn.grupo){
                             for (int k=0; k <= 8; k++){
                                 if (Proc.DIR[ic+(k/3)-1][jc+(k%3)-1]/100 != Sn.grupo)
@@ -268,8 +320,8 @@ public class Pit extends Object implements Comparable{
                     }
                 }
                 
-                for (int ic=Sn.Mc.ini_i; ic<=Sn.Mc.end_i; ic++){
-                    for (int jc=Sn.Mc.ini_j; jc<=Sn.Mc.end_j; jc++){
+                for (int ic=Sn.Mc.ini_row; ic<=Sn.Mc.end_row; ic++){
+                    for (int jc=Sn.Mc.ini_col; jc<=Sn.Mc.end_col; jc++){
                         if (Proc.DIR[ic][jc]/100 == Sn.grupo) Proc.DEM[ic][jc]=sink_minAdyacente;
                     }
                 }
@@ -444,7 +496,7 @@ public class Pit extends Object implements Comparable{
                 }while(corr3[in2][jn2]==2+(Sn.grupo*10));
             }
             corregido = true;
-        }//if no hay celdas en frontcp
+        }
         //System.out.print("(fondo==Sn.cota) "+(fondo==Sn.cota));
         //Sn.Mc.print_M();
         if(fondo==Sn.cota){
@@ -452,8 +504,8 @@ public class Pit extends Object implements Comparable{
             int totNumSinks=Proc.Sink_t.size();
             do{
                 aumenta=false;
-                for (int i=Sn.Mc.ini_i; i<=Sn.Mc.end_i; i++){ 
-                    for (int j=Sn.Mc.ini_j; j<=Sn.Mc.end_j; j++){                       
+                for (int i=Sn.Mc.ini_row; i<=Sn.Mc.end_row; i++){ 
+                    for (int j=Sn.Mc.ini_col; j<=Sn.Mc.end_col; j++){                       
                         if(corr3[i][j] == 0 && Proc.DIR[i][j]>=10 && Proc.DEM[i][j]==Sn.cota){                                    
                             for(int t=0; t<totNumSinks; t++){
                                 Pit St = (Pit)Proc.Sink_t.get(t);                                        
@@ -464,25 +516,10 @@ public class Pit extends Object implements Comparable{
                                 }   
                             }                     
                         }
-                    }//for(j)
-                }//for(i)              
+                    }
+                }           
             }while(aumenta);
         }
-        
-        /*if (Sn.Mc.is_on(2027,435)) {
-            System.out.print("    >>> Frame AFTER corrPit: Grupo:"+Sn.grupo+" Frame: ");
-            Sn.Mc.print_M();
-            Sn.Mc.printPedazoTemporal();
-            System.out.println();
-            System.out.println("CORR 3");
-            for(int i=2030;i>2020;i--){
-                for(int j=430;j<440;j++){
-                    System.out.print(corr3[i][j]+" ");
-                }
-                System.out.println();
-            }
-            System.out.println();
-        }*/
         
         Sn.corregido=true;
         
@@ -492,10 +529,16 @@ public class Pit extends Object implements Comparable{
     }
     
     //Para OpProcesar
+    /**
+     * Returns the size (number of pixels) in the Pit
+     * @param MD A direction matrix in which cells belonging to a Pit are labeled by the Pit
+     * group ID
+     * @return An integer with the Pit size
+     */
     public int getCantPit(int[][] MD){
         int cant=0;
-        for (int i=Mp.ini_i ; i<=Mp.end_i; i++){
-            for (int j=Mp.ini_j; j<=Mp.end_j; j++){
+        for (int i=Mp.ini_row ; i<=Mp.end_row; i++){
+            for (int j=Mp.ini_col; j<=Mp.end_col; j++){
                 if (MD[i][j]/100 == grupo){
                     cant++;
                 }
@@ -505,10 +548,16 @@ public class Pit extends Object implements Comparable{
     }
     
     
+    /**
+     * Returns the size (number of pixels) in the Pit's basin
+     * @param MD A direction matrix in which cells belonging to a Pit are labeled by the Pit
+     * group ID
+     * @return The size of the Pit's basin
+     */
     public int getCantCPit(int[][] MD){
         int cant=0;
-        for (int i=Mp.ini_i ; i<=Mp.end_i; i++){
-            for (int j=Mp.ini_j; j<=Mp.end_j; j++){
+        for (int i=Mp.ini_row ; i<=Mp.end_row; i++){
+            for (int j=Mp.ini_col; j<=Mp.end_col; j++){
                 if (MD[i][j]/100 == grupo){
                     if (MD[i][j]%100 == 11)
                         cant += getNCuencaPit(i,j,0,MD);
@@ -518,8 +567,7 @@ public class Pit extends Object implements Comparable{
         return cant;
     }
     
-    //Para OpProcesar
-    public int getNCuencaPit(int i, int j, int lleva, int[][]MD){
+    private int getNCuencaPit(int i, int j, int lleva, int[][]MD){
         int lleva2=lleva;
         for (int k=0; k <= 8; k++){
             if (MD[i+(k/3)-1][j+(k%3)-1] == 9-k){
@@ -529,8 +577,8 @@ public class Pit extends Object implements Comparable{
         }
         return lleva2;
     }
-    //-------------------------------------------------------------------------------------------------------
-    public void marcarCuencaPit(int i, int j, int[][] MD, int[][] corr3){
+
+    private void marcarCuencaPit(int i, int j, int[][] MD, int[][] corr3){
         for (int k=0; k <= 8; k++){
             if (MD[i+(k/3)-1][j+(k%3)-1] == 9-k){
                 Mc.act_WorkRectangle(i+(k/3)-1,j+(k%3)-1);
@@ -539,10 +587,9 @@ public class Pit extends Object implements Comparable{
                 
             }
         }
-    }//metodo getCuenca
+    }
     
-    //----------------------
-    public void marcarCuencaPit2(NetworkExtractionModule Proc, int i, int j, Pit pit, int[][] corr3){
+    private void marcarCuencaPit2(NetworkExtractionModule Proc, int i, int j, Pit pit, int[][] corr3){
         int nc = Proc.metaDEM.getNumCols();
         int parIni = i*nc+j;
         int par1 = i*nc+j; int par2 = i*nc+j; int par3 = i*nc+j;
@@ -578,7 +625,7 @@ public class Pit extends Object implements Comparable{
         }
     }
     
-    public  int markCell(NetworkExtractionModule Proc, int id,Pit P, int ncols){
+    private  int markCell(NetworkExtractionModule Proc, int id,Pit P, int ncols){
         int j= id%ncols;
         int i = id/ncols;
         for (int k=0; k <= 8; k++){
@@ -591,9 +638,9 @@ public class Pit extends Object implements Comparable{
         return 0;
     }
     
-    public void fillCuencaPit(double cotaf,int[][] corr3, NetworkExtractionModule Proc){
-        for (int i=Mc.ini_i; i<=Mc.end_i; i++){
-            for (int j=Mc.ini_j; j<=Mc.end_j; j++){
+    private void fillCuencaPit(double cotaf,int[][] corr3, NetworkExtractionModule Proc){
+        for (int i=Mc.ini_row; i<=Mc.end_row; i++){
+            for (int j=Mc.ini_col; j<=Mc.end_col; j++){
                 if (corr3[i][j]/10 == grupo && Proc.DEM[i][j]< cotaf){
                    /*try{
                         Proc.MaxPend[i][j]=(Proc.DEM[i][j]-cotaf);
@@ -605,16 +652,15 @@ public class Pit extends Object implements Comparable{
         }
     }
     
-    //-----------------------
-    public int countMarcados(double cotaf, int[][] corr3, double[][] DEMC){
+    private int countMarcados(double cotaf, int[][] corr3, double[][] DEMC){
         int cuenca_cant = 0;
-        for (int i=Mc.ini_i; i<=Mc.end_i; i++){
-            for (int j=Mc.ini_j; j<=Mc.end_j; j++){
+        for (int i=Mc.ini_row; i<=Mc.end_row; i++){
+            for (int j=Mc.ini_col; j<=Mc.end_col; j++){
                 if (corr3[i][j]/10 == grupo && DEMC[i][j]<=cotaf)
                     cuenca_cant++;
             }
         }
         return cuenca_cant;
-    }//metodo countCuenca
+    }
 
 }

@@ -796,6 +796,7 @@ public class Rainfall_Runoff_Model extends javax.swing.JDialog implements Displa
             return;
         }
         simButton.setEnabled(true);
+        System.setOut(System.out);
     }//GEN-LAST:event_sim2ButtonActionPerformed
 
     private void rainButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rainButtonActionPerformed

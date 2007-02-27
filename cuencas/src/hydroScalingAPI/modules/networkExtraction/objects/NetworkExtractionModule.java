@@ -672,10 +672,10 @@ public class NetworkExtractionModule implements Runnable {
         double min_dif_front = 1000.0;
         for(int n=0; n<F.size(); n++){
             Pit Fn = (Pit)F.get(n);
-            max_M = Math.max(max_M, Math.max(Fn.Mp.end_j-Fn.Mp.ini_j,Fn.Mp.end_i-Fn.Mp.ini_i));
+            max_M = Math.max(max_M, Math.max(Fn.Mp.end_col-Fn.Mp.ini_col,Fn.Mp.end_row-Fn.Mp.ini_row));
             if (max_M==0) max_M=2;
-            for(int i=Fn.Mp.ini_i; i<=Fn.Mp.end_i; i++){
-                for(int j=Fn.Mp.ini_j ; j<=Fn.Mp.end_j; j++){
+            for(int i=Fn.Mp.ini_row; i<=Fn.Mp.end_row; i++){
+                for(int j=Fn.Mp.ini_col ; j<=Fn.Mp.end_col; j++){
                     if(DIR[i][j]==11 + Fn.grupo*100){
                         for(int k=0; k<= 8; k++){
                             if (DEM[i+(k/3)-1][j+(k%3)-1] > DEM[i][j] )

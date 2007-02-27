@@ -27,8 +27,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.modules.rainfallRunoffModel.objects;
 
 /**
- *
- * @author  John Mobley
+ * This calss implements the set of non-linear ordinary differential equations used
+ * to simulate flows along the river network.  The function is writen as a 
+ * {@link hydroScalingAPI.util.ordDiffEqSolver.BasicFunction}
+ * that is used by the
+ * {@link hydroScalingAPI.util.ordDiffEqSolver.RKF}
+ * @author John Mobley
  */
 public class NetworkEquations_FlowOnly implements hydroScalingAPI.util.ordDiffEqSolver.BasicFunction {
     private hydroScalingAPI.util.geomorphology.objects.LinksAnalysis linksConectionStruct;
@@ -43,7 +47,16 @@ public class NetworkEquations_FlowOnly implements hydroScalingAPI.util.ordDiffEq
     private float[][] areasHillArray;
     private double So,Ts,Te; // not an array because I assume uniform soil properties
     
-    /** Creates new NetworkEquations */
+    /**
+     * Creates new NetworkEquations_FlowOnly
+     * @param links The topologic structure of the river network
+     * @param hillinf The parameters manager for the system of hillsopes
+     * @param linkIn The parameters manager for links in the network
+     * @param rt The routing scheme.  Available schemes are <br>
+     * <p>0: Spatially variable Chezi coefficient </p>
+     * <p>1: Spatially uniform Chezi coefficient </p>
+     * <p>2: Constant Velocity</p>
+     */
     public NetworkEquations_FlowOnly(hydroScalingAPI.util.geomorphology.objects.LinksAnalysis links, hydroScalingAPI.modules.rainfallRunoffModel.objects.HillSlopesInfo hillinf, hydroScalingAPI.modules.rainfallRunoffModel.objects.LinksInfo linkIn, int rt){
         linksConectionStruct=links;
         basinHillSlopesInfo=hillinf;
@@ -63,18 +76,44 @@ public class NetworkEquations_FlowOnly implements hydroScalingAPI.util.ordDiffEq
         
     }
     
+    /**
+     * An empty but required evaluate method
+     * @param input The values used to evaluate the function
+     * @param time The time at which the function is evaluated
+     * @return The value of the function
+     */
     public float[] eval(float[] input, float time) {
-        return new float[0];  // dummy
+        return null;
     }    
     
+    /**
+     * An empty but required evaluate method
+     * @param input The values used to evaluate the function
+     * @return The value of the function
+     */
     public float[] eval(float[] input) {
-        return new float[0];  // dummy
+        return null;
     }    
 
+    /**
+     * An empty but required evaluate method
+     * @param input The values used to evaluate the function
+     * @return The value of the function
+     */
     public double[] eval(double[] input) {
-        return new double[0];  // dummy
+        return null;
     }
     
+    /**
+     * The acual evaluate method for this function.  The equation implemented here is
+     * 
+     * dq/dt=sum(q_trib)-q
+     * 
+     * Where q_trib is the flow for the incoming link
+     * @param input The values used to evaluate the function
+     * @param time The time at which the function is evaluated
+     * @return The value of the function
+     */
     public double[] eval(double[] input, double time) {
         //the input's length is twice the number of links... the first half corresponds to links discharge and the second to hillslopes storage
 
@@ -128,7 +167,7 @@ public class NetworkEquations_FlowOnly implements hydroScalingAPI.util.ordDiffEq
 
                             break;    
 
-                case 2:     K_Q=3.0/lengthArray[0][i];
+                case 2:     K_Q=1.0/lengthArray[0][i];
                             break;
             
             }

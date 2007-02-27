@@ -27,7 +27,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.modules.rainfallRunoffModel.objects;
 
 /**
- *
+ * This is a primitive implementation of a dynamic InfiltrationManager.  This class
+ * provides information for the average infiltration rate at time t for a hillslope
  * @author Ricardo Mantilla
  */
 public class InfiltrationManager {
@@ -36,7 +37,12 @@ public class InfiltrationManager {
     private float[] infiltrationValue;
     int[][] matrizPintada;
 
-    /** Creates a new instance of InfiltrationManager */
+    /**
+     * Creates a new instance of InfiltrationManager (with constant infiltration rate
+     * over the basin)
+     * @param linksStructure The topologic structure of the river network
+     * @param infiltRate A constant value of infiltration for the entire basin
+     */
     public InfiltrationManager(hydroScalingAPI.util.geomorphology.objects.LinksAnalysis linksStructure, float infiltRate) {
         
         infiltrationValue=new float[linksStructure.connectionsArray.length];
@@ -44,6 +50,16 @@ public class InfiltrationManager {
         
     }
     
+    /**
+     * Creates a new instance of InfiltrationManager (with spatially variable infiltration
+     * rate over the basin)
+     * @param myCuenca The {@link hydroScalingAPI.util.geomorphology.objects.Basin} object describing the
+     * basin under consideration
+     * @param linksStructure The topologic structure of the river network
+     * @param metaDatos A MetaRaster describing the infiltration map
+     * @param matDir The directions matrix of the DEM that contains the basin
+     * @param magnitudes The magnitudes matrix of the DEM that contains the basin
+     */
     public InfiltrationManager(hydroScalingAPI.util.geomorphology.objects.Basin myCuenca, hydroScalingAPI.util.geomorphology.objects.LinksAnalysis linksStructure, hydroScalingAPI.io.MetaRaster metaDatos, byte[][] matDir, int[][] magnitudes) {
         
         //Una vez leidos los archivos:
@@ -158,17 +174,15 @@ public class InfiltrationManager {
         }
     }
     
+    /**
+     * Returns the value of infiltration rate in mm/h for a given moment of time
+     * @param HillNumber The index of the desired hillslope
+     * @return The value of infiltration intensity
+     */
     public float getInfiltrationOnHillslope(int HillNumber){
         
         return infiltrationValue[HillNumber];
         
-    }
-    
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        // TODO code application logic here
     }
     
 }

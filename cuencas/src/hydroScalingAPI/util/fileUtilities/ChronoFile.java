@@ -90,6 +90,12 @@ public class ChronoFile extends Object implements Comparable{
         
     }
     
+    /**
+     * 
+     * @param obj 
+     * @return A negative integer, zero, or a positive integer as this object is less than, equal
+     * to, or greater than the specified object.
+     */
     public int compareTo(final java.lang.Object obj) {
         
         java.util.StringTokenizer thisFile=new java.util.StringTokenizer(this.fileName.getName().substring(baseName.length()+1),".");

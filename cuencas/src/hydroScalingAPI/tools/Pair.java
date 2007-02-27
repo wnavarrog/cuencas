@@ -42,6 +42,12 @@ public class Pair implements Comparable{
         property2=b;
     }
     
+    /**
+     * 
+     * @param o 
+     * @return A negative integer, zero, or a positive integer as this object is less than, equal
+     * to, or greater than the specified object.
+     */
     public int compareTo(Object o) {
         
         Pair newPair=(Pair)o;

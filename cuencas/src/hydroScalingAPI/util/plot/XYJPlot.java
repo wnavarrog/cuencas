@@ -1,21 +1,21 @@
 /*
 CUENCAS is a River Network Oriented GIS
 Copyright (C) 2005  Ricardo Mantilla
-
+ 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
 as published by the Free Software Foundation; either version 2
 of the License, or (at your option) any later version.
-
+ 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
-
+ 
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
+ */
 
 
 /*
@@ -68,9 +68,9 @@ public class XYJPlot {
         yTitle(yLabel);
         for(int l=0;l<Math.min(Math.min(datosx.length,datosy.length),leg.length);l++)
             addDoubles(new double[][]{datosx[l],datosy[l]},Color.blue,0,leg[l],6,null,falt);
-            axis.setTipo(t);
-            create();
-            legend.show(true);
+        axis.setTipo(t);
+        create();
+        legend.show(true);
     }
     public XYJPlot(Component p,double[][] datosx,double[][] datosy,String[] leg,String Title,String xLabel,String yLabel,double falt){
         this(p,datosx,datosy,leg,Title,xLabel,yLabel,falt,Color.blue,0);
@@ -385,14 +385,12 @@ public class XYJPlot {
                 axis.xmax(d1);
                 axis.ymin(d2);
                 axis.ymax(d3);
-            }
-            else if(first_x == i && first_y == j) {
+            } else if(first_x == i && first_y == j) {
                 axis.xmin(xminimum);
                 axis.xmax(xmaximum);
                 axis.ymin(yminimum);
                 axis.ymax(ymaximum);
-            }
-            else{
+            } else{
                 double d4 = axis.xmax() - axis.xmin();
                 double d = (double)((float)(Math.min(first_x,i) - axis.plotXstart()) / (float)axis.plotWidth()) * d4 + axis.xmin();
                 double d1 = (double)((float)(Math.max(i,first_x) - axis.plotXstart()) / (float)axis.plotWidth()) * d4 + axis.xmin();

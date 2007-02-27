@@ -91,7 +91,8 @@ public class MetaGauge extends Object implements Comparable{
     /**
      * The comparison method
      * @param obj The object to be compared with
-     * @return -1, 0 or 1 for smaller, equal or less than
+     * @return A negative integer, zero, or a positive integer as this object is less than, equal
+     * to, or greater than the specified object.
      */
     public int compareTo(Object obj) {
         return (this.toString()).compareToIgnoreCase(obj.toString());

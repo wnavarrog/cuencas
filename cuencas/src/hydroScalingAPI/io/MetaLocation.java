@@ -81,7 +81,8 @@ public class MetaLocation extends Object implements Comparable{
     /**
      * The comparison criteria
      * @param obj The object to compare to
-     * @return -1 if smaller 0 if equal and 1 if larger
+     * @return A negative integer, zero, or a positive integer as this object is less than, equal
+     * to, or greater than the specified object.
      */
     public int compareTo(Object obj) {
         return (this.toString()).compareToIgnoreCase(obj.toString());

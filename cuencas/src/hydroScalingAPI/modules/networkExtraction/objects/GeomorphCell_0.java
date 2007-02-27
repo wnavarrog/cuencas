@@ -54,6 +54,13 @@ public class GeomorphCell_0 extends Object implements Comparable{
     private int i_romper;
     private int j_romper;
     
+    /**
+     * Creates an instance of the GeomorphCell_0 class
+     * @param ii The row number of the location
+     * @param jj The column number of the location
+     * @param ccota The elevation of the location
+     * @param mmin_ady The minimum elevation of the adjacents cell
+     */
     public GeomorphCell_0(int ii, int jj, double ccota, double mmin_ady){
         i = ii;
         j = jj;
@@ -62,6 +69,12 @@ public class GeomorphCell_0 extends Object implements Comparable{
         min_ady =  mmin_ady;
     }
     //ESTE COMPARADOR ORGANIZA LAS CELDAS DE MENOR A MAYOR SEGUN SU COTA
+    /**
+     * The comparison criteria for the GeomorphCell_0
+     * @param c1 The GeomorphCell_0 to be compared with
+     * @return A negative integer, zero, or a positive integer as this object is less than, equal
+     * to, or greater than the specified object.
+     */
     public int compareTo(java.lang.Object c1) {
         int comp;
         GeomorphCell_0 thisGeomorphCell_0 =(GeomorphCell_0)c1;
@@ -69,10 +82,19 @@ public class GeomorphCell_0 extends Object implements Comparable{
         return comp;
     }
     
+    /**
+     * The euclidian distance to another cell
+     * @param cell The reference cell
+     * @return A double with the distance in cartesian units
+     */
     public double euclid_distance(GeomorphCell_0 cell){
         return Math.sqrt(Math.pow(this.i - cell.i,2) + Math.pow(this.j - cell.j,2));
     }
     
+    /**
+     * Finds the shortest distance between the cell and the cells in the Pit
+     * @param pitcells The reference Pit
+     */
     public void findDisToPit(Object[] pitcells){
         
         

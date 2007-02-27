@@ -21,22 +21,34 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.modules.networkExtraction.widgets;
 
 /**
- *
- * @author  Jorge Mario Ramirez
+ * This GUI allows the user to select the tasks that the NetworkExtractionModule
+ * should perform on the current DEM
+ * @author Jorge Mario Ramirez
  */
 public class ExtractionOptions extends javax.swing.JDialog {
     
     private hydroScalingAPI.util.plot.XYJPanel Ppanel;
+    /**
+     * The {@link hydroScalingAPI.modules.networkExtraction.objects.NetworkExtractionModule}
+     * associated to this interface
+     */
     public hydroScalingAPI.modules.networkExtraction.objects.NetworkExtractionModule Proc;
     
     private double dx, dy;
-    public boolean listo = false;
+    private boolean listo = false;
+    /**
+     * The list of flat zones and sinks detected over the entire DEM
+     */
     public java.util.Vector myFSc;
     double[][] promsAP;
     double[][] APFuentes;
     
     
-    /** Creates new form OpProcesar */
+    /**
+     * Creates new form OpProcesar but doesn't display it
+     * @param Proc1 The {@link hydroScalingAPI.modules.networkExtraction.objects.NetworkExtractionModule}
+     * to be associated to this interface
+     */
     public ExtractionOptions(hydroScalingAPI.modules.networkExtraction.objects.NetworkExtractionModule Proc1) {
         super(Proc1.parent,true);
         initComponents();
@@ -54,6 +66,12 @@ public class ExtractionOptions extends javax.swing.JDialog {
         //buscandoPits();
     }
     
+    /**
+     * Creates new form OpProcesar and displayes it
+     * @param Proc1 The {@link hydroScalingAPI.modules.networkExtraction.objects.NetworkExtractionModule}
+     * to be associated to this interface
+     * @param b A boolean indicating that the interface must be set visible
+     */
     public ExtractionOptions(hydroScalingAPI.modules.networkExtraction.objects.NetworkExtractionModule Proc1, boolean b) {
         super(Proc1.parent,false);
         initComponents();
@@ -70,7 +88,7 @@ public class ExtractionOptions extends javax.swing.JDialog {
         setVisible(true);
     }
     
-    public void inicio(){
+    private void inicio(){
         jComboBox1.setMaximumRowCount(2);
         jComboBox1.addItem(new String("cells"));
         jComboBox1.addItem(new String("km^2"));
@@ -192,6 +210,10 @@ public class ExtractionOptions extends javax.swing.JDialog {
         jCheckBoxVECT.setSelected(Proc.taskVECT);
     }
     
+    /**
+     * Aplies the findPits() algorithm over the entire DEM and uses the prameters to
+     * update information in the GUI
+     */
     public void buscandoPits(){
         jLabelBarra.setText("Searching for sinks y and flat zones");
 
@@ -203,6 +225,11 @@ public class ExtractionOptions extends javax.swing.JDialog {
         jLabelBarra.setText("There are " + F.size() + " flat zones and " + S.size() + "  sinks");
     }
     
+    /**
+     * Creates the graph for the Area-Slope analysis
+     * @param promsAP1 Binned Areas and Slopes
+     * @param inicial A boolean indicating if it is the first time the graph will be made
+     */
     public void graficaAP(double[][] promsAP1, boolean inicial){
         // Estos valores son logaritmos de A  y P respectivamente
         promsAP = promsAP1;
@@ -264,30 +291,55 @@ public class ExtractionOptions extends javax.swing.JDialog {
     
     
     
+    /**
+     * Indicates to the interface that the NetworkExtractionModule has finished the
+     * required tasks
+     */
     public void set_ready(){
         jButtonAplicar.setEnabled(true);
         jButtonIniciar.setEnabled(true);
     }
     
+    /**
+     * Sets bounds for the Optimizer status bar
+     * @param min The minimum value
+     * @param max The maximum value
+     */
     public void setMaxMinOptimizerBar(int min, int max){
         optimizationProgressBar.setMinimum(min);
         optimizationProgressBar.setMaximum(max);
         optimizationProgressBar.setValue(0);
     }
     
+    /**
+     * Updates the status of the Optimizer status bar
+     */
     public void increaseValueExtractionBar(){
         optimizationProgressBar.setValue(optimizationProgressBar.getValue()+1);
     }
     
+    /**
+     * Sets bounds for the Extraction status bar
+     * @param min The minimum elevation of the terrain
+     * @param max The maximum elevation of the terrain
+     */
     public void setMaxMinExtractionBar(int min, int max){
         extractionProgressBar.setMinimum(min);
         extractionProgressBar.setMaximum(max);
     }
     
+    /**
+     * Updates the status of the Extraction status bar
+     * @param value The current elevation
+     */
     public void setValueExtractionBar(int value){
         extractionProgressBar.setValue(extractionProgressBar.getMaximum()-value+extractionProgressBar.getMinimum());
     }
     
+    /**
+     * Announces that the Algorithm has failed to complete the extraction process. 
+     * Manual modifications of the DEM may be needed
+     */
     public void announceFailure(){
         extractionProgressBar.setValue(extractionProgressBar.getMinimum());
         Object [] tmp = new Object[]{"Accept"};
@@ -1402,8 +1454,7 @@ public class ExtractionOptions extends javax.swing.JDialog {
       }
   }//GEN-LAST:event_jButtonAplicarActionPerformed
   
-  //--------------------*-**-------------------------------------------------------------------------------
-  public boolean cheqManual(){
+  private boolean cheqManual(){
       boolean todoBien=true;
       
       if(!jCheckBox4.isSelected()) Proc.pixManual=Float.POSITIVE_INFINITY;
@@ -1515,6 +1566,7 @@ public class ExtractionOptions extends javax.swing.JDialog {
     }//GEN-LAST:event_closeDialog
     
     /**
+     * Tests for the form
      * @param args the command line arguments
      */
     public static void main(String args[]) {

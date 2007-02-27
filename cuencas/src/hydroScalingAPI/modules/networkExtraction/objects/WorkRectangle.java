@@ -21,50 +21,89 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.modules.networkExtraction.objects;
 
 /**
- *
+ * This class is used to identify a region in the DEM where correction action must
+ * be taken.  This class contains several methods to correct artifitial features in
+ * the DEM such as flat zones
  * @author Jorge Mario Ramirez and Ricardo Mantilla
  */
 public class WorkRectangle extends Object  {
-    public int ini_i;
-    public int end_i;
-    public int ini_j;
-    public int end_j;
-    public int nfilaM;
-    public int ncolM;
-    public int corr1[][];
-    public int corr2[][];
-    public boolean corrija2=true;
-    NetworkExtractionModule Proc;
+    /**
+     * The initial row of the rectangle
+     */
+    public int ini_row;
+    /**
+     * The final row of the rectangle
+     */
+    public int end_row;
+    /**
+     * The initial column of the rectangle
+     */
+    public int ini_col;
+    /**
+     * The final column of the rectangle
+     */
+    public int end_col;
     
-    /** Creates new WorkRectangle */
+    private int nfilaM;
+    private int ncolM;
+    
+    private int corr1[][];
+    private int corr2[][];
+    private boolean corrija2=true;
+    private NetworkExtractionModule Proc;
+    
+    /**
+     * Creates an instnace of the WorkRectangle associated to a NetworkExtractionModule
+     * @param ii The initial row of the rectangle
+     * @param ei The final row of the rectangle
+     * @param ij The initial column of the rectangle
+     * @param ej The final column of the rectangle
+     * @param Proc1 The parent NetworkExtractionModule
+     */
     public WorkRectangle(int ii, int ei, int ij, int ej, NetworkExtractionModule Proc1) {
-        ini_i=ii;
-        end_i=ei;
-        ini_j=ij;
-        end_j=ej;
+        ini_row=ii;
+        end_row=ei;
+        ini_col=ij;
+        end_col=ej;
         nfilaM = ei-ii+1;
         ncolM = ej-ij+1;
         Proc = Proc1;
     }
     
+    /**
+     * Creates an instnace of the WorkRectangle
+     * @param ii The initial row of the rectangle
+     * @param ei The final row of the rectangle
+     * @param ij The initial column of the rectangle
+     * @param ej The final column of the rectangle
+     */
     public WorkRectangle(int ii, int ei, int ij, int ej) {
-        ini_i=ii;
-        end_i=ei;
-        ini_j=ij;
-        end_j=ej;
+        ini_row=ii;
+        end_row=ei;
+        ini_col=ij;
+        end_col=ej;
         nfilaM = ei-ii+1;
         ncolM = ej-ij+1;
     }
     
-    public boolean equals(final java.lang.Object p1) {
+    /**
+     * The equal method for the WorkRectangle
+     * @param m1 The Pit be compared against
+     * @return A boolean indicating if the equality holds
+     */
+    public boolean equals(final java.lang.Object m1) {
         int comp;
-        WorkRectangle myWorkRectangle = (WorkRectangle) p1;
-        if(ini_i==myWorkRectangle.ini_i && ini_j==myWorkRectangle.ini_j && end_i==myWorkRectangle.end_i && end_j==myWorkRectangle.end_j)
+        WorkRectangle myWorkRectangle = (WorkRectangle) m1;
+        if(ini_row==myWorkRectangle.ini_row && ini_col==myWorkRectangle.ini_col && end_row==myWorkRectangle.end_row && end_col==myWorkRectangle.end_col)
             return true;
         else 
             return false;
     }
     
+    /**
+     * In a recursive fashion corrects all the flat areas in the current WorkRectangle
+     * @param FSc A list of flat areas and sinks in the work rectangle
+     */
     public void corrigeWorkRectangle(java.util.Vector FSc){
         java.util.Vector F = (java.util.Vector) FSc.get(0);
         java.util.Vector S = (java.util.Vector) FSc.get(1);
@@ -92,7 +131,7 @@ public class WorkRectangle extends Object  {
         FSc=null; F_on=null; S_on=null;
     }
     
-    public void corrigeUnipit(){
+    private void corrigeUnipit(){
         if (Proc.printDebug) System.out.println("    >>> UniPit Method" );
         
         int ncol = Proc.metaDEM.getNumCols();
@@ -105,8 +144,8 @@ public class WorkRectangle extends Object  {
 
         WorkRectangle M = this;
         
-        for (int i=M.ini_i; i<=M.end_i; i++){
-            for (int j=M.ini_j; j<=M.end_j; j++){
+        for (int i=M.ini_row; i<=M.end_row; i++){
+            for (int j=M.ini_col; j<=M.end_col; j++){
                 min_ady = Double.MAX_VALUE;
                 contAltas = 0;
                 contPlanas=0;
@@ -139,6 +178,11 @@ public class WorkRectangle extends Object  {
     }//metodo corrUnipit
     
     
+    /**
+     * Finds pits in the current WorkRectangle above a given elevation (c)
+     * @param c The elevation over which to search for sinks
+     * @return A list of sinks
+     */
     public java.util.Vector findPits(double c){
         corrigeUnipit();
         if (Proc.printDebug) {
@@ -158,14 +202,14 @@ public class WorkRectangle extends Object  {
         Pits.addElement(P0);
         P0.corregido=true;
         
-        for (int i=M.ini_i; i<=M.end_i; i++){
-            for (int j=M.ini_j; j<=M.end_j; j++){
+        for (int i=M.ini_row; i<=M.end_row; i++){
+            for (int j=M.ini_col; j<=M.end_col; j++){
                 if (Proc.DEM[i][j]>=c && Proc.DIR[i][j]>=10 && Proc.DIR[i][j]<100){
                     Pit estePit = new Pit(contgrupos,Proc.DEM[i][j],new WorkRectangle(i,i,j,j,Proc));
                     Pits.addElement(estePit);
                     contgrupos++;
                     estePit.orden=Proc.sinkOrder; Proc.sinkOrder++;
-                    estePit.cant=1; estePit.salida=0;
+                    estePit.salida=false;
                     marquePit(i,j,estePit);
                 }
             }
@@ -175,7 +219,7 @@ public class WorkRectangle extends Object  {
 
         for (int n=0; n<Pits.size(); n++){
             Pit Pn = (Pit)Pits.get(n);
-            if (Pn.salida == 1)
+            if (Pn.salida)
                 Flats.addElement(Pn);
             else
                 Sinks.addElement(Pn);
@@ -191,6 +235,12 @@ public class WorkRectangle extends Object  {
         return FindP;
     }//Metodo findPits
     
+    /**
+     * A non-recursive implementation of findPits().  This method is called when there
+     * is insufisient memory to use findPits().
+     * @param c The elevation over which to search for sinks
+     * @return A list of sinks
+     */
     public java.util.Vector findPits2(double c){
         corrigeUnipit();
         if (Proc.printDebug) {
@@ -208,14 +258,14 @@ public class WorkRectangle extends Object  {
         Pits.addElement(P0); 
         P0.corregido=true;
         
-        for (int i=M.ini_i; i<=M.end_i; i++){
-            for (int j=M.ini_j; j<=M.end_j; j++){
+        for (int i=M.ini_row; i<=M.end_row; i++){
+            for (int j=M.ini_col; j<=M.end_col; j++){
                 if (Proc.DEM[i][j]>=c && Proc.DIR[i][j]>=10 && Proc.DIR[i][j]<100){
                     Pit estePit = new Pit(contgrupos,Proc.DEM[i][j],new WorkRectangle(i,i,j,j,Proc));
                     Pits.addElement(estePit);
                     contgrupos++;
                     estePit.orden=Proc.sinkOrder; Proc.sinkOrder++;
-                    estePit.cant=1; estePit.salida=0;
+                    estePit.salida=false;
                     int nc = Proc.metaDEM.getNumCols();
                     int parIni = i*nc+j;
                     int par1 = i*nc+j; int par2 = i*nc+j; int par3 = i*nc+j;
@@ -230,7 +280,6 @@ public class WorkRectangle extends Object  {
                                 estePit.Mp.act_WorkRectangle(par1/nc,par1%nc);
                                 //if(par1==16*nc+99) System.out.println("vealo1*************************** "+ (100*estePit.grupo + Proc.DIR[par1/nc][par1%nc])+" "+parIni/nc+" "+parIni%nc+" "+par1/nc+" "+par1%nc);
                                 Proc.DIR[par1/nc][par1%nc] = 100*estePit.grupo + Proc.DIR[par1/nc][par1%nc];
-                                estePit.cant++;
                                 //if(parIni == 170*nc+442)System.out.println("a�ade1 "+ (par1/nc) +" "+par1%nc+" "+estePit.grupo +" "+ Proc.DIR[par1/nc][par1%nc]);
                             }
                             devuelve = false;
@@ -242,7 +291,6 @@ public class WorkRectangle extends Object  {
                                 estePit.Mp.act_WorkRectangle(par2/nc,par2%nc);
                                 Proc.DIR[par2/nc][par2%nc] = 100*estePit.grupo + Proc.DIR[par2/nc][par2%nc];
                                 //if(parIni == 16*nc+99)System.out.println("ahnade2 *****************************"+ (par2/nc) +" "+par2%nc+" "+estePit.grupo + " "+ Proc.DIR[par2/nc][par2%nc]);
-                                estePit.cant++;
                                 par3 = findCell(par2, estePit, nc);
                                 salga = (par3 == 0);
                             }
@@ -264,7 +312,7 @@ public class WorkRectangle extends Object  {
         Pits.remove(P0);
         for (int n=0; n<Pits.size(); n++){
             Pit Pn = (Pit)Pits.get(n);
-            if (Pn.salida == 1)
+            if (Pn.salida)
                 Flats.addElement(Pn);
             else
                 Sinks.addElement(Pn);
@@ -277,16 +325,15 @@ public class WorkRectangle extends Object  {
         return FindP;
     }//Metodo findPits2
     
-    public void marquePit(int i, int j, Pit P){
+    private void marquePit(int i, int j, Pit P){
         
         //System.out.println("en "+i+" "+j);
         P.Mp.act_WorkRectangle(i,j);
         Proc.DIR[i][j] = 100*P.grupo + Proc.DIR[i][j];
-        P.cant++;
         
         for (int k=0; k <= 8; k++){
-            if (P.salida==0 && Proc.DIR[i+(k/3)-1][j+(k%3)-1] < 10 && Proc.DEM[i+(k/3)-1][j+(k%3)-1] == Proc.DEM[i][j])
-                P.salida = 1;
+            if (!P.salida && Proc.DIR[i+(k/3)-1][j+(k%3)-1] < 10 && Proc.DEM[i+(k/3)-1][j+(k%3)-1] == Proc.DEM[i][j])
+                P.salida = true;
             if (Proc.DIR[i+(k/3)-1][j+(k%3)-1] >=10 && Proc.DIR[i+(k/3)-1][j+(k%3)-1]<100 && Proc.DEM[i+(k/3)-1][j+(k%3)-1]==P.cota){
                 marquePit(i+(k/3)-1,j+(k%3)-1,P);
             }
@@ -294,12 +341,12 @@ public class WorkRectangle extends Object  {
         
     }
     
-    public int findCell(int id,Pit P, int ncols){
+    private int findCell(int id,Pit P, int ncols){
         int j= id%ncols;
         int i = id/ncols;
         for (int k=0; k <= 8; k++){
-            if (P.salida==0 && Proc.DIR[i+(k/3)-1][j+(k%3)-1] < 10 && Proc.DEM[i+(k/3)-1][j+(k%3)-1] == Proc.DEM[i][j])
-                P.salida = 1;
+            if (!P.salida && Proc.DIR[i+(k/3)-1][j+(k%3)-1] < 10 && Proc.DEM[i+(k/3)-1][j+(k%3)-1] == Proc.DEM[i][j])
+                P.salida = true;
             if (Proc.DIR[i+(k/3)-1][j+(k%3)-1] >=10 && Proc.DIR[i+(k/3)-1][j+(k%3)-1]<100 && Proc.DEM[i+(k/3)-1][j+(k%3)-1]==P.cota){
                 return((i+(k/3)-1)*ncols + (j+(k%3)-1));
             }
@@ -308,6 +355,11 @@ public class WorkRectangle extends Object  {
     }
     
     
+    /**
+     * Calculates directions for all cells in the DEM using the steepest gradient
+     * criteria.  For ambiguous cells (flat zones, pits) it assigns a group number.
+     * @param c The elevation over which to apply the steepest gradient criteria
+     */
     public void direcciones(double c){
         /*Se inicializa el arreglo pend[] que llevar las pendientes en cada celda hacia las
         ocho direcciones posibles.*/
@@ -327,9 +379,9 @@ public class WorkRectangle extends Object  {
         
         /*Se crea un arrgelo de distancias en donde estan las distancias de una celda al centro de
         cada una de las ocho adyacentes. Esto depende de la fila de la celda.*/
-        for (int i=ini_i; i<=end_i; i++){
+        for (int i=ini_row; i<=end_row; i++){
             double[] dist = {Proc.dxy[i],Proc.dy,Proc.dxy[i],Proc.dx[i],1,Proc.dx[i],Proc.dxy[i],Proc.dy,Proc.dxy[i]};
-            for (int j=ini_j; j<=end_j; j++){
+            for (int j=ini_col; j<=end_col; j++){
                 double maxpend;
                 //Si no es un dato faltante:
                 if(Proc.DEM[i][j]!=-1){
@@ -431,17 +483,17 @@ public class WorkRectangle extends Object  {
     }//metodo  direcciones
     
     
-    public void corrigeFlat(java.util.Vector F, double incr){
+    private void corrigeFlat(java.util.Vector F, double incr){
         if (Proc.printDebug) System.out.println("    >>> FIXING FLAT ZONES");
         
         WorkRectangle M = this;
         corr1 = new int[M.nfilaM+2][M.ncolM+2];
         corr2 = new int[M.nfilaM+2][M.ncolM+2];
-        for (int i=M.ini_i ; i<=M.end_i; i++){
-            for (int j=M.ini_j; j<=M.end_j; j++){
+        for (int i=M.ini_row ; i<=M.end_row; i++){
+            for (int j=M.ini_col; j<=M.end_col; j++){
                 
-                int ic=i-M.ini_i+1; 
-                int jc=j-M.ini_j+1;
+                int ic=i-M.ini_row+1; 
+                int jc=j-M.ini_col+1;
                 
                 if (Proc.DIR[i][j]%100 >=10){
                     corr1[ic][jc]++ ;
@@ -466,11 +518,11 @@ public class WorkRectangle extends Object  {
             
             Pit Fn = (Pit)F.get(n);
             
-            if (Fn.Mp.is_on(2027,435)) {
-                System.out.print("    >>> Frame before corrFlat: ");
-                M.print_M();
-                //printPedazoTemporal();
-            }
+//            if (Fn.Mp.is_on(2027,435)) {
+//                System.out.print("    >>> Frame before corrFlat: ");
+//                M.print_M();
+//                //printPedazoTemporal();
+//            }
             
             boolean listo1 = false; boolean listo2 =  false;
             int faltan1; int faltan2;
@@ -483,14 +535,14 @@ public class WorkRectangle extends Object  {
             int timeInloop=0;
             do{
                 faltan1 = 0; faltan2 = 0;
-                for (int i=Fn.Mp.ini_i ; i<=Fn.Mp.end_i; i++){
-                    for (int j=Fn.Mp.ini_j; j<=Fn.Mp.end_j; j++){
+                for (int i=Fn.Mp.ini_row ; i<=Fn.Mp.end_row; i++){
+                    for (int j=Fn.Mp.ini_col; j<=Fn.Mp.end_col; j++){
                         /*
                          *Este if evita la confusion de zonas planas con el mismo grupo que estan a diferente nivel
                          */
                         if (Proc.DEM[i][j] == Fn.cota){
-                            int ic=i-M.ini_i+1;
-                            int jc=j-M.ini_j+1;
+                            int ic=i-M.ini_row+1;
+                            int jc=j-M.ini_col+1;
 
                             if (!contado && Proc.DIR[i][j]/100 == Fn.grupo)
                                 cantp ++;
@@ -540,8 +592,8 @@ public class WorkRectangle extends Object  {
                     if (Proc.printDebug) Fn.Mp.print_M();
 
                     /*System.out.println("Modified DEM up to this point:");
-                    for (int i=Fn.Mp.end_i ; i>=Fn.Mp.ini_i; i--){
-                        for (int j=Fn.Mp.ini_j ; j<=Fn.Mp.end_j; j++){
+                    for (int i=Fn.Mp.end_row ; i>=Fn.Mp.ini_row; i--){
+                        for (int j=Fn.Mp.ini_col ; j<=Fn.Mp.end_col; j++){
                             System.out.print(Proc.DEM[i][j]+" ");
                         }
                         System.out.println();
@@ -549,8 +601,8 @@ public class WorkRectangle extends Object  {
 
                     System.out.println();
                     System.out.println("Direction Matrix up to this point:");
-                    for (int i=Fn.Mp.end_i ; i>=Fn.Mp.ini_i; i--){
-                        for (int j=Fn.Mp.ini_j ; j<=Fn.Mp.end_j; j++){
+                    for (int i=Fn.Mp.end_row ; i>=Fn.Mp.ini_row; i--){
+                        for (int j=Fn.Mp.ini_col ; j<=Fn.Mp.end_col; j++){
                             System.out.print(Proc.DIR[i][j]+" ");
                         }
                         System.out.println();
@@ -558,10 +610,10 @@ public class WorkRectangle extends Object  {
 
                     System.out.println();
                     System.out.println("Corr1 Matrix:");
-                    for (int i=Fn.Mp.end_i ; i>=Fn.Mp.ini_i; i--){
-                        for (int j=Fn.Mp.ini_j ; j<=Fn.Mp.end_j; j++){
-                            int ic=i-M.ini_i+1;
-                            int jc=j-M.ini_j+1;
+                    for (int i=Fn.Mp.end_row ; i>=Fn.Mp.ini_row; i--){
+                        for (int j=Fn.Mp.ini_col ; j<=Fn.Mp.end_col; j++){
+                            int ic=i-M.ini_row+1;
+                            int jc=j-M.ini_col+1;
                             System.out.print(corr1[ic][jc]+" ");
                         }
                         System.out.println();
@@ -569,10 +621,10 @@ public class WorkRectangle extends Object  {
 
                     System.out.println();
                     System.out.println("Corr2 Matrix:");
-                    for (int i=Fn.Mp.end_i ; i>=Fn.Mp.ini_i; i--){
-                        for (int j=Fn.Mp.ini_j ; j<=Fn.Mp.end_j; j++){
-                            int ic=i-M.ini_i+1;
-                            int jc=j-M.ini_j+1;
+                    for (int i=Fn.Mp.end_row ; i>=Fn.Mp.ini_row; i--){
+                        for (int j=Fn.Mp.ini_col ; j<=Fn.Mp.end_col; j++){
+                            int ic=i-M.ini_row+1;
+                            int jc=j-M.ini_col+1;
                             System.out.print(corr2[ic][jc]+" ");
                         }
                         System.out.println();
@@ -584,10 +636,10 @@ public class WorkRectangle extends Object  {
 
                     System.exit(0);*/
 
-                    for (int i=Fn.Mp.end_i ; i>=Fn.Mp.ini_i; i--){
-                        for (int j=Fn.Mp.ini_j ; j<=Fn.Mp.end_j; j++){
-                            int ic=i-M.ini_i+1;
-                            int jc=j-M.ini_j+1;
+                    for (int i=Fn.Mp.end_row ; i>=Fn.Mp.ini_row; i--){
+                        for (int j=Fn.Mp.ini_col ; j<=Fn.Mp.end_col; j++){
+                            int ic=i-M.ini_row+1;
+                            int jc=j-M.ini_col+1;
                             if(corr1[ic][jc]>0){
                                 corr1[ic][jc]=0;
                                 corr2[ic][jc]=0;
@@ -600,18 +652,18 @@ public class WorkRectangle extends Object  {
                 //}while ((faltan2 != cantp || !contado) && (faltan1 + faltan2 != 0)); EN PRUEBAS !!!!!!!
             } while ((faltan2 != cantp || faltan1 != 0) && (faltan1 + faltan2 != 0));
             
-            for (int i=Fn.Mp.ini_i ; i<=Fn.Mp.end_i; i++){
-                for (int j=Fn.Mp.ini_j; j<=Fn.Mp.end_j; j++){
-                    int ic=i-M.ini_i+1; int jc=j-M.ini_j+1;
+            for (int i=Fn.Mp.ini_row ; i<=Fn.Mp.end_row; i++){
+                for (int j=Fn.Mp.ini_col; j<=Fn.Mp.end_col; j++){
+                    int ic=i-M.ini_row+1; int jc=j-M.ini_col+1;
                     if (Proc.DIR[i][j]/100 == Fn.grupo && Proc.DEM[i][j] == Fn.cota){
                         if (corrija2) corr2[ic][jc] = (max_corr2 - Math.abs(corr2[ic][jc])+1);
                         else  corr2[ic][jc] = 0;
                     }
                 }
             }
-            for (int i=Fn.Mp.ini_i ; i<=Fn.Mp.end_i; i++){
-                for (int j=Fn.Mp.ini_j; j<=Fn.Mp.end_j; j++){
-                    int ic=i-M.ini_i+1; int jc=j-M.ini_j+1;
+            for (int i=Fn.Mp.ini_row ; i<=Fn.Mp.end_row; i++){
+                for (int j=Fn.Mp.ini_col; j<=Fn.Mp.end_col; j++){
+                    int ic=i-M.ini_row+1; int jc=j-M.ini_col+1;
                     if(Proc.DIR[i][j]/100==Fn.grupo && Proc.DEM[i][j] == Fn.cota)
                         Proc.DEM[i][j]= Proc.DEM[i][j]+(incr)*(corr2[ic][jc]-corr1[ic][jc]);
                 }
@@ -622,8 +674,8 @@ public class WorkRectangle extends Object  {
                 printPedazoTemporal();
                 System.out.println();
                 System.out.println("CORR 1");
-                for(int i=2030-M.ini_i;i>2020-M.ini_i;i--){
-                    for(int j=430-M.ini_j;j<440-M.ini_j;j++){
+                for(int i=2030-M.ini_row;i>2020-M.ini_row;i--){
+                    for(int j=430-M.ini_col;j<440-M.ini_col;j++){
                         if(i < 0 || j< 0 || i>=corr2.length || j>=corr2[0].length)
                            System.out.print("XXX ");
                         else
@@ -632,8 +684,8 @@ public class WorkRectangle extends Object  {
                     System.out.println();
                 }
                 System.out.println("CORR 2");
-                for(int i=2030-M.ini_i;i>2020-M.ini_i;i--){
-                    for(int j=430-M.ini_j;j<440-M.ini_j;j++){
+                for(int i=2030-M.ini_row;i>2020-M.ini_row;i--){
+                    for(int j=430-M.ini_col;j<440-M.ini_col;j++){
                         if(i < 0 || j< 0 || i>=corr2.length || j>=corr2[0].length)
 			   System.out.print("XXX ");
 			else
@@ -643,7 +695,7 @@ public class WorkRectangle extends Object  {
                 }
             }*/
 
-        }//for(n)
+        }
         
         
         
@@ -652,35 +704,53 @@ public class WorkRectangle extends Object  {
         corr1=null; corr2=null;
         if (Proc.printDebug) System.out.println("    >>> FLAT ZONES FIXED");
         
-    }//M�todo corrFlat
+    }
     
     
+    /**
+     * Updates the limits of the WorkRectangle to include a given location
+     * @param i The row number of the location
+     * @param j The column number of the location
+     */
     public void act_WorkRectangle(int i, int j){
-        ini_i = Math.min(ini_i,i);
-        ini_j = Math.min(ini_j,j);
-        end_i = Math.max(end_i,i);
-        end_j = Math.max(end_j,j);
-        nfilaM = end_i-ini_i+1;
-        ncolM = end_j-ini_j+1;
+        ini_row = Math.min(ini_row,i);
+        ini_col = Math.min(ini_col,j);
+        end_row = Math.max(end_row,i);
+        end_col = Math.max(end_col,j);
+        nfilaM = end_row-ini_row+1;
+        ncolM = end_col-ini_col+1;
     }
     
+    /**
+     * Updates the limits of the WorkRectangle to include another WorkRectangle
+     * @param M2 The WorkRectangle to use as reference
+     */
     public void add_WorkRectangle(WorkRectangle M2){
-        act_WorkRectangle(M2.ini_i,M2.ini_j);
-        act_WorkRectangle(M2.end_i,M2.end_j);
+        act_WorkRectangle(M2.ini_row,M2.ini_col);
+        act_WorkRectangle(M2.end_row,M2.end_col);
     }
     
-    public WorkRectangle def_WorkRectangle(int d, int nfila, int ncol){
-        act_WorkRectangle(Math.max(2,ini_i-d), Math.max(2,ini_j-d));
-        act_WorkRectangle(Math.min(end_i+d,nfila),Math.min(end_j+d,ncol));
-        return this;
-    }
+//    public WorkRectangle def_WorkRectangle(int d, int nfila, int ncol){
+//        act_WorkRectangle(Math.max(2,ini_row-d), Math.max(2,ini_col-d));
+//        act_WorkRectangle(Math.min(end_row+d,nfila),Math.min(end_col+d,ncol));
+//        return this;
+//    }
     
+    /**
+     * A string describing the WorkRectangle
+     */
     public void print_M(){
-        if (Proc.printDebug) System.out.println("    Yi="+ini_i + "  Yf=" +end_i + "  Xi=" +ini_j + "  Xf=" +end_j);
+        if (Proc.printDebug) System.out.println("    Yi="+ini_row + "  Yf=" +end_row + "  Xi=" +ini_col + "  Xf=" +end_col);
     }
     
+    /**
+     * A boolean flag that indicates if a given cell belongs to the WorkRectangle
+     * @param i The row number of the location to test
+     * @param j The column number of the location to test
+     * @return The boolean indicating if the cell is inside the WorkRectangle
+     */
     public boolean is_on(int i , int j){
-        if(i<=end_i && i>=ini_i && j<=end_j && j>=ini_j)
+        if(i<=end_row && i>=ini_row && j<=end_col && j>=ini_col)
             return true;
         else
             return false;
@@ -716,13 +786,13 @@ public class WorkRectangle extends Object  {
     
     
     /*public void print_M(WorkRectangle M1, boolean s, int[][] D, int c){
-        System.out.println(M1.ini_i + "  " +M1.end_i + "  " +M1.ini_j + "  " +M1.end_j);
+        System.out.println(M1.ini_row + "  " +M1.end_row + "  " +M1.ini_col + "  " +M1.end_col);
         if(s){
-            WorkRectangle M2 = new WorkRectangle(M1.ini_i-c,M1.end_i+c,M1.ini_j-c,M1.end_j+c,M1.Proc);
-            System.out.println("This  "+M2.ini_i + "  " +M2.end_i + "  " +M2.ini_j + "  " +M2.end_j);
-            for (int i=M2.ini_i; i<=M2.end_i; i++){
+            WorkRectangle M2 = new WorkRectangle(M1.ini_row-c,M1.end_row+c,M1.ini_col-c,M1.end_col+c,M1.Proc);
+            System.out.println("This  "+M2.ini_row + "  " +M2.end_row + "  " +M2.ini_col + "  " +M2.end_col);
+            for (int i=M2.ini_row; i<=M2.end_row; i++){
                 System.out.print("\n" + i + " " );
-                for (int j=M2.ini_j; j<=M2.end_j; j++){
+                for (int j=M2.ini_col; j<=M2.end_col; j++){
                     System.out.print(D[i][j]+ "  ");
                 }
             }
@@ -731,13 +801,13 @@ public class WorkRectangle extends Object  {
     }
      
     public void print_M(WorkRectangle M1, boolean s, double[][] D, int c){
-        System.out.println(M1.ini_i + "  " +M1.end_i + "  " +M1.ini_j + "  " +M1.end_j);
+        System.out.println(M1.ini_row + "  " +M1.end_row + "  " +M1.ini_col + "  " +M1.end_col);
         if(s){
-            WorkRectangle M2 = new WorkRectangle(M1.ini_i-c,M1.end_i+c,M1.ini_j-c,M1.end_j+c,M1.Proc);
-            System.out.println("This  "+M2.ini_i + "  " +M2.end_i + "  " +M2.ini_j + "  " +M2.end_j);
-            for (int i=M2.ini_i; i<=M2.end_i; i++){
+            WorkRectangle M2 = new WorkRectangle(M1.ini_row-c,M1.end_row+c,M1.ini_col-c,M1.end_col+c,M1.Proc);
+            System.out.println("This  "+M2.ini_row + "  " +M2.end_row + "  " +M2.ini_col + "  " +M2.end_col);
+            for (int i=M2.ini_row; i<=M2.end_row; i++){
                 System.out.print("\n" + i + " " );
-                for (int j=M2.ini_j; j<=M2.end_j; j++){
+                for (int j=M2.ini_col; j<=M2.end_col; j++){
                     System.out.print(D[i][j]+ "  ");
                 }
             }

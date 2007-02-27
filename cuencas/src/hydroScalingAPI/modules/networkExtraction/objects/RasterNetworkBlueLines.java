@@ -21,13 +21,19 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.modules.networkExtraction.objects;
 
 /**
- *
+ * This object implements a group of static methods to handle a river network
+ * derived from a Blue Lines map
  * @author Jorge Mario Ramirez
  */
 public abstract class RasterNetworkBlueLines extends Object {
     
     
-    static byte[][] Lee_LA(hydroScalingAPI.modules.networkExtraction.objects.NetworkExtractionModule Proc){
+    /**
+     * Reads a raster map associated to the Blue Lines Map
+     * @param Proc The NetworkExtractionModule
+     * @return A byte array with the info to use in the incisions
+     */
+    public static byte[][] Lee_LA(hydroScalingAPI.modules.networkExtraction.objects.NetworkExtractionModule Proc){
         byte[][] LA = new byte[Proc.metaDEM.getNumRows()][Proc.metaDEM.getNumCols()];
         try{
             boolean isMdt = Proc.fileLAzules.getName().lastIndexOf(".dem") != -1;
@@ -54,7 +60,12 @@ public abstract class RasterNetworkBlueLines extends Object {
     }
     
     
-    static byte[][] Lee_Incisa(NetworkExtractionModule Proc){
+    /**
+     * Uses an external map to incise the DEM
+     * @param Proc The NetworkExtractionModule
+     * @return A byte array with the result of the incision
+     */
+    public static byte[][] Lee_Incisa(NetworkExtractionModule Proc){
         if (Proc.printDebug) System.out.println("INCISANDO");
         byte[][] LA = new byte[Proc.metaDEM.getNumRows()][Proc.metaDEM.getNumCols()];
         Proc.DEMrep = new double[Proc.metaDEM.getNumRows()+2][Proc.metaDEM.getNumCols()+2];
@@ -93,7 +104,14 @@ public abstract class RasterNetworkBlueLines extends Object {
         return LA;
     }
     
-    static void cabecitas(NetworkExtractionModule Proc, byte[][] Red, boolean incisa){
+    /**
+     * Takes in a map of locations where channels starts
+     * @param Proc The NetworkExtractionModule
+     * @param Red A Raster network array
+     * @param incisa Indicates if the algorithm must incise as it finds the network associates to the
+     * headwaters
+     */
+    public static void cabecitas(NetworkExtractionModule Proc, byte[][] Red, boolean incisa){
         if (Proc.printDebug) System.out.println("CABECITAS ");
         Proc.RedRas = new byte[Proc.metaDEM.getNumRows()+2][Proc.metaDEM.getNumCols()+2];
         for(int i=0; i<Proc.metaDEM.getNumRows(); i++){
@@ -143,7 +161,7 @@ public abstract class RasterNetworkBlueLines extends Object {
         }
     }
     
-    static void persiga(int i, int j, NetworkExtractionModule Proc){
+    private static void persiga(int i, int j, NetworkExtractionModule Proc){
         int iPv = i+1; int jPv = j+1;
         int iPn=iPv,jPn=jPv;
         Proc.DEM[iPv][jPv]=Proc.DEMrep[iPv][jPv];
@@ -164,7 +182,7 @@ public abstract class RasterNetworkBlueLines extends Object {
         //System.out.println("sale en "+iPn+" "+jPn);
     }
     
-    static void solo_persiga(int i, int j, NetworkExtractionModule Proc){
+    private static void solo_persiga(int i, int j, NetworkExtractionModule Proc){
         int iPv = i+1; int jPv = j+1;
         int iPn=iPv,jPn=jPv;
         do{

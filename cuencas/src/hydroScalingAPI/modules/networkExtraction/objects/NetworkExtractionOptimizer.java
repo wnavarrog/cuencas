@@ -41,7 +41,10 @@ public class NetworkExtractionOptimizer implements Runnable {
     
     private ExternalNetworkExtraction ExtractorNo1, ExtractorNo2;
     
-    /** Creates a new instance of NetworkExtractionOptimizer */
+    /**
+     * Creates a new instance of NetworkExtractionOptimizer
+     * @param exOp The stettings GUI associated to the NetworkExtractionModule
+     */
     public NetworkExtractionOptimizer(hydroScalingAPI.modules.networkExtraction.widgets.ExtractionOptions exOp) {
         
         extractOptions=exOp;

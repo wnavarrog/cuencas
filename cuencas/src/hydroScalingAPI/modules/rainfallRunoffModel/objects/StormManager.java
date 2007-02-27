@@ -32,7 +32,7 @@ package hydroScalingAPI.modules.rainfallRunoffModel.objects;
  */
 public class StormManager {
     
-    private hydroScalingAPI.modules.rainfallRunoffModel.objects.PrecHillSlopeTimeSeries[] precOnBasin;
+    private hydroScalingAPI.modules.rainfallRunoffModel.objects.HillSlopeTimeSeries[] precOnBasin;
     private boolean success=false,veryFirstDrop=true;
     private hydroScalingAPI.io.MetaRaster metaStorm;
     private java.util.Calendar firstWaterDrop,lastWaterDrop;
@@ -55,9 +55,9 @@ public class StormManager {
         firstWaterDrop=date;
         lastWaterDrop=date;
         
-        precOnBasin=new hydroScalingAPI.modules.rainfallRunoffModel.objects.PrecHillSlopeTimeSeries[linksStructure.connectionsArray.length];
+        precOnBasin=new hydroScalingAPI.modules.rainfallRunoffModel.objects.HillSlopeTimeSeries[linksStructure.connectionsArray.length];
         for (int i=0;i<precOnBasin.length;i++){
-            precOnBasin[i]=new hydroScalingAPI.modules.rainfallRunoffModel.objects.PrecHillSlopeTimeSeries((int)(rainDuration*60*1000));
+            precOnBasin[i]=new hydroScalingAPI.modules.rainfallRunoffModel.objects.HillSlopeTimeSeries((int)(rainDuration*60*1000));
             precOnBasin[i].addDateAndValue(date,new Float(rainIntensity));
         }
         
@@ -129,7 +129,7 @@ public class StormManager {
                 }
             }
             
-            precOnBasin=new hydroScalingAPI.modules.rainfallRunoffModel.objects.PrecHillSlopeTimeSeries[linksStructure.tailsArray.length];
+            precOnBasin=new hydroScalingAPI.modules.rainfallRunoffModel.objects.HillSlopeTimeSeries[linksStructure.tailsArray.length];
             
             int regInterval=metaStorm.getTemporalScale();
             
@@ -138,7 +138,7 @@ public class StormManager {
             totalHillBasedPrec=new float[precOnBasin.length];
             
             for (int i=0;i<precOnBasin.length;i++){
-                precOnBasin[i]=new hydroScalingAPI.modules.rainfallRunoffModel.objects.PrecHillSlopeTimeSeries(regInterval);
+                precOnBasin[i]=new hydroScalingAPI.modules.rainfallRunoffModel.objects.HillSlopeTimeSeries(regInterval);
             }
 
             double[] evalSpot;
@@ -242,19 +242,19 @@ public class StormManager {
     
     public float getPrecOnHillslope(int HillNumber,java.util.Calendar dateRequested){
         
-        return precOnBasin[HillNumber].getPrec(dateRequested);
+        return precOnBasin[HillNumber].getRecord(dateRequested);
         
     }
     
     public float getMaxPrecOnHillslope(int HillNumber){
         
-        return precOnBasin[HillNumber].getMaxPrec();
+        return precOnBasin[HillNumber].getMaxRecord();
         
     }
     
     public float getMeanPrecOnHillslope(int HillNumber){
         
-        return precOnBasin[HillNumber].getMeanPrec();
+        return precOnBasin[HillNumber].getMeanRecord();
         
     }
     

@@ -27,13 +27,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.modules.rainfallRunoffModel.objects;
 
 /**
- *
- * @author Ricardo Mantilla 
+ * This class manages a time series of parameters associated to the hillslope.  For
+ * example rainfall, or any other temporaly varaible parameter.
+ * @author Ricardo Mantilla
  */
-public class PrecHillSlopeTimeSeries {
+public class HillSlopeTimeSeries {
     
-    private float timeInterval;
-    private int regInterval; //Register interval in milliseconds
+    private int regInterval;
     
     private java.util.Vector recordValue;
     private java.util.Vector recordTime;
@@ -42,13 +42,21 @@ public class PrecHillSlopeTimeSeries {
     private float totalPrec=0.0f;
     private int numRecordsWithRain=0;
 
-    /** Creates new precHillSlopeTimeSeries */
-    public PrecHillSlopeTimeSeries(int regIn) {
+    /**
+     * Creates new HillSlopeTimeSeries
+     * @param regIn Register interval in milliseconds
+     */
+    public HillSlopeTimeSeries(int regIn) {
         recordValue=new java.util.Vector();
         recordTime=new java.util.Vector();
         regInterval=regIn;
     }
     
+    /**
+     * Adds a new date and value to the time series
+     * @param newRecordTime The time at which the record was taken
+     * @param newRecordValue The value of the record taken
+     */
     public void addDateAndValue(java.util.Calendar newRecordTime, Float newRecordValue){
         recordTime.add(newRecordTime);
         recordValue.add(newRecordValue);
@@ -58,7 +66,12 @@ public class PrecHillSlopeTimeSeries {
         totalPrec+=newRecordValue.floatValue();
     }
     
-    public float getPrec(java.util.Calendar atThisTime){
+    /**
+     * Returns a value for the record for a given time
+     * @param atThisTime The desired time to evaluate
+     * @return A float with the record value
+     */
+    public float getRecord(java.util.Calendar atThisTime){
         
         java.util.Calendar serchForTime = java.util.Calendar.getInstance(); 
         serchForTime.setTimeInMillis(atThisTime.getTimeInMillis());
@@ -72,42 +85,36 @@ public class PrecHillSlopeTimeSeries {
 
         if (serchForTime.after(recordTime.lastElement())) return 0.0f;
 
-        /*
-        System.out.println(atThisTime.getTimeInMillis());
-        System.out.println(((java.util.Calendar)recordTime.firstElement()).getTimeInMillis());
-        System.out.println(((java.util.Calendar)recordTime.lastElement()).getTimeInMillis());
-        System.exit(0);
-        */
-        
-        //System.out.println(serchForTime);
-        //System.out.println(iniTimeMill);
-        
         int k=recordTime.indexOf(serchForTime);
-        //System.out.println(k);
-        //System.exit(0);
         
         if (k == -1) return 0.0f;
         
         return ((Float) recordValue.get(k)).floatValue();
     }
     
+    /**
+     * The record lenght
+     * @return The record lenght
+     */
     public float getSize(){
         return recordValue.size();
     }
     
-    public float getMaxPrec(){
+    /**
+     * The maximum value observed in the time series
+     * @return The maximum recorded value
+     */
+    public float getMaxRecord(){
         return maxPrec;
     }
     
-    public float getMeanPrec(){
+    /**
+     * The average value observed in the time series
+     * @return The mean recorded value
+     */
+    public float getMeanRecord(){
         if(numRecordsWithRain == 0) return 0.0f;
         return totalPrec/(float)numRecordsWithRain;
-    }
-
-    /**
-    * @param args the command line arguments
-    */
-    public static void main (String args[]) {
     }
 
 }
