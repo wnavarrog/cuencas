@@ -58,13 +58,6 @@ public class NetworkEquations_S1S2 implements hydroScalingAPI.util.ordDiffEqSolv
      * @param links The topologic structure of the river network
      * @param hillinf The parameters manager for the system of hillsopes
      * @param linkIn The parameters manager for links in the network
-     * @param rt The routing scheme.  Available schemes are <br>
-     * <p>0: Spatially variable Chezi coefficient </p>
-     * <p>1: Spatially uniform Chezi coefficient </p>
-     * <p>2: Constant Velocity</p>
-     * <p>3: Spatially uniform Manning coefficient</p>
-     * <p>4: Spatially variable Manning coefficient</p>
-     * <p>5: Velocity based on parametrization v=Ck*q^lambda1*A^lambda2</p>
      */
     public NetworkEquations_S1S2(hydroScalingAPI.util.geomorphology.objects.LinksAnalysis links, hydroScalingAPI.modules.rainfallRunoffModel.objects.HillSlopesInfo hillinf, hydroScalingAPI.modules.rainfallRunoffModel.objects.LinksInfo linkIn){
         linksConectionStruct=links;

@@ -37,26 +37,26 @@ public class RsnWFSToAsciiFile extends java.lang.Object {
     private hydroScalingAPI.io.MetaRaster metaDatos;
     private byte[][] matDir;
     
-    hydroScalingAPI.modules.rsnFlowSymulations.objects.RsnStructure rsns;
+    hydroScalingAPI.util.randomSelfSimilarNetworks.RsnStructure rsns;
     float rainIntensity;
     float rainDuration;
     float infiltRate;
     int routingType;
     java.io.File outputDirectory;
     
-    hydroScalingAPI.modules.rsnFlowSymulations.objects.RsnLinksAnalysis linksStructure;
+    hydroScalingAPI.util.randomSelfSimilarNetworks.RsnLinksAnalysis linksStructure;
     int basinOrder;
     hydroScalingAPI.modules.rainfallRunoffModel.objects.LinksInfo thisNetworkGeom;
     hydroScalingAPI.modules.rainfallRunoffModel.objects.HillSlopesInfo thisHillsInfo;
     hydroScalingAPI.modules.rainfallRunoffModel.objects.StormManager storm;
     hydroScalingAPI.modules.rainfallRunoffModel.objects.InfiltrationManager infilMan;
 
-    public RsnWFSToAsciiFile(hydroScalingAPI.modules.rsnFlowSymulations.objects.RsnStructure rsns_OR, float rainIntensity_OR, float rainDuration_OR, float infiltRate_OR, int routingType_OR, java.io.File outputDirectory_OR) throws java.io.IOException, VisADException{
+    public RsnWFSToAsciiFile(hydroScalingAPI.util.randomSelfSimilarNetworks.RsnStructure rsns_OR, float rainIntensity_OR, float rainDuration_OR, float infiltRate_OR, int routingType_OR, java.io.File outputDirectory_OR) throws java.io.IOException, VisADException{
         this(rsns_OR, rainIntensity_OR, rainDuration_OR, infiltRate_OR, routingType_OR, outputDirectory_OR,0.5f,-0.5f);
     }
     
     /** Creates new simulationsRep3 */
-    public RsnWFSToAsciiFile(hydroScalingAPI.modules.rsnFlowSymulations.objects.RsnStructure rsns_OR, float rainIntensity_OR, float rainDuration_OR, float infiltRate_OR, int routingType_OR, java.io.File outputDirectory_OR,float exponentQ, float exponentA) throws java.io.IOException, VisADException{
+    public RsnWFSToAsciiFile(hydroScalingAPI.util.randomSelfSimilarNetworks.RsnStructure rsns_OR, float rainIntensity_OR, float rainDuration_OR, float infiltRate_OR, int routingType_OR, java.io.File outputDirectory_OR,float exponentQ, float exponentA) throws java.io.IOException, VisADException{
         rsns=rsns_OR;
         rainIntensity=rainIntensity_OR;
         rainDuration=rainDuration_OR;
@@ -64,7 +64,7 @@ public class RsnWFSToAsciiFile extends java.lang.Object {
         routingType=routingType_OR;
         outputDirectory=outputDirectory_OR;
         
-        linksStructure=new hydroScalingAPI.modules.rsnFlowSymulations.objects.RsnLinksAnalysis(rsns);
+        linksStructure=new hydroScalingAPI.util.randomSelfSimilarNetworks.RsnLinksAnalysis(rsns);
         basinOrder=linksStructure.getBasinOrder();
         
         thisNetworkGeom=new hydroScalingAPI.modules.rainfallRunoffModel.objects.LinksInfo(linksStructure);
@@ -190,7 +190,7 @@ public class RsnWFSToAsciiFile extends java.lang.Object {
 
                         hydroScalingAPI.util.probability.DiscreteDistribution myUD_I=new hydroScalingAPI.util.probability.GeometricDistribution(p_i,0);
                         hydroScalingAPI.util.probability.DiscreteDistribution myUD_E=new hydroScalingAPI.util.probability.GeometricDistribution(p_e,1);
-                        hydroScalingAPI.modules.rsnFlowSymulations.objects.RsnStructure myRSN=new hydroScalingAPI.modules.rsnFlowSymulations.objects.RsnStructure(sofi-1,myUD_I,myUD_E);
+                        hydroScalingAPI.util.randomSelfSimilarNetworks.RsnStructure myRSN=new hydroScalingAPI.util.randomSelfSimilarNetworks.RsnStructure(sofi-1,myUD_I,myUD_E);
                         new RsnWFSToAsciiFile(myRSN,0,1,experiment,5,new java.io.File(fileString)).executeSimulation();
 
                     }

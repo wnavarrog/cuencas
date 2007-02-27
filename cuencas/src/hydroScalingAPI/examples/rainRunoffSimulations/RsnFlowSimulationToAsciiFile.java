@@ -37,26 +37,26 @@ public class RsnFlowSimulationToAsciiFile extends java.lang.Object {
     private hydroScalingAPI.io.MetaRaster metaDatos;
     private byte[][] matDir;
     
-    hydroScalingAPI.modules.rsnFlowSymulations.objects.RsnStructure rsns;
+    hydroScalingAPI.util.randomSelfSimilarNetworks.RsnStructure rsns;
     float rainIntensity;
     float rainDuration;
     float infiltRate;
     int routingType;
     java.io.File outputDirectory;
     
-    hydroScalingAPI.modules.rsnFlowSymulations.objects.RsnLinksAnalysis linksStructure;
+    hydroScalingAPI.util.randomSelfSimilarNetworks.RsnLinksAnalysis linksStructure;
     int basinOrder;
     hydroScalingAPI.modules.rainfallRunoffModel.objects.LinksInfo thisNetworkGeom;
     hydroScalingAPI.modules.rainfallRunoffModel.objects.HillSlopesInfo thisHillsInfo;
     hydroScalingAPI.modules.rainfallRunoffModel.objects.StormManager storm;
     hydroScalingAPI.modules.rainfallRunoffModel.objects.InfiltrationManager infilMan;
 
-    public RsnFlowSimulationToAsciiFile(hydroScalingAPI.modules.rsnFlowSymulations.objects.RsnStructure rsns_OR, float rainIntensity_OR, float rainDuration_OR, float infiltRate_OR, int routingType_OR, java.io.File outputDirectory_OR) throws java.io.IOException, VisADException{
+    public RsnFlowSimulationToAsciiFile(hydroScalingAPI.util.randomSelfSimilarNetworks.RsnStructure rsns_OR, float rainIntensity_OR, float rainDuration_OR, float infiltRate_OR, int routingType_OR, java.io.File outputDirectory_OR) throws java.io.IOException, VisADException{
         this(rsns_OR, rainIntensity_OR, rainDuration_OR, infiltRate_OR, routingType_OR, outputDirectory_OR,0.5f,-0.5f);
     }
     
     /** Creates new simulationsRep3 */
-    public RsnFlowSimulationToAsciiFile(hydroScalingAPI.modules.rsnFlowSymulations.objects.RsnStructure rsns_OR, float rainIntensity_OR, float rainDuration_OR, float infiltRate_OR, int routingType_OR, java.io.File outputDirectory_OR,float exponentQ, float exponentA) throws java.io.IOException, VisADException{
+    public RsnFlowSimulationToAsciiFile(hydroScalingAPI.util.randomSelfSimilarNetworks.RsnStructure rsns_OR, float rainIntensity_OR, float rainDuration_OR, float infiltRate_OR, int routingType_OR, java.io.File outputDirectory_OR,float exponentQ, float exponentA) throws java.io.IOException, VisADException{
         rsns=rsns_OR;
         rainIntensity=rainIntensity_OR;
         rainDuration=rainDuration_OR;
@@ -64,7 +64,7 @@ public class RsnFlowSimulationToAsciiFile extends java.lang.Object {
         routingType=routingType_OR;
         outputDirectory=outputDirectory_OR;
         
-        linksStructure=new hydroScalingAPI.modules.rsnFlowSymulations.objects.RsnLinksAnalysis(rsns);
+        linksStructure=new hydroScalingAPI.util.randomSelfSimilarNetworks.RsnLinksAnalysis(rsns);
         basinOrder=linksStructure.getBasinOrder();
         
         thisNetworkGeom=new hydroScalingAPI.modules.rainfallRunoffModel.objects.LinksInfo(linksStructure);
@@ -294,7 +294,7 @@ public class RsnFlowSimulationToAsciiFile extends java.lang.Object {
 
                         hydroScalingAPI.util.probability.DiscreteDistribution myUD_I=new hydroScalingAPI.util.probability.GeometricDistribution(p_i,0);
                         hydroScalingAPI.util.probability.DiscreteDistribution myUD_E=new hydroScalingAPI.util.probability.GeometricDistribution(p_e,1);
-                        hydroScalingAPI.modules.rsnFlowSymulations.objects.RsnStructure myRSN=new hydroScalingAPI.modules.rsnFlowSymulations.objects.RsnStructure(sofi-1,myUD_I,myUD_E);
+                        hydroScalingAPI.util.randomSelfSimilarNetworks.RsnStructure myRSN=new hydroScalingAPI.util.randomSelfSimilarNetworks.RsnStructure(sofi-1,myUD_I,myUD_E);
                         new RsnFlowSimulationToAsciiFile(myRSN,0,1,experiment,2,new java.io.File(outDir+"p_i"+labelFormat.format(p_i)+"p_e"+labelFormat.format(p_e)+"/ord_"+sofi)).executeSimulation();
 
                     }
@@ -332,7 +332,7 @@ public class RsnFlowSimulationToAsciiFile extends java.lang.Object {
                         hydroScalingAPI.util.probability.ContinuousDistribution myLinkAreaDistro_E=new hydroScalingAPI.util.probability.LogGaussianDistribution(Elae,SDlae);
                         hydroScalingAPI.util.probability.ContinuousDistribution myLinkAreaDistro_I=new hydroScalingAPI.util.probability.LogGaussianDistribution(0.01f+0.88f*Elae,0.04f+0.85f*SDlae);
 
-                        hydroScalingAPI.modules.rsnFlowSymulations.objects.RsnStructure myRSN=new hydroScalingAPI.modules.rsnFlowSymulations.objects.RsnStructure(sofi-1,myUD_I,myUD_E,myLinkAreaDistro_E,myLinkAreaDistro_I);
+                        hydroScalingAPI.util.randomSelfSimilarNetworks.RsnStructure myRSN=new hydroScalingAPI.util.randomSelfSimilarNetworks.RsnStructure(sofi-1,myUD_I,myUD_E,myLinkAreaDistro_E,myLinkAreaDistro_I);
                         RsnFlowSimulationToAsciiFile rsnfs=new RsnFlowSimulationToAsciiFile(myRSN,0,1,experiment,2,new java.io.File(outDir+"p_i"+labelFormat.format(p_i)+"p_e"+labelFormat.format(p_e)+"/ord_"+sofi));
                         rsnfs.executeSimulation();
 
@@ -372,7 +372,7 @@ public class RsnFlowSimulationToAsciiFile extends java.lang.Object {
         
                 hydroScalingAPI.util.probability.DiscreteDistribution myUD_I=new hydroScalingAPI.util.probability.BinaryDistribution(1,2,probab);
                 hydroScalingAPI.util.probability.DiscreteDistribution myUD_E=new hydroScalingAPI.util.probability.BinaryDistribution(2,3,probab);
-                hydroScalingAPI.modules.rsnFlowSymulations.objects.RsnStructure myRSN=new hydroScalingAPI.modules.rsnFlowSymulations.objects.RsnStructure(pVal,myUD_I,myUD_E);
+                hydroScalingAPI.util.randomSelfSimilarNetworks.RsnStructure myRSN=new hydroScalingAPI.util.randomSelfSimilarNetworks.RsnStructure(pVal,myUD_I,myUD_E);
                 new RsnFlowSimulationToAsciiFile(myRSN,0,10,experiment,2,new java.io.File("/home/ricardo/workFiles/myWorkingStuff/MateriasDoctorado/PhD_Thesis/results/flowSimulations/p_"+pVal));
                 
             }
@@ -403,7 +403,7 @@ public class RsnFlowSimulationToAsciiFile extends java.lang.Object {
 
                         hydroScalingAPI.util.probability.DiscreteDistribution myUD_I=new hydroScalingAPI.util.probability.BinaryDistribution(I,I,0.5);
                         hydroScalingAPI.util.probability.DiscreteDistribution myUD_E=new hydroScalingAPI.util.probability.BinaryDistribution(E,E,0.5);
-                        hydroScalingAPI.modules.rsnFlowSymulations.objects.RsnStructure myRSN=new hydroScalingAPI.modules.rsnFlowSymulations.objects.RsnStructure(sofi,myUD_I,myUD_E);
+                        hydroScalingAPI.util.randomSelfSimilarNetworks.RsnStructure myRSN=new hydroScalingAPI.util.randomSelfSimilarNetworks.RsnStructure(sofi,myUD_I,myUD_E);
                         RsnFlowSimulationToAsciiFile rsnfs=new RsnFlowSimulationToAsciiFile(myRSN,0,10,experiment,2,new java.io.File("/home/ricardo/workFiles/myWorkingStuff/MateriasDoctorado/PhD_Thesis/results/flowSimulations/tokunaga/E"+E+"I"+I+"/ord_"+sofi));
                         rsnfs.executeSimulation();
                     }
@@ -448,7 +448,7 @@ public class RsnFlowSimulationToAsciiFile extends java.lang.Object {
 
                                 hydroScalingAPI.util.probability.DiscreteDistribution myUD_I=new hydroScalingAPI.util.probability.GeometricDistribution(p_i,0);
                                 hydroScalingAPI.util.probability.DiscreteDistribution myUD_E=new hydroScalingAPI.util.probability.GeometricDistribution(p_e,1);
-                                hydroScalingAPI.modules.rsnFlowSymulations.objects.RsnStructure myRSN=new hydroScalingAPI.modules.rsnFlowSymulations.objects.RsnStructure(sofi-1,myUD_I,myUD_E);
+                                hydroScalingAPI.util.randomSelfSimilarNetworks.RsnStructure myRSN=new hydroScalingAPI.util.randomSelfSimilarNetworks.RsnStructure(sofi-1,myUD_I,myUD_E);
                                 new RsnFlowSimulationToAsciiFile(myRSN,0,1,experiment,5,new java.io.File(fileString), expQ, expA).executeSimulation();
 
                             }
@@ -488,7 +488,7 @@ public class RsnFlowSimulationToAsciiFile extends java.lang.Object {
 
                         hydroScalingAPI.util.probability.DiscreteDistribution myUD_I=new hydroScalingAPI.util.probability.BinaryDistribution(1,1,1);
                         hydroScalingAPI.util.probability.DiscreteDistribution myUD_E=new hydroScalingAPI.util.probability.BinaryDistribution(1,1,1);
-                        hydroScalingAPI.modules.rsnFlowSymulations.objects.RsnStructure myRSN=new hydroScalingAPI.modules.rsnFlowSymulations.objects.RsnStructure(sofi-1,myUD_I,myUD_E);
+                        hydroScalingAPI.util.randomSelfSimilarNetworks.RsnStructure myRSN=new hydroScalingAPI.util.randomSelfSimilarNetworks.RsnStructure(sofi-1,myUD_I,myUD_E);
                         new RsnFlowSimulationToAsciiFile(myRSN,0,1,experiment,5,new java.io.File(fileString), expQ, expA).executeSimulation();
 
                     }

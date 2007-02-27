@@ -24,7 +24,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * Created on July 11, 2005, 9:41 AM
  */
 
-package hydroScalingAPI.modules.rsnFlowSymulations.objects;
+package hydroScalingAPI.util.randomSelfSimilarNetworks;
 
 /**
  *

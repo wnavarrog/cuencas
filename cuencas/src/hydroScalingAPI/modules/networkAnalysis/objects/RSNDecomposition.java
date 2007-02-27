@@ -19,7 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 
 /*
- * RSNAnalysis.java
+ * RSNDecomposition.java
  *
  * Created on October 1, 2003, 3:07 PM
  */
@@ -27,12 +27,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.modules.networkAnalysis.objects;
 
 /**
- * The analogous of {@link hydroScalingAPI.util.geomorphology.objects.LinksAnalysis}
- * for a network pruned by order.  This class treats the pruned network as a set of
+ * This class applies the RSN decomposition algorithm to a real river network and
+ * provides information for the different levels of the pruned network as a set of
  * pseudo-links.  See PhD Thesis of Ricardo Mantilla for definitions
  * @author Ricardo Mantilla
  */
-public class RSNAnalysis {
+public class RSNDecomposition {
     
     private hydroScalingAPI.util.geomorphology.objects.LinksAnalysis mylinksAnalysis;
     
@@ -47,11 +47,12 @@ public class RSNAnalysis {
     private int[] subOutlets;
     
     /**
-     * Creates a new instance of RSNAnalysis
+     * Creates a new instance of RSNDecomposition
+     * 
      * @param mla The LinksAnalysis object asociated to the river network under consideration
      * @throws java.io.IOException Captures errors while retreiving information
      */
-    public RSNAnalysis(hydroScalingAPI.util.geomorphology.objects.LinksAnalysis mla) throws java.io.IOException {
+    public RSNDecomposition(hydroScalingAPI.util.geomorphology.objects.LinksAnalysis mla) throws java.io.IOException {
          
          mylinksAnalysis=mla;
          
@@ -435,7 +436,7 @@ public class RSNAnalysis {
             hydroScalingAPI.util.geomorphology.objects.LinksAnalysis mylinksAnalysis = new hydroScalingAPI.util.geomorphology.objects.LinksAnalysis(laCuenca, metaModif, matDirs);
             
             long iniTime=System.currentTimeMillis();
-            RSNAnalysis myRsnGen=new RSNAnalysis(mylinksAnalysis);
+            RSNDecomposition myRsnGen=new RSNDecomposition(mylinksAnalysis);
             long finTime=System.currentTimeMillis();
             
             myRsnGen.printGeneratorsToFile("/home/ricardo/workFiles/ecologyWork/DD/output_rsns/"+metaModif.getLocationMeta().getName()+"_x_"+laCuenca.getXYBasin()[0][0]+"_y_"+laCuenca.getXYBasin()[1][0]+".rsnGens.txt");
@@ -559,7 +560,7 @@ public class RSNAnalysis {
             hydroScalingAPI.util.geomorphology.objects.LinksAnalysis mylinksAnalysis = new hydroScalingAPI.util.geomorphology.objects.LinksAnalysis(laCuenca, metaModif, matDirs);
             
             long iniTime=System.currentTimeMillis();
-            RSNAnalysis myRsnGen=new RSNAnalysis(mylinksAnalysis);
+            RSNDecomposition myRsnGen=new RSNDecomposition(mylinksAnalysis);
             long finTime=System.currentTimeMillis();
             
             //Testing the idea of distribution of properties at different scales
@@ -629,7 +630,7 @@ public class RSNAnalysis {
             hydroScalingAPI.util.geomorphology.objects.LinksAnalysis mylinksAnalysis = new hydroScalingAPI.util.geomorphology.objects.LinksAnalysis(laCuenca, metaModif, matDirs);
             
             long iniTime=System.currentTimeMillis();
-            RSNAnalysis myRsnGen=new RSNAnalysis(mylinksAnalysis);
+            RSNDecomposition myRsnGen=new RSNDecomposition(mylinksAnalysis);
             long finTime=System.currentTimeMillis();
             
             java.util.Vector generatorsInfo=myRsnGen.getGeneratorsInfo();
@@ -690,7 +691,7 @@ public class RSNAnalysis {
             hydroScalingAPI.util.geomorphology.objects.LinksAnalysis mylinksAnalysis = new hydroScalingAPI.util.geomorphology.objects.LinksAnalysis(laCuenca, metaModif, matDirs);
             
             long iniTime=System.currentTimeMillis();
-            RSNAnalysis myRsnGen=new RSNAnalysis(mylinksAnalysis);
+            RSNDecomposition myRsnGen=new RSNDecomposition(mylinksAnalysis);
             long finTime=System.currentTimeMillis();
             
             //Testing the idea of distribution of properties at different scales

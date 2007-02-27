@@ -40,9 +40,9 @@ public class RsnFlowSimulationTestPeaks extends java.lang.Object {
     private double maxDischarge=Double.MIN_VALUE;
     
     /** Creates new simulationsRep3 */
-    public RsnFlowSimulationTestPeaks(hydroScalingAPI.modules.rsnFlowSymulations.objects.RsnStructure rsns, float rainIntensity, float rainDuration, float infiltRate, int routingType) throws java.io.IOException, VisADException{
+    public RsnFlowSimulationTestPeaks(hydroScalingAPI.util.randomSelfSimilarNetworks.RsnStructure rsns, float rainIntensity, float rainDuration, float infiltRate, int routingType) throws java.io.IOException, VisADException{
         
-        hydroScalingAPI.modules.rsnFlowSymulations.objects.RsnLinksAnalysis linksStructure=new hydroScalingAPI.modules.rsnFlowSymulations.objects.RsnLinksAnalysis(rsns);
+        hydroScalingAPI.util.randomSelfSimilarNetworks.RsnLinksAnalysis linksStructure=new hydroScalingAPI.util.randomSelfSimilarNetworks.RsnLinksAnalysis(rsns);
         
         hydroScalingAPI.modules.rainfallRunoffModel.objects.LinksInfo thisNetworkGeom=new hydroScalingAPI.modules.rainfallRunoffModel.objects.LinksInfo(linksStructure);
         thisNetworkGeom.setWidthsHG(5.6f, 0.46f,0.0f);
@@ -203,8 +203,8 @@ public class RsnFlowSimulationTestPeaks extends java.lang.Object {
         
                 hydroScalingAPI.util.probability.DiscreteDistribution myUD_I=new hydroScalingAPI.util.probability.BinaryDistribution(1,2,probab);
                 hydroScalingAPI.util.probability.DiscreteDistribution myUD_E=new hydroScalingAPI.util.probability.BinaryDistribution(2,3,probab);
-                hydroScalingAPI.modules.rsnFlowSymulations.objects.RsnStructure myRSN=new hydroScalingAPI.modules.rsnFlowSymulations.objects.RsnStructure(pVal,myUD_I,myUD_E);
-                hydroScalingAPI.modules.rsnFlowSymulations.objects.RsnLinksAnalysis myResults=new hydroScalingAPI.modules.rsnFlowSymulations.objects.RsnLinksAnalysis(myRSN);
+                hydroScalingAPI.util.randomSelfSimilarNetworks.RsnStructure myRSN=new hydroScalingAPI.util.randomSelfSimilarNetworks.RsnStructure(pVal,myUD_I,myUD_E);
+                hydroScalingAPI.util.randomSelfSimilarNetworks.RsnLinksAnalysis myResults=new hydroScalingAPI.util.randomSelfSimilarNetworks.RsnLinksAnalysis(myRSN);
                 
                 float[][] linkAreas=myResults.getVarValues(2);
                 averageUA+=linkAreas[0][0];
@@ -278,8 +278,8 @@ public class RsnFlowSimulationTestPeaks extends java.lang.Object {
 
                 hydroScalingAPI.util.probability.DiscreteDistribution myUD_I=new hydroScalingAPI.util.probability.GeometricDistribution(0.436,0);
                 hydroScalingAPI.util.probability.DiscreteDistribution myUD_E=new hydroScalingAPI.util.probability.GeometricDistribution(0.460,1);
-                hydroScalingAPI.modules.rsnFlowSymulations.objects.RsnStructure myRSN=new hydroScalingAPI.modules.rsnFlowSymulations.objects.RsnStructure(pVal,myUD_I,myUD_E);
-                hydroScalingAPI.modules.rsnFlowSymulations.objects.RsnLinksAnalysis myResults=new hydroScalingAPI.modules.rsnFlowSymulations.objects.RsnLinksAnalysis(myRSN);
+                hydroScalingAPI.util.randomSelfSimilarNetworks.RsnStructure myRSN=new hydroScalingAPI.util.randomSelfSimilarNetworks.RsnStructure(pVal,myUD_I,myUD_E);
+                hydroScalingAPI.util.randomSelfSimilarNetworks.RsnLinksAnalysis myResults=new hydroScalingAPI.util.randomSelfSimilarNetworks.RsnLinksAnalysis(myRSN);
 
                 float[][] linkAreas=myResults.getVarValues(2);
                 averageUA+=linkAreas[0][0];

@@ -52,7 +52,7 @@ public class BasinAnalyzer extends javax.swing.JDialog{
     private byte[][] netMask;
     public hydroScalingAPI.util.geomorphology.objects.HortonAnalysis myHortonStructure;
     public hydroScalingAPI.util.geomorphology.objects.LinksAnalysis myLinksStructure;
-    public hydroScalingAPI.modules.networkAnalysis.objects.RSNAnalysis myRSNAnalysis;
+    public hydroScalingAPI.modules.networkAnalysis.objects.RSNDecomposition myRSNAnalysis;
     
     private String[] itemsToAnalize={   "Link's Hillslope Area [km^2]",
                                         "Link's Length [km]",
@@ -396,7 +396,7 @@ public class BasinAnalyzer extends javax.swing.JDialog{
         
         addWheelFunctionality(displayMap_RSNs);
         
-        myRSNAnalysis=new hydroScalingAPI.modules.networkAnalysis.objects.RSNAnalysis(myLinksStructure);
+        myRSNAnalysis=new hydroScalingAPI.modules.networkAnalysis.objects.RSNDecomposition(myLinksStructure);
         plotRSNTiles(myHortonStructure.getBasinOrder()-1);
         plotNetwork(displayMap_RSNs,myHortonStructure.getBasinOrder()-1);
         

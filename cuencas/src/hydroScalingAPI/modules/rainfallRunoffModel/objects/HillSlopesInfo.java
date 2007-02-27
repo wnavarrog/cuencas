@@ -232,8 +232,8 @@ public class HillSlopesInfo extends java.lang.Object {
      * @param HillNumber The index of the desired hillslope
      * @return NOTE: units undocumented
      */
-    public double S2max(int i){
-        double s2max_m3 = ( 1.0/ S2Param(i) ) ;
+    public double S2max(int HillNumber){
+        double s2max_m3 = ( 1.0/ S2Param(HillNumber) ) ;
         return s2max_m3;
     }
     
@@ -242,7 +242,7 @@ public class HillSlopesInfo extends java.lang.Object {
      * @param HillNumber The index of the desired hillslope
      * @return NOTE: units undocumented
      */
-    public double ETrate(int i){
+    public double ETrate(int HillNumber){
         double etrate_mpd = 0.0034;
         double etrate_mphr = etrate_mpd*(1./24.);
         return etrate_mphr;

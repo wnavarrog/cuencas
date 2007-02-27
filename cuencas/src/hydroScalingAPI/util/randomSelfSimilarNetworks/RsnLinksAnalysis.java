@@ -24,7 +24,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * Created on July 11, 2005, 9:51 AM
  */
 
-package hydroScalingAPI.modules.rsnFlowSymulations.objects;
+package hydroScalingAPI.util.randomSelfSimilarNetworks;
 
 /**
  *
@@ -32,13 +32,13 @@ package hydroScalingAPI.modules.rsnFlowSymulations.objects;
  */
 public class RsnLinksAnalysis extends hydroScalingAPI.util.geomorphology.objects.LinksAnalysis{
     
-    private hydroScalingAPI.modules.rsnFlowSymulations.objects.RsnStructure rsnNS;
+    private hydroScalingAPI.util.randomSelfSimilarNetworks.RsnStructure rsnNS;
     
     /** Creates a new instance of RsnLinksAnalysis */
     public RsnLinksAnalysis() {
     }
     
-    public RsnLinksAnalysis(hydroScalingAPI.modules.rsnFlowSymulations.objects.RsnStructure rsns) {
+    public RsnLinksAnalysis(hydroScalingAPI.util.randomSelfSimilarNetworks.RsnStructure rsns) {
         
         rsnNS=rsns;
         

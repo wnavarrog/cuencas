@@ -27,7 +27,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.modules.rainfallRunoffModel.objects;
 
 /**
- *
+ * This class handles the precipitation over a basin.  It takes in a group of
+ * raster files that represent snapshots of the rainfall fields and projects those
+ * fields over the hillslope map to obtain hillslope-based rainfall time series.
  * @author Ricardo Mantilla
  */
 public class StormManager {
@@ -46,6 +48,13 @@ public class StormManager {
     
     private double recordResolutionInMinutes;
     
+    /**
+     * Creates a new instance of StormManager (with constant rainfall rate
+     * over the basin during a given period of time)
+     * @param linksStructure The topologic structure of the river network
+     * @param rainIntensity The uniform intensity to be applied over the basinb
+     * @param rainDuration The duration of the event with the given intensity
+     */
     public StormManager(hydroScalingAPI.util.geomorphology.objects.LinksAnalysis linksStructure, float rainIntensity, float rainDuration) {
 
         java.util.Calendar date=java.util.Calendar.getInstance();
@@ -66,7 +75,17 @@ public class StormManager {
        
     }
 
-    /** Creates new stormManager */
+    /**
+     * Creates a new instance of StormManager (with spatially and temporally variable rainfall
+     * rates over the basin) based in a set of raster maps of rainfall intensities
+     * @param locFile The path to the raster files
+     * @param myCuenca The {@link hydroScalingAPI.util.geomorphology.objects.Basin} object describing the
+     * basin under consideration
+     * @param linksStructure The topologic structure of the river network
+     * @param metaDatos A MetaRaster describing the rainfall intensity maps
+     * @param matDir The directions matrix of the DEM that contains the basin
+     * @param magnitudes The magnitudes matrix of the DEM that contains the basin
+     */
     public StormManager(java.io.File locFile, hydroScalingAPI.util.geomorphology.objects.Basin myCuenca, hydroScalingAPI.util.geomorphology.objects.LinksAnalysis linksStructure, hydroScalingAPI.io.MetaRaster metaDatos, byte[][] matDir, int[][] magnitudes) {
         
         java.io.File directorio=locFile.getParentFile();
@@ -240,76 +259,144 @@ public class StormManager {
         }
     }
     
+    /**
+     * Returns the value of rainfall rate in mm/h for a given moment of time
+     * @param HillNumber The index of the desired hillslope
+     * @param dateRequested The time for which the rain is desired
+     * @return Returns the rainfall rate in mm/h
+     */
     public float getPrecOnHillslope(int HillNumber,java.util.Calendar dateRequested){
         
         return precOnBasin[HillNumber].getRecord(dateRequested);
         
     }
     
+    /**
+     * Returns the maximum value of precipitation recorded for a given hillslope
+     * @param HillNumber The index of the desired hillslope
+     * @return The maximum rainfall rate in mm/h
+     */
     public float getMaxPrecOnHillslope(int HillNumber){
         
         return precOnBasin[HillNumber].getMaxRecord();
         
     }
     
+    /**
+     * Returns the maximum value of precipitation recorded for a given hillslope
+     * @param HillNumber The index of the desired hillslope
+     * @return The average rainfall rate in mm/h
+     */
     public float getMeanPrecOnHillslope(int HillNumber){
         
         return precOnBasin[HillNumber].getMeanRecord();
         
     }
     
+    /**
+     *  A boolean flag indicating if the precipitation files were fully read
+     * @return A flag for the constructor success
+     */
     public boolean isCompleted(){
         return success;
     }
     
+    /**
+     * Returns the name of this storm event
+     * @return A String that describes this storm
+     */
     public String stormName(){
         return metaStorm.getLocationBinaryFile().getName().substring(0,metaStorm.getLocationBinaryFile().getName().lastIndexOf("."));
     }
     
+    /**
+     * The storm temporal resolution in milliseconds
+     * @return A float with the temporal resolution
+     */
     public float stormRecordResolution(){
         
         return metaStorm.getTemporalScale();
         
     }
     
+    /**
+     * The initial storm time as a {@link java.util.Calendar} object
+     * @return A {@link java.util.Calendar} object indicating when the first drop of water fell
+     * on the basin
+     */
     public java.util.Calendar stormInitialTime(){
         
         return firstWaterDrop;
     }
     
+    /**
+     * The initial storm time as a double in milliseconds obtained from the method getTimeInMillis()
+     * of the {@link java.util.Calendar} object
+     * @return A double indicating when the first drop of water fell over the basin
+     * on the basin
+     */
     public double stormInitialTimeInMinutes(){
         
         return firstWaterDrop.getTimeInMillis()/1000./60.;
     }
     
+    /**
+     * The final storm time as a double in milliseconds obtained from the method getTimeInMillis()
+     * of the {@link java.util.Calendar} object
+     * @return A double indicating when the last drop of water fell over the basin
+     * on the basin
+     */
     public double stormFinalTimeInMinutes(){
         return lastWaterDrop.getTimeInMillis()/1000./60.+stormRecordResolutionInMinutes();
     }
     
+    /**
+     * The storm record time resolution in minutes
+     * @return A double indicating the time series time step
+     */
     public double stormRecordResolutionInMinutes(){
         
         return recordResolutionInMinutes;
         
     }
     
+    /**
+     * The total rainfall over a given pixel of the original raster fields
+     * @param i The row number of the desired location
+     * @param j The column number of the desired location
+     * @return The accumulated rain over the entire storm period
+     */
     public float getTotalPixelBasedPrec(int i, int j){
         
         return totalPixelBasedPrec[i][j];
         
     }
     
-    public float getTotalHillSlopeBasedPrec(int i){
+    /**
+     * The total rainfall over a given hillslope
+     * @param HillNumber The index of the desired hillslope
+     * @return The value of rainfall intensity
+     */
+    public float getTotalHillSlopeBasedPrec(int HillNumber){
         
-        return totalHillBasedPrec[i];
+        return totalHillBasedPrec[HillNumber];
         
     }
     
+    /**
+     * 
+     * @return 
+     */
     public int getNumberOfFilesRead(){
         
         return arCron.length;
         
     }
     
+    /**
+     * 
+     * @return 
+     */
     public java.util.Date[] getFilesDates(){
         
         java.util.Date[] filesDates=new java.util.Date[arCron.length];
