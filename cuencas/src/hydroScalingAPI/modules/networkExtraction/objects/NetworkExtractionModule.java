@@ -315,7 +315,7 @@ public class NetworkExtractionModule implements Runnable {
         inicio(dataDEM1);
         OpProc = new hydroScalingAPI.modules.networkExtraction.widgets.ExtractionOptions(this);
         //taskDIR=true; taskRED=true; taskGEO=false; taskVECT=false;
-        taskDIR=false; taskRED=false; taskGEO=true; taskVECT=true;
+        taskDIR=false; taskRED=true; taskGEO=true; taskVECT=true;
         corrigeDEM();
         OpProc.dispose();
     }
