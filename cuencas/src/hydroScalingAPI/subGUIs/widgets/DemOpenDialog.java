@@ -19,7 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 
 /*
- * mdtGeomorCheck.java
+ * DemOpenDialog.java
  *
  * Created on March 3, 2003, 4:31 PM
  */
@@ -27,8 +27,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.subGUIs.widgets;
 
 /**
- *
- * @author  Ricardo Mantilla
+ * This dialog is designed as an advance file selector of the DEM and its derived variables
+ * @author Ricardo Mantilla
  */
 public class DemOpenDialog extends javax.swing.JDialog {
     
@@ -104,10 +104,21 @@ public class DemOpenDialog extends javax.swing.JDialog {
                                   " Topologic Diameter - ",
                                   " Raster Drainage Network - "};
         
+    /**
+     * Creates new form DemOpenDialog to select a map to open
+     * @param parent The main GIS interface
+     * @param md The MetaRaster asociated with the DEM
+     */
     public DemOpenDialog(hydroScalingAPI.mainGUI.ParentGUI parent, hydroScalingAPI.io.MetaRaster md) {
         this(parent,md,"Open");
     }
-    /** Creates new form mdtGeomorCheck */
+    /**
+     * Creates new form DemOpenDialog to select a map to any diferent action
+     * @param actionToDo A String describing the action that will take place with the selected derived
+     * map
+     * @param parent The main GIS interface
+     * @param md The MetaRaster asociated with the DEM
+     */
     public DemOpenDialog(hydroScalingAPI.mainGUI.ParentGUI parent, hydroScalingAPI.io.MetaRaster md,String actionToDo) {
         super (parent, true);
         initComponents ();
@@ -155,18 +166,36 @@ public class DemOpenDialog extends javax.swing.JDialog {
         listDEM_subproducts.setSelectedIndex(0);
     }
     
+    /**
+     * A boolean flag that indicates if the user selected the 3D option
+     * @return True if the user wants to view the 3D map
+     */
     public boolean is3D(){
         return option3D.isSelected();
     }
     
+    /**
+     * A boolean flag that indicates if the user selected at least one map
+     * @return The boolean flag for map selection
+     */
     public boolean mapsSelected(){
         return listOfMetaRasters != null;
     }
     
+    /**
+     * Returns an array of MetaRaster associated to each of the maps selected by the
+     * user
+     * @return The list of maps selected by the user
+     */
     public hydroScalingAPI.io.MetaRaster[] getSelectedMetaRasters(){
         return listOfMetaRasters;
     }
     
+    /**
+     * Returns a {@link java.util.Hashtable} with paths to the derived maps associated
+     * to the DEM.  The keys of the Hastable correspond to the map descriptor
+     * @return A {@link java.util.Hashtable}
+     */
     public java.util.Hashtable getRelatedMaps(){
         java.util.Hashtable nameToFile = new java.util.Hashtable();
         

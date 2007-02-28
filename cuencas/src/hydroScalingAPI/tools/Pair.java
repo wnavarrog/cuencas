@@ -27,24 +27,35 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.tools;
 
 /**
- *
- * @author  Peter Furey
+ * An auxiliary object composed by two properties.  It allows to sort a group of
+ * this objects using property1
+ * @author Peter Furey
  */
 public class Pair implements Comparable{
 
+    /**
+     * The master property
+     */
     public float property1;
+    /**
+     * The secondary property
+     */
     public float property2;
     
     
-    /** Creates a new instance of Pair */
+    /**
+     * Creates a new instance of Pair
+     * @param a The value to assign to the master property
+     * @param b The value to assign to the secondary property
+     */
     public Pair(float a, float b) {
         property1=a;
         property2=b;
     }
     
     /**
-     * 
-     * @param o 
+     * The compareTo implementation for the Pair object
+     * @param o The object to be compared against
      * @return A negative integer, zero, or a positive integer as this object is less than, equal
      * to, or greater than the specified object.
      */
@@ -60,6 +71,7 @@ public class Pair implements Comparable{
     }
     
     /**
+     * Tests for the class
      * @param args the command line arguments
      */
     public static void main(String[] args ) {

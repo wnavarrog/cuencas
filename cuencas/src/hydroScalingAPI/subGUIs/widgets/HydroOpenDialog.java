@@ -23,7 +23,7 @@ package hydroScalingAPI.subGUIs.widgets;
 import javax.swing.ListSelectionModel;
 
 /**
- *
+ * This dialog is designed as an advance file selector for Hydroclimatic variables
  * @author Ricardo Mantilla
  */
 public class HydroOpenDialog extends javax.swing.JDialog {
@@ -40,10 +40,21 @@ public class HydroOpenDialog extends javax.swing.JDialog {
     private hydroScalingAPI.io.MetaRaster[] listOfMetaRasters;
 
     
+    /**
+     * Creates new form HydroOpenDialog to select a map to open
+     * @param parent The main GIS interface
+     * @param md The MetaRaster asociated with the DEM
+     */
     public HydroOpenDialog(hydroScalingAPI.mainGUI.ParentGUI parent, hydroScalingAPI.io.MetaRaster md) {
         this(parent,md,"Open File");
     }
-    /** Creates new form varHidrolCheck */
+    /**
+     * Creates new form HydroOpenDialog to select a map to any diferent action
+     * @param actionToDo A String describing the action that will take place with the selected derived
+     * map
+     * @param parent The main GIS interface
+     * @param md The MetaRaster asociated with the DEM
+     */
     public HydroOpenDialog(hydroScalingAPI.mainGUI.ParentGUI parent, hydroScalingAPI.io.MetaRaster md, String actionToDo) {
         super(parent, true);
         initComponents();
@@ -83,6 +94,10 @@ public class HydroOpenDialog extends javax.swing.JDialog {
         
     }
     
+    /**
+     * Returns a list of CronoFiles selected by the user
+     * @return An array of {@link hydroScalingAPI.util.fileUtilities.ChronoFile}s
+     */
     public hydroScalingAPI.util.fileUtilities.ChronoFile[] getFilesList(){
         hydroScalingAPI.util.fileUtilities.ChronoFile[] chronoFilesSel;
         if (openSeveralAtOnce){
@@ -96,22 +111,45 @@ public class HydroOpenDialog extends javax.swing.JDialog {
         return chronoFilesSel;
     }
     
+    /**
+     * A boolean flag indicating if if the user wants to use the Multiple Maps viewer
+     * mode
+     * @return The boolean for multiple maps interfaces
+     */
     public boolean isMultiple(){
         return openSeveralAtOnce;
     }
     
+    /**
+     * The type of Multiple-map interface
+     * @return An integer with the multi-map interface
+     */
     public int selectedViewer(){
         return (allAtOnce.isSelected()?1:0)+(layers.isSelected()?2:0)+(animation.isSelected()?3:0);
     }
     
+    /**
+     * A boolean flag indicating if the user selected maps
+     * @return A boolean for canceled action
+     */
     public boolean mapsSelected(){
         return !gotCancel;
     }
     
+    /**
+     * Returns an array of MetaRaster associated to each of the maps selected by the
+     * user
+     * @return The list of maps selected by the user
+     */
     public hydroScalingAPI.io.MetaRaster[] getSelectedMetaRasters(){
         return listOfMetaRasters;
     }
     
+    /**
+     * Returns a {@link java.util.Hashtable} with paths to the derived maps associated
+     * to the DEM.  The keys of the Hastable correspond to the map descriptor
+     * @return A {@link java.util.Hashtable}
+     */
     public java.util.Hashtable getRelatedMaps(){
         java.util.Hashtable nameToFile = new java.util.Hashtable();
         

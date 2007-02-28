@@ -27,7 +27,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.subGUIs.widgets;
 
 /**
- *
+ * This dialog is designed as an advance file selector of the Gauges in the database
  * @author Ricardo Mantilla
  */
 public class GaugesOpenDialog extends javax.swing.JDialog {
@@ -38,7 +38,10 @@ public class GaugesOpenDialog extends javax.swing.JDialog {
     
     private boolean cancelFlag=false;
     
-    /** Creates new form GaugesOpenDialog */
+    /**
+     * Creates new form GaugesOpenDialog to select gauges to display
+     * @param parent The main GIS interface
+     */
     public GaugesOpenDialog(hydroScalingAPI.mainGUI.ParentGUI parent) {
         super(parent, true);
         mainFrame=parent;
@@ -171,7 +174,11 @@ public class GaugesOpenDialog extends javax.swing.JDialog {
         }
      }
     
-     public hydroScalingAPI.io.MetaGauge[] getSelectedGauges(){
+    /**
+     * Returns the list of {@link hydroScalingAPI.io.MetaGauge}s selected by the user
+     * @return The selected gauges
+     */
+    public hydroScalingAPI.io.MetaGauge[] getSelectedGauges(){
          
          Object[] matchedValues=jListFinalSelection.getSelectedValues();
          hydroScalingAPI.io.MetaGauge[] foundGauges=new hydroScalingAPI.io.MetaGauge[matchedValues.length];
@@ -183,13 +190,22 @@ public class GaugesOpenDialog extends javax.swing.JDialog {
 
      }
      
-     public boolean showNames(){
-         return showNamesOnDisplay.isSelected();
-     }
+    /**
+     * A boolean flag indicating if the user wants the label associated to the gauge to
+     * be displayed next to the gauge location
+     * @return True if the user wants the label associated to the gauge
+     */
+    public boolean showNames(){
+     return showNamesOnDisplay.isSelected();
+    }
      
-     public boolean isCanceled(){
-         return cancelFlag;
-     }
+    /**
+     * A boolean flag indicating that the user didn't make a selection
+     * @return True if a selection was made
+     */
+    public boolean isCanceled(){
+     return cancelFlag;
+    }
     
     /** This method is called from within the constructor to
      * initialize the form.
@@ -715,6 +731,7 @@ public class GaugesOpenDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_closeDialog
     
     /**
+     * Test for the class
      * @param args the command line arguments
      */
     public static void main(String args[]) {

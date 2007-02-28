@@ -27,14 +27,21 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.subGUIs.widgets;
 
 /**
- *
+ * This interface handles VisAD widgets to manipulate elements of the map display
  * @author Ricardo Mantilla
  */
 public class RasterViewerControlsDialog extends javax.swing.JDialog {
     
     private hydroScalingAPI.mainGUI.ParentGUI mainFrame;
     
-    /** Creates new form RasterViewerControlsDialog */
+    /**
+     * Creates new form RasterViewerControlsDialog
+     * @param parent The main GIS GUI
+     * @param latMap The Latitude Map for the x-axis
+     * @param lonMap The Longitude Map for the y-axis
+     * @param heigthMap The Height Map for the z-axis
+     * @param colorMap The Colors Map overlaying the surface
+     */
     public RasterViewerControlsDialog(hydroScalingAPI.mainGUI.ParentGUI parent, visad.ScalarMap latMap, visad.ScalarMap lonMap, visad.ScalarMap heigthMap, visad.ScalarMap colorMap) {
         super(parent, true);
         mainFrame=parent;
@@ -106,6 +113,7 @@ public class RasterViewerControlsDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_closeDialog
     
     /**
+     * Tests for the class
      * @param args the command line arguments
      */
     public static void main(String args[]) {

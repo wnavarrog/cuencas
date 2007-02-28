@@ -17,8 +17,9 @@ import geotransform.ellipsoids.*;
 import geotransform.transforms.*;
     
 /**
- *
- * @author  Ricardo Mantilla
+ * This module is a graphical interface for creating input and analyzing output
+ * for/from the tRIBS program developed at MIT
+ * @author Ricardo Mantilla
  */
 public class TRIBS_io extends javax.swing.JDialog {
     
@@ -35,13 +36,13 @@ public class TRIBS_io extends javax.swing.JDialog {
     private hydroScalingAPI.mainGUI.ParentGUI mainFrame;
     
     private hydroScalingAPI.util.geomorphology.objects.Basin myCuenca;
-    public hydroScalingAPI.io.MetaRaster metaDatos;
-    public byte[][] matDir;
-    public hydroScalingAPI.util.geomorphology.objects.HortonAnalysis myBasinResults;
-    public hydroScalingAPI.util.geomorphology.objects.LinksAnalysis linksStructure;
+    private hydroScalingAPI.io.MetaRaster metaDatos;
+    private byte[][] matDir;
+    private hydroScalingAPI.util.geomorphology.objects.HortonAnalysis myBasinResults;
+    private hydroScalingAPI.util.geomorphology.objects.LinksAnalysis linksStructure;
     
     private int[][] magnitudes;
-    float[][] DEM;
+    private float[][] DEM;
     
     private visad.RealTupleType domain=new visad.RealTupleType(visad.RealType.Longitude,visad.RealType.Latitude);
     private visad.FlatField demField;
@@ -67,6 +68,15 @@ public class TRIBS_io extends javax.swing.JDialog {
     
     /**
      * Creates new form TRIBS_io
+     * @param parent The main GIS GUI
+     * @param x The column number of the basin outlet location
+     * @param y The row number of the basin outlet location
+     * @param direcc The direction matrix associated to the DEM where the basin is embeded
+     * @param magnit The magnitudes matrix associated to the DEM where the basin is embeded
+     * @param md The MetaRaster associated to the DEM where the basin is embeded
+     * @throws java.rmi.RemoteException Captures errors while assigning values to VisAD data objects
+     * @throws visad.VisADException Captures errors while creating VisAD objects
+     * @throws java.io.IOException Captures errors while reading information
      */
     public TRIBS_io(hydroScalingAPI.mainGUI.ParentGUI parent, int x, int y, byte[][] direcc, int[][] magnit, hydroScalingAPI.io.MetaRaster md) throws RemoteException, VisADException, java.io.IOException{
         super(parent, true);
@@ -367,7 +377,7 @@ public class TRIBS_io extends javax.swing.JDialog {
         
     }
     
-    public double[] intersection(double x1, double y1, double x2, double y2,double x3, double y3, double x4, double y4){
+    private double[] intersection(double x1, double y1, double x2, double y2,double x3, double y3, double x4, double y4){
         double b1=x1*y2-y1*x2;
         double b2=x3*y4-y3*x4;
         
@@ -383,7 +393,7 @@ public class TRIBS_io extends javax.swing.JDialog {
         return answ;
     }
     
-    public void sortTriangles(Delaunay delaun,float[][] samples){
+    private void sortTriangles(Delaunay delaun,float[][] samples){
         for(int j=0;j<delaun.Vertices.length;j++) {
             float[][] lines1=new float[3][delaun.Vertices[j].length];
             for(int i=0;i<delaun.Vertices[j].length;i++){
@@ -1153,6 +1163,7 @@ public class TRIBS_io extends javax.swing.JDialog {
     }//GEN-LAST:event_closeDialog
     
     /**
+     * Test for the class
      * @param args the command line arguments
      */
     public static void main(String args[]) {

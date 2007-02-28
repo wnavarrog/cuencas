@@ -21,19 +21,25 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.tools;
 
 /**
- *
+ * An abstract class to manipulate tranformations of value representation of
+ * geographic coordinates to nicely formated string
  * @author Ricardo Mantilla
  */
-public class DegreesToDMS extends Object {
+public abstract class DegreesToDMS{
 
+    /**
+     * The identifier for Latitude string
+     */
     public static int LATITUDE=0;
+    /**
+     * The identifier for Longitude string
+     */
     public static int LONGITUDE=1;
     private static String prettyString="";
     
-    /** Creates new degreesToGMS */
-    public static void processNumber(double degrees, int type) {
+    private static void processNumber(double degrees, int type) {
         /*
-            Typo defines:
+            Type defines:
             0: Latitude
             1: Longitude
         */
@@ -119,17 +125,35 @@ public class DegreesToDMS extends Object {
         
     }
     
+    /**
+     * Takes in a double in degrees units and a type (0 for Latitude or 1 for Longitudes) and
+     * returns a formated string
+     * @param degrees The coordinate in degrees
+     * @param type The orientation of the coordinate
+     * @return A formated String
+     */
     public static String getprettyString(double degrees, int type){
         processNumber(degrees,type);
         return prettyString;
     }
     
+    /**
+     * Takes in a float in degrees units and a type (0 for Latitude or 1 for Longitudes) and
+     * returns a formated string
+     * @param degrees The coordinate in degrees
+     * @param type The orientation of the coordinate
+     * @return A formated String
+     */
     public static String getprettyString(float degrees, int type){
         processNumber((double)degrees,type);
         return prettyString;
     }
     
     
+    /**
+     * Tests for the class
+     * @param args The command line arguments
+     */
     public static void main (String args[]) {
         
         System.out.println(hydroScalingAPI.tools.DegreesToDMS.getprettyString(-100.056,1));

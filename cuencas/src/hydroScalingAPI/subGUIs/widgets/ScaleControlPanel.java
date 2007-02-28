@@ -27,7 +27,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.subGUIs.widgets;
 
 /**
- *
+ * A Panel containing a manager of axis maps
  * @author Ricardo Mantilla
  */
 public class ScaleControlPanel extends javax.swing.JPanel {
@@ -35,7 +35,10 @@ public class ScaleControlPanel extends javax.swing.JPanel {
     private visad.AxisScale scale;
     private visad.ScalarMap myMap;
     
-    /** Creates new form ScaleControlPanel */
+    /**
+     * Creates new form colorManager
+     * @param map A visad.ScalarMap
+     */
     public ScaleControlPanel(visad.ScalarMap map) {
         myMap=map;
         scale = map.getAxisScale();

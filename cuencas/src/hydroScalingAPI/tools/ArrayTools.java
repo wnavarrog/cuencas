@@ -27,14 +27,14 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.tools;
 
 /**
- *
+ * An abstract class with a set of tools to manipulate arrays
  * @author Ricardo Mantilla
  */
 public abstract class ArrayTools {
     
     /**
-     * 
-     * @param theFloatArray 
+     * Casts float values to int
+     * @param theFloatArray The original array with float falues
      * @return A new array of integers
      */
     public static int[] convertFloatArrayToIntArray(float[] theFloatArray){
@@ -46,8 +46,8 @@ public abstract class ArrayTools {
     }
     
     /**
-     * 
-     * @param theArray 
+     * Prints the contents of an integer array
+     * @param theArray The int array to print
      */
     public static void printArray(int[] theArray){
         //method prints array values to standard output
@@ -59,26 +59,16 @@ public abstract class ArrayTools {
     }
     
     /**
-     * 
-     * @param twoArray 
-     * @throws java.io.IOException 
-     * @return oneArray
+     * Changes the dimensions of a two dimensional array into a one dimensional array
+     * @param twoArray The original two dimensional array
+     * @return A one dimensional array
      */
-    public static float[] convertTwoToOne(float[][] twoArray) throws java.io.IOException{
+    public static float[] convertTwoToOne(float[][] twoArray){
         float[] oneArray = new float[twoArray[0].length];
         for (int i = 0;i<twoArray[0].length;i++){
              oneArray[i] = twoArray[0][i];
         }
         return oneArray;
-    }
-    
-    
 
-    
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
     }
-    
 }

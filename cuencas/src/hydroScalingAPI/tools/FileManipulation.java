@@ -27,12 +27,16 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.tools;
 
 /**
- *
+ * An abstract class to manage files
  * @author Ricardo Mantilla
  */
 public abstract class FileManipulation {
     
-    /** Creates a new instance of CopyFile */
+    /**
+     * Creates a new instance of CopyFile
+     * @param sourceFile The source file
+     * @param destinationFile The destination file
+     */
     public static void  CopyFile(java.io.File sourceFile, java.io.File destinationFile) {
         
         try {
@@ -42,7 +46,8 @@ public abstract class FileManipulation {
             sourceChannel.close();
             destinationChannel.close();
         }
-        catch (java.io.IOException e) { // handle any IOException
+        catch (java.io.IOException e) {
+            e.printStackTrace();
         }
         
     }

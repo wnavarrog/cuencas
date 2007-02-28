@@ -23,14 +23,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
  * Created on December 21, 2006, 9:53 AM
  *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
  */
 
 package hydroScalingAPI.modules;
 
 /**
- *
+ * This class has been developed to test basin modules in an independent fashion
  * @author Ricardo Mantilla
  */
 public class ModuleTester {
@@ -40,8 +38,9 @@ public class ModuleTester {
     }
     
         /**
-    * @param args the command line arguments
-    */
+     * Tests for the class
+     * @param args the command line arguments
+     */
     public static void main (String args[]) {
         new ModuleTester();
     }

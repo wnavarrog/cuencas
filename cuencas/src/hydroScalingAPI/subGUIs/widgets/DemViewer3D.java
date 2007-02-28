@@ -27,12 +27,22 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.subGUIs.widgets;
 
 /**
- *
+ * The extension of the {@link hydroScalingAPI.subGUIs.widgets.RasterViewer} for
+ * for 3-dimensional visualization of DEMs and derived fields
  * @author Ricardo Mantilla
  */
 public class DemViewer3D extends hydroScalingAPI.subGUIs.widgets.RasterViewer implements visad.DisplayListener {
     
-    /** Creates a new instance of DemViewer3D */
+    /**
+     * Creates new instance of DemViewer3D
+     * @param relMaps A {@link java.util.Hashtable} with paths to the derived quantities and with keys
+     * that describe the variable
+     * @param parent The main GIS interface
+     * @param md The MetaRaster asociated with the DEM
+     * @throws java.rmi.RemoteException Captures remote exceptions
+     * @throws visad.VisADException Captures VisAD Exeptions
+     * @throws java.io.IOException Captures I/O Execptions
+     */
     public DemViewer3D(hydroScalingAPI.mainGUI.ParentGUI parent, hydroScalingAPI.io.MetaRaster md, java.util.Hashtable relMaps) throws java.rmi.RemoteException, visad.VisADException, java.io.IOException{
         super(parent,md,relMaps);
         
@@ -131,8 +141,13 @@ public class DemViewer3D extends hydroScalingAPI.subGUIs.widgets.RasterViewer im
         updateUI();
     }
     
-    /** send a DisplayEvent to this DisplayListener  */
-    public void displayChanged(visad.DisplayEvent e) throws visad.VisADException, java.rmi.RemoteException {
+    /**
+     * A required method to handle interaction with the various visad.Display
+     * @param DispEvt The interaction event
+     * @throws visad.VisADException Errors while handling VisAD objects
+     * @throws java.rmi.RemoteException Errors while assigning data to VisAD objects
+     */
+    public void displayChanged(visad.DisplayEvent DispEvt) throws visad.VisADException, java.rmi.RemoteException {
     }
     
 }

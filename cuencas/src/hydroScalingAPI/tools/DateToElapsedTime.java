@@ -19,7 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 
 /*
- * DateToSeconds.java
+ * DateToElapsedTime.java
  *
  * Created on June 26, 2003, 11:09 AM
  */
@@ -27,7 +27,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.tools;
 
 /**
- *
+ * This object tranforms a date represented by a string of the type
+ * year-month-day-hour-minute-second into an elapsed time since a reference time
+ * set by the {@link java.util.Calendar} object
  * @author Ricardo Mantilla
  */
 public class DateToElapsedTime {
@@ -36,7 +38,10 @@ public class DateToElapsedTime {
     private int yy=0, mm=0, dd=0, hh=0 ,mi=0 ,ss=0;
         
     
-    /** Creates a new instance of DateToSeconds */
+    /**
+     * Creates a new instance of DateToSeconds
+     * @param date The string of the type year-month-day-hour-minute-second
+     */
     public DateToElapsedTime(String date) {
         
         java.util.StringTokenizer tokens=new java.util.StringTokenizer(date,".");
@@ -53,31 +58,48 @@ public class DateToElapsedTime {
         
     }
     
-    public double getDateInYears(){
-        return yy+mm/12.0+dd/365.25+hh/(365.25*24.0)+mi/(365.25*24.0*60.)+ss/(365.25*24.0*60.*60.);
-    }
-    
+    /**
+     * The number of seconds since the reference time
+     * @return A double in units of seconds
+     */
     public double getSeconds(){
         return dateComposite.getTimeInMillis()/1000.0;
     }
     
+    /**
+     * The number of minutes since the reference time
+     * @return A double in units of seconds
+     */
     public double getMinutes(){
         return dateComposite.getTimeInMillis()/1000.0/60.0;
     }
     
+    /**
+     * The number of hours since the reference time
+     * @return A double in units of hours
+     */
     public double getHours(){
         return dateComposite.getTimeInMillis()/1000.0/60.0/60.0;
     }
     
+    /**
+     * The number of days since the reference time
+     * @return A double in units of days
+     */
     public double getDays(){
         return dateComposite.getTimeInMillis()/1000.0/60.0/60.0/24.0;
     }
     
+    /**
+     * The number of years since the reference time
+     * @return A double in units of years
+     */
     public double getYears(){
         return dateComposite.getTimeInMillis()/1000.0/60.0/60.0/24.0/365.25;
     }
     
     /**
+     * Tests for the class
      * @param args the command line arguments
      */
     public static void main(String[] args) {

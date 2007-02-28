@@ -35,7 +35,7 @@ public class Stats{
     public float total=0.0f;
     public int dataCount=0;
 
-    /** Creates new estadisticos */
+    /** Creates new Stats */
     public Stats(float[][] matrix) {
         for (int j=0;j<matrix.length;j++){
             for (int k=0;k<matrix[j].length;k++){
@@ -148,7 +148,7 @@ public class Stats{
                          {0.0f,0.0f,0.0f},
                          {0.0f,0.0f,0.0f}};*/
         hydroScalingAPI.tools.Stats algo= new Stats(estat,0);
-        System.out.println(algo.meanValue+" "+algo.standardDeviation+" "+algo.minValue+" "+algo.maxValue+" "+algo.dataCount+" "+algo.total);
+        System.out.println(algo.toString());
     }
     
 

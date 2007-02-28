@@ -27,44 +27,91 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.subGUIs.widgets;
 
 /**
- *
+ * The master GIS frame for displaying maps and overlaying vector and sites
  * @author Ricardo Mantilla
  */
 
 public abstract class RasterViewer extends javax.swing.JInternalFrame {
     
+    private String myStringID;
+    private hydroScalingAPI.io.BasinsLogReader localBasinsLog;
+    
+    private java.util.Hashtable relatedMapsList;
+
+    private java.util.Vector temporalReferences=new java.util.Vector();
+    private java.util.Vector basinOutlets=new java.util.Vector();
+
+    private float[] red;
+    private float[] green;
+    private float[] blue;
+
+    private hydroScalingAPI.io.MetaNetwork localNetwork;
+    private java.util.Hashtable networkReferences=new java.util.Hashtable();
+    
+    private int[][] subSetCorners=new int[2][2];
+    private int subSetCornersCounter=0;
+    
+    /**
+     * The main GIS GUI
+     */
     protected hydroScalingAPI.mainGUI.ParentGUI mainFrame;
-    protected String myStringID;
+    /**
+     * The MetaRaster that describes to map to be displayed
+     */
     protected hydroScalingAPI.io.MetaRaster metaData;
-    protected hydroScalingAPI.io.BasinsLogReader localBasinsLog;
     
-    protected final visad.util.HersheyFont font = new visad.util.HersheyFont("meteorology");
+    /**
+     * The font for the axis and the labels
+     */
+    protected final visad.util.HersheyFont font = new visad.util.HersheyFont("futural");
     
+    /**
+     * The visad.Display
+     */
     protected visad.DisplayImpl display;
-    protected visad.ScalarMap latitudeMap,longitudeMap,heightMap,colorScaleMap;
+    /**
+     * The visad.java3d.DisplayRendererJ3D asociated to the visad.Display
+     */
+    protected visad.java3d.DisplayRendererJ3D dr;
+    /**
+     * The Latitude Map for the x-axis
+     */
+    protected visad.ScalarMap latitudeMap;
+    /**
+     * The Longitude Map for the y-axis
+     */
+    protected visad.ScalarMap longitudeMap;
+    /**
+     * The Height Map for the z-axis
+     */
+    protected visad.ScalarMap heightMap;
+    /**
+     * The Colors Map overlaying the surface
+     */
+    protected visad.ScalarMap colorScaleMap;
+    
+    /**
+     * The visad.FlatField with data
+     */
     protected visad.FlatField localField;
     
-    protected visad.java3d.DisplayRendererJ3D dr;
-    
-    protected java.util.Hashtable relatedMapsList;
-    
-    protected hydroScalingAPI.io.MetaNetwork localNetwork;
-    protected java.util.Hashtable networkReferences=new java.util.Hashtable();
-    protected float[] red;
-    protected float[] green;
-    protected float[] blue;
-    
-    protected java.util.Vector temporalReferences=new java.util.Vector();
-    protected java.util.Vector basinOutlets=new java.util.Vector();
-
+    /**
+     * The active event for the mouse middle button
+     */
     protected int activeEvent=0;
     
+    /**
+     * The direction matrix associated to the DEM (only if a processed DEM is being displayed)
+     */
     protected byte[][] fullDirMatrix;
     
-    protected int[][] subSetCorners=new int[2][2];
-    protected int subSetCornersCounter=0;
-    
-    /** Creates new form RasterViewer */
+    /**
+     * Creates new instance of RasterViewer
+     * @param relMaps A {@link java.util.Hashtable} with paths to the derived quantities and with keys
+     * that describe the variable
+     * @param parent The main GIS interface
+     * @param md The MetaRaster asociated with the DEM
+     */
     public RasterViewer(hydroScalingAPI.mainGUI.ParentGUI parent,hydroScalingAPI.io.MetaRaster md, java.util.Hashtable relMaps) {
         mainFrame=parent;
         metaData=md;
@@ -86,14 +133,22 @@ public abstract class RasterViewer extends javax.swing.JInternalFrame {
         return metaData.getLocationMeta().getName().toLowerCase().lastIndexOf(".metadem") != -1;
     }
     
+    /**
+     * Enables the set of tools for processed DEMs
+     * @param enabled The status for the tools
+     */
     protected void demToolsEnable(boolean enabled){
         showNetwork.setEnabled(enabled);
         showBasins.setEnabled(enabled);
         selectOutlet.setEnabled(enabled);
         traceStream.setEnabled(enabled);
+        if(enabled){
+            updateNetworkPopupMenu();
+            updateBasinsPopupMenu();
+        }
     }
     
-    protected void updateBasinsPopupMenu(){
+    private void updateBasinsPopupMenu(){
         java.io.File originalFile=metaData.getLocationBinaryFile();
         java.io.File logFile=new java.io.File(originalFile.getParent()+"/"+originalFile.getName().substring(0,originalFile.getName().lastIndexOf("."))+".log");
         
@@ -128,7 +183,7 @@ public abstract class RasterViewer extends javax.swing.JInternalFrame {
         
     }
     
-    protected void addPreselectedBasin(String basinLabel){
+    private void addPreselectedBasin(String basinLabel){
         javax.swing.JMenuItem showBasinI = new javax.swing.JMenuItem();
         showBasinI.setFont(new java.awt.Font("Dialog", 0, 10));
         showBasinI.setText(basinLabel);
@@ -141,7 +196,7 @@ public abstract class RasterViewer extends javax.swing.JInternalFrame {
         basinsViewerPopUp.add(showBasinI);
     }
     
-    protected void showBasinPreSelectedActionPerformed(java.awt.event.ActionEvent evt) {
+    private void showBasinPreSelectedActionPerformed(java.awt.event.ActionEvent evt) {
         
         javax.swing.JMenuItem showOrderW = (javax.swing.JMenuItem)evt.getSource();
         
@@ -164,7 +219,7 @@ public abstract class RasterViewer extends javax.swing.JInternalFrame {
         
     }
     
-    protected void updateNetworkPopupMenu(){
+    private void updateNetworkPopupMenu(){
         
         javax.swing.JCheckBoxMenuItem showAllOrders = new javax.swing.JCheckBoxMenuItem();
         showAllOrders.setFont(new java.awt.Font("Dialog", 0, 10));
@@ -207,7 +262,7 @@ public abstract class RasterViewer extends javax.swing.JInternalFrame {
         
     }
 
-    protected void showAllOrdersActionPerformed(java.awt.event.ActionEvent evt) {
+    private void showAllOrdersActionPerformed(java.awt.event.ActionEvent evt) {
         selectAllNetworkPopup();
         javax.swing.JCheckBoxMenuItem showAllOrders = (javax.swing.JCheckBoxMenuItem)evt.getSource();
         if(showAllOrders.isSelected()){
@@ -281,7 +336,7 @@ public abstract class RasterViewer extends javax.swing.JInternalFrame {
         
     }
     
-    public void addStreamsWithOrder(final int orderRequested){
+    private void addStreamsWithOrder(final int orderRequested){
         Runnable addStreams = new Runnable() {
             public void run() {
                 try {
@@ -310,7 +365,7 @@ public abstract class RasterViewer extends javax.swing.JInternalFrame {
         new Thread(addStreams).start();
     }
     
-    protected void saveImage(java.io.File f) throws visad.VisADException, java.io.IOException {
+    private void saveImage(java.io.File f) throws visad.VisADException, java.io.IOException {
         java.awt.image.BufferedImage image = (java.awt.image.BufferedImage) display.getImage();
         
         if(!f.getName().endsWith(".jpg")){
@@ -322,6 +377,15 @@ public abstract class RasterViewer extends javax.swing.JInternalFrame {
         
     }
     
+    /**
+     * This method creates a dataReference for the polygon describing a basin contour.
+     * The basin is interctively selected by the user
+     * @param MatX The column number of the basin outlet
+     * @param MatY The row number of the basin outlet
+     * @param isNew A boolean flag indicating if this is a previously selected basin or a new one
+     * @throws java.rmi.RemoteException Captures remote exceptions
+     * @throws visad.VisADException Captures VisAD Exeptions
+     */
     protected void traceBasinContour(final int MatX,final int MatY, boolean isNew) throws visad.VisADException, java.rmi.RemoteException{
         if (MatX >= 0 && MatY >= 0 && MatX < metaData.getNumCols() && MatY < metaData.getNumRows() ) {
             if(isNew){
@@ -337,7 +401,7 @@ public abstract class RasterViewer extends javax.swing.JInternalFrame {
             
             hydroScalingAPI.util.geomorphology.objects.Basin thisBasin = new hydroScalingAPI.util.geomorphology.objects.Basin(MatX,MatY, fullDirMatrix,metaData);
             
-            visad.DataReferenceImpl riverRef=new visad.DataReferenceImpl("rio");
+            visad.DataReferenceImpl riverRef=new visad.DataReferenceImpl("divide");
             riverRef.setData(thisBasin.getBasinDivide());
             visad.ConstantMap[] lineCMap = {  new visad.ConstantMap( 100/255.0f, visad.Display.Red),
                                               new visad.ConstantMap( 100/255.0f, visad.Display.Green),
@@ -371,6 +435,13 @@ public abstract class RasterViewer extends javax.swing.JInternalFrame {
         }
     }
     
+    /**
+     * This method creates a dataReference for the line describing a river pathway
+     * @param MatX The column number of the beginging of the river pathway
+     * @param MatY The row number of the beginging of the river pathway
+     * @throws java.rmi.RemoteException Captures remote exceptions
+     * @throws visad.VisADException Captures VisAD Exeptions
+     */
     protected void traceRiverPath(int MatX,int MatY) throws visad.VisADException, java.rmi.RemoteException{
         if (MatX >= 0 && MatY >= 0 && MatX < metaData.getNumCols() && MatY < metaData.getNumRows() ) {
 
@@ -415,6 +486,13 @@ public abstract class RasterViewer extends javax.swing.JInternalFrame {
 
     }
     
+    /**
+     * This method assigns the corners of a map section to be writen to a file
+     * @param MatX The column number of the corner
+     * @param MatY The row number of the corner
+     * @throws java.rmi.RemoteException Captures remote exceptions
+     * @throws visad.VisADException Captures VisAD Exeptions
+     */
     protected void assignSubDataSet(int MatX,int MatY) throws visad.VisADException, java.rmi.RemoteException{
         if (MatX >= 0 && MatY >= 0 && MatX < metaData.getNumCols() && MatY < metaData.getNumRows() ) {
 
@@ -435,7 +513,7 @@ public abstract class RasterViewer extends javax.swing.JInternalFrame {
 
     }
     
-    protected void extractSubDataSet(){
+    private void extractSubDataSet(){
             javax.swing.JFileChooser fc=new javax.swing.JFileChooser(mainFrame.getInfoManager().dataBaseRastersDemPath);
             fc.setFileSelectionMode(fc.DIRECTORIES_ONLY);
             fc.setDialogTitle("Select Destination Folder");
@@ -455,8 +533,8 @@ public abstract class RasterViewer extends javax.swing.JInternalFrame {
             sectionMR.setNumCols(Math.abs(subSetCorners[0][0]-subSetCorners[1][0]));
             sectionMR.setNumRows(Math.abs(subSetCorners[0][1]-subSetCorners[1][1]));
             
-            sectionMR.setMinLon(hydroScalingAPI.tools.DegreesToDMS.getprettyString(metaData.getMinLat()+metaData.getResLat()/3600.*(int)Math.min(subSetCorners[0][0],subSetCorners[1][0]),0));
-            sectionMR.setMinLon(hydroScalingAPI.tools.DegreesToDMS.getprettyString(metaData.getMinLon()+metaData.getResLon()/3600.*(int)Math.min(subSetCorners[0][1],subSetCorners[1][1]),1));
+            sectionMR.setMinLat(hydroScalingAPI.tools.DegreesToDMS.getprettyString(metaData.getMinLat()+metaData.getResLat()/3600.*(int)Math.min(subSetCorners[0][1],subSetCorners[1][1]),0));
+            sectionMR.setMinLon(hydroScalingAPI.tools.DegreesToDMS.getprettyString(metaData.getMinLon()+metaData.getResLon()/3600.*(int)Math.min(subSetCorners[0][0],subSetCorners[1][0]),1));
             
             sectionMR.setFormat("float");
             
@@ -490,30 +568,9 @@ public abstract class RasterViewer extends javax.swing.JInternalFrame {
                 System.err.println(exc);
             }
             
-            
-            
-//            if (this.isDEM()){
-//                if (defFileName.indexOf(".metaDEM") == -1)
-//                defFileName+=".metaMDT";
-//                else
-//                defFileName=defFileName.substring(0,defFileName.indexOf(".metamdt"))+".metaMDT";
-//            } else{
-//                if (defFileName.indexOf(".metavhc") == -1)
-//                defFileName+=".metaVHC";
-//                else
-//                defFileName=defFileName.substring(0,defFileName.indexOf(".metavhc"))+".metaVHC";
-//            }
-//            try{
-//                java.io.File fileNewMeta = new java.io.File(defFileName);
-//                javaSIH.objetos.ExtraerMapa.extraerMapa(cajaDeExtract,metaDatos,fileNewMeta,mainFrame.Idioma);
-//                mainFrame.abrirRaster(fileNewMeta);
-//            }catch(javaSIH.objetos.JavaSIHException ex){
-//                javax.swing.JOptionPane.showMessageDialog(this,"No hay memoria suficiente","Error",javax.swing.JOptionPane.ERROR_MESSAGE);
-//            }
-            
-            
     }
-    protected void plotTemporaryReferences(){
+    
+    private void plotTemporaryReferences(){
         for (int i=0;i<temporalReferences.size();i++){
             final int ii=i;
             Runnable addRef = new Runnable() {
@@ -553,7 +610,7 @@ public abstract class RasterViewer extends javax.swing.JInternalFrame {
         }
     }
     
-    protected void plotField(){
+    private void plotField(){
         Runnable addField = new Runnable() {
             public void run() {
                 try {
@@ -573,7 +630,7 @@ public abstract class RasterViewer extends javax.swing.JInternalFrame {
         new Thread(addField).start();
     }
     
-    protected void plotNetwork(){
+    private void plotNetwork(){
         if(showNetwork.isEnabled()){
             for (int i=2;i<newtorkViewerPopUp.getComponentCount();i++){
                 javax.swing.JCheckBoxMenuItem theMenu=(javax.swing.JCheckBoxMenuItem)newtorkViewerPopUp.getComponent(i);
@@ -583,7 +640,7 @@ public abstract class RasterViewer extends javax.swing.JInternalFrame {
         }
     }
     
-    protected void plotVectors(){
+    private void plotVectors(){
         Object[] actVectors=mainFrame.getActiveVectors();
         for (int i=0;i<actVectors.length;i++){
             final javax.swing.JCheckBox theCheckBox=(javax.swing.JCheckBox)actVectors[i];
@@ -685,7 +742,7 @@ public abstract class RasterViewer extends javax.swing.JInternalFrame {
         }
     }
     
-    protected void plotPolygons(){
+    private void plotPolygons(){
         
         Object[] actPolygons=mainFrame.getActivePolygons();
         for (int i=0;i<actPolygons.length;i++){
@@ -734,7 +791,7 @@ public abstract class RasterViewer extends javax.swing.JInternalFrame {
         
     }
     
-    protected void plotGauges(final boolean withNames){
+    private void plotGauges(final boolean withNames){
         Object[] actGauges=mainFrame.getActiveGauges();
         
         for (int i=0;i<actGauges.length;i++){
@@ -775,7 +832,7 @@ public abstract class RasterViewer extends javax.swing.JInternalFrame {
         }
     }
     
-    protected void plotLocations(final boolean withNames){
+    private void plotLocations(final boolean withNames){
         Object[] actLocations=mainFrame.getActiveLocations();
         
         for (int i=0;i<actLocations.length;i++){
@@ -822,6 +879,11 @@ public abstract class RasterViewer extends javax.swing.JInternalFrame {
         }
     }
     
+    /**
+     * A method to externaly trigger an update of all the references in the map
+     * @param gaugesWithNames A boolean flag indicating if the gauge points must have a label with the code
+     * @param locationsWithNames A boolean flag indicating if the locations points must have a label with the code
+     */
     public void refreshReferences(final boolean gaugesWithNames, final boolean locationsWithNames){
         try{
             display.removeAllReferences();
@@ -842,7 +904,7 @@ public abstract class RasterViewer extends javax.swing.JInternalFrame {
         plotTemporaryReferences();
     }
     
-    public void updateRelatedMaps(){
+    private void updateRelatedMaps(){
         
         Object[] mapNames=relatedMapsList.keySet().toArray();
         java.util.Arrays.sort(mapNames);
@@ -860,47 +922,67 @@ public abstract class RasterViewer extends javax.swing.JInternalFrame {
         });
     }
     
+    /**
+     * Sets the value in the latitude label
+     * @param latLabel The value for the label
+     */
     protected void setLatitudeLabel(String latLabel){
         latitudeLabel.setText(latLabel);
     }
+    /**
+     * Sets the value in the longitude label
+     * @param lonLabel The value for the label
+     */
     protected void setLongitudeLabel(String lonLabel){
         longitudeLabel.setText(lonLabel);
     }
     
+    /**
+     * Sets the value in the Value label
+     * @param valLabel The value for the label
+     */
     protected void setValueLabel(String valLabel){
         valueLabel.setText(valLabel);
     }
     
-    protected void gaugeAction(hydroScalingAPI.io.MetaGauge gaugeInfo){
+    private void gaugeAction(hydroScalingAPI.io.MetaGauge gaugeInfo){
         hydroScalingAPI.modules.analysis_TS.widgets.TimeSeriesViewer gauView=new hydroScalingAPI.modules.analysis_TS.widgets.TimeSeriesViewer(mainFrame,gaugeInfo);
         gauView.setVisible(true);
     }
     
-    protected void locationAction(hydroScalingAPI.io.MetaLocation locationInfo){
+    private void locationAction(hydroScalingAPI.io.MetaLocation locationInfo){
         hydroScalingAPI.subGUIs.widgets.LocationsViewer locView=new hydroScalingAPI.subGUIs.widgets.LocationsViewer(mainFrame,locationInfo);
         locView.setVisible(true);
     }
     
-    protected void lunchBasinAnalyzer(int MatX, int MatY){
+    private void lunchBasinAnalyzer(int MatX, int MatY){
         
         new hydroScalingAPI.subGUIs.widgets.NetworkTools(mainFrame,MatX,MatY,fullDirMatrix,metaData).setVisible(true);
         display.reDisplayAll();
         
     }
     
+    /**
+     * A method to externaly assign a unique identifier for the RasterViewer
+     * @param windowIdentifier The unique code
+     */
     public void setIdentifier(String windowIdentifier){
         myStringID=windowIdentifier;
     }
     
+    /**
+     * Returns the unique identifier assigned to this RasterViewer
+     * @return The unique identifier
+     */
     public String getIdentifier(){
         return myStringID;
     }
     
-    protected void addToNetworkPupUp(java.awt.Component item){
+    private void addToNetworkPupUp(java.awt.Component item){
         newtorkViewerPopUp.add(item);
     }
     
-    protected void selectAllNetworkPopup(){
+    private void selectAllNetworkPopup(){
         javax.swing.JCheckBoxMenuItem selectAllMenu=(javax.swing.JCheckBoxMenuItem)newtorkViewerPopUp.getComponent(0);
         for (int i=2;i<newtorkViewerPopUp.getComponentCount();i++){
             javax.swing.JCheckBoxMenuItem theMenu=(javax.swing.JCheckBoxMenuItem)newtorkViewerPopUp.getComponent(i);

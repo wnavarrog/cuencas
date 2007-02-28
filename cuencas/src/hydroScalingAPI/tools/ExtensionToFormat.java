@@ -19,7 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 
 /*
- * extensionToFormat.java
+ * ExtensionToFormat.java
  *
  * Created on June 28, 2003, 11:44 AM
  */
@@ -27,11 +27,31 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.tools;
 
 /**
- *
+ * An abstract class to assign formats to file extension
  * @author Ricardo Mantilla
  */
 public abstract class ExtensionToFormat {
     
+    /**
+     * Given a file extension return the associated format.  Available extensions
+     * are:<br>
+     * <p>.areas</p>
+     * <p>.corrDEM</p>
+     * <p>.dir</p>
+     * <p>.dtopo</p>
+     * <p>.gdo</p>
+     * <p>.horton</p>
+     * <p>.lcp</p>
+     * <p>.ltc</p>
+     * <p>.mcd</p>
+     * <p>.magn</p>
+     * <p>.redRas</p>
+     * <p>.slope</p>
+     * <p>.tdo</p>
+     * <p>.tcd</p>
+     * @param extension The extension of interest
+     * @return The associated format
+     */
     public static String getFormat(String extension){
         java.util.Hashtable extToFormat=new java.util.Hashtable();
 

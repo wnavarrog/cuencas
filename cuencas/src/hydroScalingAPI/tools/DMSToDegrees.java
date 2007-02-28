@@ -21,12 +21,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.tools;
 
 /**
- *
+ * An abstract class to manipulate tranformations of string representation of
+ * geographic coordinates to values in degrees
  * @author Ricardo Mantilla
  */
 public abstract class DMSToDegrees{
-    public static int LATITUDE=0;
-    public static int LONGITUDE=1;
+    
     private static double Degrees=0;
 
     /** Creates new GMSToDegrees */
@@ -52,16 +52,30 @@ public abstract class DMSToDegrees{
  
     }
     
+    /**
+     * A method for tranforming a string representation into a double
+     * @param GMS The string to be processed
+     * @return The double value
+     */
     public static double getDegrees(String GMS){
         processString(GMS);
         return Degrees;
     }
     
+    /**
+     * A method for tranforming a string representation into a Double object
+     * @param GMS The string to be processed
+     * @return The Double object
+     */
     public static Double getDoubleDegrees(String GMS){
         processString(GMS);
         return new Double(Degrees);
     }
     
+    /**
+     * Tests for the class
+     * @param args The command line arguments
+     */
     public static void main (String args[]) {
         System.out.println(hydroScalingAPI.tools.DMSToDegrees.getDegrees("00:00:20.05 N"));
         System.out.println(hydroScalingAPI.tools.DMSToDegrees.getDegrees("60:30:20.05 W"));

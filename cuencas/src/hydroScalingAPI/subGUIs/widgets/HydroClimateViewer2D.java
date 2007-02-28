@@ -27,14 +27,24 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.subGUIs.widgets;
 
 /**
- *
+ * The extension of the {@link hydroScalingAPI.subGUIs.widgets.RasterViewer} for
+ * for 2-dimensional visualization of Hydroclimatic variables
  * @author Ricardo Mantilla
  */
 public class HydroClimateViewer2D  extends hydroScalingAPI.subGUIs.widgets.RasterViewer implements visad.DisplayListener{
 
     private visad.RealTupleType domain=new visad.RealTupleType(visad.RealType.Longitude,visad.RealType.Latitude);
 
-    /** Creates a new instance of HydroClimateViewer */
+    /**
+     * Creates new instance of HydroClimateViewer2D
+     * @param relMaps A {@link java.util.Hashtable} with paths to the derived quantities and with keys
+     * that describe the variable
+     * @param parent The main GIS interface
+     * @param md The MetaRaster asociated with the DEM
+     * @throws java.rmi.RemoteException Captures remote exceptions
+     * @throws visad.VisADException Captures VisAD Exeptions
+     * @throws java.io.IOException Captures I/O Execptions
+     */
     public HydroClimateViewer2D(hydroScalingAPI.mainGUI.ParentGUI parent, hydroScalingAPI.io.MetaRaster md, java.util.Hashtable relMaps) throws java.rmi.RemoteException, visad.VisADException, java.io.IOException{
         
         super(parent,md,relMaps);
@@ -118,38 +128,54 @@ public class HydroClimateViewer2D  extends hydroScalingAPI.subGUIs.widgets.Raste
     }
     
     /**
-     * @param args the command line arguments
+     * A required method to handle interaction with the various visad.Display
+     * @param DispEvt The interaction event
+     * @throws visad.VisADException Errors while handling VisAD objects
+     * @throws java.rmi.RemoteException Errors while assigning data to VisAD objects
      */
-    public static void main(String[] args) {
-    }
-    
     public void displayChanged(visad.DisplayEvent DispEvt) throws visad.VisADException, java.rmi.RemoteException {
         
         int id = DispEvt.getId();
         
-        if (activeEvent == 0){
-        
+        if (activeEvent == 3){
             try {
-                if(DispEvt.getId() == visad.DisplayEvent.MOUSE_PRESSED_CENTER){
+                if(DispEvt.getId() == visad.DisplayEvent.MOUSE_RELEASED_CENTER){
 
-                    //Initialize Box Zoom
-                            
+                    visad.VisADRay ray = dr.getMouseBehavior().findRay(DispEvt.getX(), DispEvt.getY());
+
+                    float resultX= longitudeMap.inverseScaleValues(new float[] {(float)ray.position[0]})[0];
+                    float resultY= latitudeMap.inverseScaleValues(new float[] {(float)ray.position[1]})[0];
+
+                    hydroScalingAPI.subGUIs.widgets.LocationsEditor theEditor=new hydroScalingAPI.subGUIs.widgets.LocationsEditor(mainFrame);
+                    theEditor.setLatLong(resultY,resultX);
+                    theEditor.setVisible(true);
+
+                    mainFrame.addNewLocationInteractively(theEditor);
                 }
-            } catch (Exception e) {
-                System.err.println(e);
-            }
-
-            try {
-                if (DispEvt.getId() == visad.DisplayEvent.MOUSE_RELEASED_CENTER) {
-
-                    //End Box Zoom
-                }
-
             } catch (Exception e) {
                 System.err.println(e);
             }
         }
         
+        if (activeEvent == 4){
+            try {
+                if(DispEvt.getId() == visad.DisplayEvent.MOUSE_RELEASED_CENTER){
+
+                    visad.VisADRay ray = dr.getMouseBehavior().findRay(DispEvt.getX(), DispEvt.getY());
+
+                    float resultX= longitudeMap.inverseScaleValues(new float[] {(float)ray.position[0]})[0];
+                    float resultY= latitudeMap.inverseScaleValues(new float[] {(float)ray.position[1]})[0];
+
+                    int MatX=(int) ((resultX -metaData.getMinLon())/(float) metaData.getResLon()*3600.0f);
+                    int MatY=(int) ((resultY -metaData.getMinLat())/(float) metaData.getResLat()*3600.0f);
+                    
+                    assignSubDataSet(MatX,MatY);
+                }
+            } catch (Exception e) {
+                System.err.println(e);
+            }
+        }
+
         try {
             if (id == DispEvt.MOUSE_MOVED) {
                 visad.VisADRay ray = dr.getMouseBehavior().findRay(DispEvt.getX(), DispEvt.getY());

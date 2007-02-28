@@ -27,7 +27,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.subGUIs.widgets;
 
 /**
- *
+ * This interface is a basic visualizator for the Locations in the database.  It
+ * includes a space to display images associated to the location.  It is designed to
+ * display one or several Locations
  * @author Ricardo Mantilla
  */
 public class LocationsViewer extends javax.swing.JDialog {
@@ -40,20 +42,33 @@ public class LocationsViewer extends javax.swing.JDialog {
     private int currentDisplayedImage=0;
     
     
-    /** Creates new form LocationsViewer */
+    /**
+     * Creates new form LocationsViewer using {@link hydroScalingAPI.io.MetaLocation}
+     * @param oneLocation The {@link hydroScalingAPI.io.MetaLocation}
+     * @param parent The main GIS interface
+     */
     public LocationsViewer(hydroScalingAPI.mainGUI.ParentGUI parent,hydroScalingAPI.io.MetaLocation oneLocation) {
         this(parent,oneLocation,null,null);
     }
     
+    /**
+     * Creates new form LocationsViewer using {@link hydroScalingAPI.io.MetaLocation}
+     * @param locations A set of Objects that can be casted into {@link hydroScalingAPI.io.MetaLocation}s
+     * @param parent The main GIS interface
+     */
     public LocationsViewer(hydroScalingAPI.mainGUI.ParentGUI parent,Object[] locations) {
         this(parent,null,locations,null);
     }
     
+    /**
+     * Creates new form LocationsViewer using {@link hydroScalingAPI.io.MetaLocation}
+     * @param metaLocations A set of {@link hydroScalingAPI.io.MetaLocation}s
+     * @param parent The main GIS interface
+     */
     public LocationsViewer(hydroScalingAPI.mainGUI.ParentGUI parent,hydroScalingAPI.io.MetaLocation[] metaLocations) {
         this(parent,null,null,metaLocations);
     }
     
-    /** Creates new form LocationsViewer */
     private LocationsViewer(hydroScalingAPI.mainGUI.ParentGUI parent,hydroScalingAPI.io.MetaLocation oneLocation,Object[] locations,hydroScalingAPI.io.MetaLocation[] metaLocations) {
         super(parent, true);
         mainFrame=parent;
@@ -325,6 +340,7 @@ public class LocationsViewer extends javax.swing.JDialog {
     }//GEN-LAST:event_closeDialog
     
     /**
+     * Tests for the class
      * @param args the command line arguments
      */
     public static void main(String args[]) {

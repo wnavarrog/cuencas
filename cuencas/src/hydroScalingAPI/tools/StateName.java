@@ -27,7 +27,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.tools;
 
 /**
- *
+ * An abstract class to handle United States convention for states
  * @author Ricardo Mantilla
  */
 public abstract class StateName {
@@ -36,6 +36,8 @@ public abstract class StateName {
 
     /**
      * Creates a new instance of CodeOrNameToStandardName
+     * @param state 
+     * @return 
      */
     public static String CodeOrNameToStandardName(String state) {
         for (int i=0;i<code.length;i++){
@@ -45,6 +47,11 @@ public abstract class StateName {
         return state;
     }
     
+    /**
+     * Tranforms a state name to the two letter code
+     * @param state The state name
+     * @return The two letters code
+     */
     public static String NameToCode(String state) {
         for (int i=0;i<code.length;i++){
             if(name[i].equalsIgnoreCase(state)) return code[i];
@@ -52,6 +59,11 @@ public abstract class StateName {
         return state;
     }
     
+    /**
+     * Tranforms a  two letter code to the state name
+     * @param state The two letters code
+     * @return The state name
+     */
     public static String NameToName(String state) {
         for (int i=0;i<code.length;i++){
             if(name[i].equalsIgnoreCase(state)) return name[i];
@@ -59,6 +71,7 @@ public abstract class StateName {
         return state;
     }
     /**
+     * Tests for the class
      * @param args the command line arguments
      */
     public static void main(String[] args) {

@@ -27,17 +27,24 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.subGUIs.widgets;
 
 /**
- *
+ * A GUI to access
  * @author Ricardo Mantilla
  */
 public class NetworkTools extends javax.swing.JDialog {
     
     private hydroScalingAPI.mainGUI.ParentGUI mainFrame;
-    public hydroScalingAPI.io.MetaRaster metaDatos;
-    public byte[][] matDir;
+    private hydroScalingAPI.io.MetaRaster metaDatos;
+    private byte[][] matDir;
     private int xOut,yOut;
     
-    /** Creates new form NetworkTools */
+    /**
+     * Creates new form NetworkTools
+     * @param parent The main GIS GUI
+     * @param x The column number of the basin outlet location
+     * @param y The row number of the basin outlet location
+     * @param direcc The direction matrix associated to the DEM where the basin is embeded
+     * @param md The MetaRaster associated to the DEM where the basin is embeded
+     */
     public NetworkTools(hydroScalingAPI.mainGUI.ParentGUI parent, int x, int y, byte[][] direcc, hydroScalingAPI.io.MetaRaster md) {
         super(parent, true);
         mainFrame=parent;
@@ -208,6 +215,7 @@ public class NetworkTools extends javax.swing.JDialog {
     }//GEN-LAST:event_closeDialog
     
     /**
+     * Tests for the class
      * @param args the command line arguments
      */
     public static void main(String args[]) {

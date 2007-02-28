@@ -27,7 +27,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.subGUIs.widgets;
 
 /**
- *
+ * An interface to edit the information associated to a Location-type object in the
+ * database
  * @author Ricardo Mantilla
  */
 public class LocationsEditor extends javax.swing.JDialog {
@@ -42,14 +43,28 @@ public class LocationsEditor extends javax.swing.JDialog {
     
     private java.io.File lastSearchedPath=new java.io.File("/");
     
+    /**
+     * Creates new form LocationsEditor with no information associated
+     * @param parent The main GIS interface
+     */
     public LocationsEditor(hydroScalingAPI.mainGUI.ParentGUI parent) {
         this(parent,null,null);
     }
+    /**
+     * Creates new form LocationsEditor associated to a specific Location in the database
+     * @param parent The main GIS interface
+     * @param Location An object that can be casted into a {@link hydroScalingAPI.io.MetaLocation}
+     */
     public LocationsEditor(hydroScalingAPI.mainGUI.ParentGUI parent, Object Location){
         this(parent,(String)((hydroScalingAPI.io.MetaLocation)Location).getProperty("[site name]"),(String)((hydroScalingAPI.io.MetaLocation)Location).getProperty("[type]"));
     }
-    
-    /** Creates new form LocationsEditor */
+    /**
+     * Creates new form LocationsEditor associated to a specific Location in the database
+     * 
+     * @param parent The main GIS interface
+     * @param nameToEdit The name associated to the location
+     * @param typeToMatch They type associate to the location
+     */
     public LocationsEditor(hydroScalingAPI.mainGUI.ParentGUI parent, String nameToEdit, String typeToMatch) {
         super(parent, true);
         
@@ -109,10 +124,18 @@ public class LocationsEditor extends javax.swing.JDialog {
         infoTextArea.setText(queryResult.getInformation());
     }
     
+    /**
+     * A boolean flag indicating if the location file was writen
+     * @return True if the file was succesfully wirten
+     */
     public boolean wroteNewLocation(){
         return wrote;
     }
     
+    /**
+     * A String[] with the information of the location String[0]=code and String[1]=Type
+     * @return A String[]
+     */
     public String[] writtenOrModifiedLocation(){
         String[] locInfo={codeField.getText(),(String)typeCombo.getSelectedItem()};
         return locInfo;
@@ -131,6 +154,11 @@ public class LocationsEditor extends javax.swing.JDialog {
         
     }
     
+    /**
+     * Sets the coordinates for a newly created location
+     * @param latitude The latitude in decimal degrees
+     * @param longitude The longitude in decimal degrees
+     */
     public void setLatLong(float latitude, float longitude){
         latitudeField.setText(hydroScalingAPI.tools.DegreesToDMS.getprettyString(latitude,0));
         longitudeField.setText(hydroScalingAPI.tools.DegreesToDMS.getprettyString(longitude,1));
@@ -464,6 +492,7 @@ public class LocationsEditor extends javax.swing.JDialog {
     }//GEN-LAST:event_closeDialog
     
     /**
+     * Tests for the class
      * @param args the command line arguments
      */
     public static void main(String args[]) {

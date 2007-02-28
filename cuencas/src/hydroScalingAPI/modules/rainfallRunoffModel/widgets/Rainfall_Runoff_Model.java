@@ -26,6 +26,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 package hydroScalingAPI.modules.rainfallRunoffModel.widgets;
 
+import ij.util.Java2;
+import javax.swing.JViewport;
 import visad.*;
 import visad.java3d.DisplayImplJ3D;
 import java.rmi.RemoteException;
@@ -33,7 +35,7 @@ import java.awt.Font;
 
 
 /**
- *
+ * A GUI for preparing a rainfall-runoff simulation
  * @author Ricardo Mantilla
  */
 public class Rainfall_Runoff_Model extends javax.swing.JDialog implements DisplayListener{
@@ -47,10 +49,10 @@ public class Rainfall_Runoff_Model extends javax.swing.JDialog implements Displa
     private hydroScalingAPI.mainGUI.ParentGUI mainFrame;
     
     private hydroScalingAPI.util.geomorphology.objects.Basin myCuenca;
-    public hydroScalingAPI.io.MetaRaster metaDatos;
-    public byte[][] matDir;
-    public hydroScalingAPI.util.geomorphology.objects.HortonAnalysis myBasinResults;
-    public hydroScalingAPI.util.geomorphology.objects.LinksAnalysis linksStructure;
+
+    private hydroScalingAPI.io.MetaRaster metaDatos;
+    private byte[][] matDir;
+    private hydroScalingAPI.util.geomorphology.objects.LinksAnalysis linksStructure;
     
     private int[][] magnitudes;
     
@@ -64,9 +66,9 @@ public class Rainfall_Runoff_Model extends javax.swing.JDialog implements Displa
                       varMapDEM,altMapDEM, lonMapStorm,latMapStorm,varMapStorm,
                       timeMapPlot,rainMapPlot;
     
-    int[][] matrizPintada;
-    float[][][] alturasCuenca;
-    int maxColor;
+    private int[][] matrizPintada;
+    private float[][][] alturasCuenca;
+    private int maxColor;
     private int NumMaxAltura = 15000;
     private int NumMinAltura = 0;
     
@@ -78,11 +80,25 @@ public class Rainfall_Runoff_Model extends javax.swing.JDialog implements Displa
     
     private javax.swing.JTextArea textArea;
     private TextAreaPrintStream redirect;
+    private java.io.PrintStream originalStreamOut;
     
-    /** Creates new form rainfall_runoff_Model */
+    /**
+     * Creates new form rainfall_runoff_Model
+     * @param parent The main GIS GUI
+     * @param x The column number of the basin outlet location
+     * @param y The row number of the basin outlet location
+     * @param direcc The direction matrix associated to the DEM where the basin is embeded
+     * @param magnit The magnitudes matrix associated to the DEM where the basin is embeded
+     * @param md The MetaRaster associated to the DEM where the basin is embeded
+     * @throws java.rmi.RemoteException Captures errors while assigning values to VisAD data objects
+     * @throws visad.VisADException Captures errors while creating VisAD objects
+     * @throws java.io.IOException Captures errors while reading information
+     */
     public Rainfall_Runoff_Model(hydroScalingAPI.mainGUI.ParentGUI parent, int x, int y, byte[][] direcc, int[][] magnit, hydroScalingAPI.io.MetaRaster md) throws RemoteException, VisADException, java.io.IOException{
         super(parent, true);
         initComponents();
+        
+        originalStreamOut=new java.io.PrintStream(System.out);
         
         textArea = new javax.swing.JTextArea(5, 3);
         redirect = new TextAreaPrintStream(textArea, System.out);
@@ -782,6 +798,8 @@ public class Rainfall_Runoff_Model extends javax.swing.JDialog implements Displa
         int xOulet,yOulet;
         xOulet=myCuenca.getOutletID()%metaDatos.getNumCols();
         yOulet=myCuenca.getOutletID()/metaDatos.getNumCols();
+        
+        
 
         System.setOut(redirect);
 
@@ -796,7 +814,6 @@ public class Rainfall_Runoff_Model extends javax.swing.JDialog implements Displa
             return;
         }
         simButton.setEnabled(true);
-        System.setOut(System.out);
     }//GEN-LAST:event_sim2ButtonActionPerformed
 
     private void rainButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rainButtonActionPerformed
@@ -860,8 +877,6 @@ public class Rainfall_Runoff_Model extends javax.swing.JDialog implements Displa
             return;
         }
         
-        simButton.setEnabled(false);
-        
         int xOulet,yOulet;
         xOulet=myCuenca.getOutletID()%metaDatos.getNumCols();
         yOulet=myCuenca.getOutletID()/metaDatos.getNumCols();
@@ -873,12 +888,9 @@ public class Rainfall_Runoff_Model extends javax.swing.JDialog implements Displa
             t1.start();
         } catch(java.io.IOException ioe){
             System.err.println(ioe);
-            return;
         } catch(visad.VisADException vie){
             System.err.println(vie);
-            return;
         }
-        simButton.setEnabled(true);
         
     }//GEN-LAST:event_simButtonActionPerformed
 
@@ -1014,13 +1026,15 @@ public class Rainfall_Runoff_Model extends javax.swing.JDialog implements Displa
 
     /** Closes the dialog */
     private void closeDialog(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_closeDialog
+        System.setOut(originalStreamOut);
         setVisible(false);
         dispose();
     }//GEN-LAST:event_closeDialog
 
     /**
-    * @param args the command line arguments
-    */
+     * Tests for the module
+     * @param args the command line arguments
+     */
     public static void main (String args[]) {
         
         try{
@@ -1110,6 +1124,12 @@ public class Rainfall_Runoff_Model extends javax.swing.JDialog implements Displa
     // End of variables declaration//GEN-END:variables
 
     
+    /**
+     * A required method to handle interaction with the various visad.Display
+     * @param displayEvent The interaction event
+     * @throws visad.VisADException Errors while handling VisAD objects
+     * @throws java.rmi.RemoteException Errors while assigning data to VisAD objects
+     */
     public void displayChanged(visad.DisplayEvent displayEvent) throws visad.VisADException, java.rmi.RemoteException {
         
         double[] CurPosDisD=activeDisplay.getDisplayRenderer().getCursor();

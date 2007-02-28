@@ -21,11 +21,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.subGUIs.widgets;
 
 import visad.*;
-import visad.java2d.DisplayImplJ2D;
 import java.rmi.RemoteException;
 
 /**
- *
+ * A Panel containing a manager of color tables
  * @author Ricardo Mantilla
  */
 public class RasterPalettesManager extends javax.swing.JPanel {
@@ -36,7 +35,12 @@ public class RasterPalettesManager extends javax.swing.JPanel {
     private java.util.Hashtable colorTables=new java.util.Hashtable();
     private boolean first=true;
     
-    /** Creates new form colorManager */
+    /**
+     * Creates new form colorManager
+     * @param theMap A visad.ScalarMap
+     * @throws java.rmi.RemoteException Captures errors while assigning values to VisAD data objects
+     * @throws visad.VisADException Captures errors while creating VisAD objects
+     */
     public RasterPalettesManager(ScalarMap theMap) throws RemoteException, VisADException{
         varMap=theMap;
         initComponents();
@@ -75,6 +79,10 @@ public class RasterPalettesManager extends javax.swing.JPanel {
         }        
     }
     
+    /**
+     * A method to externally set the ColorTable associated to the visad.ScalarMap
+     * @param name 
+     */
     public void setSelectedTable(String name){
         try{
             ColorControl control = (ColorControl) varMap.getControl();
