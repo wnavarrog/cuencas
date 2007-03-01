@@ -165,8 +165,8 @@ public class drainageDensity {
     public static void main(String[] args) {
         
         //try {
-            //main1(args);
-            main2(args);
+            main1(args);
+            //main2(args);
 
 //        } catch(java.io.IOException IOE){
 //            System.err.println(IOE);
@@ -175,8 +175,8 @@ public class drainageDensity {
     }
     public static void main1(String[] args) {
         
-        StringTokenizer tokenizer = new StringTokenizer("B_26	1104	474	B_26");
-        //StringTokenizer tokenizer = new StringTokenizer(args[0]);
+        //StringTokenizer tokenizer = new StringTokenizer("B_26	1104	474	B_26");
+        StringTokenizer tokenizer = new StringTokenizer(args[0]);
         String path = "/hidrosigDataBases/Continental_US_database/Rasters/";
         String filepath = path + "Topography/Dd_Basins_30_ArcSec/" + tokenizer.nextToken();
         int x_outlet = Integer.parseInt(tokenizer.nextToken());
