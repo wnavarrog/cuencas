@@ -24,7 +24,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * Created on August 12, 2001, 10:49 PM
  */
 
-package hydroScalingAPI.tools.ordDiffEqSolver;
+package hydroScalingAPI.util.ordDiffEqSolver;
 
 import visad.*;
 import visad.java3d.DisplayImplJ3D;
