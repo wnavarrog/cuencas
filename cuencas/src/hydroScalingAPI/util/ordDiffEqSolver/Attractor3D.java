@@ -34,10 +34,10 @@ import java.rmi.RemoteException;
  *
  * @author  Ricardo Mantilla 
  */
-public class aattractor3D extends javax.swing.JFrame {
+public class Attractor3D extends javax.swing.JFrame {
 
     /** Creates new form attractor3D */
-    public aattractor3D()  throws RemoteException, VisADException {
+    public Attractor3D()  throws RemoteException, VisADException {
         initComponents ();
         pack ();
         
@@ -111,7 +111,7 @@ public class aattractor3D extends javax.swing.JFrame {
     */
     public static void main (String args[]){
         try{
-            new hydroScalingAPI.tools.ordDiffEqSolver.aattractor3D().setVisible(true);
+            new hydroScalingAPI.util.ordDiffEqSolver.Attractor3D().setVisible(true);
         } catch(RemoteException rie){
             
         } catch(VisADException vie){
