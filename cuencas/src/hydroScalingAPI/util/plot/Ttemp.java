@@ -30,11 +30,11 @@ package hydroScalingAPI.util.plot;
  *
  * @author Olver Hernandez
  */
-public class temp extends javax.swing.JDialog {
+public class Ttemp extends javax.swing.JDialog {
 
     /** Creates new form temp */
     hydroScalingAPI.util.plot.XYJPanel p;
-    public temp(java.awt.Frame parent,boolean modal) {
+    public Ttemp(java.awt.Frame parent,boolean modal) {
         super (parent, modal);
         initComponents ();
         pack ();
@@ -100,7 +100,7 @@ public class temp extends javax.swing.JDialog {
     * @param args the command line arguments
     */
     public static void main (String args[]) {
-        new temp (new javax.swing.JFrame (), true).setVisible(true);
+        new Ttemp (new javax.swing.JFrame (), true).setVisible(true);
     }
 
 

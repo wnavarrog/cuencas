@@ -30,11 +30,11 @@ package hydroScalingAPI.util.plot;
  *
  * @author Olver Hernandez
  */
-public class plot extends java.awt.Dialog {
+public class Pplot extends java.awt.Dialog {
 
     /** Creates new form plot */
     hydroScalingAPI.util.plot.XYPlot Ppanel;
-    public plot(java.awt.Frame parent,boolean modal) {
+    public Pplot(java.awt.Frame parent,boolean modal) {
         super (parent, modal);
         initComponents ();
         pack ();
@@ -177,7 +177,7 @@ public class plot extends java.awt.Dialog {
     * @param args the command line arguments
     */
     public static void main (String args[]) {
-        new plot (new java.awt.Frame (), true).setVisible(true);
+        new Pplot (new java.awt.Frame (), true).setVisible(true);
     }
 
 

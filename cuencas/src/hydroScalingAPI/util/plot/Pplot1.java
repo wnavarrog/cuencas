@@ -31,11 +31,11 @@ package hydroScalingAPI.util.plot;
  * @author Olver Hernandez
  */
 
-public class plot1 extends javax.swing.JDialog {
+public class Pplot1 extends javax.swing.JDialog {
 
     /** Creates new form plot1 */
     hydroScalingAPI.util.plot.XYJPanel Ppanel;
-    public plot1(java.awt.Frame parent,boolean modal) {
+    public Pplot1(java.awt.Frame parent,boolean modal) {
         super (parent, modal);
         initComponents ();
         pack ();
@@ -114,7 +114,7 @@ public class plot1 extends javax.swing.JDialog {
      * @param args the command line arguments
      */
     public static void main (String args[]) {
-        new plot1 (new javax.swing.JFrame (), true).setVisible(true);
+        new Pplot1 (new javax.swing.JFrame (), true).setVisible(true);
     }
 
 

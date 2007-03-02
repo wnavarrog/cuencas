@@ -34,10 +34,10 @@ import java.rmi.RemoteException;
  *
  * @author Ricardo Mantilla
  */
-public class attractorPlot extends java.lang.Object {
+public class AattractorPlot extends java.lang.Object {
 
     /** Creates new attractorPlot */
-    public attractorPlot() throws RemoteException, VisADException {
+    public AattractorPlot() throws RemoteException, VisADException {
         //float[][] answer=new RK4(new uposearch.Lorenz(16.0f,45.0f,4.0f), new float[] {-13,-12, 52}, 0.005f, 0.0f).run(5000);
         float[][] answer=new RK4(new hydroScalingAPI.util.ordDiffEqSolver.Rossler(0.398f,2.0f,4.0f), new float[] {0,1, 1}, 0.05f, 0.0f).run(50000);
         
@@ -78,7 +78,7 @@ public class attractorPlot extends java.lang.Object {
     */
     public static void main (String args[]) throws RemoteException, VisADException {
         
-        new attractorPlot();
+        new AattractorPlot();
         
     }
 
