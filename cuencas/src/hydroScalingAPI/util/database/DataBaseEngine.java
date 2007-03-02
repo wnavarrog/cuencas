@@ -27,13 +27,25 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.util.database;
 
 /**
- *
+ * A Memory based implementation of a database engine.  This was created to
+ * simplify the comunication between GUIs and Analysis Modules with the Gauges and
+ * Locations data in CUENCAS.  However it is generic enough to handle other types
+ * of registers.
  * @author Ricardo Mantilla
  */
 public class DataBaseEngine {
     
+    /**
+     * The value used to indicate a SMALLER_THAN type of comparison
+     */
     public static final int SMALLER_THAN=-1;
+    /**
+     * The value used to indicate a EQUAL_TO type of comparison
+     */
     public static final int EQUAL_TO=0;
+    /**
+     * The value used to indicate a GREATER_THAN type of comparison
+     */
     public static final int GREATER_THAN=1;
     
     java.util.Hashtable Tables;
@@ -43,10 +55,23 @@ public class DataBaseEngine {
         Tables = new java.util.Hashtable();
     }
     
+    /**
+     * Adds a DB_Table into the database engine
+     * @param tableName The name associated to this table
+     * @param Fields The properties of the registers in the table
+     * @param Type The type of register {@see hydroScalingAPI.util.database.DB_Table} for details
+     */
     public void addTable(String tableName,String [] Fields,String [] Type){
         Tables.put(tableName,new DB_Table(Fields,Type));
     }
     
+    /**
+     * Adds an entry to one of the tables
+     * @param tableName The name associated to this table
+     * @param RegisterIndex A unique identifier for the register
+     * @param Values The Values to be assigned.  Note: Values need to be in the same order than the
+     * Fields variable when the table was created
+     */
     public void addData(String tableName, String RegisterIndex,Object[] Values) {
         if (Tables.containsKey(tableName)){
             DB_Table thisTable=(DB_Table) Tables.get(tableName);
@@ -54,6 +79,12 @@ public class DataBaseEngine {
         }
     }
     
+    /**
+     * Adds an entry to one of the tables
+     * @param tableName The name associated to this table
+     * @param Field The DB_Register to add
+     * @param RegisterIndex A unique identifier for the register
+     */
     public void addData(String tableName,String RegisterIndex,DB_Register Field){
         if (Tables.containsKey(tableName)){
             DB_Table thisTable=(DB_Table) Tables.get(tableName);
@@ -61,6 +92,13 @@ public class DataBaseEngine {
         }
     }
     
+    /**
+     * Returns a DB_Register whose main index matches a predetermined keyword in a
+     * specific table
+     * @param tableName The name associated to this table
+     * @param ValueToMatch The keyword to be matched
+     * @return The DB_Register found or null value
+     */
     public DB_Register getRegisterByMainIndex(String tableName,Object ValueToMatch){
         if (Tables.containsKey(tableName)){
             DB_Table thisTable=(DB_Table) Tables.get(tableName);
@@ -69,6 +107,14 @@ public class DataBaseEngine {
         return null;
     }
     
+    /**
+     * Finds registers in a table that match a set of values criteria in several of
+     * its properties (e.g. in a gazetteer find all the "cities" that are in "colorado")
+     * @param tableName The name associated to this table
+     * @param FieldName The properties to match
+     * @param ValueToMatch The values to match
+     * @return The gruop of registers that match the imposed criteria
+     */
     public DB_Register[] findRegister(String tableName,String[] FieldName,Object[] ValueToMatch){
         if (Tables.containsKey(tableName)){
             DB_Table thisTable=(DB_Table) Tables.get(tableName);
@@ -77,6 +123,18 @@ public class DataBaseEngine {
         return null;
     }
     
+    /**
+     * A more general search for registers in a table.  It compares registers with a
+     * a set of criteria in several of its properties.  The criteria are:<br>
+     * <p> 0: equal to</p>
+     * <p>-1: smaller than</p>
+     * <p> 1: greater than</p>
+     * @param tableName The name associated to this table
+     * @param FieldName The properties to match
+     * @param ValueToCompare The values used as reference
+     * @param ConditionToCheckFor The conditions to apply to the reference value
+     * @return The gruop of registers that match the imposed criteria
+     */
     public DB_Register[] compareFieldsTo(String tableName,String[] FieldName,Object[] ValueToCompare,int[] ConditionToCheckFor){
         if (Tables.containsKey(tableName)){
             DB_Table thisTable=(DB_Table) Tables.get(tableName);
@@ -85,6 +143,13 @@ public class DataBaseEngine {
         return null;
     }
     
+    /**
+     * Returns a vector of Objects with unique values for a given property
+     * @param tableName The name associated to this table
+     * @param FieldName The property to query
+     * @return The vector of unique values.  For "Numeric" type properties a int[] is returned
+     * where int[0] is the minimum value and int[1] is the maximum value
+     */
     public java.util.Vector getUniqueValues(String tableName,String FieldName){
         if (Tables.containsKey(tableName)){
             DB_Table thisTable=(DB_Table) Tables.get(tableName);
@@ -93,6 +158,12 @@ public class DataBaseEngine {
         return null;
     }
     
+    /**
+     * Returns the maximum value for a given "Numeric" Property in a given table
+     * @param tableName The name associated to this table
+     * @param FieldName The property to query
+     * @return The maximum value
+     */
     public Double getMaxValue(String tableName,String FieldName){
         if (Tables.containsKey(tableName)){
             DB_Table thisTable=(DB_Table) Tables.get(tableName);
@@ -101,6 +172,12 @@ public class DataBaseEngine {
         return null;
     }
     
+    /**
+     * Returns the minimum value for a given "Numeric" Property in a given table
+     * @param tableName The name associated to this table
+     * @param FieldName The property to query
+     * @return The minimum value
+     */
     public Double getMinValue(String tableName,String FieldName){
         if (Tables.containsKey(tableName)){
             DB_Table thisTable=(DB_Table) Tables.get(tableName);
@@ -110,6 +187,7 @@ public class DataBaseEngine {
     }
     
     /**
+     * An extensive test for the Database engine
      * @param args the command line arguments
      */
     public static void main(String[] args) {

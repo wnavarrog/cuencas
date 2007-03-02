@@ -37,7 +37,7 @@ import java.awt.Font;
  * the result of reaserch by Ricardo Mantilla.
  * @author Ricardo Mantilla
  */
-public class BasinAnalyzer extends javax.swing.JDialog{
+public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayListener {
     
     private float[] red;
     private float[] green;
@@ -370,6 +370,8 @@ public class BasinAnalyzer extends javax.swing.JDialog{
         
         displayMap_RSNs = new DisplayImplJ3D("displayMap",new visad.java3d.TwoDDisplayRendererJ3D());
         
+        displayMap_RSNs.addDisplayListener(this);
+        
         dispGMC = (GraphicsModeControl) displayMap_RSNs.getGraphicsModeControl();
         dispGMC.setScaleEnable(true);
         
@@ -384,7 +386,7 @@ public class BasinAnalyzer extends javax.swing.JDialog{
         lonMapRSN.setRange(metaDatos.getMinLon()+(myCuenca.getMinX()-1)*metaDatos.getResLon()/3600.0,metaDatos.getMinLon()+(myCuenca.getMaxX()+2)*metaDatos.getResLon()/3600.0);
         latMapRSN.setRange(metaDatos.getMinLat()+(myCuenca.getMinY()-1)*metaDatos.getResLat()/3600.0,metaDatos.getMinLat()+(myCuenca.getMaxY()+2)*metaDatos.getResLat()/3600.0);
         
-        rsnScaleSlider.setMinimum(2);
+        rsnScaleSlider.setMinimum(1);
         rsnScaleSlider.setMaximum(myHortonStructure.getBasinOrder());
         rsnScaleSlider.setValue(myHortonStructure.getBasinOrder()-1);
         
@@ -1453,10 +1455,11 @@ public class BasinAnalyzer extends javax.swing.JDialog{
             
             metaDatos.restoreOriginalFormat();
             
-            int[][] matrizPintada=new int[myCuenca.getMaxY()-myCuenca.getMinY()+3][myCuenca.getMaxX()-myCuenca.getMinX()+3];
+            matrizPintada=new int[myCuenca.getMaxY()-myCuenca.getMinY()+3][myCuenca.getMaxX()-myCuenca.getMinX()+3];
             int[][] headsTails=myRSNAnalysis.getHeadsAndTails(scale);
             
-            int maxColor=5000;
+            int maxColor=headsTails[0].length+1;
+            System.out.println(headsTails[0].length);
             float[][] estaTabla=new float[3][maxColor];
             
             for (int i=1;i<estaTabla[0].length;i++){
@@ -1483,7 +1486,7 @@ public class BasinAnalyzer extends javax.swing.JDialog{
                     ySource=-1;
                 }
                 
-                int tileColor=(int)(i/(float)headsTails[0].length*200)+30;
+                int tileColor=i+1;
                 //System.out.println("Head: "+xOulet+","+yOulet+" Tail: "+xSource+","+ySource+" Color: "+tileColor+" Scale: "+(scale+1));
                 
                 myTileActual=new hydroScalingAPI.modules.networkAnalysis.objects.RsnTile(xOulet,yOulet,xSource,ySource,matDir,matOrders,metaDatos,scale+1);
@@ -3288,9 +3291,13 @@ public class BasinAnalyzer extends javax.swing.JDialog{
             //hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
             //metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS/Whitewaters.dir"));
             
-            java.io.File theFile=new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Topography/1_ArcSec_USGS/ORIGINAL/walnutGulchUpdated.metaDEM");
+//            java.io.File theFile=new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Topography/1_ArcSec_USGS/walnutGulchUpdated.metaDEM");
+//            hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
+//            metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Topography/1_ArcSec_USGS/walnutGulchUpdated.dir"));
+            
+            java.io.File theFile=new java.io.File("/hidrosigDataBases/Gila River DB/Rasters/Topography/1_ArcSec/mogollon.metaDEM");
             hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
-            metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Topography/1_ArcSec_USGS/ORIGINAL/walnutGulchUpdated.dir"));
+            metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Gila River DB/Rasters/Topography/1_ArcSec/mogollon.dir"));
             
             String formatoOriginal=metaModif.getFormat();
             metaModif.setFormat("Byte");
@@ -3300,7 +3307,8 @@ public class BasinAnalyzer extends javax.swing.JDialog{
             
             //new BasinAnalyzer(tempFrame,2,96,matDirs,metaModif).setVisible(true);
             //new BasinAnalyzer(tempFrame,1063,496,matDirs,metaModif).show();
-            new BasinAnalyzer(tempFrame,82,260,matDirs,metaModif).setVisible(true);
+            //new BasinAnalyzer(tempFrame,82,260,matDirs,metaModif).setVisible(true);
+            new BasinAnalyzer(tempFrame,282,298,matDirs,metaModif).setVisible(true);
             
         } catch (java.io.IOException IOE){
             System.err.println(IOE);
@@ -3598,6 +3606,40 @@ public class BasinAnalyzer extends javax.swing.JDialog{
         } catch (VisADException v){
             System.out.print(v);
         }
+    }
+
+    /**
+     * send a DisplayEvent to this DisplayListener
+     * 
+     * @param DispEvt DisplayEvent to send
+     * @throws VisADException a VisAD error occurred
+     * @throws RemoteException an RMI error occurred
+     */
+    public void displayChanged(DisplayEvent DispEvt) throws VisADException, RemoteException {
+        
+        int id = DispEvt.getId();
+        
+        try {
+            if (id == DispEvt.MOUSE_RELEASED_RIGHT) {
+                
+                visad.VisADRay ray = displayMap_RSNs.getDisplayRenderer().getMouseBehavior().findRay(DispEvt.getX(), DispEvt.getY());
+                
+                float resultX= lonMapRSN.inverseScaleValues(new float[] {(float)ray.position[0]})[0];
+                float resultY= latMapRSN.inverseScaleValues(new float[] {(float)ray.position[1]})[0];
+                
+                
+                
+                int MatX=(int) ((resultX -(metaDatos.getMinLon()+(myCuenca.getMinX()-1)*metaDatos.getResLon()/3600.0))/(float) metaDatos.getResLon()*3600.0f);
+                int MatY=(int) ((resultY -(metaDatos.getMinLat()+(myCuenca.getMinY()-1)*metaDatos.getResLat()/3600.0))/(float) metaDatos.getResLat()*3600.0f);
+                
+                System.out.println(matrizPintada[MatY][MatX]);
+                
+            }
+            
+        } catch (Exception e) {
+            System.err.println(e);
+        }
+        
     }
 }
 

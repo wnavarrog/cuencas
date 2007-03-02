@@ -68,15 +68,20 @@ public class RsnTile extends java.lang.Object {
         //System.out.println("Limits: "+magnitudes.length+" "+magnitudes[0].length);
         //System.out.println("Tile Outlet: "+xT+" "+yT+" "+thisLinkMagn);
         
+        thisTileOrder=tileScale;
+        
         idsTile.add(new int[] {xT,yT});
         if(xT==xH && yT==yH){
-        } else getTile(yT,xT,yH,xH,fullDirMatrix);
-        
-        if (xH != -1 && yH!= -1) {
-            thisTileOrder=tileScale;
-            idsTile.add(new int[] {xH,yH});
             getHill(yH,xH,fullDirMatrix, order);
+        } else {
+            getTile(yT,xT,yH,xH,fullDirMatrix);
+            if (xH != -1 && yH!= -1) {
+                idsTile.add(new int[] {xH,yH});
+                getHill(yH,xH,fullDirMatrix, order);
+            }
         }
+        
+        
         LonLatRsnTile=new float[2][idsTile.size()];
         xyRsnTile=new int[2][idsTile.size()];
         
@@ -92,7 +97,7 @@ public class RsnTile extends java.lang.Object {
         
         idsTile=null;
         
-        findRsnTileDivide();
+        //findRsnTileDivide();
     }
     
     private void getTile(int i,int j,int iEnd, int jEnd, byte [][] fullDirMatrix){
@@ -225,10 +230,14 @@ public class RsnTile extends java.lang.Object {
     public static void main(String args[]) {
         
         try{
-            java.io.File theFile=new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Topography/1_ArcSec_USGS/walnutGulchUpdated.metaDEM");
-            hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
-            metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Topography/1_ArcSec_USGS/walnutGulchUpdated.dir"));
+//            java.io.File theFile=new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Topography/1_ArcSec_USGS/walnutGulchUpdated.metaDEM");
+//            hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
+//            metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Topography/1_ArcSec_USGS/walnutGulchUpdated.dir"));
             
+            java.io.File theFile=new java.io.File("/hidrosigDataBases/Gila River DB/Rasters/Topography/1_ArcSec/mogollon.metaDEM");
+            hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
+            metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Gila River DB/Rasters/Topography/1_ArcSec/mogollon.dir"));
+
             String formatoOriginal=metaModif.getFormat();
             metaModif.setFormat("Byte");
             byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
@@ -238,7 +247,7 @@ public class RsnTile extends java.lang.Object {
             metaModif.setFormat("Byte");
             byte[][] matOrders=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
             
-            hydroScalingAPI.modules.networkAnalysis.objects.RsnTile myTileActual=new hydroScalingAPI.modules.networkAnalysis.objects.RsnTile(902,238,902,238,matDirs,matOrders,metaModif,4);
+            hydroScalingAPI.modules.networkAnalysis.objects.RsnTile myTileActual=new hydroScalingAPI.modules.networkAnalysis.objects.RsnTile(485,472,485,472,matDirs,matOrders,metaModif,4);
             
             
         } catch (java.io.IOException IOE){

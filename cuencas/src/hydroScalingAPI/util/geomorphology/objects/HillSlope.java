@@ -19,7 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 
 /*
- * hillSlope.java
+ * HillSlope.java
  *
  * Created on November 13, 2001, 11:25 AM
  */
@@ -27,8 +27,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.util.geomorphology.objects;
 
 /**
- *
- * @author  Ricardo Mantilla 
+ * Uses a recursive algorithm to find the locations in the DEM that drain to a network
+ * link, and defines the boundary of these group of points.
+ * @author Ricardo Mantilla
  */
 public class HillSlope extends java.lang.Object {
     
@@ -41,7 +42,14 @@ public class HillSlope extends java.lang.Object {
     private int thisLinkMagn;
     private hydroScalingAPI.io.MetaRaster localMetaRaster;
 
-    /** Creates new hillSlope */
+    /**
+     * Creates an instance of HillSlope
+     * @param x The column number of the link contact
+     * @param y The row number of the link contact
+     * @param fullDirMatrix The direction matrix associated to the DEM where the basin is ebedded
+     * @param magnitudes The magnitudes matrix associated to the DEM where the basin is ebedded
+     * @param mr The MetaRaster that describes the DEM
+     */
     public HillSlope(int x, int y, byte[][] fullDirMatrix, int[][] magnitudes, hydroScalingAPI.io.MetaRaster mr) {
         
         //assumes unpruned directions matrix
@@ -76,7 +84,7 @@ public class HillSlope extends java.lang.Object {
         idsHill=null;
     }
     
-    public void getHill(int i,int j,byte [][] fullDirMatrix,int[][] magnitudes){
+    private void getHill(int i,int j,byte [][] fullDirMatrix,int[][] magnitudes){
         for (int k=0; k <= 8; k++){
            if (fullDirMatrix[i+(k/3)-1][j+(k%3)-1] == 9-k && (magnitudes[i+(k/3)-1][j+(k%3)-1] == thisLinkMagn || magnitudes[i+(k/3)-1][j+(k%3)-1]<=0)){
              idsHill.add(new int[] {j+(k%3)-1,i+(k/3)-1});
@@ -87,17 +95,29 @@ public class HillSlope extends java.lang.Object {
         }
     }
     
+    /**
+     * Returns an array of floats float[2][numPointsInHillslope] with the longitudes (float[0])
+     * and latitudes (float[1]) for the points that belong to the hillslope
+     * @return An array with the coordinates of the points in the landscape that belong to the
+     * hillslope
+     */
     public float[][] getLonLatHillSlope(){
         return LonLatHillSlope;
     }
     
+    /**
+     * Returns an array of integers int[2][numPointsInBasin] with the column number (int[0])
+     * and the row number (int[1]) for the points that belong to the hillslope
+     * @return An array of i,j position of points that belong to the hillslope
+     */
     public int[][] getXYHillSlope(){
         return xyHillSlope;
     }
 
     /**
-    * @param args the command line arguments
-    */
+     * Tests for the class
+     * @param args The command line arguments
+     */
     public static void main (String args[]) {
         
         try{

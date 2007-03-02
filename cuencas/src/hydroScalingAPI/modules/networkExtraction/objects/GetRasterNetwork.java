@@ -40,7 +40,7 @@ public abstract class GetRasterNetwork extends Object {
         if (Proc.printDebug) System.out.println(">>> All cells are Network");
         for (int i=1; i<Proc.DIR.length-1; i++){
             for (int j=1; j<Proc.DIR[0].length-1; j++){
-                if(Proc.DEM[i][j]>0) Proc.RedRas[i][j]=1;
+                if(Proc.DIR[i][j]>0) Proc.RedRas[i][j]=1;
             }
         }
     }
@@ -87,6 +87,25 @@ public abstract class GetRasterNetwork extends Object {
                     Proc.RedRas[i][j]=1;
             }
         }
+    }
+    
+    /**
+     * Applies the Area Montgomery Threshold criteria
+     * @param Proc The parent {@link hydroScalingAPI.modules.networkExtraction.objects.NetworkExtractionModule}
+     */
+    public static void umbral_Montgomery(NetworkExtractionModule Proc){
+        if (Proc.printDebug) System.out.println(">>> Montgomery Area Threshold");
+        for (int i=1; i<Proc.DIR.length-1; i++){
+            for (int j=1; j<Proc.DIR[0].length-1; j++){
+                double areaPodado = Math.pow(10,-3*Proc.MaxPend[i][j]-1);
+                //System.out.println(Proc.MaxPend[i][j]+" "+areaPodado);
+                if ((Proc.Areas[i][j] > areaPodado))
+                    Proc.RedRas[i][j]=1;
+                else
+                    Proc.RedRas[i][j]=0;
+            }
+        }
+        persiga(Proc);
     }
     
     /**

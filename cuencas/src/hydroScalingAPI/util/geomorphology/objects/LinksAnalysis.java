@@ -39,10 +39,10 @@ public class LinksAnalysis extends java.lang.Object {
     public int basinOrder=0,OuletLinkNum,ressimID;
     public int basinMagnitude=0;
     
-    public int[] magnitudeArray;
     public int[] headsArray;
     public int[] contactsArray;
     public int[] tailsArray;
+    public int[] magnitudeArray;
     
     public int[][] connectionsArray; //In this array are listed all the links that drain to the i-th link
     public int[] nextLinkArray;

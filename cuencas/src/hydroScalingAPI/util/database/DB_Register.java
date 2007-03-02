@@ -27,13 +27,19 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.util.database;
 
 /**
- *
+ * The basic database building block.  The register is in escence a {@link
+ * java.util.Hashtable} which allows for rapid retreival of the properties
  * @author Ricardo Mantilla
  */
 public class DB_Register {
     
     java.util.Hashtable properties=new java.util.Hashtable();
     
+    /**
+     * Creates a new DB_Register
+     * @param Fields The name of the properties
+     * @param Values The values associated to the properties
+     */
     public DB_Register (String[] Fields,Object[] Values) {
         
         for (int i=0;i<Fields.length;i++){
@@ -42,10 +48,20 @@ public class DB_Register {
         
     }
     
+    /**
+     * Returns the value associated to a given property
+     * @param propName The desired property
+     * @return An Object
+     */
     public Object getProperty(String propName){
         return properties.get(propName);
     }
     
+    /**
+     * Prints an elegant description of the DB_Register showin the property nams and
+     * property values
+     * @return A String
+     */
     public String toString(){
         return properties.toString();
     }

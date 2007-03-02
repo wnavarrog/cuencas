@@ -21,11 +21,16 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.util.fileUtilities;
 
 /**
- *
+ * The CronoFile is an extension of a regular file that imposes an order scheme
+ * different to the alphabetical.  This object handles files with extensions
+ * desribed in the Developer's manual for temporally changing raster fields
  * @author Ricardo Mantilla
  */
 public class ChronoFile extends Object implements Comparable{
 
+    /**
+     * The {@link java.io.File} associated to this object
+     */
     public java.io.File fileName;
     private String baseName;
     
@@ -34,7 +39,11 @@ public class ChronoFile extends Object implements Comparable{
     
     java.util.Calendar date=null;  //If the file is dated this variable contains the file date
         
-    /** Creates new chronoFile */
+    /**
+     * Creates new chronoFile
+     * @param file The {@link java.io.File} to associate to this object
+     * @param bN The base name of the file
+     */
     public ChronoFile(java.io.File file, String bN) {
         fileName=file;
         baseName=bN;
@@ -91,8 +100,8 @@ public class ChronoFile extends Object implements Comparable{
     }
     
     /**
-     * 
-     * @param obj 
+     * The compareTo method for this object
+     * @param obj The object to be compared against
      * @return A negative integer, zero, or a positive integer as this object is less than, equal
      * to, or greater than the specified object.
      */
@@ -169,10 +178,18 @@ public class ChronoFile extends Object implements Comparable{
         return 0;
     }
     
+    /**
+     * Returns a {@link java.util.Calendar} object associated to the ChronoFile date
+     * @return A {@link java.util.Calendar}
+     */
     public java.util.Calendar getDate(){
         return date;
     }
     
+    /**
+     * Tests for the class
+     * @param args The command line arguments
+     */
     public static void main (String args[]) {
         ChronoFile otr=new ChronoFile (new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Hydrology/precipitation_events/event_00/precipitation_interpolated_ev00.041000.10.September.1964.vhc"),"precipitation_interpolated_ev00");
         ChronoFile uno=new ChronoFile (new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Hydrology/precipitation_events/event_00/precipitation_interpolated_ev00.233500.09.September.1964.vhc"),"precipitation_interpolated_ev00");

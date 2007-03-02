@@ -92,7 +92,7 @@ public class drainageDensity {
             }
         }*/
         
-        writer.println("Relief: "+myCuenca.getRelief(md));
+        writer.println("Relief: "+myCuenca.getRelief());
         
         //New lines added to calculate average value of field over basin
         

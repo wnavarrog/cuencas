@@ -19,7 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 
 /*
- * dotFilter.java
+ * DirFilter.java
  *
  * Created on 3 de diciembre de 2000, 17:20
  */
@@ -27,8 +27,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.util.fileUtilities;
 
 /**
- *
- * @author  Ricardo Mantilla
+ * An implementation of the {@link java.io.FileFilter} that allows directories only
+ * @author Ricardo Mantilla
  */
 public class DirFilter extends Object implements java.io.FileFilter{
 
@@ -36,6 +36,12 @@ public class DirFilter extends Object implements java.io.FileFilter{
     public DirFilter() {
     }
 
+    /**
+     * The accept criteria based on the isDirectory() method in {@link java.io.File}
+     * @param p1 The file to filter
+     * @return true if and only if the file denoted by this abstract pathname exists and is a normal
+     * file; false otherwise
+     */
     public boolean accept(final java.io.File p1) {
         return p1.isDirectory();
     }

@@ -17,11 +17,13 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-
 package hydroScalingAPI.util.geomorphology.objects;
 
 /**
- *
+ * Uses a recursive algorithm to find the locations in the DEM that drain through a
+ * given point in the landscape, and defines the boundary of these group of points.
+ * This class implements several methods for analysis of characteristics in the
+ * basin
  * @author Ricardo Mantilla
  */
 public class Basin extends Object{
@@ -33,11 +35,19 @@ public class Basin extends Object{
         
     private int minX,maxX,minY,maxY;
     private float minZ,maxZ;
+    private float[] elevationsBasin;
     
     private hydroScalingAPI.io.MetaRaster localMetaRaster;
     
     private int[][] toMark;
     
+    /**
+     * Creates an instance of Basin
+     * @param x The column number of the basin outlet
+     * @param y The row number of the basin outlet
+     * @param fullDirMatrix The direction matrix associated to the DEM where the basin is ebedded
+     * @param mr The MetaRaster that describes the DEM
+     */
     public Basin(int x, int y, byte[][] fullDirMatrix, hydroScalingAPI.io.MetaRaster mr) {
         
         localMetaRaster=mr;
@@ -71,11 +81,15 @@ public class Basin extends Object{
         
     }
     
+    /**
+     * Prints a description of the Basin with respect to its location in the DEM
+     * @return A String
+     */
     public String toString(){
         return localMetaRaster.getLocationBinaryFile().getName()+"_Basin_x"+xyBasin[0][0]+"_y_"+xyBasin[1][0];
     }
     
-    public void getBasin(byte [][] fullDirMatrix, java.util.Vector idsBasin,int[][] ijs){
+    private void getBasin(byte [][] fullDirMatrix, java.util.Vector idsBasin,int[][] ijs){
         java.util.Vector tribsVector=new java.util.Vector();
         
         for(int incoming=0;incoming<ijs.length;incoming++){
@@ -111,6 +125,12 @@ public class Basin extends Object{
        }
     }*/
     
+    /**
+     * Returns an array of floats float[2][numPointsInBasin] with the longitudes (float[0])
+     * and latitudes (float[1]) for the points that belong to the basin
+     * @return An array with the coordinates of the points in the landscape that belong to the
+     * basin
+     */
     public float[][] getLonLatBasin(){
         
         float[][] LonLatBasin=new float[2][xyBasin[0].length];
@@ -122,10 +142,20 @@ public class Basin extends Object{
         return LonLatBasin;
     }
     
+    /**
+     * Returns an array of integers int[2][numPointsInBasin] with the column number (int[0])
+     * and the row number (int[1]) for the points that belong to the basin
+     * @return An array of i,j position of points that belong to the basin
+     */
     public int[][] getXYBasin(){
         return xyBasin;
     }
     
+    /**
+     * Creates visad.Gridded2DSet with the basin divide polygon
+     * @throws visad.VisADException Captures errors while creating the visad object
+     * @return A visad.Gridded2DSet
+     */
     public visad.Gridded2DSet getBasinDivide() throws visad.VisADException {
         
         visad.RealTupleType domain=new visad.RealTupleType(visad.RealType.Longitude,visad.RealType.Latitude);
@@ -134,6 +164,12 @@ public class Basin extends Object{
         return basinCountour;
     }
     
+    /**
+     * Uses the basin divide to determine a shape factor for the basin.  Shape factor
+     * equals the ratio between the basin diameter and the basin width
+     * @return An int[3] array where int[0] is the shape factor, int[1] is the basin diameter
+     * and int[2] is the basin width perpendicular to the diameter line
+     */
     public float[] getDivideShapeFactor(){
         
         float shapeF=1;
@@ -190,14 +226,30 @@ public class Basin extends Object{
         return (float)Math.sqrt(Math.pow(X0-X1,2)+Math.pow(Y0-Y1,2));
     }
     
+    /**
+     * Returns an array of integers int[2][numPointsInDivide] with the column number (int[0])
+     * and the row number (int[1]) for the points that determine the divide
+     * @return An int[][] array
+     */
     public int[][] getXYBasinDivide(){
         return xyContour;
     }
     
+    /**
+     * Returns an array of floats float[2][numPointsInDivide] with the longitudes (float[0])
+     * and latitudes (float[1]) for the points that determine the divide
+     * @return  A float[][] array
+     */
     public float[][] getLonLatBasinDivide(){
         return lonLatCountour;
     }
     
+    /**
+     * Returns an visad object that describes the basin outlet
+     * @throws java.rmi.RemoteException Captures errors while assigning values to VisAD data objects
+     * @throws visad.VisADException Captures errors while creating VisAD objects
+     * @return A visad.RealTuple of the basin outlet
+     */
     public visad.RealTuple getOutletTuple() throws visad.VisADException, java.rmi.RemoteException{
         float[] LonLatBasin=new float[2];
         
@@ -209,7 +261,7 @@ public class Basin extends Object{
         return new visad.RealTuple(rtd1);
     }
     
-    public void findBasinDivide(){
+    private void findBasinDivide(){
         
         //Relleno la matriz con 0's y 1's
         
@@ -283,125 +335,120 @@ public class Basin extends Object{
         }
     }
     
+    /**
+     * The minimum column of a box encosing the basin
+     * @return The column index
+     */
     public int getMinX(){
         return minX;
     }
     
+    /**
+     * The maximum column of a box encosing the basin
+     * @return The column index
+     */
     public int getMaxX(){
         return maxX;
     }
     
+    /**
+     * The minimum row of a box encosing the basin
+     * @return The column index
+     */
     public int getMinY(){
         return minY;
     }
     
+    /**
+     * The maximum row of a box encosing the basin
+     * @return The column index
+     */
     public int getMaxY(){
         return maxY;
     }
     
+    /**
+     * Reads the corrected DEM and returns the elevations of the points contained in the basin
+     * @return A float[] with the elevations of the points
+     * @throws java.io.IOException Captures errors while reading from the DEM
+     */
     public float[] getElevations() throws java.io.IOException{
         
-        float[] elevationsBasin=new float[xyBasin[0].length];
-        String currFormat=localMetaRaster.getFormat();
-        java.io.File currBinLoc=localMetaRaster.getLocationBinaryFile();
-        localMetaRaster.setFormat(hydroScalingAPI.tools.ExtensionToFormat.getFormat(".corrDEM"));
-        localMetaRaster.setLocationBinaryFile(new java.io.File(currBinLoc.getAbsolutePath().subSequence(0, currBinLoc.getAbsolutePath().lastIndexOf("."))+".corrDEM"));
-        float[][] elevations=new hydroScalingAPI.io.DataRaster(localMetaRaster).getFloat();
-        localMetaRaster.restoreOriginalFormat();
-        localMetaRaster.setLocationBinaryFile(currBinLoc);
+        if(elevationsBasin == null){
+            
+            minZ=Float.MAX_VALUE;
+            maxZ=Float.MIN_VALUE;
         
-        for (int k=0; k < xyBasin[0].length; k++){
-            elevationsBasin[k]=elevations[xyBasin[1][k]][xyBasin[0][k]]; 
+            elevationsBasin=new float[xyBasin[0].length];
+            String currFormat=localMetaRaster.getFormat();
+            java.io.File currBinLoc=localMetaRaster.getLocationBinaryFile();
+            localMetaRaster.setFormat(hydroScalingAPI.tools.ExtensionToFormat.getFormat(".corrDEM"));
+            localMetaRaster.setLocationBinaryFile(new java.io.File(currBinLoc.getAbsolutePath().subSequence(0, currBinLoc.getAbsolutePath().lastIndexOf("."))+".corrDEM"));
+            float[][] elevations=new hydroScalingAPI.io.DataRaster(localMetaRaster).getFloat();
+            localMetaRaster.restoreOriginalFormat();
+            localMetaRaster.setLocationBinaryFile(currBinLoc);
+
+            for (int k=0; k < xyBasin[0].length; k++){
+                elevationsBasin[k]=elevations[xyBasin[1][k]][xyBasin[0][k]]; 
+                minZ=Math.min(minZ,elevationsBasin[k]); 
+                maxZ=Math.max(maxZ,elevationsBasin[k]); 
+            }
         }
         
         return elevationsBasin;
-    
     }
     
-    public float getRelief(hydroScalingAPI.io.MetaRaster mr) throws java.io.IOException{
+    /**
+     * Returns the difference between the highest and the lowest points in the basin
+     * @throws java.io.IOException Captures errors while reading from the DEM
+     * @return The basin relief
+     */
+    public float getRelief() throws java.io.IOException{
         
-        String currFormat=mr.getFormat();
-        java.io.File currBinLoc=mr.getLocationBinaryFile();
-        mr.restoreOriginalFormat();
-        mr.setLocationBinaryFile(new java.io.File(currBinLoc.getAbsolutePath().subSequence(0, currBinLoc.getAbsolutePath().lastIndexOf("."))+".dem"));
-        float[][] elevations=new hydroScalingAPI.io.DataRaster(mr).getFloat();
-        minZ=Float.MAX_VALUE;
-        maxZ=Float.MIN_VALUE;
-        
-        for (int k=0; k < xyBasin[0].length; k++){
-            minZ=Math.min(minZ,elevations[xyBasin[1][k]][xyBasin[0][k]]); 
-            maxZ=Math.max(maxZ,elevations[xyBasin[1][k]][xyBasin[0][k]]); 
-        }
-        
-        return maxZ-minZ;
-        
-    }
-    
-    public float getRelief(float [][] elevations) throws java.io.IOException{
-        
-        minZ=Float.MAX_VALUE;
-        maxZ=Float.MIN_VALUE;
-        
-        for (int k=0; k < xyBasin[0].length; k++){
-            minZ=Math.min(minZ,elevations[xyBasin[1][k]][xyBasin[0][k]]); 
-            maxZ=Math.max(maxZ,elevations[xyBasin[1][k]][xyBasin[0][k]]); 
-        }
+        getElevations();
         
         return maxZ-minZ;
         
     }
 
-    public float getMaxZ(hydroScalingAPI.io.MetaRaster mr) throws java.io.IOException{
+    /**
+     * Returns the elevation of the highest point in the basin
+     * @throws java.io.IOException Captures errors while reading from the DEM
+     * @return The highest point
+     */
+    public float getMaxZ() throws java.io.IOException{
 
-        String currFormat=mr.getFormat();
-        java.io.File currBinLoc=mr.getLocationBinaryFile();
-        mr.restoreOriginalFormat();
-        mr.setLocationBinaryFile(new java.io.File(currBinLoc.getAbsolutePath().subSequence(0, currBinLoc.getAbsolutePath().lastIndexOf("."))+".dem"));
-        float[][] elevations=new hydroScalingAPI.io.DataRaster(mr).getFloat();
-        maxZ=Float.MIN_VALUE;
-
-        for (int k=0; k < xyBasin[0].length; k++){
-            maxZ=Math.max(maxZ,elevations[xyBasin[1][k]][xyBasin[0][k]]);
-        }
+        getElevations();
 
         return maxZ;
 
     }
 
-    public float getMaxZ(float [][] elevations) throws java.io.IOException{
+    /**
+     * Returns the elevation of the lowest point in the basin
+     * @throws java.io.IOException Captures errors while reading from the DEM
+     * @return The lowest point
+     */
+    public float getMinZ() throws java.io.IOException{
 
-        maxZ=Float.MIN_VALUE;
+        getElevations();
 
-        for (int k=0; k < xyBasin[0].length; k++){
-            maxZ=Math.max(maxZ,elevations[xyBasin[1][k]][xyBasin[0][k]]);
-        }
-
-        return maxZ;
-
+        return minZ;
+        
     }
-
-    public float getMinZ(hydroScalingAPI.io.MetaRaster mr) throws java.io.IOException{
-
-        String currFormat=mr.getFormat();
-        java.io.File currBinLoc=mr.getLocationBinaryFile();
-        mr.restoreOriginalFormat();
-        mr.setLocationBinaryFile(new java.io.File(currBinLoc.getAbsolutePath().subSequence(0, currBinLoc.getAbsolutePath().lastIndexOf("."))+".dem"));
-        float[][] elevations=new hydroScalingAPI.io.DataRaster(mr).getFloat();
-        
-        return elevations[xyBasin[1][0]][xyBasin[0][0]];
-        
-    }       
             
-    public float getMinZ(float [][] elevations) throws java.io.IOException{
-
-        return elevations[xyBasin[1][0]][xyBasin[0][0]];
-        
-    }   
-
+    /**
+     * Returns the ID of the basin outlet
+     * @return An integer with the basin ID
+     */
     public int getOutletID(){
         return xyBasin[1][0]*localMetaRaster.getNumCols()+xyBasin[0][0];
     }
     
+    /**
+     * Returns and array of the same size of the DEM with 1s in the positions that belong to the basin
+     * @return A byte[][] with the basin mask
+     */
     public  byte[][] getBasinMask(){
         byte[][] basinMask = new byte[localMetaRaster.getNumRows()][localMetaRaster.getNumCols()];
         for (int i=0;i<xyBasin[0].length;i++){
@@ -410,6 +457,10 @@ public class Basin extends Object{
         return basinMask;
     }
     
+    /**
+     * Returns and array of the same size of the DEM with 1s in the positions that are network and belong to the basin
+     * @return A byte[][] with the basin network mask
+     */
     public  byte[][] getNetworkMask(){
         try{
             String pathToRasterNetwork=localMetaRaster.getLocationBinaryFile().getPath();
@@ -433,6 +484,10 @@ public class Basin extends Object{
         return null;
     }
     
+    /**
+     * Tests for the class
+     * @param args The command line arguments
+     */
     public static void main (String args[]) {
         
         
@@ -452,7 +507,7 @@ public class Basin extends Object{
             System.exit(0);
             
             
-            System.out.println("Relief: "+laCuenca.getRelief(metaModif));
+            System.out.println("Relief: "+laCuenca.getRelief());
             java.util.Calendar finalTime=java.util.Calendar.getInstance();
             System.out.println("Extraction ends");
             System.out.println(">>> Running Time is "+(finalTime.getTimeInMillis()-iniTime.getTimeInMillis())/1000.);

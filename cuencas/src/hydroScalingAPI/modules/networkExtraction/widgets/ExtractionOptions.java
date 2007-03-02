@@ -177,6 +177,7 @@ public class ExtractionOptions extends javax.swing.JDialog {
             
         }
         jCheckBoxTodoRed.setSelected(Proc.todoRed);
+        jCheckBoxMontgomery.setSelected(Proc.montgomery);
         jButton4.setEnabled(jCheckBox4.isSelected() || jCheckBox6.isSelected() || jCheckBox7.isSelected());
         jRadioButton14.setSelected(Proc.archPro);
         jCheckBoxAreaPend_n.setSelected(Proc.areaPend_nuevo);
@@ -392,23 +393,26 @@ public class ExtractionOptions extends javax.swing.JDialog {
         jCheckBox3 = new javax.swing.JCheckBox();
         jPanelRedRas = new javax.swing.JPanel();
         jPanelIniCanales = new javax.swing.JPanel();
+        jPanel2 = new javax.swing.JPanel();
+        jCheckBoxTodoRed = new javax.swing.JCheckBox();
         jPanel3 = new javax.swing.JPanel();
+        jCheckBox2 = new javax.swing.JCheckBox();
         jTextField1 = new javax.swing.JTextField();
         jComboBox2 = new javax.swing.JComboBox();
-        jCheckBox2 = new javax.swing.JCheckBox();
         jPanel4 = new javax.swing.JPanel();
-        jTextField2 = new javax.swing.JTextField();
         jCheckBox5 = new javax.swing.JCheckBox();
-        jCheckBoxTodoRed = new javax.swing.JCheckBox();
+        jTextField2 = new javax.swing.JTextField();
         jPanel7 = new javax.swing.JPanel();
+        jCheckBoxUmbralAP = new javax.swing.JCheckBox();
         jLabel4 = new javax.swing.JLabel();
         jTextFieldAlfaU = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
         jTextFieldCU = new javax.swing.JTextField();
-        jCheckBoxUmbralAP = new javax.swing.JCheckBox();
+        jPanel9 = new javax.swing.JPanel();
+        jCheckBoxMontgomery = new javax.swing.JCheckBox();
         jPanelTopoConv = new javax.swing.JPanel();
-        jTextFieldCeldasConv = new javax.swing.JTextField();
         jCheckBoxLaplace = new javax.swing.JCheckBox();
+        jTextFieldCeldasConv = new javax.swing.JTextField();
         jPaneLAzules = new javax.swing.JPanel();
         jCheckBoxLAzules = new javax.swing.JCheckBox();
         jButtonBuscarLA = new javax.swing.JButton();
@@ -791,32 +795,21 @@ public class ExtractionOptions extends javax.swing.JDialog {
         jPanelRedRas.setLayout(new java.awt.GridBagLayout());
 
         jPanelRedRas.setPreferredSize(new java.awt.Dimension(507, 78));
-        jPanelIniCanales.setLayout(new java.awt.GridBagLayout());
+        jPanelIniCanales.setLayout(new java.awt.GridLayout(6, 0));
 
         jPanelIniCanales.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
-        jPanel3.setLayout(new java.awt.GridBagLayout());
+        jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jTextField1.setFont(new java.awt.Font("SansSerif", 0, 12));
-        jTextField1.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        jTextField1.setText("0.01");
-        jTextField1.setMinimumSize(new java.awt.Dimension(60, 15));
-        jTextField1.setPreferredSize(new java.awt.Dimension(70, 20));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        jPanel3.add(jTextField1, gridBagConstraints);
+        jCheckBoxTodoRed.setFont(new java.awt.Font("Dialog", 0, 12));
+        jCheckBoxTodoRed.setSelected(true);
+        jCheckBoxTodoRed.setText("All cells are part of the river network (No Prunning)");
+        jPanel2.add(jCheckBoxTodoRed);
 
-        jComboBox2.setFont(new java.awt.Font("Dialog", 0, 10));
-        jComboBox2.setMinimumSize(new java.awt.Dimension(60, 16));
-        jComboBox2.setPreferredSize(new java.awt.Dimension(60, 20));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        jPanel3.add(jComboBox2, gridBagConstraints);
+        jPanelIniCanales.add(jPanel2);
+
+        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
         jCheckBox2.setFont(new java.awt.Font("Dialog", 0, 12));
-        jCheckBox2.setSelected(true);
         jCheckBox2.setText("Prune by Area Threshold (A < )");
         jCheckBox2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -824,28 +817,23 @@ public class ExtractionOptions extends javax.swing.JDialog {
             }
         });
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        jPanel3.add(jCheckBox2, gridBagConstraints);
+        jPanel3.add(jCheckBox2);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        jPanelIniCanales.add(jPanel3, gridBagConstraints);
+        jTextField1.setFont(new java.awt.Font("SansSerif", 0, 12));
+        jTextField1.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        jTextField1.setText("0.01");
+        jTextField1.setMinimumSize(new java.awt.Dimension(60, 15));
+        jTextField1.setPreferredSize(new java.awt.Dimension(70, 20));
+        jPanel3.add(jTextField1);
 
-        jPanel4.setLayout(new java.awt.GridBagLayout());
+        jComboBox2.setFont(new java.awt.Font("Dialog", 0, 10));
+        jComboBox2.setMinimumSize(new java.awt.Dimension(60, 16));
+        jComboBox2.setPreferredSize(new java.awt.Dimension(60, 20));
+        jPanel3.add(jComboBox2);
 
-        jTextField2.setFont(new java.awt.Font("SansSerif", 0, 12));
-        jTextField2.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        jTextField2.setMinimumSize(new java.awt.Dimension(40, 20));
-        jTextField2.setPreferredSize(new java.awt.Dimension(40, 20));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
-        jPanel4.add(jTextField2, gridBagConstraints);
+        jPanelIniCanales.add(jPanel3);
+
+        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
         jCheckBox5.setFont(new java.awt.Font("Dialog", 0, 12));
         jCheckBox5.setText("Prune by Horton Order (Order <)");
@@ -855,54 +843,17 @@ public class ExtractionOptions extends javax.swing.JDialog {
             }
         });
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        jPanel4.add(jCheckBox5, gridBagConstraints);
+        jPanel4.add(jCheckBox5);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        jPanelIniCanales.add(jPanel4, gridBagConstraints);
+        jTextField2.setFont(new java.awt.Font("SansSerif", 0, 12));
+        jTextField2.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        jTextField2.setMinimumSize(new java.awt.Dimension(40, 20));
+        jTextField2.setPreferredSize(new java.awt.Dimension(40, 20));
+        jPanel4.add(jTextField2);
 
-        jCheckBoxTodoRed.setFont(new java.awt.Font("Dialog", 0, 12));
-        jCheckBoxTodoRed.setSelected(true);
-        jCheckBoxTodoRed.setText("All cells are part of the river network (No Prunning)");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        jPanelIniCanales.add(jCheckBoxTodoRed, gridBagConstraints);
+        jPanelIniCanales.add(jPanel4);
 
-        jPanel7.setLayout(new java.awt.GridBagLayout());
-
-        jLabel4.setText("a =");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
-        jPanel7.add(jLabel4, gridBagConstraints);
-
-        jTextFieldAlfaU.setMinimumSize(new java.awt.Dimension(20, 20));
-        jTextFieldAlfaU.setPreferredSize(new java.awt.Dimension(40, 20));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 0;
-        jPanel7.add(jTextFieldAlfaU, gridBagConstraints);
-
-        jLabel5.setText("   C =");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = 0;
-        jPanel7.add(jLabel5, gridBagConstraints);
-
-        jTextFieldCU.setMinimumSize(new java.awt.Dimension(20, 20));
-        jTextFieldCU.setPreferredSize(new java.awt.Dimension(40, 20));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 5;
-        gridBagConstraints.gridy = 0;
-        jPanel7.add(jTextFieldCU, gridBagConstraints);
+        jPanel7.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
         jCheckBoxUmbralAP.setFont(new java.awt.Font("Dialog", 0, 12));
         jCheckBoxUmbralAP.setText("Prune by Power Threshold (AS^a > C)");
@@ -913,30 +864,34 @@ public class ExtractionOptions extends javax.swing.JDialog {
             }
         });
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        jPanel7.add(jCheckBoxUmbralAP, gridBagConstraints);
+        jPanel7.add(jCheckBoxUmbralAP);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        jPanelIniCanales.add(jPanel7, gridBagConstraints);
+        jLabel4.setText("a =");
+        jPanel7.add(jLabel4);
 
-        jPanelTopoConv.setLayout(new java.awt.GridBagLayout());
+        jTextFieldAlfaU.setMinimumSize(new java.awt.Dimension(20, 20));
+        jTextFieldAlfaU.setPreferredSize(new java.awt.Dimension(40, 20));
+        jPanel7.add(jTextFieldAlfaU);
 
-        jTextFieldCeldasConv.setFont(new java.awt.Font("SansSerif", 0, 12));
-        jTextFieldCeldasConv.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        jTextFieldCeldasConv.setText("2");
-        jTextFieldCeldasConv.setMinimumSize(new java.awt.Dimension(40, 15));
-        jTextFieldCeldasConv.setPreferredSize(new java.awt.Dimension(40, 20));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
-        jPanelTopoConv.add(jTextFieldCeldasConv, gridBagConstraints);
+        jLabel5.setText("   C =");
+        jPanel7.add(jLabel5);
+
+        jTextFieldCU.setMinimumSize(new java.awt.Dimension(20, 20));
+        jTextFieldCU.setPreferredSize(new java.awt.Dimension(40, 20));
+        jPanel7.add(jTextFieldCU);
+
+        jPanelIniCanales.add(jPanel7);
+
+        jPanel9.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jCheckBoxMontgomery.setFont(new java.awt.Font("Dialog", 0, 12));
+        jCheckBoxMontgomery.setSelected(true);
+        jCheckBoxMontgomery.setText("Apply the Montgomery and Ditrich criteria");
+        jPanel9.add(jCheckBoxMontgomery);
+
+        jPanelIniCanales.add(jPanel9);
+
+        jPanelTopoConv.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
         jCheckBoxLaplace.setFont(new java.awt.Font("Dialog", 0, 12));
         jCheckBoxLaplace.setSelected(true);
@@ -947,18 +902,16 @@ public class ExtractionOptions extends javax.swing.JDialog {
             }
         });
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        jPanelTopoConv.add(jCheckBoxLaplace, gridBagConstraints);
+        jPanelTopoConv.add(jCheckBoxLaplace);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        jPanelIniCanales.add(jPanelTopoConv, gridBagConstraints);
+        jTextFieldCeldasConv.setFont(new java.awt.Font("SansSerif", 0, 12));
+        jTextFieldCeldasConv.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        jTextFieldCeldasConv.setText("2");
+        jTextFieldCeldasConv.setMinimumSize(new java.awt.Dimension(40, 15));
+        jTextFieldCeldasConv.setPreferredSize(new java.awt.Dimension(40, 20));
+        jPanelTopoConv.add(jTextFieldCeldasConv);
+
+        jPanelIniCanales.add(jPanelTopoConv);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -1400,6 +1353,7 @@ public class ExtractionOptions extends javax.swing.JDialog {
               Proc.pixAP=Proc.pixAP/(float)(dx*dy);
       }catch(NumberFormatException e){ jTextField1.setText(" "); jTextField1.grabFocus() ; ok=false;}
       Proc.todoRed = jCheckBoxTodoRed.isSelected();
+      Proc.montgomery = jCheckBoxMontgomery.isSelected();
       Proc.archPro=jRadioButton14.isSelected();
       Proc.lAzules = jCheckBoxLAzules.isSelected();
       Proc.areaPend_LA = jCheckBoxAP_LA.isSelected();
@@ -1596,6 +1550,7 @@ public class ExtractionOptions extends javax.swing.JDialog {
     private javax.swing.JCheckBox jCheckBoxGEO;
     private javax.swing.JCheckBox jCheckBoxLAzules;
     private javax.swing.JCheckBox jCheckBoxLaplace;
+    private javax.swing.JCheckBox jCheckBoxMontgomery;
     private javax.swing.JCheckBox jCheckBoxRED;
     private javax.swing.JCheckBox jCheckBoxTodoRed;
     private javax.swing.JCheckBox jCheckBoxUmbralAP;
@@ -1625,6 +1580,7 @@ public class ExtractionOptions extends javax.swing.JDialog {
     private javax.swing.JPanel jPanel17;
     private javax.swing.JPanel jPanel18;
     private javax.swing.JPanel jPanel19;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel25;
     private javax.swing.JPanel jPanel26;
     private javax.swing.JPanel jPanel28;
@@ -1634,6 +1590,7 @@ public class ExtractionOptions extends javax.swing.JDialog {
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
     private javax.swing.JPanel jPanelArea_Pend;
     private javax.swing.JPanel jPanelBotones;
     private javax.swing.JPanel jPanelGetGeo;

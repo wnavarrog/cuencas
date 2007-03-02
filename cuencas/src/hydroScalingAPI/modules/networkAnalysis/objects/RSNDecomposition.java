@@ -405,7 +405,57 @@ public class RSNDecomposition {
         
         //subMain3(args); //Basin Shape invariance as a function of generator type
 
-        subMain4(args); //Test for divergence of areas across scales
+        //subMain4(args); //Test for divergence of areas across scales
+        
+        subMain5(args); //Test for divergence of areas across scales
+    }
+    
+    /**
+     * @param args the command line arguments
+     */
+    private static void subMain5(String[] args) {
+        
+        int x_outlet = 282;
+        int y_outlet = 298;
+        String filename = "/Users/ricardo/Documents/databases/Gila River DB/Rasters/Topography/1_ArcSec/mogollon";
+        
+        try{
+        
+            java.io.File theFile=new java.io.File(filename + ".metaDEM");
+            hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
+            metaModif.setLocationBinaryFile(new java.io.File(filename + ".dir"));
+            
+            String formatoOriginal=metaModif.getFormat();
+            metaModif.setFormat("Byte");
+            byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
+
+            
+            hydroScalingAPI.util.geomorphology.objects.Basin laCuenca=new hydroScalingAPI.util.geomorphology.objects.Basin(x_outlet,y_outlet,matDirs,metaModif);
+            
+            hydroScalingAPI.util.geomorphology.objects.LinksAnalysis mylinksAnalysis = new hydroScalingAPI.util.geomorphology.objects.LinksAnalysis(laCuenca, metaModif, matDirs);
+            
+            long iniTime=System.currentTimeMillis();
+            RSNDecomposition myRsnGen=new RSNDecomposition(mylinksAnalysis);
+            long finTime=System.currentTimeMillis();
+            
+            int[][] test1=myRsnGen.getHeadsAndTails(1);
+            int[] test2=mylinksAnalysis.headsArray;
+            java.util.Arrays.sort(test1[2]);
+            java.util.Arrays.sort(test2);
+            
+            for(int i=0;i<test2.length;i++) {
+                System.out.println(test1[2][i]+" "+test2[i]);
+            }
+            
+            
+            
+        } catch (java.io.IOException IOE){
+            System.out.print(IOE);
+            System.exit(0);
+        }
+        
+        System.exit(0);
+        
     }
     
     /**

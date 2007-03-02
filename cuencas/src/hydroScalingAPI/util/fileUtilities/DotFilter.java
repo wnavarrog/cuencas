@@ -19,7 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 
 /*
- * dotFilter.java
+ * DotFilter.java
  *
  * Created on 3 de diciembre de 2000, 17:20
  */
@@ -27,18 +27,29 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.util.fileUtilities;
 
 /**
- *
- * @author  Ricardo Mantilla
+ * An implementation of the {@link java.io.FileFilter} that allows files with a
+ * predetermined extension
+ * @author Ricardo Mantilla
  */
 public class DotFilter extends Object implements java.io.FileFilter{
 
     String[] myExt;
     
-    /** Creates new filtroExtenciones */
+    /**
+     * Creates new DotFilter
+     * @param ext The desired extension or a comma separated lists of acceptable extensions.
+     * The filter asumes that the extension is the string after the last occurence of a
+     * period in the file name.  Thus extension cannot have periods embedded.
+     */
     public DotFilter(String ext) {
         myExt=ext.toLowerCase().split(",");
     }
 
+    /**
+     * The accept criteria based on the file name
+     * @param p1 The file to filter
+     * @return true if and only if the file contains one of the extensions allowed
+     */
     public boolean accept(final java.io.File p1) {
         boolean extExists=false;
         for(int i=0;i<myExt.length;i++) extExists|=p1.getName().toLowerCase().lastIndexOf("."+myExt[i]) != -1;

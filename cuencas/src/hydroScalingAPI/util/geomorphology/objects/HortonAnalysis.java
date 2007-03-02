@@ -27,8 +27,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.util.geomorphology.objects;
 
 /**
- *
- * @author  Ricardo Mantilla 
+ * This class organizes network related information in the context of the
+ * Horton-Strahler order scheme
+ * @author Ricardo Mantilla
  */
 public class HortonAnalysis extends java.lang.Object {
     
@@ -40,8 +41,20 @@ public class HortonAnalysis extends java.lang.Object {
     
     private int basinOrder;
     
+    /**
+     * An array conaining the pixel ID where the stream begins.  ID=i+j*numCols, where
+     * i is the column number of the pixel and j is the row number of the pixel
+     */
     public int[][] headsArray;
+    /**
+     * An array conaining the pixel ID before the stream merges with another stream.  ID=i+j*numCols, where
+     * i is the column number of the pixel and j is the row number of the pixel
+     */
     public int[][] contactsArray;
+    /**
+     * An array conaining the pixel ID where the stream merges with another stream (junction).  ID=i+j*numCols, where
+     * i is the column number of the pixel and j is the row number of the pixel
+     */
     public int[][] tailsArray;
     
     private String[] extenciones={".areas",
@@ -54,9 +67,15 @@ public class HortonAnalysis extends java.lang.Object {
                                   ".mcd",
                                   ".corrDEM"};
                                   
-    public int[] formatosAsoc={0,1,0,1,0,2,0,0,2}; //0:Flotantes, 1:Enteros, 2:Doubles
+    private int[] formatosAsoc={0,1,0,1,0,2,0,0,2}; //0:Flotantes, 1:Enteros, 2:Doubles
 
-    /** Creates new hortonAnalysis */
+    /**
+     * Creates new HortonAnalysis
+     * @param bas The Basin on which the analysis is performed
+     * @param metar The MetaRaster describing the DEM that contains the basin
+     * @param DM The direction matrix
+     * @throws java.io.IOException Captures errors while readin the vectorial network files
+     */
     public HortonAnalysis(hydroScalingAPI.util.geomorphology.objects.Basin bas,hydroScalingAPI.io.MetaRaster metar, byte[][] DM) throws java.io.IOException{
         
         localMetaRaster=metar;
@@ -147,21 +166,36 @@ public class HortonAnalysis extends java.lang.Object {
         
     }
     
+    /**
+     * Calculates the branching ratio
+     * @param minOrderToInclude The minimum order to include in the regression
+     * @param maxOrderToInclude The maximum order to include in the regression
+     * @param cuentaOrdenes An array with the number of brances of different orders
+     * @return An int[] with int[0]=The regression slope, int[1]=The regression intercept, and
+     * int[2]=the regression's R^2
+     */
     public float[] getBranchingRatio(int minOrderToInclude, int maxOrderToInclude,float[] cuentaOrdenes){
-        //This method retunrns the Branching Ratio and the regresion coeficient
         return ajustesRO(cuentaOrdenes,minOrderToInclude,maxOrderToInclude,true);
     }
     
+    /**
+     * Calculates the branching ratio
+     * @param minOrderToInclude The minimum order to include in the regression
+     * @param maxOrderToInclude The maximum order to include in the regression
+     * @return An int[] with int[0]=The regression slope, int[1]=The regression intercept, and
+     * int[2]=the regression's R^2
+     */
     public float[] getBranchingRatio(int minOrderToInclude, int maxOrderToInclude){
-        //This method retunrns the Branching Ratio and the regresion coeficient
-        
         float[] cuentaOrdenes=getBranchingPerOrder();
-
         return getBranchingRatio(minOrderToInclude,maxOrderToInclude,cuentaOrdenes);
     }
     
+    /**
+     * This method retunrns the numbers of branches of order omega
+     * @return An array of integers
+     */
     public float[] getBranchingPerOrder(){
-        //This method retunrns the numbers of branches of order w
+        
         float[] cuentaOrdenes=new float[basinOrder];
         for (int i=0;i<tailsArray.length;i++)
             cuentaOrdenes[i]=tailsArray[i].length;
@@ -170,6 +204,25 @@ public class HortonAnalysis extends java.lang.Object {
         
     }
     
+    /**
+     * Calculates the Horton ratio for the designated quantity.  Available quantities
+     * are:
+     * <p>0: Upstream Areas</p>
+     * <p>1: Magnitudes</p>
+     * <p>2: Longest channel length</p>
+     * <p>3: Topologic diameter</p>
+     * <p>4: Total channels lenght</p>
+     * <p>5: Link's outlet slope</p>
+     * <p>6: Total channel drop</p>
+     * <p>7: Maximum channel drop</p>
+     * <p>8: Channel elevation</p>
+     * @param varToGet The variable to get
+     * @param minOrderToInclude The minimum order to include in the regression
+     * @param maxOrderToInclude The maximum order to include in the regression
+     * @throws java.io.IOException Captures errors while reading the values
+     * @return An int[] with int[0]=The regression slope, int[1]=The regression intercept, and
+     * int[2]=the regression's R^2
+     */
     public float[] getQuantityRatio(int minOrderToInclude, int maxOrderToInclude,int varToGet) throws java.io.IOException{
         //This method retunrns the Area Ratio and the regresion coeficient
         
@@ -178,6 +231,15 @@ public class HortonAnalysis extends java.lang.Object {
         return ajustesRO(meansQuantityArray,minOrderToInclude,maxOrderToInclude,true);
     }
     
+    /**
+     * Calculates the Horton ratio for the designated quantity given by an array.
+     * @param quantityArray The array containing the variable values
+     * @param minOrderToInclude The minimum order to include in the regression
+     * @param maxOrderToInclude The maximum order to include in the regression
+     * @throws java.io.IOException Captures errors while reading the values
+     * @return An int[] with int[0]=The regression slope, int[1]=The regression intercept, and
+     * int[2]=the regression's R^2
+     */
     public float[] getQuantityRatio(int minOrderToInclude, int maxOrderToInclude,float[][] quantityArray) throws java.io.IOException{
         //This method retunrns the Area Ratio and the regresion coeficient
         
@@ -186,9 +248,23 @@ public class HortonAnalysis extends java.lang.Object {
         return ajustesRO(meansQuantityArray,minOrderToInclude,maxOrderToInclude,true);
     }
 
+    /**
+     * Calculates an array with the average values of a quantity for complete Horton streams.  Available quantities
+     * are:
+     * <p>0: Upstream Areas</p>
+     * <p>1: Magnitudes</p>
+     * <p>2: Longest channel length</p>
+     * <p>3: Topologic diameter</p>
+     * <p>4: Total channels lenght</p>
+     * <p>5: Link's outlet slope</p>
+     * <p>6: Total channel drop</p>
+     * <p>7: Maximum channel drop</p>
+     * <p>8: Channel elevation</p>
+     * @param varToGet The variable to get
+     * @throws java.io.IOException Captures errors while reading the values
+     * @return An array with the average values
+     */
     public float[] getQuantityPerOrder(int varToGet) throws java.io.IOException{
-        //This method retunrns the average areas of order w
-        
         float[][] quantityArray=getQuantityDistributionPerOrder(varToGet);
         
         float[] meansQuantityArray=new float[basinOrder];
@@ -203,6 +279,12 @@ public class HortonAnalysis extends java.lang.Object {
         
     }
     
+    /**
+     * Calculates an array with the average values of a quantity for complete Horton streams given as an array.
+     * @param quantityArray The array containing the variable values
+     * @return An array with the average values
+     * @throws java.io.IOException Captures errors while reading the values
+     */
     public float[] getQuantityPerOrder(float[][] quantityArray) throws java.io.IOException{
         //This method retunrns the average areas of order w
         
@@ -218,6 +300,22 @@ public class HortonAnalysis extends java.lang.Object {
         
     }
     
+    /**
+     * Calculates an array with the values of a quantity for complete Horton streams.  Available quantities
+     * are:
+     * <p>0: Upstream Areas</p>
+     * <p>1: Magnitudes</p>
+     * <p>2: Longest channel length</p>
+     * <p>3: Topologic diameter</p>
+     * <p>4: Total channels lenght</p>
+     * <p>5: Link's outlet slope</p>
+     * <p>6: Total channel drop</p>
+     * <p>7: Maximum channel drop</p>
+     * <p>8: Channel elevation</p>
+     * @param varToGet The variable to get
+     * @throws java.io.IOException Captures errors while reading the values
+     * @return A float[maxOrder][numStreamsOmega] with the values
+     */
     public float[][] getQuantityDistributionPerOrder(int varToGet) throws java.io.IOException {
         //This method retunrns all the areas for links of order w
         
@@ -266,6 +364,15 @@ public class HortonAnalysis extends java.lang.Object {
         
     }
     
+    /**
+     * Calculates the geometric or topologic length ratio
+     * @param minOrderToInclude The minimum order to include in the regression
+     * @param maxOrderToInclude The maximum order to include in the regression
+     * @param metric The metric to use 0: geometric, 1: Topologic.  
+     * @throws java.io.IOException Captures errors while reading the values
+     * @return An int[] with int[0]=The regression slope, int[1]=The regression intercept, and
+     * int[2]=the regression's R^2
+     */
     public float[] getLengthRatio(int minOrderToInclude, int maxOrderToInclude,int metric) throws java.io.IOException{
         //This method retunrns the Area Ratio and the regresion coeficient
         float[] meansLengthArray= getLengthPerOrder(metric);
@@ -273,6 +380,15 @@ public class HortonAnalysis extends java.lang.Object {
         return ajustesRO(meansLengthArray,minOrderToInclude,maxOrderToInclude,true);
     }
     
+    /**
+     * Calculates the length ratio given by an array
+     * @param minOrderToInclude The minimum order to include in the regression
+     * @param maxOrderToInclude The maximum order to include in the regression
+     * @param lengthArray The array with lengths 
+     * @throws java.io.IOException Captures errors while reading the values
+     * @return An int[] with int[0]=The regression slope, int[1]=The regression intercept, and
+     * int[2]=the regression's R^2
+     */
     public float[] getLengthRatio(int minOrderToInclude, int maxOrderToInclude,float[][] lengthArray) throws java.io.IOException{
         //This method retunrns the Area Ratio and the regresion coeficient
         float[] meansLengthArray= getLengthPerOrder(lengthArray);
@@ -281,6 +397,12 @@ public class HortonAnalysis extends java.lang.Object {
     }
 
     
+    /**
+     * Calculates an array with the average values of channel lengths for complete Horton streams.
+     * @param metric The metric to use 0: geometric, 1: Topologic.  
+     * @throws java.io.IOException Captures errors while reading the values
+     * @return An array with the average values
+     */
     public float[] getLengthPerOrder(int metric) throws java.io.IOException{
         //This method retunrns the average areas of order w
         
@@ -298,6 +420,12 @@ public class HortonAnalysis extends java.lang.Object {
         
     }
     
+    /**
+     * Calculates an array with the average values of channel lengths for complete Horton streams.
+     * @param lengthArray The array containing the lengths
+     * @throws java.io.IOException Captures errors while reading the values
+     * @return An array with the average values
+     */
      public float[] getLengthPerOrder(float[][] lengthArray) throws java.io.IOException{
         //This method retunrns the average areas of order w
         
@@ -313,7 +441,12 @@ public class HortonAnalysis extends java.lang.Object {
         
     }
     
-    public float[][] getLengthDistributionPerOrder(int metric/* 0: geometric, 1: Topologic */){
+    /**
+     * Calculates an array with the values of stream lengths for complete Horton streams.
+     * @param metric The metric to use 0: geometric, 1: Topologic.  
+     * @return A float[maxOrder][numStreamsOmega] with the values
+     */
+    public float[][] getLengthDistributionPerOrder(int metric){
         //This method returns all the areas for links of order w
         
         byte [][] rasterNetworkMatrix=new byte[1][1];;
@@ -380,9 +513,15 @@ public class HortonAnalysis extends java.lang.Object {
         return lengthArray;
     }
     
-    
-    
-    
+    /**
+     * Calculates the regression parameters of a Horton plot
+     * @param datos The data to analyze
+     * @param minOrderToInclude The minimum order to include in the regression
+     * @param maxOrderToInclude The maximum order to include in the regression
+     * @param takeLogs A boolean flag indicating if logs of the variable need to be taken
+     * @return An int[] with int[0]=The regression slope, int[1]=The regression intercept, and
+     * int[2]=the regression's R^2
+     */
     public float[] ajustesRO(float[] datos,int minOrderToInclude, int maxOrderToInclude,boolean takeLogs){
         
         int maxOrden=datos.length;
@@ -419,14 +558,19 @@ public class HortonAnalysis extends java.lang.Object {
         return  puntos;
     }
     
+    /**
+     * The network order
+     * @return The basin Horton-Strahler order
+     */
     public int getBasinOrder(){
         return basinOrder;
     }
     
     
     /**
-    * @param args the command line arguments
-    */
+     * Tests for the class
+     * @param args the command line arguments
+     */
     public static void main (String args[]) {
         
         java.text.NumberFormat number2 = java.text.NumberFormat.getNumberInstance();

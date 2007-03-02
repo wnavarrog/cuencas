@@ -240,6 +240,10 @@ public class NetworkExtractionModule implements Runnable {
      */
     public boolean areaPend_LA = false;
     /**
+     * Indicates the montgomery method is to be used to prune the network
+     */
+    public boolean montgomery = false;
+    /**
      * Indicates the laplace method is to be used to prune the network
      */
     public boolean laplace = true;
@@ -473,6 +477,9 @@ public class NetworkExtractionModule implements Runnable {
             if(umbralAP){
                 GetGeomorphologyRAM.getORD(this);
                 GetRasterNetwork.umbralASalfa(this);
+            }
+            if(montgomery){
+                GetRasterNetwork.umbral_Montgomery(this);
             }
             if(laplace && !areaPend_nuevo){
                 GetRasterNetwork.laplace2(this,nCeldasConv);

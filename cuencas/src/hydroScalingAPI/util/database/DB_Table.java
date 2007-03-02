@@ -27,7 +27,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.util.database;
 
 /**
- *
+ * A second level building block for the database.  The DB_Table groups a number of
+ * registers and performs actions on them, such as searchs, retreival, adding and
+ * removing, getting value ranges, etc.
  * @author Ricardo Mantilla
  */
 public class DB_Table {
@@ -43,6 +45,16 @@ public class DB_Table {
     
     private boolean first=true;
     
+    /**
+     * Creates a new DB_Table
+     * @param Fields The properties that the table will handle
+     * @param Type The type associated to each of the properties.  Available types are:<br>
+     * <p>Index</p>
+     * <p>Alpha</p>
+     * <p>Numeric</p>
+     * The type determines how search condition are aplied to this object and how to
+     * determine the unique values for a given property
+     */
     public DB_Table(String[] Fields,String[] Type) {
         
         FieldNames=Fields;
@@ -64,12 +76,22 @@ public class DB_Table {
         
     }
     
+    /**
+     * Adds a regiter to the table using a master String unique descriptor
+     * @param RegisterIndex The unique descriptor for the Register to be added
+     * @param Register The register to be added
+     */
     public void addRegister(String RegisterIndex,DB_Register Register) {
         indexNames.addElement(RegisterIndex);
         FieldsInformation.put(RegisterIndex,Register);
         checkUniqueness(Register);
     }
     
+    /**
+     * Adds a regiter to the table using a pre-defined master index (defined ath the
+     * time of the DB_Table construction) or an integer to identyfy the register
+     * @param Register The register to be added
+     */
     public void addRegister(DB_Register Register) {
         String RegisterIndex="";
         if (indexField == -1) 
@@ -80,7 +102,7 @@ public class DB_Table {
         addRegister(RegisterIndex,Register);
     }
     
-    public void checkUniqueness(DB_Register Register) {
+    private void checkUniqueness(DB_Register Register) {
         double numericValue=0.0;
         for (int i=0;i<FieldNames.length;i++){
             if (i != indexField){
@@ -121,10 +143,22 @@ public class DB_Table {
         }
     }
     
+    /**
+     * Returns a DB_Register whose main index matches a predetermined keyword
+     * @param ValueToMatch The keyword to be matched
+     * @return The DB_Register found or null value
+     */
     public DB_Register getRegisterByMainIndex(Object ValueToMatch){
         return (DB_Register) FieldsInformation.get((String) ValueToMatch);
     }
     
+    /**
+     * Finds registers in the table that match a set of values criteria in several of
+     * its properties (e.g. in a gazetteer find all the "cities" that are in "colorado")
+     * @param FieldName The properties to match
+     * @param ValueToCompare The values to match
+     * @return The gruop of registers that match the imposed criteria
+     */
     public DB_Register[] findRegister(String[] FieldName,Object[] ValueToCompare){
         
         int[] ConditionToCheckFor=new int[FieldName.length];
@@ -132,6 +166,17 @@ public class DB_Table {
         return compareFieldsTo(FieldName,ValueToCompare,ConditionToCheckFor);
     }
     
+    /**
+     * A more general search for registers in the table.  It compares registers with a
+     * a set of criteria in several of its properties.  The criteria are:<br>
+     * <p> 0: equal to</p>
+     * <p>-1: smaller than</p>
+     * <p> 1: greater than</p>
+     * @param FieldName The properties to match
+     * @param ValueToCompare The values to match
+     * @param ConditionToCheckFor The conditions to apply to the reference value
+     * @return The gruop of registers that match the imposed criteria
+     */
     public DB_Register[] compareFieldsTo(String[] FieldName,Object[] ValueToCompare,int[] ConditionToCheckFor){
         for (int i=0;i<FieldName.length;i++){
              if (nameToTypeMap.get(FieldName[i]) == "alpha" && ConditionToCheckFor[i] != 0) return null; 
@@ -203,18 +248,38 @@ public class DB_Table {
         }
     }
     
+    /**
+     * Returns the maximum value for a given "Numeric" Property
+     * @param FieldName The property to query
+     * @return The maximum value
+     */
     public Double getMaxValue(String FieldName) {
         return((Double[])uniqueValues.get(FieldName))[1];
     }
     
+    /**
+     * Returns the minimum value for a given "Numeric" Property
+     * @param FieldName The property to query
+     * @return The minimum value
+     */
     public Double getMinValue(String FieldName) {
         return((Double[])uniqueValues.get(FieldName))[0];
     }
     
+    /**
+     * Returns a list of the available properties in the registers of the table
+     * @return A String[] with the field names
+     */
     public String[] getFieldNames(){
         return FieldNames;
     }
     
+    /**
+     * Returns a vector of Objects with unique values for a given property
+     * @param FieldName The property to query
+     * @return The vector of unique values.  For "Numeric" type properties a int[] is returned
+     * where int[0] is the minimum value and int[1] is the maximum value
+     */
     public java.util.Vector getUniqueValues(String FieldName){
         
         if (first){
