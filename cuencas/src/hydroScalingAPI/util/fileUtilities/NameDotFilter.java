@@ -49,9 +49,8 @@ public class NameDotFilter extends Object implements java.io.FileFilter{
     
     /**
      * The accept criteria based on the file name
-     * @param p1 The file to filter
-     * @return true if and only if the file contains the extensions allowed and begins
-     * with the base name provided
+     * @param file The file to compare with
+     * @return A boolean flag indicating sucess or failure of the test
      */
     public boolean accept(java.io.File file) {
         return file.getName().toLowerCase().lastIndexOf("."+myExt) != -1 && 

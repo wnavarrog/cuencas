@@ -37,7 +37,7 @@ public abstract class StateName {
     /**
      * Creates a new instance of CodeOrNameToStandardName
      * @param state 
-     * @return 
+     * @return The state's name
      */
     public static String CodeOrNameToStandardName(String state) {
         for (int i=0;i<code.length;i++){

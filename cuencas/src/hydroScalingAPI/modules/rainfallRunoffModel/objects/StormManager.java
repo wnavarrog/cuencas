@@ -384,8 +384,8 @@ public class StormManager {
     }
     
     /**
-     * 
-     * @return 
+     * Returns the number of files that were read
+     * @return An integer
      */
     public int getNumberOfFilesRead(){
         
@@ -394,8 +394,8 @@ public class StormManager {
     }
     
     /**
-     * 
-     * @return 
+     * Returns a group of {@link java.util.Date} indicating the date associated to the files
+     * @return An array of {@link java.util.Date}s
      */
     public java.util.Date[] getFilesDates(){
         

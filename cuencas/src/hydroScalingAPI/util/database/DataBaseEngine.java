@@ -59,7 +59,7 @@ public class DataBaseEngine {
      * Adds a DB_Table into the database engine
      * @param tableName The name associated to this table
      * @param Fields The properties of the registers in the table
-     * @param Type The type of register {@see hydroScalingAPI.util.database.DB_Table} for details
+     * @param Type The type of register see {@link hydroScalingAPI.util.database.DB_Table} for details
      */
     public void addTable(String tableName,String [] Fields,String [] Type){
         Tables.put(tableName,new DB_Table(Fields,Type));
