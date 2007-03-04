@@ -98,12 +98,12 @@ public class drainageDensity {
         
         String path = "/hidrosigDataBases/Continental_US_database/Rasters/";
         
-        String fieldfile[] = new String[4];
+        String fieldfile[] = new String[5];
         fieldfile[0] = path + "Hydrology/precipitation/ppt_1971-2000";
         fieldfile[1] = path + "Hydrology/p_pet/p_pet";
         fieldfile[2] = path + "Hydrology/pet_swm/7488uswbm98_petsdrd0yr";
         fieldfile[3] = path + "Hydrology/sum_p_pet_i/sum_p_pet_i";
-            
+        fieldfile[3] = path + "Hydrology/i1/i1";
         
         for (int i=0; i<4; i++) {
             writer.println(fieldfile[i]);
@@ -143,7 +143,7 @@ public class drainageDensity {
                 }
 
                 accumValue/=(float)misCoordenadas[0].length;
-                writer.println("value: " + accumValue);
+                writer.println("value"+rasterMeta.getName()+": " + accumValue);
 
             } catch (java.io.IOException IOE) {
                 System.err.println(IOE);
