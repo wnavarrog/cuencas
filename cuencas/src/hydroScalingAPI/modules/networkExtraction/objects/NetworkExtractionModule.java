@@ -294,6 +294,29 @@ public class NetworkExtractionModule implements Runnable {
      * Creates an instance of the NetworkExtractionModule that uses the {@link
      * hydroScalingAPI.modules.networkExtraction.widgets.ExtractionOptions} interface
      * to query for tasks to be performed
+     * @param metaDEM1 The MetaRaster associated to the DEM to be processed
+     * @param dataDEM1 The DataRaster associated to the data
+     * @param moreArgs A String[] of arguments that Matt Luck created
+     */
+    public NetworkExtractionModule(hydroScalingAPI.io.MetaRaster metaDEM1, hydroScalingAPI.io.DataRaster dataDEM1,String[] moreArgs) {
+        
+        
+        //printDebug=false;
+        printDebug=true;
+        metaDEM=metaDEM1;
+        inicio(dataDEM1);
+        OpProc = new hydroScalingAPI.modules.networkExtraction.widgets.ExtractionOptions(this);
+        //taskDIR=true; taskRED=true; taskGEO=false; taskVECT=false;
+        pixPodado=Float.parseFloat(moreArgs[2])/(float)dy/(float)dxm;
+        taskDIR=false; taskRED=true; taskGEO=true; taskVECT=true;
+        corrigeDEM();
+        OpProc.dispose();
+    }
+    
+    /**
+     * Creates an instance of the NetworkExtractionModule that uses the {@link
+     * hydroScalingAPI.modules.networkExtraction.widgets.ExtractionOptions} interface
+     * to query for tasks to be performed
      * @param parent1 The main GIS interface
      * @param metaDEM1 The MetaRaster associated to the DEM to be processed
      * @param dataDEM1 The DataRaster associated to the data
@@ -1011,7 +1034,12 @@ public class NetworkExtractionModule implements Runnable {
             hydroScalingAPI.io.MetaRaster metaRaster1= new hydroScalingAPI.io.MetaRaster(new java.io.File(Arguments[0]));
             metaRaster1.setLocationBinaryFile(new java.io.File(Arguments[1]));
             hydroScalingAPI.io.DataRaster datosRaster = new hydroScalingAPI.io.DataRaster(metaRaster1);
-            new NetworkExtractionModule(metaRaster1, datosRaster);
+            if(Arguments.length == 2){
+                new NetworkExtractionModule(metaRaster1, datosRaster);
+            }
+            if(Arguments.length > 2){
+                new NetworkExtractionModule(metaRaster1, datosRaster,Arguments);
+            }
             System.exit(0);
         } catch (java.io.IOException e1){
             System.err.println("ERROR** "+e1.getMessage());
