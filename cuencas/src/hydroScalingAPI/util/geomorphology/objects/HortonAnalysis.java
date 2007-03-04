@@ -42,18 +42,24 @@ public class HortonAnalysis extends java.lang.Object {
     private int basinOrder;
     
     /**
-     * An array conaining the pixel ID where the stream begins.  ID=i+j*numCols, where
-     * i is the column number of the pixel and j is the row number of the pixel
+     * An array conaining the pixel ID where the stream begins for streams of different
+     * order.  The first dimension of the array corresponds to the order of the
+     * streams and the second dimesion contains the IDs. ID=i+j*numCols, where i is the
+     * column number of the pixel and j is the row number of the pixel
      */
     public int[][] headsArray;
     /**
-     * An array conaining the pixel ID before the stream merges with another stream.  ID=i+j*numCols, where
-     * i is the column number of the pixel and j is the row number of the pixel
+     * An array conaining the pixel ID before the stream merges with another stream for streams of different
+     * order.  The first dimension of the array corresponds to the order of the
+     * streams and the second dimesion contains the IDs. ID=i+j*numCols, where i is the
+     * column number of the pixel and j is the row number of the pixel
      */
     public int[][] contactsArray;
     /**
-     * An array conaining the pixel ID where the stream merges with another stream (junction).  ID=i+j*numCols, where
-     * i is the column number of the pixel and j is the row number of the pixel
+     * An array conaining the pixel ID where the stream merges with another stream (junction) for streams of different
+     * order.  The first dimension of the array corresponds to the order of the
+     * streams and the second dimesion contains the IDs. ID=i+j*numCols, where i is the
+     * column number of the pixel and j is the row number of the pixel
      */
     public int[][] tailsArray;
     

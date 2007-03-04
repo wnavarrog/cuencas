@@ -27,32 +27,86 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.util.geomorphology.objects;
 
 /**
- *
- * @author  Ricardo Mantilla
+ * This class manages the topologic structure of the river network of a basin.  This
+ * is the most important class in CUENCAS.  It is used by the Network Analysis module
+ * and the Rainfall-Runoff module.
+ * @author Ricardo Mantilla
  */
 public class LinksAnalysis extends java.lang.Object {
     
+    /**
+     * The MetaRaster that described the DEM in which the basin is embeded
+     */
     public hydroScalingAPI.io.MetaRaster localMetaRaster;
     private hydroScalingAPI.util.geomorphology.objects.Basin basin;
     private byte[][] dirMatrix;
+    /**
+     * The Horton-Strahler order of the river network
+     */
+    public int basinOrder = 0;
+    /**
+     * The link number corresponding to the basin outlet
+     */
+    public int OuletLinkNum;
     
-    public int basinOrder=0,OuletLinkNum,ressimID;
+    /**
+     * The Shreve's magnitude associated to the river network
+     */
     public int basinMagnitude=0;
     
+    /**
+     * An array conaining the pixel ID where the link begins.  ID=i+j*numCols, where
+     * i is the column number of the pixel and j is the row number of the pixel
+     */
     public int[] headsArray;
+    /**
+     * An array conaining the pixel ID before the link merges with another link.  ID=i+j*numCols, where
+     * i is the column number of the pixel and j is the row number of the pixel
+     */
     public int[] contactsArray;
+    /**
+     * An array conaining the pixel ID where the link merges with another link (junction).  ID=i+j*numCols, where
+     * i is the column number of the pixel and j is the row number of the pixel
+     */
     public int[] tailsArray;
+    
+    /**
+     * An array conaining the link's magnitude
+     */
     public int[] magnitudeArray;
     
+    /**
+     * An array with the ID of the links that drain into it.  It provides the backbone
+     * of the system of differetial equations that describe flow along the river
+     * network
+     */
     public int[][] connectionsArray; //In this array are listed all the links that drain to the i-th link
+    /**
+     * An array with the ID of the link to which it drains.  The oulet link has value
+     * -1 indicating that it doesn't drain anywhere
+     */
     public int[] nextLinkArray;
+    /**
+     * An array containing the indexes of the links at the bottom of complete order
+     * streams
+     */
     public int[] completeStreamLinksArray;
     
-    /* This constructor is only used by its extension hydroScalingAPI.modules.rsnFlowSymulations.objects.rsnLinksAnalysis */
+    /**
+     * Creates new empty instance of LinksAnalysis. This constructor is only used by its
+     * extension {@link hydroScalingAPI.modules.rsnFlowSymulations.objects.rsnLinksAnalysis}
+     */
     public LinksAnalysis(){
     }
                                     
-    /** Creates new linksAnalysis */
+    /**
+     * Creates new linksAnalysis
+     * @param bas The {@link hydroScalingAPI.util.geomorphology.objects.Basin} associated to this
+     * network
+     * @param metaR The MetaRaster that described the DEM in which the basin is embeded
+     * @param DM The directions matrix associated to the DEM in which the basin is embeded
+     * @throws java.io.IOException Captures errors while reading network related information
+     */
     public LinksAnalysis(hydroScalingAPI.util.geomorphology.objects.Basin bas,hydroScalingAPI.io.MetaRaster metaR, byte[][] DM) throws java.io.IOException{
         
         localMetaRaster=metaR;
@@ -204,13 +258,17 @@ public class LinksAnalysis extends java.lang.Object {
     }
     
     /**
-     * 
-     * @return Returns network Horton-Strahler order.
+     * Returns the network Horton-Strahler order.
+     * @return An integer with the basin order
      */
     public int getBasinOrder(){
         return basinOrder;
     }
     
+    /**
+     * 
+     * @return 
+     */
     public float[][] getDistancesToOutlet(){
         try{
             float[][] dToOutlet=new float[2][];
@@ -229,7 +287,6 @@ public class LinksAnalysis extends java.lang.Object {
     public float[][] getDistancesToOutlet(int outlet){
         try{
             float[][] dToOutlet=new float[2][1];
-            //THIS METHOD TO BE COMPLETED FOR REAL BASINS
             dToOutlet[0]=getVarValues(7)[0];
             dToOutlet[1]=getVarValues(8)[0];
             return dToOutlet;
@@ -504,16 +561,6 @@ public class LinksAnalysis extends java.lang.Object {
         
         return OuletLinkNum;
         
-    }
-    
-    public int getResSimID(int x, int y){       
-        int contactsID = x+(y*localMetaRaster.getNumCols());     
-        ressimID=-1;
-        for (int i=0;i<contactsArray.length;i++){
-            if (contactsArray[i]==contactsID) ressimID=i+1;
-            //Add 1 to ressimID because link ids in resSimul array in idl code start at 1.        
-        }
-        return ressimID;
     }
         
     /**

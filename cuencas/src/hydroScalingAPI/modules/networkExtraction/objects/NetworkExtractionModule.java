@@ -319,6 +319,7 @@ public class NetworkExtractionModule implements Runnable {
         inicio(dataDEM1);
         OpProc = new hydroScalingAPI.modules.networkExtraction.widgets.ExtractionOptions(this);
         //taskDIR=true; taskRED=true; taskGEO=false; taskVECT=false;
+        
         taskDIR=false; taskRED=true; taskGEO=true; taskVECT=true;
         corrigeDEM();
         OpProc.dispose();
@@ -1009,7 +1010,6 @@ public class NetworkExtractionModule implements Runnable {
         try{
             hydroScalingAPI.io.MetaRaster metaRaster1= new hydroScalingAPI.io.MetaRaster(new java.io.File(Arguments[0]));
             metaRaster1.setLocationBinaryFile(new java.io.File(Arguments[1]));
-            
             hydroScalingAPI.io.DataRaster datosRaster = new hydroScalingAPI.io.DataRaster(metaRaster1);
             new NetworkExtractionModule(metaRaster1, datosRaster);
             System.exit(0);

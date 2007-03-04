@@ -291,7 +291,7 @@ public class SimulationToFileFurey extends java.lang.Object {
             int[][] xyval = {{55,114},{111,180},{204,219},{196,209},{256,227}, //sgs 1 - 5
             {240,256},{243,199},{325,249},{325,250},{319,225},{344,233},                  //sgs 6-11
             {369,239},{127,187},{172,191}};                                     //sgs 12-14
-            int resSimID = linksStructure.getResSimID(xyval[i][0],xyval[i][1]);
+            int resSimID = linksStructure.OuletLinkNum+1;
             sg_IDvals.write(sg_nums[i] + "   " + resSimID + "  " + thisNetworkGeom.upStreamArea(resSimID-1) + '\n');
             //System.out.println(linksStructure.contactsArray(xyval[i][0],xyval[i][1]).length);   //contactsArray.length
         }

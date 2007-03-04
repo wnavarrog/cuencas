@@ -51,7 +51,7 @@ public abstract class GetRasterNetwork extends Object {
      * @param Proc The parent {@link hydroScalingAPI.modules.networkExtraction.objects.NetworkExtractionModule}
      */
     public static void umbral_Area_Ord(NetworkExtractionModule Proc){
-        if (Proc.printDebug) System.out.println(">>> Area-Order Threshold");
+        if (Proc.printDebug) System.out.println(">>> Area-Order Threshold "+Proc.pixPodado);
         boolean critOrd = (Proc.ordenMax < Integer.MAX_VALUE);
         boolean critArea = (Proc.pixPodado > 0);
         double areaPodado=Float.MAX_VALUE;
@@ -100,9 +100,9 @@ public abstract class GetRasterNetwork extends Object {
                 double areaPodado = Math.pow(10,-3*Proc.MaxPend[i][j]-1);
                 //System.out.println(Proc.MaxPend[i][j]+" "+areaPodado);
                 if ((Proc.Areas[i][j] > areaPodado))
-                    Proc.RedRas[i][j]=1;
+                    Proc.RedRas[i][j]*=1;
                 else
-                    Proc.RedRas[i][j]=0;
+                    Proc.RedRas[i][j]*=0;
             }
         }
         persiga(Proc);
@@ -161,8 +161,10 @@ public abstract class GetRasterNetwork extends Object {
                     else
                         pointLap=(Proc.DEM[i-1][j-1]-2*Proc.DEM[i][j]+Proc.DEM[i+1][j+1])+(Proc.DEM[i-1][j+1]-2*Proc.DEM[i][j]+Proc.DEM[i+1][j-1]);
                     
-                    if(llegan>m && lleganForward>m && pointLap > 0) Proc.RedRas[i][j]=1;
-                    else Proc.RedRas[i][j] = 0;
+                    if(llegan>m && lleganForward>m && pointLap > 0) 
+                        Proc.RedRas[i][j] *=1;
+                    else 
+                        Proc.RedRas[i][j] *=0;
                     
                 }
                 
