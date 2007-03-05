@@ -27,8 +27,8 @@ import geotransform.ellipsoids.*;
 import geotransform.transforms.*;
 
 /**
- *
- * @author  Ricardo Mantilla
+ * Test of the geotransform package
+ * @author Ricardo Mantilla
  */
 public class conv_gdc_utm
 {
