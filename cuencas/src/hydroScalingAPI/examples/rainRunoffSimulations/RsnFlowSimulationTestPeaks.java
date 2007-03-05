@@ -209,7 +209,7 @@ public class RsnFlowSimulationTestPeaks extends java.lang.Object {
                 float[][] linkAreas=myResults.getVarValues(2);
                 averageUA+=linkAreas[0][0];
                 
-                double[][] distances=myResults.getTopologicWidthFunctions(new int[] {0});
+                double[][] distances=myResults.getWidthFunctions(new int[] {0},0);
                 int maxLinks=Integer.MIN_VALUE;
                 for(int i=0;i<distances[0].length;i++){
                     maxLinks=Math.max(maxLinks,(int)distances[0][i]);
@@ -284,7 +284,7 @@ public class RsnFlowSimulationTestPeaks extends java.lang.Object {
                 float[][] linkAreas=myResults.getVarValues(2);
                 averageUA+=linkAreas[0][0];
 
-                double[][] distances=myResults.getTopologicWidthFunctions(new int[] {0});
+                double[][] distances=myResults.getWidthFunctions(new int[] {0},0);
                 int maxLinks=Integer.MIN_VALUE;
                 for(int i=0;i<distances[0].length;i++){
                     maxLinks=Math.max(maxLinks,(int)distances[0][i]);

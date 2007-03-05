@@ -183,46 +183,42 @@ public class RsnLinksAnalysis extends hydroScalingAPI.util.geomorphology.objects
                 RsnStructure myRSN=new RsnStructure(pVal,myUD_I,myUD_E);
                 RsnLinksAnalysis myResults=new RsnLinksAnalysis(myRSN);
 
-                try{
-                    /*float[][] hsorderLinks=myResults.getVarValues(4);
-                    
-                    int[] counterOrders=new int[myResults.getBasinOrder()];
-                    for(int j=0;j<myResults.completeStreamLinksArray.length;j++){
-                        counterOrders[(int)hsorderLinks[0][myResults.completeStreamLinksArray[j]]-1]++;
-                    }
-                    
-                    double mean_R_B=0;
-                    double divider=0;
-                    for(int j=1;j<counterOrders.length;j++){
-                        mean_R_B+=(1/(double)j)*counterOrders[counterOrders.length-j-1]/(double)counterOrders[counterOrders.length-j];
-                        divider+=(1/(double)j);
-                    }
-                    mean_R_B/=divider;*/
-                    
-                    double[][] distances=myResults.getTopologicWidthFunctions(new int[] {0,2});
-                    int maxLinks=Integer.MIN_VALUE;
-                    for(int i=0;i<distances[0].length;i++){
-                        maxLinks=Math.max(maxLinks,(int)distances[0][i]);
-                        System.out.println(i+" "+(int)distances[0][i]);
-                    }
-                    
-                    maxLinks=Integer.MIN_VALUE;
-                    for(int i=0;i<distances[1].length;i++){
-                        maxLinks=Math.max(maxLinks,(int)distances[1][i]);
-                        System.out.println(i+" "+(int)distances[1][i]);
-                    }
+                
+                /*float[][] hsorderLinks=myResults.getVarValues(4);
 
-                    System.exit(0);
-                    
-                    thisLevel_A+=(myResults.getVarValues(2))[0][0];
-                    thisLevel_PWF+=maxLinks;
-                    
-                    //System.out.println(totalAreas+" "+peakWF+" "+mean_R_B);
-                } catch(java.io.IOException ioe){
-                    System.err.println(ioe);
-                } catch(visad.VisADException vie){
-                    System.err.println(vie);
+                int[] counterOrders=new int[myResults.getBasinOrder()];
+                for(int j=0;j<myResults.completeStreamLinksArray.length;j++){
+                    counterOrders[(int)hsorderLinks[0][myResults.completeStreamLinksArray[j]]-1]++;
                 }
+
+                double mean_R_B=0;
+                double divider=0;
+                for(int j=1;j<counterOrders.length;j++){
+                    mean_R_B+=(1/(double)j)*counterOrders[counterOrders.length-j-1]/(double)counterOrders[counterOrders.length-j];
+                    divider+=(1/(double)j);
+                }
+                mean_R_B/=divider;*/
+
+                double[][] distances=myResults.getWidthFunctions(new int[] {0,2},0);
+                int maxLinks=Integer.MIN_VALUE;
+                for(int i=0;i<distances[0].length;i++){
+                    maxLinks=Math.max(maxLinks,(int)distances[0][i]);
+                    System.out.println(i+" "+(int)distances[0][i]);
+                }
+
+                maxLinks=Integer.MIN_VALUE;
+                for(int i=0;i<distances[1].length;i++){
+                    maxLinks=Math.max(maxLinks,(int)distances[1][i]);
+                    System.out.println(i+" "+(int)distances[1][i]);
+                }
+
+                System.exit(0);
+
+                thisLevel_A+=(myResults.getVarValues(2))[0][0];
+                thisLevel_PWF+=maxLinks;
+
+                //System.out.println(totalAreas+" "+peakWF+" "+mean_R_B);
+                
                 
                 System.gc();
             }
@@ -258,53 +254,48 @@ public class RsnLinksAnalysis extends hydroScalingAPI.util.geomorphology.objects
                 float[] meanPeakWF=new float[myResults.getBasinOrder()];
                 int[] counterOrders=new int[myResults.getBasinOrder()];
 
-                try{
-                    float[][] linkAreas=myResults.getVarValues(2);
-                    float[][] hsorderLinks=myResults.getVarValues(4);
-                    double[][] distances=myResults.getTopologicWidthFunctions(myResults.completeStreamLinksArray);
-                    for(int j=0;j<distances.length;j++){
-                        int maxLinks=Integer.MIN_VALUE;
-                        for(int i=0;i<distances[j].length;i++){
-                            maxLinks=Math.max(maxLinks,(int)distances[j][i]);
-                        }
-                        meanAreas[(int)hsorderLinks[0][myResults.completeStreamLinksArray[j]]-1]+=linkAreas[0][myResults.completeStreamLinksArray[j]];
-                        meanPeakWF[(int)hsorderLinks[0][myResults.completeStreamLinksArray[j]]-1]+=maxLinks;
-                        counterOrders[(int)hsorderLinks[0][myResults.completeStreamLinksArray[j]]-1]++;
+                
+                float[][] linkAreas=myResults.getVarValues(2);
+                float[][] hsorderLinks=myResults.getVarValues(4);
+                double[][] distances=myResults.getWidthFunctions(myResults.completeStreamLinksArray,0);
+                for(int j=0;j<distances.length;j++){
+                    int maxLinks=Integer.MIN_VALUE;
+                    for(int i=0;i<distances[j].length;i++){
+                        maxLinks=Math.max(maxLinks,(int)distances[j][i]);
                     }
-                    for(int j=0;j<meanPeakWF.length;j++){
-                        meanPeakWF[j]/=(float)counterOrders[j];
-                        meanAreas[j]/=(float)counterOrders[j];
-                        meanBifur[j]=(float)counterOrders[j];
-                    }
-                    
-                    double meanPWFS=0,meanAS=0,meanBif=0;
-                    double mean_R_PWFS=0,mean_R_AS=0,mean_R_B=0;
-                    
-                    for(int j=3;j<meanPeakWF.length-2;j++){
-                        mean_R_PWFS+=meanPeakWF[j]/meanPeakWF[j-1];
-                        mean_R_AS+=meanAreas[j]/meanAreas[j-1];
-                        mean_R_B+=meanBifur[meanPeakWF.length-j-1]/meanBifur[meanPeakWF.length-j];
-                        meanPWFS+=Math.log(meanPeakWF[j]/meanPeakWF[j-1]);
-                        meanAS+=Math.log(meanAreas[j]/meanAreas[j-1]);
-                        meanBif+=Math.log(meanBifur[j-1]/meanBifur[j]);
-                    }
-                    MVexperiment[pVal][experiment]=meanPWFS/meanAS;
-
-                    System.out.print("Done with experiment "+(experiment+1)
-                                        +" Beta: "+MVexperiment[pVal][experiment]
-                                        +" Rpwf: ");
-                    
-                    for(int j=1;j<meanPeakWF.length;j++) System.out.print(meanPeakWF[j]/meanPeakWF[j-1]+" ");
-                    
-                    System.out.print(" Ra: "+mean_R_AS/(float)(meanPeakWF.length-5)
-                                        +" Rb: "+mean_R_B/(float)(meanPeakWF.length-5));
-                    System.out.println();
-                    
-                } catch(java.io.IOException ioe){
-                    System.err.println(ioe);
-                } catch(visad.VisADException vie){
-                    System.err.println(vie);
+                    meanAreas[(int)hsorderLinks[0][myResults.completeStreamLinksArray[j]]-1]+=linkAreas[0][myResults.completeStreamLinksArray[j]];
+                    meanPeakWF[(int)hsorderLinks[0][myResults.completeStreamLinksArray[j]]-1]+=maxLinks;
+                    counterOrders[(int)hsorderLinks[0][myResults.completeStreamLinksArray[j]]-1]++;
                 }
+                for(int j=0;j<meanPeakWF.length;j++){
+                    meanPeakWF[j]/=(float)counterOrders[j];
+                    meanAreas[j]/=(float)counterOrders[j];
+                    meanBifur[j]=(float)counterOrders[j];
+                }
+
+                double meanPWFS=0,meanAS=0,meanBif=0;
+                double mean_R_PWFS=0,mean_R_AS=0,mean_R_B=0;
+
+                for(int j=3;j<meanPeakWF.length-2;j++){
+                    mean_R_PWFS+=meanPeakWF[j]/meanPeakWF[j-1];
+                    mean_R_AS+=meanAreas[j]/meanAreas[j-1];
+                    mean_R_B+=meanBifur[meanPeakWF.length-j-1]/meanBifur[meanPeakWF.length-j];
+                    meanPWFS+=Math.log(meanPeakWF[j]/meanPeakWF[j-1]);
+                    meanAS+=Math.log(meanAreas[j]/meanAreas[j-1]);
+                    meanBif+=Math.log(meanBifur[j-1]/meanBifur[j]);
+                }
+                MVexperiment[pVal][experiment]=meanPWFS/meanAS;
+
+                System.out.print("Done with experiment "+(experiment+1)
+                                    +" Beta: "+MVexperiment[pVal][experiment]
+                                    +" Rpwf: ");
+
+                for(int j=1;j<meanPeakWF.length;j++) System.out.print(meanPeakWF[j]/meanPeakWF[j-1]+" ");
+
+                System.out.print(" Ra: "+mean_R_AS/(float)(meanPeakWF.length-5)
+                                    +" Rb: "+mean_R_B/(float)(meanPeakWF.length-5));
+                System.out.println();
+                    
                 
                 System.gc();
             }

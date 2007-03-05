@@ -26,6 +26,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 package hydroScalingAPI.util.geomorphology.objects;
 
+import java.rmi.RemoteException;
+import java.util.Iterator;
+import visad.VisADException;
+
 /**
  * This class manages the topologic structure of the river network of a basin.  This
  * is the most important class in CUENCAS.  It is used by the Network Analysis module
@@ -266,25 +270,11 @@ public class LinksAnalysis extends java.lang.Object {
     }
     
     /**
-     * 
-     * @return 
+     * Returns the topologic and geometric distances of all links to the outlet link
+     * @return A float[][] array. Where float[0] contains the array of topologic distances to
+     * the outlet and float[1] contains the array of geometric distances to the outlet
      */
     public float[][] getDistancesToOutlet(){
-        try{
-            float[][] dToOutlet=new float[2][];
-            dToOutlet[0]=getVarValues(7)[0];
-            dToOutlet[1]=getVarValues(8)[0];
-            return dToOutlet;
-        } catch (java.io.IOException IOE){
-            System.err.println("Failed reading lengths for width Function");
-            System.err.println(IOE);
-        }
-        
-        return null;
-        
-    }
-    
-    public float[][] getDistancesToOutlet(int outlet){
         try{
             float[][] dToOutlet=new float[2][1];
             dToOutlet[0]=getVarValues(7)[0];
@@ -299,56 +289,150 @@ public class LinksAnalysis extends java.lang.Object {
         
     }
     
-    
-    public double[][] getTopologicWidthFunctions(int[] outlets) throws visad.VisADException, java.rmi.RemoteException{
-        
-        double[][] widthFunctions=new double[outlets.length][];
-        
-        int OriginalBasinOutlet=OuletLinkNum;
-        
-        int metric=1;
-        float binsize=1;
-        
-        for(int k=0;k<outlets.length;k++){
-            if(magnitudeArray[outlets[k]] > 1){
-                OuletLinkNum=outlets[k];
-
-                float[][] wFunc=getDistancesToOutlet(outlets[k]);
-                java.util.Arrays.sort(wFunc[metric]);
-
-                float[][] gWFunc=new float[1][wFunc[metric].length];
-
-                for (int i=0;i<wFunc[0].length;i++)
-                    gWFunc[0][i]=wFunc[metric][i];
-
-                visad.RealType numLinks= visad.RealType.getRealType("numLinks");
-                visad.RealType distanceToOut = visad.RealType.getRealType("distanceToOut");
-                visad.FunctionType func_distanceToOut_numLinks= new visad.FunctionType(distanceToOut, numLinks);
-                visad.FlatField vals_ff_W = new visad.FlatField( func_distanceToOut_numLinks, new visad.Linear1DSet(distanceToOut,1,gWFunc[0].length,gWFunc[0].length));
-                vals_ff_W.setSamples( gWFunc );
-
-                int numBins=(int) (gWFunc[0][gWFunc[0].length-1]/binsize)+1;
-
-                visad.Linear1DSet binsSet = new visad.Linear1DSet(numLinks,binsize, gWFunc[0][gWFunc[0].length-1]+binsize,numBins);
-
-                visad.FlatField hist = visad.math.Histogram.makeHistogram(vals_ff_W, binsSet);
-
-                float[][] laLinea=binsSet.getSamples();
-                double[][] laWFunc=hist.getValues();
-
-                widthFunctions[k]=laWFunc[0];
-                widthFunctions[k][0]=1;
-            } else {
-                widthFunctions[k]=new double[] {1};
+    /**
+     * Returns the topologic and geometric distances of the upstream links to a
+     * desired link in the basin
+     * @param outlet A list of desired outlets
+     * @return A float[][] array. Where float[0] contains the array of topologic distances to
+     * the desired link and float[1] contains the array of geometric distances to the
+     * desired link
+     */
+    public float[][] getDistancesToOutlet(int outlet){
+        try{
+            float[][] dToOutlet=new float[2][];
+            dToOutlet[0]=getVarValues(7)[0];
+            dToOutlet[1]=getVarValues(8)[0];
+            
+            for(int i=0;i<dToOutlet[0].length;i++){
+                dToOutlet[0][i]-=dToOutlet[0][outlet];
+                dToOutlet[1][i]-=dToOutlet[1][outlet];
             }
+            
+            java.util.Vector distToInclue=new java.util.Vector();
+            distToInclue.add(new float[] {dToOutlet[0][outlet],dToOutlet[1][outlet]});
+            addIncoming(dToOutlet,distToInclue,outlet);
+            
+            float[][] shortGroupDists=new float[2][distToInclue.size()];
+            for(int i=0;i<shortGroupDists[0].length;i++){
+                int[] myDists=(int[])distToInclue.get(i);
+                shortGroupDists[0][i]=myDists[0];
+                shortGroupDists[1][i]=myDists[1];
+            }
+            
+            return shortGroupDists;
+        } catch (java.io.IOException IOE){
+            System.err.println("Failed reading lengths for width Function");
+            System.err.println(IOE);
         }
         
-        OuletLinkNum=OriginalBasinOutlet;
-        
-        return widthFunctions;
+        return null;
         
     }
     
+    private void addIncoming(float[][] dToOutlet,java.util.Vector distToInclue,int outlet){
+        for(int i=0;i<connectionsArray[outlet].length;i++){
+            distToInclue.add(new float[] {dToOutlet[0][outlet],dToOutlet[1][outlet]});
+            addIncoming(dToOutlet,distToInclue,connectionsArray[outlet][i]);
+        }
+    }
+    
+    /**
+     * Returns the Topologic or Geometric Width Functions above a specified group of
+     * outlets
+     * @param outlets The list of links where the width function is desired
+     * @param metric 0 for topologic and 1 for geometric
+     * @return A double[numOutlets][numBins] array with the Width Functions
+     */
+    public double[][] getWidthFunctions(int[] outlets,int metric){
+        try {
+            
+            double[][] widthFunctions=new double[outlets.length][];
+            
+            int OriginalBasinOutlet=OuletLinkNum;
+            
+            float binsize=1;
+            
+            for(int k=0;k<outlets.length;k++){
+                if(magnitudeArray[outlets[k]] > 1){
+                    OuletLinkNum=outlets[k];
+
+                    float[][] wFunc=getDistancesToOutlet(outlets[k]);
+                    java.util.Arrays.sort(wFunc[metric]);
+
+                    float[][] gWFunc=new float[1][wFunc[metric].length];
+
+                    for (int i=0;i<wFunc[0].length;i++)
+                        gWFunc[0][i]=wFunc[metric][i];
+                    
+                    hydroScalingAPI.tools.Stats distStats=new hydroScalingAPI.tools.Stats(gWFunc);
+                    
+                    if(metric == 0){
+                        binsize=0.2f;  //This can be improved by using the mean link lenght
+                    } else {
+                        binsize=distStats.meanValue;
+                    }
+
+                    visad.RealType numLinks= visad.RealType.getRealType("numLinks");
+                    visad.RealType distanceToOut = visad.RealType.getRealType("distanceToOut");
+                    visad.FunctionType func_distanceToOut_numLinks= new visad.FunctionType(distanceToOut, numLinks);
+                    visad.FlatField vals_ff_W = new visad.FlatField( func_distanceToOut_numLinks, new visad.Linear1DSet(distanceToOut,1,gWFunc[0].length,gWFunc[0].length));
+                    vals_ff_W.setSamples( gWFunc );
+
+                    int numBins=(int) (gWFunc[0][gWFunc[0].length-1]/binsize)+1;
+                    visad.Linear1DSet binsSet = new visad.Linear1DSet(numLinks,binsize, gWFunc[0][gWFunc[0].length-1]+binsize,numBins);
+                    
+                    if(metric == 1){
+                        numBins =(int) ((distStats.maxValue-distStats.minValue)/0.2f);
+                        binsSet = new visad.Linear1DSet(numLinks,distStats.minValue, distStats.maxValue,numBins);
+                    }
+
+                    visad.FlatField hist = visad.math.Histogram.makeHistogram(vals_ff_W, binsSet);
+
+                    float[][] laLinea=binsSet.getSamples();
+                    double[][] laWFunc=hist.getValues();
+
+                    widthFunctions[k]=laWFunc[0];
+                    widthFunctions[k][0]=1;
+                } else {
+                    widthFunctions[k]=new double[] {1};
+                }
+            }
+            
+            OuletLinkNum=OriginalBasinOutlet;
+            
+            return widthFunctions;
+        } catch (RemoteException ex) {
+            System.err.println("Failed while calculating histrograms");
+            ex.printStackTrace();
+        } catch (VisADException ex) {
+            System.err.println("Failed while calculating histrograms");
+            ex.printStackTrace();
+        }
+        
+        return null;
+        
+    }
+    
+    /**
+     * Returns and array with information about the link.  Available variables are:
+     * <p>0: Link's Hillslope Area.  This is done by subtraction of area at head and area at incoming links head</p>
+     * <p>1: Link's Length.  This is done by subtraction of tcl at head and tcl at incoming links head</p>
+     * <p>2: Link's Upstream area.</p>
+     * <p>3: Link's drop</p>
+     * <p>4: Link's order</p>
+     * <p>5: Total Channel Length</p>
+     * <p>6: Link's Magnitude</p>
+     * <p>7: Link's Distance to Outlet</p>
+     * <p>8: Link's Topologic Distance to Outlet</p>
+     * <p>9: Link's outlet Slope</p>
+     * <p>10: Link's Elevation</p>
+     * <p>11: Longest Channel Length</p>
+     * <p>12: Binary Link Address</p>
+     * <p>13: Total Channel Drop</p>
+     * @param varIndex An integer indicating the desired variable associated to the group of links
+     * @return A float[1][numLinks]
+     * @throws java.io.IOException Throws errors while reading information from raster files
+     */
     public float[][] getVarValues(int varIndex) throws java.io.IOException {
         
         String[] extenciones={  ".areas",       /*0*/
@@ -557,6 +641,11 @@ public class LinksAnalysis extends java.lang.Object {
         return BLAs;
     }
     
+    /**
+     * Returns the ID of the link in the basin outlet
+     * @return An integer with the position of the outlet links in the different arrays of the
+     * class
+     */
     public int getOutletID(){
         
         return OuletLinkNum;
@@ -564,6 +653,7 @@ public class LinksAnalysis extends java.lang.Object {
     }
         
     /**
+     * Tests for the class
      * @param args the command line arguments
      */
     public static void main(String args[]) {

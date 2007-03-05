@@ -128,7 +128,7 @@ public class RsnWFSToAsciiFile extends java.lang.Object {
         java.io.BufferedOutputStream bufferout = new java.io.BufferedOutputStream(salida);
         java.io.OutputStreamWriter newfile = new java.io.OutputStreamWriter(bufferout);
 
-        double[][] wfs=linksStructure.getTopologicWidthFunctions(linksStructure.completeStreamLinksArray);
+        double[][] wfs=linksStructure.getWidthFunctions(linksStructure.completeStreamLinksArray,0);
         for (int i=0;i<linksStructure.completeStreamLinksArray.length;i++){
             if(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > Math.max(basinOrder-3,1)){
                 newfile.write("Link #"+linksStructure.completeStreamLinksArray[i]+",");
