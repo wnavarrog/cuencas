@@ -24,8 +24,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * Created on August 12, 2001, 10:49 PM
  */
 
-package hydroScalingAPI.util.ordDiffEqSolver;
+package hydroScalingAPI.examples.ordDiffEqns;
 
+import hydroScalingAPI.util.ordDiffEqSolver.*;
 import visad.*;
 import visad.java3d.DisplayImplJ3D;
 import java.rmi.RemoteException;
@@ -111,7 +112,7 @@ public class Attractor3D extends javax.swing.JFrame {
     */
     public static void main (String args[]){
         try{
-            new hydroScalingAPI.util.ordDiffEqSolver.Attractor3D().setVisible(true);
+            new hydroScalingAPI.examples.ordDiffEqns.Attractor3D().setVisible(true);
         } catch(RemoteException rie){
             
         } catch(VisADException vie){
