@@ -484,6 +484,57 @@ public class Basin extends Object{
         return null;
     }
     
+    
+    /**
+     * Computes the hypsometric curve and some statistical parameters: area, mean, standard deviation, skewness, and kurtosis.
+     * @return Vector object with: a/A, h/H, mean, sd, kurtosis, skewness
+     */
+    public java.util.Vector getHypCurve() throws java.io.IOException{
+        java.util.Vector hyp = new java.util.Vector();
+        float[] eleBasin=this.getElevations();
+        java.util.Arrays.sort(eleBasin);
+        float localMinElev = eleBasin[0];
+        float localMaxElev = eleBasin[eleBasin.length-1];
+        
+        float[] keyElev = new float[100];
+        float[] accumElev = new float[100];
+        int k=0;
+        float bin = (localMaxElev-localMinElev)/99.0f;
+        for(int i=0;i<eleBasin.length;i++){
+            float eleToTest = localMinElev+k*bin;
+            if(eleBasin[i] >= eleToTest) {
+                keyElev[keyElev.length-1-k]=(eleToTest-localMinElev)/(localMaxElev-localMinElev);
+                accumElev[k]=i/(float)eleBasin.length;
+                k++;
+                i--;
+            }
+        }
+        
+        float a = 0f;
+        
+        for (int i=0;i<keyElev.length;i++){
+            if(i==0 || i==keyElev.length-1)
+                a+=bin/2f*accumElev[i];
+           a+=bin*accumElev[i];             
+        }
+        
+        hydroScalingAPI.tools.Stats s = new hydroScalingAPI.tools.Stats(keyElev);
+        float mean = s.meanValue;
+        float sd = s.standardDeviation;
+        float kur = s.kurtosis;
+        float ske = s.skewness;
+        
+        hyp.addElement(accumElev);
+        hyp.addElement(keyElev);
+        hyp.addElement(mean);
+        hyp.addElement(sd);
+        hyp.addElement(kur);
+        hyp.addElement(ske);
+        
+        return hyp;
+        
+    }
+    
     /**
      * Tests for the class
      * @param args The command line arguments
