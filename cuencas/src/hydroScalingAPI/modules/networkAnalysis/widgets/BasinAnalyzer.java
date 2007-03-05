@@ -3295,10 +3295,14 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
 //            hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
 //            metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Topography/1_ArcSec_USGS/walnutGulchUpdated.dir"));
             
-            java.io.File theFile=new java.io.File("/hidrosigDataBases/Gila River DB/Rasters/Topography/1_ArcSec/mogollon.metaDEM");
-            hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
-            metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Gila River DB/Rasters/Topography/1_ArcSec/mogollon.dir"));
+//            java.io.File theFile=new java.io.File("/hidrosigDataBases/Gila River DB/Rasters/Topography/1_ArcSec/mogollon.metaDEM");
+//            hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
+//            metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Gila River DB/Rasters/Topography/1_ArcSec/mogollon.dir"));
             
+            java.io.File theFile=new java.io.File("/hidrosigDataBases/Rio Salado DB/Rasters/Topography/NED_26084992.metaDEM");
+            hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
+            metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Rio Salado DB/Rasters/Topography/NED_26084992.dir"));
+
             String formatoOriginal=metaModif.getFormat();
             metaModif.setFormat("Byte");
             byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
@@ -3308,7 +3312,8 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
             //new BasinAnalyzer(tempFrame,2,96,matDirs,metaModif).setVisible(true);
             //new BasinAnalyzer(tempFrame,1063,496,matDirs,metaModif).show();
             //new BasinAnalyzer(tempFrame,82,260,matDirs,metaModif).setVisible(true);
-            new BasinAnalyzer(tempFrame,282,298,matDirs,metaModif).setVisible(true);
+            //new BasinAnalyzer(tempFrame,282,298,matDirs,metaModif).setVisible(true);
+            new BasinAnalyzer(tempFrame,5173,1252,matDirs,metaModif).setVisible(true);
             
         } catch (java.io.IOException IOE){
             System.err.println(IOE);
