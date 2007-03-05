@@ -35,9 +35,6 @@ public class RsnLinksAnalysis extends hydroScalingAPI.util.geomorphology.objects
     private hydroScalingAPI.util.randomSelfSimilarNetworks.RsnStructure rsnNS;
     
     /** Creates a new instance of RsnLinksAnalysis */
-    public RsnLinksAnalysis() {
-    }
-    
     public RsnLinksAnalysis(hydroScalingAPI.util.randomSelfSimilarNetworks.RsnStructure rsns) {
         
         rsnNS=rsns;

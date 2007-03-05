@@ -27,7 +27,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.util.probability;
 
 /**
- *
+ * An implementation of {@link hydroScalingAPI.util.probability.DiscreteDistribution}
+ * using a geometric distribution P(i)=p*(1-p)^i
  * @author Ricardo Mantilla
  */
 public class GeometricDistribution implements hydroScalingAPI.util.probability.DiscreteDistribution{
@@ -35,7 +36,11 @@ public class GeometricDistribution implements hydroScalingAPI.util.probability.D
     private double base;
     private int minValue;
     
-    /** Creates a new instance of UniformDistribution */
+    /**
+     * Creates a new instance of GeometricDistribution
+     * @param theBase The probability of success
+     * @param theMinVal The lower limit of the random variable
+     */
     public GeometricDistribution(double theBase, int theMinVal) {
         
         base=theBase;
@@ -43,12 +48,17 @@ public class GeometricDistribution implements hydroScalingAPI.util.probability.D
         
     }
     
+    /**
+     * Returns a random value that follows a geometric distribution
+     * @return A random value
+     */
     public int sample() {
         double ranNum=Math.random();
         return (int)Math.floor(Math.log(ranNum)/Math.log(1-base))+minValue;
     }
     
     /**
+     * Tests for the class
      * @param args the command line arguments
      */
     public static void main(String[] args) {

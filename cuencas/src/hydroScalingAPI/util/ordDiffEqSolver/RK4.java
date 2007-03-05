@@ -19,7 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 
 /*
- * RK4step.java
+ * RK4.java
  *
  * Created on June 3, 2001, 4:50 PM
  */
@@ -27,8 +27,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.util.ordDiffEqSolver;
 
 /**
- *
- * @author  Ricardo Mantilla 
+ * An implementation of the Runge-Kutta algorithm for solving non-linear ordinary
+ * differential equations
+ * @author Ricardo Mantilla
  */
 public class RK4 {
     
@@ -37,7 +38,13 @@ public class RK4 {
     float stepSize;
     float time;
     
-    /** Creates new RK4step */
+    /**
+     * Creates new RK4
+     * @param fu The differential equation to solve described by a {@link hydroScalingAPI.util.ordDiffEqSolver.BasicFunction}
+     * @param IC The value of the initial condition
+     * @param h The step size
+     * @param t The time at which the initial condition is given
+     */
     public RK4(hydroScalingAPI.util.ordDiffEqSolver.BasicFunction fu, float[] IC, float h, float t) {
         
         theFunction=fu;
@@ -47,6 +54,11 @@ public class RK4 {
         
     }
     
+    /**
+     * Returns the value of the function described by differential equations in the
+     * next time step
+     * @return The value of the multivatiate function
+     */
     public float[] step(){
         float[] evalPoint=new float[initialCond.length];
         float evalTime=0.0f;
@@ -72,6 +84,11 @@ public class RK4 {
         return evalPoint;
     }
     
+    /**
+     * Performs a run of the RK4 algoritm for a specified number of time steps
+     * @param nSteps The number of time steps desired
+     * @return The value of the function at time = nSteps*stepSize
+     */
     public float[][] run(int nSteps){
         float[][] result=new float[initialCond.length][nSteps];
         float[] real_IC=(float[]) initialCond.clone();
@@ -86,6 +103,10 @@ public class RK4 {
         return result;
     }
     
+    /**
+     * Test for the class
+     * @param args The command line arguments
+     */
     public static void main (String args[]) {
         hydroScalingAPI.util.ordDiffEqSolver.Lorenz funcionLorenz;
         hydroScalingAPI.util.ordDiffEqSolver.Rossler funcionRossler;

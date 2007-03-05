@@ -27,13 +27,22 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.util.ordDiffEqSolver;
 
 /**
- *
- * @author  Ricardo Mantilla 
+ * An implementation of the Runge-Kutta-Felberg algorithm for solving non-linear ordinary
+ * differential equations.  It uses a time step control algorithm to avoid numerical errors
+ * while solving the equations
+ * @author Ricardo Mantilla
  */
 public class RKF extends java.lang.Object {
 
     hydroScalingAPI.util.ordDiffEqSolver.BasicFunction theFunction;
-    public double[] initialCond, finalCond;
+    private double[] initialCond;
+    
+    /**
+     * An array containing the value of the function that was last calculated by the
+     * RKF algoritm
+     */
+    public double[] finalCond;
+    
     double epsilon;
     double basicTimeStep;
     //Scheme parameters
@@ -54,13 +63,28 @@ public class RKF extends java.lang.Object {
      
      double Delta,newTimeStep,factor;
 
-    /** Creates new RKF */
+    /**
+     * Creates new RKF
+     * @param fu The differential equation to solve described by a {@link hydroScalingAPI.util.ordDiffEqSolver.BasicFunction}
+     * @param eps The value error allowed by the step forward algorithm
+     * @param basTs The step size
+     */
     public RKF(hydroScalingAPI.util.ordDiffEqSolver.BasicFunction fu, double eps, double basTs) {
         theFunction=fu;
         epsilon=eps;
         basicTimeStep=basTs;
     }
     
+    /**
+     * Returns the value of the function described by differential equations in the
+     * next time step
+     * @param currentTime The current time
+     * @param IC The value of the initial condition
+     * @param timeStep The desired step size
+     * @param finalize A boolean indicating in the timeStep provided is final or if 
+     * it needs to be refined
+     * @return The value of the multivatiate function
+     */
     public double[][] step(double currentTime, double[] IC, double timeStep, boolean finalize){
         
         carrier=new double[IC.length];
@@ -126,6 +150,14 @@ public class RKF extends java.lang.Object {
 
     }
     
+    /**
+     * Returns the values of the function described by differential equations in the
+     * the intermidia steps needed to go from the Initial to the Final time
+     * @param iniTime The initial time of the solution
+     * @param finalTime The final time of the solution
+     * @param IC The value of the initial condition
+     * @return The values of the multivatiate function at different times
+     */
     public double[][][] simpleRun(double iniTime, double finalTime, double[] IC){
         
         double currentTime=iniTime;
@@ -161,6 +193,15 @@ public class RKF extends java.lang.Object {
         return runOutput;
     }
     
+    /**
+     * Returns the values of the function described by differential equations in the
+     * the intermidia steps requested to go from the Initial to the Final time
+     * @param iniTime The initial time of the solution
+     * @param finalTime The final time of the solution
+     * @param incrementalTime How often the values are desired
+     * @param IC The value of the initial condition
+     * @return The values of the multivatiate function at different times
+     */
     public double[][][] jumpsRun(double iniTime, double finalTime, double incrementalTime, double[] IC){
         
         double currentTime=iniTime,targetTime;
@@ -214,6 +255,16 @@ public class RKF extends java.lang.Object {
         return runOutput;
     }
     
+    /**
+     * Writes (in binary format) to a specified file the values of the function described by differential
+     * equations in the the intermidia steps needed to go from the Initial to the Final
+     * time
+     * @param iniTime The initial time of the solution
+     * @param finalTime The final time of the solution
+     * @param IC The value of the initial condition
+     * @param outputStream The file to which the information will be writen
+     * @throws java.io.IOException Captures errors while writing to the file
+     */
     public void simpleRunToFile(double iniTime, double finalTime, double[] IC, java.io.DataOutputStream outputStream) throws java.io.IOException {
         
         double currentTime=iniTime;
@@ -255,6 +306,17 @@ public class RKF extends java.lang.Object {
 
     }
     
+    /**
+     * Writes (in binary format) to a specified file the values of the function described by differential
+     * equations in the the intermidia steps requested to go from the Initial to the Final
+     * time
+     * @param iniTime The initial time of the solution
+     * @param finalTime The final time of the solution
+     * @param incrementalTime How often the values are desired
+     * @param IC The value of the initial condition
+     * @param outputStream The file to which the information will be writen
+     * @throws java.io.IOException Captures errors while writing to the file
+     */
     public void jumpsRunToFile(double iniTime, double finalTime, double incrementalTime, double[] IC, java.io.DataOutputStream outputStream) throws java.io.IOException {
         
         outputStream.writeInt((int) Math.round((finalTime-iniTime)/incrementalTime)+1);
@@ -349,6 +411,21 @@ public class RKF extends java.lang.Object {
 
     }
     
+    /**
+     * Writes (in ascii format) to a specified file the values of the function described by differential
+     * equations in the the intermidia steps requested to go from the Initial to the Final
+     * time.  This method is very specific for solving equations of flow in a network.  It prints output for
+     * the flow component at all locations.
+     * @param iniTime The initial time of the solution
+     * @param finalTime The final time of the solution
+     * @param incrementalTime How often the values are desired
+     * @param IC The value of the initial condition
+     * @param outputStream The file to which the information will be writen
+     * @param linksStructure The structure describing the topology of the river network
+     * @param thisNetworkGeom The descripion the the hydraulic and geomorphic parameters
+     * of the links in the network
+     * @throws java.io.IOException Captures errors while writing to the file
+     */
     public void jumpsRunToAsciiFile(double iniTime, double finalTime, double incrementalTime, double[] IC, java.io.OutputStreamWriter outputStream, hydroScalingAPI.util.geomorphology.objects.LinksAnalysis linksStructure, hydroScalingAPI.modules.rainfallRunoffModel.objects.LinksInfo thisNetworkGeom) throws java.io.IOException {
         
         double currentTime=iniTime,targetTime;
@@ -460,6 +537,22 @@ public class RKF extends java.lang.Object {
 
     }
     
+    
+    /**
+     * Writes (in ascii format) to a specified file the values of the function described by differential
+     * equations in the the intermidia steps requested to go from the Initial to the Final
+     * time.  This method is very specific for solving equations of flow in a network.  It prints output for
+     * the flow component at a few locations.
+     * @param iniTime The initial time of the solution
+     * @param finalTime The final time of the solution
+     * @param incrementalTime How often the values are desired
+     * @param IC The value of the initial condition
+     * @param outputStream The file to which the information will be writen
+     * @param linksStructure The structure describing the topology of the river network
+     * @param thisNetworkGeom The descripion the the hydraulic and geomorphic parameters
+     * of the links in the network
+     * @throws java.io.IOException Captures errors while writing to the file
+     */
     public void jumpsRunToIncompleteAsciiFile(double iniTime, double finalTime, double incrementalTime, double[] IC, java.io.OutputStreamWriter outputStream, hydroScalingAPI.util.geomorphology.objects.LinksAnalysis linksStructure, hydroScalingAPI.modules.rainfallRunoffModel.objects.LinksInfo thisNetworkGeom) throws java.io.IOException {
         
         double currentTime=iniTime,targetTime;
@@ -573,13 +666,18 @@ public class RKF extends java.lang.Object {
 
     }
     
+    /**
+     * Sets the valuo of the algorithm time step
+     * @param newBTS The time step to assign
+     */
     public void setBasicTimeStep(double newBTS){
         basicTimeStep=newBTS;
     }
 
     /**
-    * @param args the command line arguments
-    */
+     * Tests for the class
+     * @param args the command line arguments
+     */
     public static void main (String args[]) {
         
         hydroScalingAPI.util.ordDiffEqSolver.Lorenz funcionLorenz;

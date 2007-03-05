@@ -19,7 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 
 /*
- * UniformDistribution.java
+ * GeneralGeometricDistribution.java
  *
  * Created on July 11, 2005, 10:00 AM
  */
@@ -27,7 +27,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.util.probability;
 
 /**
- *
+ * An implementation of {@link hydroScalingAPI.util.probability.DiscreteDistribution}
+ * using a generalized geometric distribution P(i)=b*c^i, i>1 and P(0)=1-sum(P(i))
  * @author Ricardo Mantilla
  */
 public class GeneralGeometricDistribution implements hydroScalingAPI.util.probability.DiscreteDistribution{
@@ -37,7 +38,12 @@ public class GeneralGeometricDistribution implements hydroScalingAPI.util.probab
     
     private double p0;
     
-    /** Creates a new instance of UniformDistribution */
+    /**
+     * Creates a new instance of GeneralGeometricDistribution
+     * @param theCoeff The probability of success
+     * @param theBase The probability of failure
+     * @param theMinVal The lower limit of the random variable
+     */
     public GeneralGeometricDistribution(double theCoeff, double theBase, int theMinVal) {
         
         /*Results for Walnut Creek
@@ -63,6 +69,10 @@ public class GeneralGeometricDistribution implements hydroScalingAPI.util.probab
         
     }
     
+    /**
+     * Returns a random value that follows a generalized geometric distribution
+     * @return A random value
+     */
     public int sample() {
         double ranNum=Math.random();
         if (ranNum > p0) return minValue;
@@ -70,6 +80,7 @@ public class GeneralGeometricDistribution implements hydroScalingAPI.util.probab
     }
     
     /**
+     * Tests for the class
      * @param args the command line arguments
      */
     public static void main(String[] args) {

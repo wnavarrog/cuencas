@@ -27,24 +27,34 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.util.probability;
 
 /**
- *
+ * An implementation of {@link hydroScalingAPI.util.probability.ContinuousDistribution}
+ * using a uniform distribution
  * @author Ricardo Mantilla
  */
 public class UniformDistribution implements hydroScalingAPI.util.probability.ContinuousDistribution{
     
     private float lowerLimit, upperLimit;
     
-    /** Creates a new instance of UniformDistribution */
+    /**
+     * Creates a new instance of UniformDistribution
+     * @param ll The lower limit of the random variable
+     * @param ul The upper limit of the random variable
+     */
     public UniformDistribution(float ll,float ul) {
         lowerLimit=ll;
         upperLimit=ul;
     }
     
+    /**
+     * Returns a random value that follows a uniform distribution
+     * @return A random value
+     */
     public float sample() {
         return (float) (Math.random()*(upperLimit-lowerLimit+1)+lowerLimit);
     }
     
     /**
+     * Tests for the class
      * @param args the command line arguments
      */
     public static void main(String[] args) {

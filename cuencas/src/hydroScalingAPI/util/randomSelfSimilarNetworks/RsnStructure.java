@@ -27,7 +27,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.util.randomSelfSimilarNetworks;
 
 /**
- *
+ * Manages information related to the topologic and geometric information associated
+ * to a Random Self-similar Network.
  * @author Ricardo Mantilla
  */
 public class RsnStructure {
@@ -45,7 +46,81 @@ public class RsnStructure {
     
     private int minimumIntegerDigits=4;
     
-    /** Creates a new instance of RsnStructure */
+    /**
+     * Creates a new instance of RsnStructure
+     * @param generations The number of generations of the RSN (number of recursive replacements)
+     * @param myDis_I A random variable with and associated probability distribution of the number of descendents
+     * of interior nodes
+     * @param myDis_E A random variable with and associated probability distribution of the number of descendents
+     * of exterioir nodes
+     * @param myDis_Areas_E A random variable with and associated probability distribution of the catchment
+     * area associated to each link in the RSN
+     * @param myDis_Areas_I A random variable with and associated probability distribution of the geometric
+     * length associated to each link in the RSN
+     */
+    public RsnStructure(int generations, hydroScalingAPI.util.probability.DiscreteDistribution myDis_I, 
+                                         hydroScalingAPI.util.probability.DiscreteDistribution myDis_E, 
+                                         hydroScalingAPI.util.probability.ContinuousDistribution myDis_Areas_E,
+                                         hydroScalingAPI.util.probability.ContinuousDistribution myDis_Areas_I) {
+        
+        java.text.NumberFormat labelFormat = java.text.NumberFormat.getNumberInstance();
+        labelFormat.setGroupingUsed(false);
+        labelFormat.setMinimumIntegerDigits(minimumIntegerDigits);
+        
+        rsnDepth=generations;
+        rsnTree=new hydroScalingAPI.util.randomSelfSimilarNetworks.Generator(0,rsnDepth,myDis_I,myDis_E,labelFormat.format(0));
+        rsnTreeDecoding=rsnTree.decodeRsnTree();
+        
+        randomGeometry=true;
+        linkAreas=new float[1][rsnTreeDecoding.length];
+        linkLengths=new float[1][rsnTreeDecoding.length];
+        
+        java.util.Random rn=new java.util.Random();
+        
+        for(int i=0;i<rsnTreeDecoding.length;i++){
+            if(rsnTreeDecoding[i].contains("E")){
+                linkAreas[0][i]=myDis_Areas_E.sample();
+                linkLengths[0][i]=(float)(1.31*Math.pow(linkAreas[0][i],0.63)*Math.exp(rn.nextGaussian()*0.7));
+            } else{
+                linkAreas[0][i]=myDis_Areas_I.sample();
+                linkLengths[0][i]=(float)(1.17*Math.pow(linkAreas[0][i],0.55)*Math.exp(rn.nextGaussian()*0.5));
+            }
+        }
+        
+        grabRsnStructure();
+    }
+    
+    /**
+     * Creates a new instance of RsnStructure. It is assumed that all links have geometric lenght = 0.3 km
+     * and catchment area = 0.1 km^2
+     * @param generations The number of generations of the RSN (number of recursive replacements)
+     * @param myDis_I A random variable with and associated probability distribution of the number of descendents
+     * of interior nodes
+     * @param myDis_E A random variable with and associated probability distribution of the number of descendents
+     * of exterioir nodes
+     */
+    public RsnStructure(int generations, hydroScalingAPI.util.probability.DiscreteDistribution myDis_I, hydroScalingAPI.util.probability.DiscreteDistribution myDis_E) {
+        java.text.NumberFormat labelFormat = java.text.NumberFormat.getNumberInstance();
+        labelFormat.setGroupingUsed(false);
+        labelFormat.setMinimumIntegerDigits(minimumIntegerDigits);
+        
+        rsnDepth=generations;
+        rsnTree=new hydroScalingAPI.util.randomSelfSimilarNetworks.Generator(0,rsnDepth,myDis_I,myDis_E,labelFormat.format(0));
+        rsnTreeDecoding=rsnTree.decodeRsnTree();
+        
+        linkAreas=new float[1][rsnTreeDecoding.length];
+        linkLengths=new float[1][rsnTreeDecoding.length];
+        
+        java.util.Arrays.fill(linkAreas[0],0.10f);
+        java.util.Arrays.fill(linkLengths[0],0.30f);
+        
+        grabRsnStructure();
+    }
+    
+    /**
+     * Creates a new instance of RsnStructure previously stored in a file
+     * @param theFile The file where the RSN structure is stored
+     */
     public RsnStructure(java.io.File theFile) {
         try{
             java.io.BufferedReader fileMeta = new java.io.BufferedReader(new java.io.FileReader(theFile));
@@ -99,57 +174,8 @@ public class RsnStructure {
         
         grabRsnStructure();
     }
-    public RsnStructure(int generations, hydroScalingAPI.util.probability.DiscreteDistribution myDis_I, hydroScalingAPI.util.probability.DiscreteDistribution myDis_E) {
-        java.text.NumberFormat labelFormat = java.text.NumberFormat.getNumberInstance();
-        labelFormat.setGroupingUsed(false);
-        labelFormat.setMinimumIntegerDigits(minimumIntegerDigits);
-        
-        rsnDepth=generations;
-        rsnTree=new hydroScalingAPI.util.randomSelfSimilarNetworks.Generator(0,rsnDepth,myDis_I,myDis_E,labelFormat.format(0));
-        rsnTreeDecoding=rsnTree.decodeRsnTree();
-        
-        linkAreas=new float[1][rsnTreeDecoding.length];
-        linkLengths=new float[1][rsnTreeDecoding.length];
-        
-        java.util.Arrays.fill(linkAreas[0],0.10f);
-        java.util.Arrays.fill(linkLengths[0],0.30f);
-        
-        grabRsnStructure();
-    }
     
-    public RsnStructure(int generations, hydroScalingAPI.util.probability.DiscreteDistribution myDis_I, 
-                                         hydroScalingAPI.util.probability.DiscreteDistribution myDis_E, 
-                                         hydroScalingAPI.util.probability.ContinuousDistribution myDis_Areas_E,
-                                         hydroScalingAPI.util.probability.ContinuousDistribution myDis_Areas_I) {
-        
-        java.text.NumberFormat labelFormat = java.text.NumberFormat.getNumberInstance();
-        labelFormat.setGroupingUsed(false);
-        labelFormat.setMinimumIntegerDigits(minimumIntegerDigits);
-        
-        rsnDepth=generations;
-        rsnTree=new hydroScalingAPI.util.randomSelfSimilarNetworks.Generator(0,rsnDepth,myDis_I,myDis_E,labelFormat.format(0));
-        rsnTreeDecoding=rsnTree.decodeRsnTree();
-        
-        randomGeometry=true;
-        linkAreas=new float[1][rsnTreeDecoding.length];
-        linkLengths=new float[1][rsnTreeDecoding.length];
-        
-        java.util.Random rn=new java.util.Random();
-        
-        for(int i=0;i<rsnTreeDecoding.length;i++){
-            if(rsnTreeDecoding[i].contains("E")){
-                linkAreas[0][i]=myDis_Areas_E.sample();
-                linkLengths[0][i]=(float)(1.31*Math.pow(linkAreas[0][i],0.63)*Math.exp(rn.nextGaussian()*0.7));
-            } else{
-                linkAreas[0][i]=myDis_Areas_I.sample();
-                linkLengths[0][i]=(float)(1.17*Math.pow(linkAreas[0][i],0.55)*Math.exp(rn.nextGaussian()*0.5));
-            }
-        }
-        
-        grabRsnStructure();
-    }
-        
-    public void grabRsnStructure() {
+    private void grabRsnStructure() {
         java.text.NumberFormat labelFormat = java.text.NumberFormat.getNumberInstance();
         labelFormat.setGroupingUsed(false);
         labelFormat.setMinimumIntegerDigits(minimumIntegerDigits);
@@ -290,50 +316,100 @@ public class RsnStructure {
         }
     }
     
+    /**
+     * Returns the Strahler order of the RSN
+     * @return The Strahler order of the network
+     */
     public int getNetworkOrder(){
         return rsnDepth+1;
     }
     
+    /**
+     * Returns the array describing the topologic connection structure of the links in
+     * the network
+     * @return An int[numLinks][numTributaries] 
+     */
     public int[][] getConnectionStructure(){
         return connStruc;
     }
     
+    /**
+     * Returns an array with the index of the downstream link
+     * @return An int[numLinks]
+     */
     public int[] getNextLinkArray(){
         return nextLink;
     }
     
+    /**
+     * Returns an array with the links Shreve's magnitude
+     * @return An int[numLinks]
+     */
     public int[] getMagnitudes(){
         return magnitudes;
     }
     
+    /**
+     * Returns an array with the links catchment area
+     * @return An float[1][numLinks]
+     */
     public float[][] getLinkAreas(){
         return linkAreas;
     }
     
+    /**
+     * Returns an array with the links upstream area
+     * @return An float[1][numLinks]
+     */
     public float[][] getUpAreas(){
         return upAreas;
     }
     
+    /**
+     * Returns an array with the links geometric length
+     * @return An float[1][numLinks]
+     */
     public float[][] getLinkLengths(){
         return linkLengths;
     }
     
+    /**
+     * Returns an array with the links upstream total length
+     * @return An float[1][numLinks]
+     */
     public float[][] getUpLength(){
         return upLength;
     }
     
+    /**
+     * Returns an array with the links Strahler order
+     * @return An float[1][numLinks]
+     */
     public float[][] getHortonOrders(){
         return linkOrders;
     }
     
+    /**
+     * Returns an array with the links upstream longest channel lenght 
+     * @return An float[1][numLinks]
+     */
     public float[][] getLongestLength(){
         return longestLenght;
     }
     
+    /**
+     * Returns an array with the index of the links that correspond to the bottom of
+     * complete order streams 
+     * @return An int[numCompleteStreams]
+     */
     public int[] getCompleteStreamLinksArray(){
         return completeStreamLinksArray;
     }
     
+    /**
+     * Writes the RSN topologic and geometric structure to a file for later retreival 
+     * and reconstruction
+     */
     public void writeRsnTreeDecoding(java.io.File theFile) throws java.io.IOException{
         java.io.FileOutputStream salida = new java.io.FileOutputStream(theFile);
         java.io.BufferedOutputStream bufferout = new java.io.BufferedOutputStream(salida);
@@ -356,6 +432,7 @@ public class RsnStructure {
     }
     
     /**
+     * Tests for the class
      * @param args the command line arguments
      */
     public static void main(String[] args) {
@@ -365,7 +442,7 @@ public class RsnStructure {
         main3(args); //Read Info from Embeded trees
     }
     
-    public static void main0(String[] args) {
+    private static void main0(String[] args) {
         hydroScalingAPI.util.probability.DiscreteDistribution myUD_I=new hydroScalingAPI.util.probability.GeneralGeometricDistribution(0.59062127,0.25756657, 0);
         hydroScalingAPI.util.probability.DiscreteDistribution myUD_E=new hydroScalingAPI.util.probability.GeneralGeometricDistribution(0.57253316,0.19803630, 1);
         RsnStructure myResults=new RsnStructure(3,myUD_I,myUD_E);
@@ -399,7 +476,7 @@ public class RsnStructure {
         System.exit(0);
     }
     
-    public static void main1(String[] args) {
+    private static void main1(String[] args) {
         hydroScalingAPI.util.probability.DiscreteDistribution myUD_I=new hydroScalingAPI.util.probability.GeneralGeometricDistribution(0.59062127,0.25756657, 0);
         hydroScalingAPI.util.probability.DiscreteDistribution myUD_E=new hydroScalingAPI.util.probability.GeneralGeometricDistribution(0.57253316,0.19803630, 1);
         RsnStructure myRsnStruc=new RsnStructure(3,myUD_I,myUD_E);
@@ -430,7 +507,7 @@ public class RsnStructure {
         System.exit(0);
     }
     
-    public static void main2(String[] args) {
+    private static void main2(String[] args) {
          
         hydroScalingAPI.util.probability.DiscreteDistribution myUD_I=new hydroScalingAPI.util.probability.GeometricDistribution(0.42,0);
         hydroScalingAPI.util.probability.DiscreteDistribution myUD_E=new hydroScalingAPI.util.probability.GeometricDistribution(0.49,1);
@@ -457,7 +534,7 @@ public class RsnStructure {
         
     }
     
-    public static void main3(String[] args) {
+    private static void main3(String[] args) {
         
         //java.io.File theFile=new java.io.File("/Users/ricardo/workFiles/PhD Thesis Results/E1I1/ord_4/Modified_RSN_result-SN_0.0.rsn.csv");
         //java.io.File theFile=new java.io.File("/Users/ricardo/workFiles/PhD Thesis Results/E1I1/ord_4/RSN_result-SN_0.0.rsn.csv");

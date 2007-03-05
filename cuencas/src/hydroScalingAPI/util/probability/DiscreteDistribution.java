@@ -27,11 +27,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.util.probability;
 
 /**
- *
+ * A basic description of a discrete distribution
  * @author Ricardo Mantilla
  */
 public interface DiscreteDistribution {
     
+    /**
+     * Returns a random value with a given distribution
+     * @return A random value
+     */
     public int sample();
     
 }

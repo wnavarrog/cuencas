@@ -98,7 +98,7 @@ public class LinksAnalysis extends java.lang.Object {
     
     /**
      * Creates new empty instance of LinksAnalysis. This constructor is only used by its
-     * extension {@link hydroScalingAPI.modules.rsnFlowSymulations.objects.rsnLinksAnalysis}
+     * extension {@link hydroScalingAPI.util.randomSelfSimilarNetworks.RsnLinksAnalysis}
      */
     public LinksAnalysis(){
     }

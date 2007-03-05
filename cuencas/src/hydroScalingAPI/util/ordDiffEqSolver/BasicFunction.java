@@ -27,17 +27,39 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.util.ordDiffEqSolver;
 
 /**
- *
- * @author  Ricardo Mantilla
+ * An abstract interface that describes a Function (In the mathematical sense)
+ * @author Ricardo Mantilla
  */
 public interface BasicFunction{
     
+    /**
+     * The result from evaluating a float multivariate function
+     * @param input The values where the function is to be evaluated
+     * @return The value of the function
+     */
     public float[] eval(float[] input);
     
+    /**
+     * The result from evaluating a float multivariate function at time t
+     * @param input The values where the function is to be evaluated
+     * @param time The time at which the function is to be evaluated
+     * @return The value of the function
+     */
     public float[] eval(float[] input, float time);
     
+    /**
+     * The result from evaluating a double multivariate function
+     * @param input The values where the function is to be evaluated
+     * @return The value of the function
+     */
     public double[] eval(double[] input);
     
+    /**
+     * The result from evaluating a double multivariate function at time t
+     * @param input The values where the function is to be evaluated
+     * @param time The time at which the function is to be evaluated
+     * @return The value of the function
+     */
     public double[] eval(double[] input, double time);
 
 }

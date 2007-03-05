@@ -27,7 +27,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.util.randomSelfSimilarNetworks;
 
 /**
- *
+ * Implementation of the Random Self-similar Networks generation algorithm.  The
+ * constructor for this class is recursive.
  * @author Ricardo Mantilla
  */
 public class Generator {
@@ -35,7 +36,17 @@ public class Generator {
     private String genID;
     private Generator[] subTree;
     
-    /** Creates a new instance of Generator */
+    /**
+     * Creates a new instance of Generator
+     * @param extInt A flag indicating if this is an exterior (0) or an interior generator
+     * @param generation The level of the generation of this Generator.  Note: Generation = 0 indicates
+     * that the members of this Generator have no descendents
+     * @param myIntDis An object describing the probability distribution of the size of the descendency
+     * for interior pseudo-links
+     * @param myExtDis An object describing the probability distribution of the size of the descendency
+     * for exterior pseudo-links
+     * @param familyID An ID for the parent family
+     */
     public Generator(   int extInt,
                         int generation,
                         hydroScalingAPI.util.probability.DiscreteDistribution myIntDis,
@@ -84,14 +95,18 @@ public class Generator {
         }
     }
     
+    /**
+     * Returns a String with the tree id (family name)
+     * @return The id (family name) of the tree
+     */
     public String getGenID(){
         return genID;
     }
     
-    public Generator[] getSubTree(){
-        return subTree;
-    }
-    
+    /**
+     * Returns a String[] with a human readable codification for the tree.
+     * @return The tree codification
+     */
     public String[] decodeRsnTree(){
         String baseID="";
         for(int i=0;i<subTree.length;i++){
@@ -108,6 +123,10 @@ public class Generator {
             branchID+=decodeBranch(baseID,branchBranches[i]);
         }
         return branchID;
+    }
+    
+    private Generator[] getSubTree(){
+        return subTree;
     }
     
     /**

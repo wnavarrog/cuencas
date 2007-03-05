@@ -27,7 +27,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.util.probability;
 
 /**
- *
+ * An implementation of {@link hydroScalingAPI.util.probability.ContinuousDistribution}
+ * using a log-gaussian distribution
  * @author Ricardo Mantilla
  */
 public class LogGaussianDistribution implements hydroScalingAPI.util.probability.ContinuousDistribution{
@@ -35,7 +36,11 @@ public class LogGaussianDistribution implements hydroScalingAPI.util.probability
     private float mean, stdev;
     private java.util.Random rn;
     
-    /** Creates a new instance of UniformDistribution */
+    /**
+     * Creates a new instance of LogGaussianDistribution
+     * @param m The mean
+     * @param s The standard deviation
+     */
     public LogGaussianDistribution(float m,float s) {
         s=(float)Math.pow(s,2);
         stdev=(float)Math.log(1+s/Math.pow(m,2));
@@ -45,11 +50,16 @@ public class LogGaussianDistribution implements hydroScalingAPI.util.probability
         
     }
     
+    /**
+     * Returns a random value that follows a log-gaussian distribution
+     * @return A random value
+     */
     public float sample() {
         return (float) Math.exp(rn.nextGaussian()*stdev+mean);
     }
     
     /**
+     * Tests for the class
      * @param args the command line arguments
      */
     public static void main(String[] args) {

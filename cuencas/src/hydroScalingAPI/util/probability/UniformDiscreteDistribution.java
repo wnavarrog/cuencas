@@ -27,24 +27,34 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.util.probability;
 
 /**
- *
+ * An implementation of {@link hydroScalingAPI.util.probability.DiscreteDistribution}
+ * using a uniform distribution P(i)=i/invervalSize
  * @author Ricardo Mantilla
  */
 public class UniformDiscreteDistribution implements hydroScalingAPI.util.probability.DiscreteDistribution{
     
     private int lowerLimit, upperLimit;
     
-    /** Creates a new instance of UniformDistribution */
+    /**
+     * Creates a new instance of UniformDiscreteDistribution
+     * @param ll The lower limit of the random variable
+     * @param ul The upper limit of the random variable
+     */
     public UniformDiscreteDistribution(int ll,int ul) {
         lowerLimit=ll;
         upperLimit=ul;
     }
     
+    /**
+     * Returns a random value that follows a discrete uniform distribution
+     * @return A random value
+     */
     public int sample() {
         return (int) (Math.random()*(upperLimit-lowerLimit+1)+lowerLimit);
     }
     
     /**
+     * Tests for the class
      * @param args the command line arguments
      */
     public static void main(String[] args) {

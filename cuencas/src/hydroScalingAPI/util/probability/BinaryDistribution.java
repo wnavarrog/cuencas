@@ -27,7 +27,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.util.probability;
 
 /**
- *
+ * An implementation of {@link hydroScalingAPI.util.probability.DiscreteDistribution}
+ * using a binary distribution P(a) = p and P(b)= 1-p
  * @author Ricardo Mantilla
  */
 public class BinaryDistribution implements hydroScalingAPI.util.probability.DiscreteDistribution{
@@ -35,18 +36,28 @@ public class BinaryDistribution implements hydroScalingAPI.util.probability.Disc
     private int value0, value1;
     private double p_value0;
     
-    /** Creates a new instance of UniformDistribution */
+    /**
+     * Creates a new instance of BinaryDistribution
+     * @param n0 The first possible outcome
+     * @param n1 The second possible outcome
+     * @param p0 The probability to return the first possible outcome
+     */
     public BinaryDistribution(int n0, int n1, double p0) {
         value0=n0;
         value1=n1;
         p_value0=p0;
     }
     
+    /**
+     * Returns a random value that follows a binary distribution
+     * @return A random value
+     */
     public int sample() {
         return (Math.random()<p_value0)?value0:value1;
     }
     
     /**
+     * Tests for the class
      * @param args the command line arguments
      */
     public static void main(String[] args) {

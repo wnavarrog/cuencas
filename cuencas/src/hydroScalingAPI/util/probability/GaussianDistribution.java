@@ -27,7 +27,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.util.probability;
 
 /**
- *
+ * An implementation of {@link hydroScalingAPI.util.probability.ContinuousDistribution}
+ * using a gaussian distribution
  * @author Ricardo Mantilla
  */
 public class GaussianDistribution implements hydroScalingAPI.util.probability.ContinuousDistribution{
@@ -35,18 +36,27 @@ public class GaussianDistribution implements hydroScalingAPI.util.probability.Co
     private float mean, stdev;
     private java.util.Random rn;
     
-    /** Creates a new instance of UniformDistribution */
+    /**
+     * Creates a new instance of GaussianDistribution
+     * @param m The mean
+     * @param s The standard deviation
+     */
     public GaussianDistribution(float m,float s) {
         mean=m;
         stdev=s;
         rn=new java.util.Random();
     }
     
+    /**
+     * Returns a random value that follows a gaussian distribution
+     * @return A random value
+     */
     public float sample() {
         return (float) (rn.nextGaussian()*stdev+mean);
     }
     
     /**
+     * Tests for the class
      * @param args the command line arguments
      */
     public static void main(String[] args) {
