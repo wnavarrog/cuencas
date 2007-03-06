@@ -331,7 +331,7 @@
                         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
                           <Image iconType="3" name="/hydroScalingAPI/subGUIs/configuration/icons/CutSubDem.gif"/>
                         </Property>
-                        <Property name="toolTipText" type="java.lang.String" value="Create New Location"/>
+                        <Property name="toolTipText" type="java.lang.String" value="Cut Map Section"/>
                         <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                           <Dimension value="[18, 18]"/>
                         </Property>

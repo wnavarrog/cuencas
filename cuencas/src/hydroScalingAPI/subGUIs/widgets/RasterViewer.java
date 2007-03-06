@@ -122,7 +122,7 @@ public abstract class RasterViewer extends javax.swing.JInternalFrame {
         blue=   mainFrame.getInfoManager().getNetworkBlue();
         
         initComponents();
-        setSize(650,700);
+        setSize(650,600);
         
         updateRelatedMaps();
         addInternalFrameListener(mainFrame);
@@ -1210,7 +1210,7 @@ public abstract class RasterViewer extends javax.swing.JInternalFrame {
         locationToolbar.add(createLocation);
 
         cutSubDataSet.setIcon(new javax.swing.ImageIcon(getClass().getResource("/hydroScalingAPI/subGUIs/configuration/icons/CutSubDem.gif")));
-        cutSubDataSet.setToolTipText("Create New Location");
+        cutSubDataSet.setToolTipText("Cut Map Section");
         cutSubDataSet.setMaximumSize(new java.awt.Dimension(18, 18));
         cutSubDataSet.setMinimumSize(new java.awt.Dimension(18, 18));
         cutSubDataSet.setPreferredSize(new java.awt.Dimension(18, 18));

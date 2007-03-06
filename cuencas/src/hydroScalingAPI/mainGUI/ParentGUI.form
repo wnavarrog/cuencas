@@ -1103,6 +1103,9 @@
                                     </Property>
                                     <Property name="text" type="java.lang.String" value="Get Time Series"/>
                                   </Properties>
+                                  <Events>
+                                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="launchTSAnalyzerActionPerformed"/>
+                                  </Events>
                                 </Component>
                                 <Component class="javax.swing.JButton" name="gaugesToDisplay">
                                   <Properties>

@@ -750,6 +750,12 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
 
         launchTSAnalyzer.setFont(new java.awt.Font("Dialog", 0, 10));
         launchTSAnalyzer.setText("Get Time Series");
+        launchTSAnalyzer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                launchTSAnalyzerActionPerformed(evt);
+            }
+        });
+
         jPanel4.add(launchTSAnalyzer);
 
         gaugesToDisplay.setFont(new java.awt.Font("Dialog", 0, 10));
@@ -1334,6 +1340,13 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void launchTSAnalyzerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_launchTSAnalyzerActionPerformed
+        Object[] toView=activeGaugesContainer.getSelectedValues();
+        hydroScalingAPI.io.MetaGauge gaugeInfo=(hydroScalingAPI.io.MetaGauge)toView[0];
+        hydroScalingAPI.modules.analysis_TS.widgets.TimeSeriesViewer gauView=new hydroScalingAPI.modules.analysis_TS.widgets.TimeSeriesViewer(this,gaugeInfo);
+        gauView.setVisible(true);
+    }//GEN-LAST:event_launchTSAnalyzerActionPerformed
 
     private void mapEditorItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mapEditorItemActionPerformed
         
