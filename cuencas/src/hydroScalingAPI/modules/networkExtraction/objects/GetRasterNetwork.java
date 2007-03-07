@@ -115,6 +115,8 @@ public abstract class GetRasterNetwork extends Object {
      */
     public static void cleanShorts(NetworkExtractionModule Proc){
         if (Proc.printDebug) System.out.println(">>> Cleaning short streams");
+        
+        GetGeomorphologyRAM.getORD(Proc);
         byte[][] cleanRedRas=new byte[Proc.DIR.length][Proc.DIR[0].length];
         for (int i=1; i<Proc.DIR.length-1; i++){
             for (int j=1; j<Proc.DIR[0].length-1; j++){
@@ -123,9 +125,18 @@ public abstract class GetRasterNetwork extends Object {
                     for (int k=0; k <= 8; k++){
                         if (Proc.RedRas[i+(k/3)-1][j+(k%3)-1]==1 && Proc.DIR[i+(k/3)-1][j+(k%3)-1]==9-k) llegan++;
                     }
+                    int iPn = i-1+(Proc.DIR[i][j]-1)/3;
+                    int jPn = j-1+(Proc.DIR[i][j]-1)%3;
                     
-                    if(llegan > 0){
-                        cleanRedRas[i][j]=1;
+                    if(Proc.DIR[iPn][jPn] > 0){
+                        int iPm = iPn-1+(Proc.DIR[iPn][jPn]-1)/3;
+                        int jPm = jPn-1+(Proc.DIR[iPn][jPn]-1)%3;
+                        
+                        if(llegan == 0 && Proc.GEO[iPm][jPm].orden > 1){
+                            cleanRedRas[i][j]=0;
+                        } else {
+                            cleanRedRas[i][j]=1;
+                        }
                     }
                 }
             }
