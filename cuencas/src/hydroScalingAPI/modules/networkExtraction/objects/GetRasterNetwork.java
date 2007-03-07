@@ -134,6 +134,7 @@ public abstract class GetRasterNetwork extends Object {
                         
                         if(llegan == 0 && Proc.GEO[iPm][jPm].orden > 1){
                             cleanRedRas[i][j]=0;
+                            if(Proc.GEO[iPn][jPn].orden == 1)  cleanRedRas[iPn][jPn]=0;
                         } else {
                             cleanRedRas[i][j]=1;
                         }

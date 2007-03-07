@@ -531,7 +531,6 @@ public class NetworkExtractionModule implements Runnable {
             }
             
             GetRasterNetwork.cleanShorts(this);
-            GetRasterNetwork.cleanShorts(this);
             
             if(!areaPend_cargar && !areaPend_nuevo && !areaPend_LA )
                 writeRED(metaDEM.getLocationBinaryFile());
