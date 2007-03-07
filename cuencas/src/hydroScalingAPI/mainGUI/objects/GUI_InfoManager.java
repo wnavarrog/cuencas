@@ -162,6 +162,10 @@ public class GUI_InfoManager {
      * The path to the logo.jpg in the database
      */
     public java.io.File dataBaseLogoPath;
+    /**
+     * The path to the name.txt file in the database
+     */
+    public java.io.File dataBaseNamePath;
     
     /**
      * The path to the active metaFile (Used by GUI tools)
@@ -349,7 +353,7 @@ public class GUI_InfoManager {
         dataBaseSitesLocationsPath=new java.io.File(dataBasePath.getPath()+"/Sites/Locations/");
         dataBaseDocumentationPath=new java.io.File(dataBasePath.getPath()+"/Documentation/");
         dataBaseLogoPath=new java.io.File(dataBasePath.getPath()+"/logo.jpg");
-        java.io.File dataBaseNamePath=new java.io.File(dataBasePath.getPath()+"/name.txt");
+        dataBaseNamePath=new java.io.File(dataBasePath.getPath()+"/name.txt");
         
         dataBaseRastersDemExists=dataBaseRastersDemPath.exists();
         dataBaseRastersHydExists=dataBaseRastersHydPath.exists();

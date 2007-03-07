@@ -105,6 +105,12 @@ public class NetworkTools extends javax.swing.JDialog {
 
         BasinMask.setFont(new java.awt.Font("Dialog", 0, 10));
         BasinMask.setText("Create Basin Mask File");
+        BasinMask.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                BasinMaskActionPerformed(evt);
+            }
+        });
+
         getContentPane().add(BasinMask);
 
         BasinDivideToPoly.setFont(new java.awt.Font("Dialog", 0, 10));
@@ -129,6 +135,10 @@ public class NetworkTools extends javax.swing.JDialog {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void BasinMaskActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BasinMaskActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_BasinMaskActionPerformed
 
     private void TribsInputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TribsInputActionPerformed
         try{

@@ -63,6 +63,15 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
     }
     
     /**
+     * Updates the Database name label
+     * @param label The new name for the database
+     */
+    public void updateDBNameLabel(String label){
+        localInfoManager.dataBaseName=label;
+        dbName.setText(label);
+    }
+    
+    /**
      * Checks the information in the database (like directories, files, etc)
      * and updates the GUI
      * @param justUpdate A boolean indicating if the GUI needs to be updated (true) or created for the
@@ -413,6 +422,8 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         jMenuItem3 = new javax.swing.JMenuItem();
         jSeparator5 = new javax.swing.JSeparator();
         mapEditorItem = new javax.swing.JMenuItem();
+        dbProps = new javax.swing.JPopupMenu();
+        editDBName = new javax.swing.JMenuItem();
         splitPane = new javax.swing.JSplitPane();
         subGUIs_container = new javax.swing.JDesktopPane();
         jPanel2 = new javax.swing.JPanel();
@@ -568,6 +579,16 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         });
 
         mapToolsPopup.add(mapEditorItem);
+
+        editDBName.setFont(new java.awt.Font("Lucida Grande", 0, 10));
+        editDBName.setText("Rename Database");
+        editDBName.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                editDBNameActionPerformed(evt);
+            }
+        });
+
+        dbProps.add(editDBName);
 
         setTitle("Multiscale Hydrology for Ungauged Basins");
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -878,6 +899,12 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         dbName.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         dbName.setText("Database Name");
         dbName.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        dbName.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                dbNameMouseReleased(evt);
+            }
+        });
+
         jPanel2.add(dbName, java.awt.BorderLayout.NORTH);
 
         splitPane.setLeftComponent(jPanel2);
@@ -1335,6 +1362,16 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void editDBNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editDBNameActionPerformed
+        new hydroScalingAPI.subGUIs.widgets.ChangeDBName(this).setVisible(true);
+    }//GEN-LAST:event_editDBNameActionPerformed
+
+    private void dbNameMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_dbNameMouseReleased
+        if(evt.getButton() == 3){
+            dbProps.show(evt.getComponent(),evt.getX(),evt.getY());
+        }
+    }//GEN-LAST:event_dbNameMouseReleased
+
     private void launchTSAnalyzerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_launchTSAnalyzerActionPerformed
         Object[] toView=activeGaugesContainer.getSelectedValues();
         hydroScalingAPI.io.MetaGauge gaugeInfo=(hydroScalingAPI.io.MetaGauge)toView[0];
@@ -1664,8 +1701,8 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         new java.io.File(dirOutput.getPath()+"/Documentation/").mkdirs();
         hydroScalingAPI.tools.FileManipulation.CopyFile(new java.io.File(getClass().getResource("/hydroScalingAPI/mainGUI/configuration/images/defaultDB.jpg").getPath()),new java.io.File(dirOutput.getPath()+"/logo.jpg"));
         try{
-            java.io.File dbName=new java.io.File(dirOutput.getPath()+"/name.txt");
-            java.io.BufferedWriter metaBuffer = new java.io.BufferedWriter(new java.io.FileWriter(dbName));
+            java.io.File dbNameFile=new java.io.File(dirOutput.getPath()+"/name.txt");
+            java.io.BufferedWriter metaBuffer = new java.io.BufferedWriter(new java.io.FileWriter(dbNameFile));
             metaBuffer.write("Unamed Database"+"\n");
             metaBuffer.close();
         } catch (java.io.IOException ioe){
@@ -1983,9 +2020,11 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
     private javax.swing.JMenuItem createDB;
     private javax.swing.JTabbedPane dataBaseTabs;
     private javax.swing.JTextField dbName;
+    private javax.swing.JPopupMenu dbProps;
     private javax.swing.JPanel dlgsContainer;
     private javax.swing.JPanel dlgsPanel;
     private javax.swing.JPanel documents;
+    private javax.swing.JMenuItem editDBName;
     private javax.swing.JButton editGauge;
     private javax.swing.JButton editLocation;
     private javax.swing.JButton editorButton;
