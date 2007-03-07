@@ -63,8 +63,8 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
     }
     
     /**
-     * Checks or updates the information in the database (like directories, files, etc)
-     * to be reflected by the GUI
+     * Checks the information in the database (like directories, files, etc)
+     * and updates the GUI
      * @param justUpdate A boolean indicating if the GUI needs to be updated (true) or created for the
      * first time (false)
      */
@@ -525,7 +525,6 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         quit = new javax.swing.JMenuItem();
         tools = new javax.swing.JMenu();
         mapCalc = new javax.swing.JMenuItem();
-        actions = new javax.swing.JMenu();
         options = new javax.swing.JMenu();
         colors = new javax.swing.JMenuItem();
         preferences = new javax.swing.JMenuItem();
@@ -1217,15 +1216,10 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         mapCalc.setFont(new java.awt.Font("Verdana", 0, 10));
         mapCalc.setMnemonic('c');
         mapCalc.setText("Map Calculator");
+        mapCalc.setEnabled(false);
         tools.add(mapCalc);
 
         jMenuBar1.add(tools);
-
-        actions.setMnemonic('a');
-        actions.setText("Actions");
-        actions.setFont(new java.awt.Font("Verdana", 0, 10));
-        actions.setEnabled(false);
-        jMenuBar1.add(actions);
 
         options.setMnemonic('o');
         options.setText("Options");
@@ -1973,7 +1967,6 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem about;
-    private javax.swing.JMenu actions;
     private javax.swing.JList activeGaugesContainer;
     private javax.swing.JList activeLocationsContainer;
     private javax.swing.JButton addDlgFile;
