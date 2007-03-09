@@ -42,15 +42,17 @@ public class Plot1 extends javax.swing.JDialog {
         initComponents ();
         pack ();
         double [] X = {1,2,3,1,2,3,1,2,3,3,4,5};
-        double [] Y = {3,5,4,6,5,3,4,8,7,2000,4,5};
+        double [] Y = {3,5,4,6,5,3,4,8,7,9,4,5};
         double [] Z = {20,4,8,7,3,5,4,6,5,-1,4,5};
         setBounds(100,50,800,600);
         int w=800;
         int h=600;
         Ppanel = new hydroScalingAPI.util.plot.XYJPanel( "Entropia", "fila ( tiempo )" , "Entropia");
         getContentPane ().add (Ppanel, java.awt.BorderLayout.CENTER);
-        Ppanel.addDatos(Z,X,-9999,java.awt.Color.red,2);
-        Ppanel.setXRange(0,100);
+        Ppanel.addDatos(X,X,-9999,java.awt.Color.red,5);
+        Ppanel.addDatos(X,Y,-9999,java.awt.Color.blue,5);
+        
+        Ppanel.setXRange(0,10);
     }
 
     /** This method is called from within the constructor to

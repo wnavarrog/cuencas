@@ -7,6 +7,8 @@
 package hydroScalingAPI.modules.tRIBS_io.widgets;
 
 
+import java.io.IOException;
+import java.util.Iterator;
 import visad.*;
 import visad.java2d.DisplayImplJ2D;
 import visad.java3d.DisplayImplJ3D;
@@ -31,7 +33,8 @@ public class TRIBS_io extends javax.swing.JDialog {
     private RealTupleType   espacioXLYL=new RealTupleType(new RealType[] {xEasting,yNorthing,nodeColor}),
                             domainXLYL=new RealTupleType(new RealType[] {xEasting,yNorthing});
     
-    private FunctionType func_xEasting_yNorthing=new FunctionType(xIndex, espacioXLYL);
+    private FunctionType func_xEasting_yNorthing=new FunctionType(xIndex, espacioXLYL),
+                         func_xEasting_yNorthing_to_Color=new FunctionType(domainXLYL,nodeColor);
     
     private hydroScalingAPI.mainGUI.ParentGUI mainFrame;
     
@@ -49,10 +52,11 @@ public class TRIBS_io extends javax.swing.JDialog {
     
     private hydroScalingAPI.modules.rainfallRunoffModel.objects.LinksInfo thisNetworkGeom;
     
-    private DisplayImplJ3D display_TIN;
-    private ScalarMap eastMap,northMap,pointsMap;
+    private DisplayImplJ3D display_TIN_I,display_TIN_O;
+    private ScalarMap eastMap_I,northMap_I,pointsMap_I,
+                      eastMap_O,northMap_O,pointsMap_O;
     
-    private visad.java3d.DisplayRendererJ3D dr;
+    private visad.java3d.DisplayRendererJ3D drI,drO;
     
     private byte[][] directionsKey={{1,2,3},{4,5,6},{7,8,9}};
     private java.util.Vector pointsInTriangulation,
@@ -64,7 +68,9 @@ public class TRIBS_io extends javax.swing.JDialog {
     private Delaunay delaun;
     private int numPointsBasin=0;
     private DataReferenceImpl data_refPoints,data_refTr,data_refPoly;
-    private ConstantMap[] pointsCMap,linesCMap,linesCMap1;
+    private ConstantMap[] pointsCMap,
+                          linesCMap,
+                          linesCMap1;
     
     /**
      * Creates new form TRIBS_io
@@ -106,53 +112,112 @@ public class TRIBS_io extends javax.swing.JDialog {
 
         thisNetworkGeom=new hydroScalingAPI.modules.rainfallRunoffModel.objects.LinksInfo(linksStructure);
         
+        //Graphical structure for aggregated response
+        hydroScalingAPI.util.plot.XYJPanel Ppanel1 = 
+                new hydroScalingAPI.util.plot.XYJPanel( "RTF File", "time [h]" , "Runoff [m^3/s]");
+        hydroScalingAPI.util.plot.XYJPanel Ppanel2 = 
+                new hydroScalingAPI.util.plot.XYJPanel( "qout Files", "time [h]" , "Discharge [m^3/s] / Stage [m]");
         
-        //Graphical structure for triangulated points
-        dr=new  visad.java3d.TwoDDisplayRendererJ3D();
-        display_TIN = new DisplayImplJ3D("displayTIN",dr);
+        rftPanel.add("Center",Ppanel1);
+        qoutPanel.add("Center",Ppanel2);
         
-        GraphicsModeControl dispGMC = (GraphicsModeControl) display_TIN.getGraphicsModeControl();
+        
+        //Graphical structure for input triangulated points
+        drI=new  visad.java3d.TwoDDisplayRendererJ3D();
+        display_TIN_I = new DisplayImplJ3D("display_TIN_I",drI);
+        
+        GraphicsModeControl dispGMC = (GraphicsModeControl) display_TIN_I.getGraphicsModeControl();
         dispGMC.setScaleEnable(true);
         
-        eastMap = new ScalarMap( xEasting , Display.XAxis );
-        eastMap.setScalarName("East Coordinate");
-        northMap = new ScalarMap( yNorthing , Display.YAxis );
-        northMap.setScalarName("North Coordinate");
-        pointsMap=new ScalarMap( nodeColor , Display.RGB );
+        eastMap_I = new ScalarMap( xEasting , Display.XAxis );
+        eastMap_I.setScalarName("East Coordinate");
+        northMap_I = new ScalarMap( yNorthing , Display.YAxis );
+        northMap_I.setScalarName("North Coordinate");
+        pointsMap_I=new ScalarMap( nodeColor , Display.RGB );
 
-        display_TIN.addMap(eastMap);
-        display_TIN.addMap(northMap);
-        display_TIN.addMap(pointsMap);
+        display_TIN_I.addMap(eastMap_I);
+        display_TIN_I.addMap(northMap_I);
+        display_TIN_I.addMap(pointsMap_I);
         
-        display_TIN.getComponent().addMouseWheelListener(new java.awt.event.MouseWheelListener() {
+        display_TIN_I.getComponent().addMouseWheelListener(new java.awt.event.MouseWheelListener() {
             public void mouseWheelMoved(java.awt.event.MouseWheelEvent e) {
                 int rot = e.getWheelRotation();
                 try{
-                    ProjectionControl pc1 = display_TIN.getProjectionControl();
-                    double[] scaleMatrix = dr.getMouseBehavior().make_matrix(0.0, 0.0, 0.0,
+                    ProjectionControl pc1 = display_TIN_I.getProjectionControl();
+                    double[] scaleMatrix = drI.getMouseBehavior().make_matrix(0.0, 0.0, 0.0,
                             1.0, 1.0, 1.0,
                             0.0, 0.0, 0.0);
                     double[] currentMatrix = pc1.getMatrix();
                     // Zoom in
                     if (rot < 0){
-                        scaleMatrix = dr.getMouseBehavior().make_matrix(0.0, 0.0, 0.0,
+                        scaleMatrix = drI.getMouseBehavior().make_matrix(0.0, 0.0, 0.0,
                                                                         1.1, 1.1, 1.1,
                                                                         0.0, 0.0, 0.0);
                     }
                     // Zoom out
                     if (rot > 0){
-                        scaleMatrix = dr.getMouseBehavior().make_matrix(0.0, 0.0, 0.0,
+                        scaleMatrix = drI.getMouseBehavior().make_matrix(0.0, 0.0, 0.0,
                                                                         0.9, 0.9, 0.9,
                                                                         0.0, 0.0, 0.0);
                     }
-                    scaleMatrix = dr.getMouseBehavior().multiply_matrix(scaleMatrix,currentMatrix);
+                    scaleMatrix = drI.getMouseBehavior().multiply_matrix(scaleMatrix,currentMatrix);
                     pc1.setMatrix(scaleMatrix);
                 } catch (java.rmi.RemoteException re) {} catch (visad.VisADException ve) {}
             }
         });
         
         initializePoints();
-        jPanel12.add("Center",display_TIN.getComponent());
+        jPanel12.add("Center",display_TIN_I.getComponent());
+        
+        //Graphical structure for output triangulated points
+        drO=new  visad.java3d.TwoDDisplayRendererJ3D();
+        display_TIN_O = new DisplayImplJ3D("display_TIN_O",drO);
+        
+        dispGMC = (GraphicsModeControl) display_TIN_O.getGraphicsModeControl();
+        dispGMC.setScaleEnable(true);
+        
+        eastMap_O = new ScalarMap( xEasting , Display.XAxis );
+        eastMap_O.setScalarName("East Coordinate");
+        northMap_O = new ScalarMap( yNorthing , Display.YAxis );
+        northMap_O.setScalarName("North Coordinate");
+        pointsMap_O=new ScalarMap( nodeColor , Display.RGB );
+
+        display_TIN_O.addMap(eastMap_O);
+        display_TIN_O.addMap(northMap_O);
+        display_TIN_O.addMap(pointsMap_O);
+        
+        display_TIN_O.getComponent().addMouseWheelListener(new java.awt.event.MouseWheelListener() {
+            public void mouseWheelMoved(java.awt.event.MouseWheelEvent e) {
+                int rot = e.getWheelRotation();
+                try{
+                    ProjectionControl pc1 = display_TIN_O.getProjectionControl();
+                    double[] scaleMatrix = drO.getMouseBehavior().make_matrix(0.0, 0.0, 0.0,
+                            1.0, 1.0, 1.0,
+                            0.0, 0.0, 0.0);
+                    double[] currentMatrix = pc1.getMatrix();
+                    // Zoom in
+                    if (rot < 0){
+                        scaleMatrix = drO.getMouseBehavior().make_matrix(0.0, 0.0, 0.0,
+                                                                        1.1, 1.1, 1.1,
+                                                                        0.0, 0.0, 0.0);
+                    }
+                    // Zoom out
+                    if (rot > 0){
+                        scaleMatrix = drO.getMouseBehavior().make_matrix(0.0, 0.0, 0.0,
+                                                                        0.9, 0.9, 0.9,
+                                                                        0.0, 0.0, 0.0);
+                    }
+                    scaleMatrix = drO.getMouseBehavior().multiply_matrix(scaleMatrix,currentMatrix);
+                    pc1.setMatrix(scaleMatrix);
+                } catch (java.rmi.RemoteException re) {} catch (visad.VisADException ve) {}
+            }
+        });
+        
+        jPanel17.add("Center",display_TIN_O.getComponent());
+        
+        if(!pathTextField.getText().equals("") && !baseNameTextField.getText().equals("")){
+            plotOutputPoints();
+        }
         
     }
     
@@ -416,6 +481,178 @@ public class TRIBS_io extends javax.swing.JDialog {
         }
     }
     
+    private java.io.File findTriEdgNodes(){
+        
+        
+        return null;
+    }
+    
+    private void plotOutputPoints() throws RemoteException, VisADException, java.io.IOException{
+        java.io.File pathToTriang=findTriEdgNodes();
+        pathToTriang=new java.io.File("/Users/ricardo/temp/TEST_VOI_OUT/SMALLBASIN/Output/voronoi");
+        String baseName="smallbasin";
+        
+        int countNoBorder=0;
+        
+        //Read nodes file
+        java.io.File nodeFile=new java.io.File(pathToTriang.getPath()+"/"+baseName+".nodes");
+        java.io.BufferedReader bufferNodes = new java.io.BufferedReader(new java.io.FileReader(nodeFile));
+        String fullLine;
+        fullLine=bufferNodes.readLine();
+        fullLine=bufferNodes.readLine();
+        int localNumPoints=Integer.parseInt(fullLine);
+        float[][] xyLinkValues=new float[3][localNumPoints];
+        for (int i = 0; i < localNumPoints; i++) {
+            String[] lineData=bufferNodes.readLine().split(" ");
+            xyLinkValues[0][i]=Float.parseFloat(lineData[0]);
+            xyLinkValues[1][i]=Float.parseFloat(lineData[1]);
+            xyLinkValues[2][i]=Float.parseFloat(lineData[3]);
+            if(xyLinkValues[2][i] != 1 && xyLinkValues[2][i] != 2) countNoBorder++;
+            
+        }
+        bufferNodes.close();
+        
+        float[][] linkAccumAVal=new float[1][xyLinkValues[1].length];
+        for(int i=0;i<xyLinkValues[0].length;i++){
+            linkAccumAVal[0][i]=(float)i;//xyLinkValues[0][i];
+        }
+        
+        Irregular1DSet xVarIndex=new Irregular1DSet(xIndex,linkAccumAVal);
+        
+        FlatField vals_ff_Li = new FlatField( func_xEasting_yNorthing, xVarIndex);
+        vals_ff_Li.setSamples( xyLinkValues );
+        
+        
+        hydroScalingAPI.tools.Stats eastStats=new hydroScalingAPI.tools.Stats(xyLinkValues[1]);
+        hydroScalingAPI.tools.Stats nortStats=new hydroScalingAPI.tools.Stats(xyLinkValues[0]);
+        
+        ProjectionControl pc = display_TIN_O.getProjectionControl();
+        
+        pc.setAspectCartesian(new double[] {1, (eastStats.maxValue-eastStats.minValue)/(nortStats.maxValue-nortStats.minValue)});        
+        
+        
+        //Read triangles file
+        java.io.File trianFile=new java.io.File(pathToTriang.getPath()+"/"+baseName+".tri");
+        java.io.BufferedReader bufferTrian = new java.io.BufferedReader(new java.io.FileReader(trianFile));
+        fullLine=bufferTrian.readLine();
+        fullLine=bufferTrian.readLine();
+        int localNumTrian=Integer.parseInt(fullLine);
+        int[][] triangulation=new int[localNumTrian][3];
+        for (int i = 0; i < localNumTrian; i++) {
+            String[] lineData=bufferTrian.readLine().split(" ");
+            triangulation[i][0]=Integer.parseInt(lineData[0]);
+            triangulation[i][1]=Integer.parseInt(lineData[1]);
+            triangulation[i][2]=Integer.parseInt(lineData[2]);
+            
+        }
+        bufferTrian.close();
+        
+        float[][] samples=new float[2][];
+        samples[0]=xyLinkValues[0];//.clone();
+        samples[1]=xyLinkValues[1];//.clone();
+        System.out.println("the DelaunayClarkson algorithm.");
+        long start = System.currentTimeMillis();
+        delaun = new DelaunayCustom(samples,triangulation);
+        long end = System.currentTimeMillis();
+        float time = (end - start) / 1000f;
+        System.out.println("Triangulation took " + time + " seconds.");
+        
+        Gridded2DSet[] triangles=new Gridded2DSet[delaun.Tri.length];
+
+        float[][] lines=new float[2][4];
+
+        for(int j=0;j<delaun.Tri.length;j++){
+            for(int i=0;i<3;i++){
+                lines[0][i]=samples[0][delaun.Tri[j][i]];
+                lines[1][i]=samples[1][delaun.Tri[j][i]];
+            }
+            lines[0][3]=samples[0][delaun.Tri[j][0]];
+            lines[1][3]=samples[1][delaun.Tri[j][0]];
+
+            triangles[j]=new Gridded2DSet(domainXLYL,lines,lines[0].length);
+
+        }
+
+        UnionSet allTriang=new UnionSet(domainXLYL,triangles);
+
+        //Read voronoi file
+        java.io.File voroFile=new java.io.File(pathToTriang.getPath()+"/"+baseName+"_voi");
+        java.io.BufferedReader bufferVoro = new java.io.BufferedReader(new java.io.FileReader(voroFile));
+        
+        java.util.Vector[] voroPolys=new java.util.Vector[countNoBorder];
+        
+        for (int i = 0; i < countNoBorder; i++) {
+            voroPolys[i]=new java.util.Vector();
+            fullLine=bufferVoro.readLine();
+            while(!fullLine.equalsIgnoreCase("END")){
+                fullLine=bufferVoro.readLine();
+                voroPolys[i].add(fullLine);
+            }
+            
+        }
+        bufferVoro.close();
+        
+        Gridded2DSet[] polygons=new Gridded2DSet[countNoBorder];
+        Irregular2DSet[] regions=new Irregular2DSet[countNoBorder];
+
+        lines=new float[2][];
+
+        for(int j=0;j<countNoBorder;j++){
+            lines = new float[2][voroPolys[j].size()-1];
+            
+            for(int i=0;i<voroPolys[j].size()-1;i++){
+                String[] lineData=((String)voroPolys[j].get(i)).split(",");
+                lines[0][i]=Float.parseFloat(lineData[0]);
+                lines[1][i]=Float.parseFloat(lineData[1]);
+            }
+
+            polygons[j]=new Gridded2DSet(domainXLYL,lines,lines[0].length);
+
+//            Delaunay dela1=new DelaunayClarkson(lines);
+//            
+            regions[j] = DelaunayCustom.fill(polygons[j]);
+
+            //float theColor=3.0f*(float)Math.random();
+            //for (int i = j*4; i < (j+1)*4; i++) colors[0][i]=theColor;
+        }
+
+        UnionSet allPoly=new UnionSet(domainXLYL,polygons);
+        
+        UnionSet allRegions=new UnionSet(domainXLYL,regions);
+
+        float[][] colors=new float[1][allRegions.getLength()];
+        for (int i = 0; i < colors[0].length; i++) {
+            colors[0][i]=2.6f*(float)Math.random();
+        }
+        
+        FlatField theColors=new FlatField(func_xEasting_yNorthing_to_Color,allRegions);
+        theColors.setSamples(colors);
+
+        DataReference region_ref = new DataReferenceImpl("region");
+        region_ref.setData(theColors);
+        //display_TIN_O.addReference( region_ref );
+        
+        DataReferenceImpl local_data_refPoints = new DataReferenceImpl("data_ref_Points");
+        local_data_refPoints.setData(vals_ff_Li);
+        
+        ConstantMap[] local_pointsCMap = new ConstantMap[] {new ConstantMap( 10.50f, Display.PointSize)};
+        display_TIN_O.addReference( local_data_refPoints, local_pointsCMap );
+        
+        DataReferenceImpl local_data_refTr = new DataReferenceImpl("data_ref_Trian");
+        local_data_refTr.setData(allTriang);
+        display_TIN_O.addReference( local_data_refTr );
+        
+        DataReferenceImpl local_data_refPoly = new DataReferenceImpl("data_ref_poly");
+        local_data_refPoly.setData(allPoly);
+        ConstantMap[] local_linesCMap1 = new ConstantMap[] {    new ConstantMap( 1.0f, Display.Red),
+                                            new ConstantMap( 0.0f, Display.Green),
+                                            new ConstantMap( 1.0f, Display.Blue),
+                                            new ConstantMap( 1.50f, Display.LineWidth)};
+
+        display_TIN_O.addReference( local_data_refPoly,local_linesCMap1 );
+            
+    }
+    
     private void plotPoints(float Zr) throws RemoteException, VisADException{
         
         int[][] xyBasin=myCuenca.getXYBasin();
@@ -482,9 +719,8 @@ public class TRIBS_io extends javax.swing.JDialog {
             samples[1]=xyLinkValues[1];//.clone();
             System.out.println("the DelaunayClarkson algorithm.");
             long start = System.currentTimeMillis();
-            Delaunay.perturb(samples,0.1f,false);
+            Delaunay.perturb(samples,0.01f,false);
             delaun = (Delaunay) new DelaunayClarkson(samples);
-            delaun.improve(samples,1);
             long end = System.currentTimeMillis();
             float time = (end - start) / 1000f;
             System.out.println("Triangulation took " + time + " seconds.");
@@ -510,7 +746,11 @@ public class TRIBS_io extends javax.swing.JDialog {
             
             
             Gridded2DSet[] triangles=new Gridded2DSet[delaun.Tri.length];
+            Irregular2DSet[] regions=new Irregular2DSet[delaun.Tri.length];
+            
+            float[][] colors=new float[1][4*delaun.Tri.length];
             float[][] lines=new float[2][4];
+            
             for(int j=0;j<delaun.Tri.length;j++){
                 for(int i=0;i<3;i++){
                     lines[0][i]=samples[0][delaun.Tri[j][i]];
@@ -518,12 +758,28 @@ public class TRIBS_io extends javax.swing.JDialog {
                 }
                 lines[0][3]=samples[0][delaun.Tri[j][0]];
                 lines[1][3]=samples[1][delaun.Tri[j][0]];
+                
                 triangles[j]=new Gridded2DSet(domainXLYL,lines,lines[0].length);
+                
+                regions[j] = new Irregular2DSet(domainXLYL,lines);
+                
+                float theColor=3.0f*(float)Math.random();
+                for (int i = j*4; i < (j+1)*4; i++) colors[0][i]=theColor;
             }
+            
             UnionSet allTriang=new UnionSet(domainXLYL,triangles);
             
             data_refTr.setData(allTriang);
-            
+
+            UnionSet allRegions=new UnionSet(domainXLYL,regions);
+
+            FlatField theColors=new FlatField(func_xEasting_yNorthing_to_Color,allRegions);
+            theColors.setSamples(colors);
+
+            DataReference region_ref = new DataReferenceImpl("region");
+            region_ref.setData(theColors);
+
+            //display_TIN_I.addReference(region_ref);
             
             int numValidPoints=0;
             for(int j=0;j<xyLinkValues[2].length;j++) {
@@ -602,6 +858,7 @@ public class TRIBS_io extends javax.swing.JDialog {
                 }
             }
             UnionSet allPoly=new UnionSet(domainXLYL,polygons);
+            
             //Gridded2DSet allPoly=polygons[1];
             data_refPoly.setData(allPoly);
             
@@ -816,7 +1073,7 @@ public class TRIBS_io extends javax.swing.JDialog {
         hydroScalingAPI.tools.Stats eastStats=new hydroScalingAPI.tools.Stats(xyLinkValues[1]);
         hydroScalingAPI.tools.Stats nortStats=new hydroScalingAPI.tools.Stats(xyLinkValues[0]);
         
-        ProjectionControl pc = display_TIN.getProjectionControl();
+        ProjectionControl pc = display_TIN_I.getProjectionControl();
         
         pc.setAspectCartesian(new double[] {1, (eastStats.maxValue-eastStats.minValue)/(nortStats.maxValue-nortStats.minValue)});        
         
@@ -835,12 +1092,12 @@ public class TRIBS_io extends javax.swing.JDialog {
         
         pointsCMap = new ConstantMap[] {new ConstantMap( 10.50f, Display.PointSize)};
 
-        display_TIN.addReference( data_refPoints,pointsCMap );
+        display_TIN_I.addReference( data_refPoints,pointsCMap );
         
         data_refTr = new DataReferenceImpl("data_ref_TRIANG");
         linesCMap = new ConstantMap[] {new ConstantMap( 0.50f, Display.LineWidth)};
 
-        display_TIN.addReference( data_refTr,linesCMap );
+        display_TIN_I.addReference( data_refTr,linesCMap );
         
         data_refPoly = new DataReferenceImpl("data_ref_poly");
         linesCMap1 = new ConstantMap[] {    new ConstantMap( 1.0f, Display.Red),
@@ -848,7 +1105,7 @@ public class TRIBS_io extends javax.swing.JDialog {
                                             new ConstantMap( 1.0f, Display.Blue),
                                             new ConstantMap( 1.50f, Display.LineWidth)};
 
-        display_TIN.addReference( data_refPoly,linesCMap1 );
+        display_TIN_I.addReference( data_refPoly,linesCMap1 );
         
         filteredPointsInTriangulation=(java.util.Vector)pointsInTriangulation.clone();
         filteredTypeOfPoint=(java.util.Vector)typeOfPoint.clone();
@@ -883,7 +1140,7 @@ public class TRIBS_io extends javax.swing.JDialog {
      */
     // <editor-fold defaultstate="collapsed" desc=" Generated Code ">//GEN-BEGIN:initComponents
     private void initComponents() {
-        jTabbedPane1 = new javax.swing.JTabbedPane();
+        panel_IO = new javax.swing.JTabbedPane();
         jPanel10 = new javax.swing.JPanel();
         panelOpciones = new javax.swing.JTabbedPane();
         jPanel1 = new javax.swing.JPanel();
@@ -902,9 +1159,41 @@ public class TRIBS_io extends javax.swing.JDialog {
         jPanel6 = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
         jPanel8 = new javax.swing.JPanel();
+        jPanel13 = new javax.swing.JPanel();
+        jPanel14 = new javax.swing.JPanel();
         jPanel9 = new javax.swing.JPanel();
         jPanel11 = new javax.swing.JPanel();
         jTabbedPane2 = new javax.swing.JTabbedPane();
+        jPanel16 = new javax.swing.JPanel();
+        rftPanel = new javax.swing.JPanel();
+        jPanel21 = new javax.swing.JPanel();
+        jLabel4 = new javax.swing.JLabel();
+        jCheckBox1 = new javax.swing.JCheckBox();
+        jCheckBox2 = new javax.swing.JCheckBox();
+        jCheckBox3 = new javax.swing.JCheckBox();
+        jCheckBox4 = new javax.swing.JCheckBox();
+        qoutPanel = new javax.swing.JPanel();
+        jPanel23 = new javax.swing.JPanel();
+        jLabel5 = new javax.swing.JLabel();
+        jComboBox1 = new javax.swing.JComboBox();
+        jCheckBox5 = new javax.swing.JCheckBox();
+        jCheckBox6 = new javax.swing.JCheckBox();
+        jPanel17 = new javax.swing.JPanel();
+        jPanel20 = new javax.swing.JPanel();
+        jComboBox2 = new javax.swing.JComboBox();
+        jComboBox3 = new javax.swing.JComboBox();
+        jPanel22 = new javax.swing.JPanel();
+        pointsCheckBox1 = new javax.swing.JCheckBox();
+        trianglesCheckBox1 = new javax.swing.JCheckBox();
+        voronoiCheckBox1 = new javax.swing.JCheckBox();
+        jPanel15 = new javax.swing.JPanel();
+        jPanel18 = new javax.swing.JPanel();
+        changePath = new javax.swing.JButton();
+        jLabel2 = new javax.swing.JLabel();
+        pathTextField = new javax.swing.JTextField();
+        jPanel19 = new javax.swing.JPanel();
+        jLabel3 = new javax.swing.JLabel();
+        baseNameTextField = new javax.swing.JTextField();
 
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
@@ -912,7 +1201,7 @@ public class TRIBS_io extends javax.swing.JDialog {
             }
         });
 
-        jTabbedPane1.setTabLayoutPolicy(javax.swing.JTabbedPane.SCROLL_TAB_LAYOUT);
+        panel_IO.setTabLayoutPolicy(javax.swing.JTabbedPane.SCROLL_TAB_LAYOUT);
         jPanel10.setLayout(new java.awt.BorderLayout());
 
         jPanel1.setLayout(new java.awt.BorderLayout());
@@ -1016,22 +1305,222 @@ public class TRIBS_io extends javax.swing.JDialog {
 
         panelOpciones.addTab("Rainfall", jPanel8);
 
+        panelOpciones.addTab("Ground Water", jPanel13);
+
+        panelOpciones.addTab("Weather", jPanel14);
+
         panelOpciones.addTab("Input File", jPanel9);
 
         jPanel10.add(panelOpciones, java.awt.BorderLayout.CENTER);
 
-        jTabbedPane1.addTab("Input Options", jPanel10);
+        panel_IO.addTab("Input Options", jPanel10);
 
         jPanel11.setLayout(new java.awt.BorderLayout());
 
+        jPanel16.setLayout(new java.awt.GridLayout(2, 0));
+
+        rftPanel.setLayout(new java.awt.BorderLayout());
+
+        jPanel21.setLayout(new java.awt.GridLayout(6, 0));
+
+        jLabel4.setFont(new java.awt.Font("Lucida Grande", 0, 10));
+        jLabel4.setText("Runoff Component Time Series (*.rft)");
+        jPanel21.add(jLabel4);
+
+        jCheckBox1.setFont(new java.awt.Font("Lucida Grande", 0, 10));
+        jCheckBox1.setSelected(true);
+        jCheckBox1.setText("Infiltration-excess Runoff");
+        jCheckBox1.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        jCheckBox1.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        jPanel21.add(jCheckBox1);
+
+        jCheckBox2.setFont(new java.awt.Font("Lucida Grande", 0, 10));
+        jCheckBox2.setSelected(true);
+        jCheckBox2.setText("Saturation-excess Runoff");
+        jCheckBox2.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        jCheckBox2.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        jPanel21.add(jCheckBox2);
+
+        jCheckBox3.setFont(new java.awt.Font("Lucida Grande", 0, 10));
+        jCheckBox3.setSelected(true);
+        jCheckBox3.setText("Perched Return Flow");
+        jCheckBox3.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        jCheckBox3.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        jPanel21.add(jCheckBox3);
+
+        jCheckBox4.setFont(new java.awt.Font("Lucida Grande", 0, 10));
+        jCheckBox4.setSelected(true);
+        jCheckBox4.setText("Groundwater Exfiltration");
+        jCheckBox4.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        jCheckBox4.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        jPanel21.add(jCheckBox4);
+
+        rftPanel.add(jPanel21, java.awt.BorderLayout.WEST);
+
+        jPanel16.add(rftPanel);
+
+        qoutPanel.setLayout(new java.awt.BorderLayout());
+
+        jPanel23.setLayout(new java.awt.GridLayout(6, 0));
+
+        jLabel5.setFont(new java.awt.Font("Lucida Grande", 0, 10));
+        jLabel5.setText("Discharge Time Series (*.qout)");
+        jLabel5.setMaximumSize(new java.awt.Dimension(179, 13));
+        jLabel5.setMinimumSize(new java.awt.Dimension(179, 13));
+        jLabel5.setPreferredSize(new java.awt.Dimension(179, 13));
+        jPanel23.add(jLabel5);
+
+        jComboBox1.setFont(new java.awt.Font("Lucida Grande", 0, 10));
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Outlet", "Internal Node 1", "Internal Node 2", "Internal Node 3", "Internal Node 4" }));
+        jPanel23.add(jComboBox1);
+
+        jCheckBox5.setFont(new java.awt.Font("Lucida Grande", 0, 10));
+        jCheckBox5.setSelected(true);
+        jCheckBox5.setText("Discharge");
+        jCheckBox5.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        jCheckBox5.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        jPanel23.add(jCheckBox5);
+
+        jCheckBox6.setFont(new java.awt.Font("Lucida Grande", 0, 10));
+        jCheckBox6.setSelected(true);
+        jCheckBox6.setText("Channel stage");
+        jCheckBox6.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        jCheckBox6.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        jPanel23.add(jCheckBox6);
+
+        qoutPanel.add(jPanel23, java.awt.BorderLayout.WEST);
+
+        jPanel16.add(qoutPanel);
+
+        jTabbedPane2.addTab("Temporal Response", jPanel16);
+
+        jPanel17.setLayout(new java.awt.BorderLayout());
+
+        jPanel20.setLayout(new java.awt.GridLayout(1, 2));
+
+        jComboBox2.setFont(new java.awt.Font("Lucida Grande", 0, 10));
+        jComboBox2.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Available Times", "Time 01", "Time 02", "Time 03", "Time 04", "Time-integrated Spatial Output" }));
+        jPanel20.add(jComboBox2);
+
+        jComboBox3.setFont(new java.awt.Font("Lucida Grande", 0, 10));
+        jComboBox3.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Available Variables", "Variable 01", "Variable 02", "Variable 03", "Variable 04" }));
+        jPanel20.add(jComboBox3);
+
+        jPanel17.add(jPanel20, java.awt.BorderLayout.NORTH);
+
+        jPanel22.setLayout(new java.awt.GridLayout(1, 3));
+
+        pointsCheckBox1.setFont(new java.awt.Font("Lucida Grande", 0, 10));
+        pointsCheckBox1.setSelected(true);
+        pointsCheckBox1.setText("Show Points");
+        pointsCheckBox1.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        pointsCheckBox1.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        pointsCheckBox1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pointsCheckBox1ActionPerformed(evt);
+            }
+        });
+
+        jPanel22.add(pointsCheckBox1);
+
+        trianglesCheckBox1.setFont(new java.awt.Font("Lucida Grande", 0, 10));
+        trianglesCheckBox1.setSelected(true);
+        trianglesCheckBox1.setText("Show Triangles");
+        trianglesCheckBox1.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        trianglesCheckBox1.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        trianglesCheckBox1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                trianglesCheckBox1ActionPerformed(evt);
+            }
+        });
+
+        jPanel22.add(trianglesCheckBox1);
+
+        voronoiCheckBox1.setFont(new java.awt.Font("Lucida Grande", 0, 10));
+        voronoiCheckBox1.setSelected(true);
+        voronoiCheckBox1.setText("Show Voronoi Polygons");
+        voronoiCheckBox1.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        voronoiCheckBox1.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        voronoiCheckBox1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                voronoiCheckBox1ActionPerformed(evt);
+            }
+        });
+
+        jPanel22.add(voronoiCheckBox1);
+
+        jPanel17.add(jPanel22, java.awt.BorderLayout.SOUTH);
+
+        jTabbedPane2.addTab("Spatial Response", jPanel17);
+
         jPanel11.add(jTabbedPane2, java.awt.BorderLayout.CENTER);
 
-        jTabbedPane1.addTab("Output Analysis", jPanel11);
+        panel_IO.addTab("Output Analysis", jPanel11);
 
-        getContentPane().add(jTabbedPane1, java.awt.BorderLayout.CENTER);
+        getContentPane().add(panel_IO, java.awt.BorderLayout.CENTER);
+
+        jPanel15.setLayout(new java.awt.GridLayout(2, 1, 0, 3));
+
+        jPanel18.setLayout(new java.awt.BorderLayout());
+
+        changePath.setFont(new java.awt.Font("Lucida Grande", 0, 10));
+        changePath.setText("Change Reference Path");
+        changePath.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                changePathActionPerformed(evt);
+            }
+        });
+
+        jPanel18.add(changePath, java.awt.BorderLayout.EAST);
+
+        jLabel2.setFont(new java.awt.Font("Lucida Grande", 0, 10));
+        jLabel2.setText("Reference Path : ");
+        jPanel18.add(jLabel2, java.awt.BorderLayout.WEST);
+
+        pathTextField.setFont(new java.awt.Font("Lucida Grande", 0, 10));
+        jPanel18.add(pathTextField, java.awt.BorderLayout.CENTER);
+
+        jPanel15.add(jPanel18);
+
+        jPanel19.setLayout(new java.awt.BorderLayout());
+
+        jLabel3.setFont(new java.awt.Font("Lucida Grande", 0, 10));
+        jLabel3.setText("Base Name : ");
+        jPanel19.add(jLabel3, java.awt.BorderLayout.WEST);
+
+        baseNameTextField.setFont(new java.awt.Font("Lucida Grande", 0, 10));
+        jPanel19.add(baseNameTextField, java.awt.BorderLayout.CENTER);
+
+        jPanel15.add(jPanel19);
+
+        getContentPane().add(jPanel15, java.awt.BorderLayout.SOUTH);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void voronoiCheckBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_voronoiCheckBox1ActionPerformed
+// TODO add your handling code here:
+    }//GEN-LAST:event_voronoiCheckBox1ActionPerformed
+
+    private void trianglesCheckBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_trianglesCheckBox1ActionPerformed
+// TODO add your handling code here:
+    }//GEN-LAST:event_trianglesCheckBox1ActionPerformed
+
+    private void pointsCheckBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pointsCheckBox1ActionPerformed
+// TODO add your handling code here:
+    }//GEN-LAST:event_pointsCheckBox1ActionPerformed
+
+    private void changePathActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_changePathActionPerformed
+        try {
+            plotOutputPoints();
+        } catch (RemoteException ex) {
+            ex.printStackTrace();
+        } catch (VisADException ex) {
+            ex.printStackTrace();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }//GEN-LAST:event_changePathActionPerformed
 
     private void exportPoiButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportPoiButtonActionPerformed
         try{
@@ -1063,7 +1552,7 @@ public class TRIBS_io extends javax.swing.JDialog {
     private void voronoiCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_voronoiCheckBoxActionPerformed
         if(voronoiCheckBox.isSelected()){
             try {
-                display_TIN.addReference(data_refPoly,linesCMap1);
+                display_TIN_I.addReference(data_refPoly,linesCMap1);
             } catch (RemoteException ex) {
                 ex.printStackTrace();
             } catch (VisADException ex) {
@@ -1071,7 +1560,7 @@ public class TRIBS_io extends javax.swing.JDialog {
             }
         } else{
             try {
-                display_TIN.removeReference(data_refPoly);
+                display_TIN_I.removeReference(data_refPoly);
             } catch (RemoteException ex) {
                 ex.printStackTrace();
             } catch (VisADException ex) {
@@ -1083,7 +1572,7 @@ public class TRIBS_io extends javax.swing.JDialog {
     private void trianglesCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_trianglesCheckBoxActionPerformed
         if(trianglesCheckBox.isSelected()){
             try {
-                display_TIN.addReference(data_refTr,linesCMap);
+                display_TIN_I.addReference(data_refTr,linesCMap);
             } catch (RemoteException ex) {
                 ex.printStackTrace();
             } catch (VisADException ex) {
@@ -1091,7 +1580,7 @@ public class TRIBS_io extends javax.swing.JDialog {
             }
         } else{
             try {
-                display_TIN.removeReference(data_refTr);
+                display_TIN_I.removeReference(data_refTr);
             } catch (RemoteException ex) {
                 ex.printStackTrace();
             } catch (VisADException ex) {
@@ -1103,7 +1592,7 @@ public class TRIBS_io extends javax.swing.JDialog {
     private void pointsCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pointsCheckBoxActionPerformed
         if(pointsCheckBox.isSelected()){
             try {
-                display_TIN.addReference(data_refPoints,pointsCMap);
+                display_TIN_I.addReference(data_refPoints,pointsCMap);
             } catch (RemoteException ex) {
                 ex.printStackTrace();
             } catch (VisADException ex) {
@@ -1111,7 +1600,7 @@ public class TRIBS_io extends javax.swing.JDialog {
             }
         } else{
             try {
-                display_TIN.removeReference(data_refPoints);
+                display_TIN_I.removeReference(data_refPoints);
             } catch (RemoteException ex) {
                 ex.printStackTrace();
             } catch (VisADException ex) {
@@ -1168,7 +1657,7 @@ public class TRIBS_io extends javax.swing.JDialog {
      */
     public static void main(String args[]) {
         try{
-            java.io.File theFile=new java.io.File("/Users/ricardo/Documents/databases/Smallbasin_DB/Rasters/Topography/1_Arcsec/NED_06075640.metaDEM");
+            java.io.File theFile=new java.io.File("/hidrosigDataBases/Smallbasin_DB/Rasters/Topography/1_Arcsec/NED_06075640.metaDEM");
             //java.io.File theFile=new java.io.File("/hidrosigDataBases/Test_DB/Rasters/Topography/58447060.metaDEM");
             hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster (theFile);
             metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".dir"));
@@ -1199,14 +1688,40 @@ public class TRIBS_io extends javax.swing.JDialog {
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTextField baseNameTextField;
+    private javax.swing.JButton changePath;
     private javax.swing.JButton exportPoiButton;
     private javax.swing.JButton exportTriButton;
+    private javax.swing.JCheckBox jCheckBox1;
+    private javax.swing.JCheckBox jCheckBox2;
+    private javax.swing.JCheckBox jCheckBox3;
+    private javax.swing.JCheckBox jCheckBox4;
+    private javax.swing.JCheckBox jCheckBox5;
+    private javax.swing.JCheckBox jCheckBox6;
+    private javax.swing.JComboBox jComboBox1;
+    private javax.swing.JComboBox jComboBox2;
+    private javax.swing.JComboBox jComboBox3;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
+    private javax.swing.JPanel jPanel13;
+    private javax.swing.JPanel jPanel14;
+    private javax.swing.JPanel jPanel15;
+    private javax.swing.JPanel jPanel16;
+    private javax.swing.JPanel jPanel17;
+    private javax.swing.JPanel jPanel18;
+    private javax.swing.JPanel jPanel19;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel20;
+    private javax.swing.JPanel jPanel21;
+    private javax.swing.JPanel jPanel22;
+    private javax.swing.JPanel jPanel23;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
@@ -1214,13 +1729,20 @@ public class TRIBS_io extends javax.swing.JDialog {
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
-    private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTabbedPane jTabbedPane2;
     private javax.swing.JTabbedPane panelOpciones;
+    private javax.swing.JTabbedPane panel_IO;
+    private javax.swing.JTextField pathTextField;
     private javax.swing.JCheckBox pointsCheckBox;
+    private javax.swing.JCheckBox pointsCheckBox1;
+    private javax.swing.JPanel qoutPanel;
+    private javax.swing.JPanel rftPanel;
     private javax.swing.JCheckBox trianglesCheckBox;
+    private javax.swing.JCheckBox trianglesCheckBox1;
     private javax.swing.JCheckBox voronoiCheckBox;
+    private javax.swing.JCheckBox voronoiCheckBox1;
     private javax.swing.JSlider zrSlider;
     // End of variables declaration//GEN-END:variables
     
 }
+
