@@ -284,7 +284,7 @@ public class Rainfall_Runoff_Model extends javax.swing.JDialog implements Displa
         latMap.setRange(metaDatos.getMinLat()+(myCuenca.getMinY()-1)*metaDatos.getResLat()/3600.0,metaDatos.getMinLat()+(myCuenca.getMaxY()+2)*metaDatos.getResLat()/3600.0);
         
         
-        maxColor=2*linksStructure.contactsArray.length+1;
+        maxColor=linksStructure.contactsArray.length+1;
         float[][] estaTabla=new float[3][maxColor];
         
         for (int i=1;i<estaTabla[0].length;i++){

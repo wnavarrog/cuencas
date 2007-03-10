@@ -441,28 +441,31 @@ public class NetworkExtractionModule implements Runnable {
             Sink_t = new java.util.Vector();
             MT.corrigeWorkRectangle(OpProc.myFSc);
             corrigeSink_t();
-            //Scan the matrix for crossing (This should not occur and it needs to be address in the algorithm itself)
+            //Scan the matrix for crossings (This should not occur and it needs to be address in the algorithm itself)
             int countSituation=0;
             
             countSituation=0;
             for (int i=1; i<DIR.length-1; i++){
                 for (int j=1; j<DIR[0].length-1; j++){
-                    int rnum=(int)Math.floor(2*Math.random());
+                    int rnum;  //a 0 or 1 determines how to solve a crossing
                     if(DIR[i][j] == 9 && DIR[i][j+1] == 7) {
+                        rnum=(DEM[i][j]-DEM[i-1][j] > DEM[i][j+1]-DEM[i-1][j+1])?0:1;
                         DIR[i][j+rnum]=8;
                         countSituation++;
                     }
-                    //System.out.println(">>>> CHANGE MADE AT x:"+(j-1)+" y:"+(i-1));
                     if(DIR[i][j] == 3 && DIR[i][j+1] == 1) {
+                        rnum=(DEM[i][j]-DEM[i+1][j] > DEM[i][j+1]-DEM[i+1][j+1])?0:1;
                         DIR[i][j+rnum]=2;
                         countSituation++;
                     }
 
                     if(DIR[i][j] == 7 && DIR[i+1][j] == 1) {
+                        rnum=(DEM[i][j]-DEM[i][j+1] > DEM[i+1][j]-DEM[i+1][j+1])?0:1;
                         DIR[i+rnum][j]=4;
                         countSituation++;
                     }
                     if(DIR[i][j] == 9 && DIR[i+1][j] == 3) {
+                        rnum=(DEM[i][j]-DEM[i][j-1] > DEM[i+1][j]-DEM[i+1][j-1])?0:1;
                         DIR[i+rnum][j]=6;
                         countSituation++;
                     }
