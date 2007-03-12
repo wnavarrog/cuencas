@@ -539,7 +539,6 @@ public class HortonAnalysis extends java.lang.Object {
             for (int i=0; i<Xs.length; i++){
                 Xs[i]=minOrderToInclude+i;
                 Ys[i]=(float) Math.log(datos[minOrderToInclude+i-1]);
-                //System.out.println(Xs[i]+" "+datos[minOrderToInclude+i-1]);
             }
         } else {
             for (int i=0; i<Xs.length; i++){

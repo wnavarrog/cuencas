@@ -46,7 +46,7 @@ public class Stats{
     /**
      * The maximum value
      */
-    public float maxValue=Float.MIN_VALUE;
+    public float maxValue=-Float.MAX_VALUE;
     /**
      * The minimum
      */

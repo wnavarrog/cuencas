@@ -19,10 +19,9 @@ package hydroScalingAPI.examples.artifitialFields;
 public class createLaplacianFromDEM {
     
     /** Creates a new instance of createLaplacianFromDEM */
-    public createLaplacianFromDEM(java.io.File metaFile, java.io.File outputDir) throws java.io.IOException{
+    public createLaplacianFromDEM(int xOut, int yOut,java.io.File metaFile, java.io.File outputDir) throws java.io.IOException{
         
         outputDir.mkdirs();
-        
         
         //Read DEM derived maps
         hydroScalingAPI.io.MetaRaster metaData=new hydroScalingAPI.io.MetaRaster(metaFile);
@@ -39,8 +38,34 @@ public class createLaplacianFromDEM {
         metaData.setFormat(hydroScalingAPI.tools.ExtensionToFormat.getFormat(".gdo"));
         float[][] GDO=new hydroScalingAPI.io.DataRaster(metaData).getFloat();
         
+        hydroScalingAPI.util.geomorphology.objects.Basin myCuenca=new hydroScalingAPI.util.geomorphology.objects.Basin(xOut,yOut,DIR,metaData);
+        int[][] xyBas=myCuenca.getXYBasin();
         
-        //Calculate laplacian
+        //Creates a basin mask file
+        float[][] BasMask=new float[DEM.length][DEM[0].length];
+        
+        for(int i=1;i<xyBas[0].length-1;i++){
+            BasMask[xyBas[1][i]][xyBas[0][i]]=1;
+        }
+        hydroScalingAPI.io.MetaRaster metaOut=new hydroScalingAPI.io.MetaRaster(metaData);
+        java.io.File saveFile;
+        
+        metaOut.setLocationMeta(new java.io.File(outputDir+"/"+metaData.getLocationMeta().getName().substring(0,metaData.getLocationMeta().getName().lastIndexOf("."))+"_BasinMask.metaVHC"));
+        saveFile=new java.io.File(outputDir+"/"+metaData.getLocationMeta().getName().substring(0,metaData.getLocationMeta().getName().lastIndexOf("."))+"_BasinMask.vhc");
+        metaOut.setLocationBinaryFile(saveFile);
+        metaOut.setFormat("Float");
+        metaOut.writeMetaRaster(metaOut.getLocationMeta());
+        
+        java.io.DataOutputStream writer;
+        writer = new java.io.DataOutputStream(new java.io.BufferedOutputStream(new java.io.FileOutputStream(saveFile)));
+        
+        for(int i=0;i<DEM.length;i++) for(int j=0;j<DEM[0].length;j++){
+            writer.writeFloat(BasMask[i][j]);
+        }
+        
+        writer.close();
+        
+        //Calculates laplacian
         float[][] LAP=new float[DEM.length][DEM[0].length];
         
         float counterZeros=0;
@@ -57,8 +82,7 @@ public class createLaplacianFromDEM {
             if(MAG[i][j] > 0) LAP[i][j]=1;
         }
         System.out.println(counterZeros+" "+(counterZeros/(float)(DEM.length*DEM[0].length)));
-        hydroScalingAPI.io.MetaRaster metaOut=new hydroScalingAPI.io.MetaRaster(metaData);
-        java.io.File saveFile;
+        metaOut=new hydroScalingAPI.io.MetaRaster(metaData);
         
         metaOut.setLocationMeta(new java.io.File(outputDir+"/"+metaData.getLocationMeta().getName().substring(0,metaData.getLocationMeta().getName().lastIndexOf("."))+"_LAPLACIAN.metaVHC"));
         saveFile=new java.io.File(outputDir+"/"+metaData.getLocationMeta().getName().substring(0,metaData.getLocationMeta().getName().lastIndexOf("."))+"_LAPLACIAN.vhc");
@@ -66,7 +90,6 @@ public class createLaplacianFromDEM {
         metaOut.setFormat("Float");
         metaOut.writeMetaRaster(metaOut.getLocationMeta());
         
-        java.io.DataOutputStream writer;
         writer = new java.io.DataOutputStream(new java.io.BufferedOutputStream(new java.io.FileOutputStream(saveFile)));
         
         for(int i=0;i<DEM.length;i++) for(int j=0;j<DEM[0].length;j++){
@@ -75,7 +98,7 @@ public class createLaplacianFromDEM {
         
         writer.close();
         
-        //Calculate # of incoming links
+        //Calculates # of incoming links
         int[][] INC=new int[DEM.length][DEM[0].length];
         for(int i=1;i<DEM.length-1;i++) for(int j=1;j<DEM[0].length-1;j++){
             int llegan=0;
@@ -103,7 +126,7 @@ public class createLaplacianFromDEM {
         hydroScalingAPI.tools.Stats statLap=new hydroScalingAPI.tools.Stats(LAP);
         System.out.println(statLap.toString());
         
-        //Calculate distance to nearest stream
+        //Calculates distance to nearest stream
         float[][] dToNearChannel=new float[DEM.length][DEM[0].length];
         for(int i=1;i<DEM.length-1;i++) for(int j=1;j<DEM[0].length-1;j++){
             if(MAG[i][j] <= 0){
@@ -139,7 +162,7 @@ public class createLaplacianFromDEM {
         
         writer.close();
         
-        //Calculate distance to outlet along channels
+        //Calculates distance to outlet along channels
         float[][] dAlongChannel=new float[DEM.length][DEM[0].length];
         for(int i=1;i<DEM.length-1;i++) for(int j=1;j<DEM[0].length-1;j++){
             if(MAG[i][j] <= 0){
@@ -147,8 +170,6 @@ public class createLaplacianFromDEM {
             } else{
                 dAlongChannel[i][j]=GDO[i][j];
             }
-                
-                
         }
         
         metaOut.setLocationMeta(new java.io.File(outputDir+"/"+metaData.getLocationMeta().getName().substring(0,metaData.getLocationMeta().getName().lastIndexOf("."))+"_DistAlongChannel.metaVHC"));
@@ -166,7 +187,7 @@ public class createLaplacianFromDEM {
         writer.close();
         
 
-        //Calculate distance to nearest stream
+        //Calculates elevation drop to nearest stream
         float[][] DropToNearChannel=new float[DEM.length][DEM[0].length];
         for(int i=1;i<DEM.length-1;i++) for(int j=1;j<DEM[0].length-1;j++){
             if(MAG[i][j] <= 0){
@@ -202,7 +223,122 @@ public class createLaplacianFromDEM {
         
         writer.close();
         
-        //Calculate an artificial DEM
+        //Calculates curvature pameter, volume parameter and relief parameter
+        float[][] curvatParam=new float[DEM.length][DEM[0].length];
+        float[][] volumeParam=new float[DEM.length][DEM[0].length];
+        float[][] reliefParam=new float[DEM.length][DEM[0].length];
+        for(int i=1;i<DEM.length-1;i++) for(int j=1;j<DEM[0].length-1;j++){
+            int llegan=0;
+            for (int k=0; k <= 8; k++){
+                if (DIR[i+(k/3)-1][j+(k%3)-1]==9-k)
+                    llegan++;
+            }
+            
+            if(llegan == 0){
+                
+                java.util.Vector vDists=new java.util.Vector();
+                java.util.Vector vDrops=new java.util.Vector();
+                java.util.Vector vIndexes=new java.util.Vector();
+                
+                vDists.add(dToNearChannel[i][j]);
+                vDrops.add(DropToNearChannel[i][j]);
+                vIndexes.add(new int[] {i,j});
+                
+                int iPn = i-1+(DIR[i][j]-1)/3;
+                int jPn = j-1+(DIR[i][j]-1)%3;
+                
+                int iPv=i;
+                int jPv=j;
+                
+                while(MAG[iPn][jPn] <=0 && DIR[iPn][jPn] !=0){
+                    vDists.add(dToNearChannel[iPn][jPn]);
+                    vDrops.add(DropToNearChannel[iPn][jPn]);
+                    vIndexes.add(new int[] {iPn,jPn});
+                    
+                    iPn = iPv-1+(DIR[iPv][jPv]-1)/3;
+                    jPn = jPv-1+(DIR[iPv][jPv]-1)%3;
+                    iPv=iPn;
+                    jPv=jPn;
+                }
+                int pathSize=vDists.size();
+                
+                float[] Xs=new float[pathSize];
+                float[] Ys=new float[pathSize];
+                
+                for(int k=0;k<pathSize;k++){
+                    Xs[k]=((Float)vDists.get(k)).floatValue();
+                    Ys[k]=((Float)vDrops.get(k)).floatValue();
+                }
+                hydroScalingAPI.tools.XYStats analysis=new hydroScalingAPI.tools.XYStats(Xs,Ys,true);
+                
+                for(int k=0;k<pathSize;k++){
+                    int[] pos=(int[])vIndexes.get(k);
+                    if(analysis.yStats.dataCount > 1){
+                        if(!Float.isNaN(analysis.slope)){
+                            curvatParam[pos[0]][pos[1]]=analysis.slope;
+                        } else{
+                            
+                        }
+                    } else {
+                        curvatParam[pos[0]][pos[1]]=0;
+                    }
+                    volumeParam[pos[0]][pos[1]]=(float)Math.exp(analysis.yStats.total);
+                    reliefParam[pos[0]][pos[1]]=(float)Math.exp(analysis.yStats.maxValue);
+                    
+                }
+//                if(Math.random() > 0.99) {
+//                    System.out.println(">"+analysis.yStats.maxValue+" "+analysis.slope);
+//                    for(int k=0;k<pathSize;k++){
+//                        System.out.println(">>>"+Xs[k]+" "+Ys[k]);
+//                    }
+//                }
+            }
+                
+        }
+
+        metaOut.setLocationMeta(new java.io.File(outputDir+"/"+metaData.getLocationMeta().getName().substring(0,metaData.getLocationMeta().getName().lastIndexOf("."))+"_HillslopeCurvature.metaVHC"));
+        saveFile=new java.io.File(outputDir+"/"+metaData.getLocationMeta().getName().substring(0,metaData.getLocationMeta().getName().lastIndexOf("."))+"_HillslopeCurvature.vhc");
+        metaOut.setLocationBinaryFile(saveFile);
+        metaOut.setFormat("Float");
+        metaOut.writeMetaRaster(metaOut.getLocationMeta());
+        
+        writer = new java.io.DataOutputStream(new java.io.BufferedOutputStream(new java.io.FileOutputStream(saveFile)));
+        
+        for(int i=0;i<DEM.length;i++) for(int j=0;j<DEM[0].length;j++){
+            writer.writeFloat(curvatParam[i][j]);
+        }
+        
+        writer.close();
+        
+        metaOut.setLocationMeta(new java.io.File(outputDir+"/"+metaData.getLocationMeta().getName().substring(0,metaData.getLocationMeta().getName().lastIndexOf("."))+"_HillslopeVolume.metaVHC"));
+        saveFile=new java.io.File(outputDir+"/"+metaData.getLocationMeta().getName().substring(0,metaData.getLocationMeta().getName().lastIndexOf("."))+"_HillslopeVolume.vhc");
+        metaOut.setLocationBinaryFile(saveFile);
+        metaOut.setFormat("Float");
+        metaOut.writeMetaRaster(metaOut.getLocationMeta());
+        
+        writer = new java.io.DataOutputStream(new java.io.BufferedOutputStream(new java.io.FileOutputStream(saveFile)));
+        
+        for(int i=0;i<DEM.length;i++) for(int j=0;j<DEM[0].length;j++){
+            writer.writeFloat(volumeParam[i][j]);
+        }
+        
+        writer.close();
+        
+        metaOut.setLocationMeta(new java.io.File(outputDir+"/"+metaData.getLocationMeta().getName().substring(0,metaData.getLocationMeta().getName().lastIndexOf("."))+"_HillslopeRelief.metaVHC"));
+        saveFile=new java.io.File(outputDir+"/"+metaData.getLocationMeta().getName().substring(0,metaData.getLocationMeta().getName().lastIndexOf("."))+"_HillslopeRelief.vhc");
+        metaOut.setLocationBinaryFile(saveFile);
+        metaOut.setFormat("Float");
+        metaOut.writeMetaRaster(metaOut.getLocationMeta());
+        
+        writer = new java.io.DataOutputStream(new java.io.BufferedOutputStream(new java.io.FileOutputStream(saveFile)));
+        
+        for(int i=0;i<DEM.length;i++) for(int j=0;j<DEM[0].length;j++){
+            writer.writeFloat(reliefParam[i][j]);
+        }
+        
+        writer.close();
+        
+        //Calculates an artificial DEM
         float m1=0.5f;
         float m2=0.5f;
         
@@ -249,15 +385,21 @@ public class createLaplacianFromDEM {
      */
     public static void main(String[] args) {
         try{
-//            new createLaplacianFromDEM(new java.io.File("/Users/ricardo/Documents/databases/Test_DB/Rasters/Topography/58447060.metaDEM"),
-//                                       new java.io.File("/Users/ricardo/Documents/databases/Test_DB/Rasters/Hydrology/"));
+            new createLaplacianFromDEM(85,42,
+                                       new java.io.File("/hidrosigDataBases/Test_DB/Rasters/Topography/58447060.metaDEM"),
+                                       new java.io.File("/hidrosigDataBases/Test_DB/Rasters/Hydrology/DerivedQuantities/"));
             
-            new createLaplacianFromDEM(new java.io.File("/hidrosigDataBases/Smallbasin_DB/Rasters/Topography/1_Arcsec/NED_06075640.metaDEM"),
-                                       new java.io.File("/hidrosigDataBases/Smallbasin_DB/Rasters/Hydrology/DerivedQuantities/"));
+//            new createLaplacianFromDEM(new java.io.File("/hidrosigDataBases/Smallbasin_DB/Rasters/Topography/1_Arcsec/NED_06075640.metaDEM"),
+//                                       new java.io.File("/hidrosigDataBases/Smallbasin_DB/Rasters/Hydrology/DerivedQuantities/"));
             
-//            new createLaplacianFromDEM(new java.io.File("/Users/ricardo/Documents/databases/Smallbasin_DB/Rasters/Topography/0.3_Arcsec/89893806.metaDEM"),
-//                                       new java.io.File("/Users/ricardo/Documents/databases/Smallbasin_DB/Rasters/Hydrology/"));
+//            new createLaplacianFromDEM(new java.io.File("/hidrosigDataBases/Smallbasin_DB/Rasters/Topography/0.3_Arcsec/89893806.metaDEM"),
+//                                       new java.io.File("/hidrosigDataBases/Smallbasin_DB/Rasters/Hydrology/DerivedQuantities/"));
             
+//              new createLaplacianFromDEM(new java.io.File("/hidrosigDataBases/Rio Salado DB/Rasters/Topography/NED_26084992.metaDEM"),
+//                                       new java.io.File("/hidrosigDataBases/Rio Salado DB/Rasters/Hydrology/DerivedQuantities/"));
+              
+//              new createLaplacianFromDEM(new java.io.File("/hidrosigDataBases/Gila River DB/Rasters/Topography/1_ArcSec/mogollon.metaDEM"),
+//                                       new java.io.File("/hidrosigDataBases/Gila River DB/Rasters/Hydrology/DerivedQuantities/"));
         } catch(java.io.IOException ioe){
             System.err.println(ioe);
         }
