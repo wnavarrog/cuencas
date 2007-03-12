@@ -263,7 +263,7 @@ public class Rainfall_Runoff_Model extends javax.swing.JDialog implements Displa
         hydroScalingAPI.subGUIs.widgets.RasterPalettesManager myLabeledColorWidget=new hydroScalingAPI.subGUIs.widgets.RasterPalettesManager(varMapDEM);
         jPanel7.add(myLabeledColorWidget);
         
-        addWheelFunctionality(displayDEM);
+        hydroScalingAPI.tools.VisadTools.addWheelFunctionality(displayDEM);
         
         //Set up interface for Hill-Slope System
         
@@ -308,7 +308,7 @@ public class Rainfall_Runoff_Model extends javax.swing.JDialog implements Displa
         
         plotNetwork(displayMap);
         
-        addWheelFunctionality(displayMap);
+        hydroScalingAPI.tools.VisadTools.addWheelFunctionality(displayMap);
         
         //Set up interface for Channel Network
         
@@ -334,7 +334,7 @@ public class Rainfall_Runoff_Model extends javax.swing.JDialog implements Displa
         
         plotNetwork(displayNet);
         
-        addWheelFunctionality(displayNet);
+        hydroScalingAPI.tools.VisadTools.addWheelFunctionality(displayNet);
         
         //Set up interface for Storm Analysis
         
@@ -359,7 +359,7 @@ public class Rainfall_Runoff_Model extends javax.swing.JDialog implements Displa
         ProjectionControl pcStorm = displayStorm.getProjectionControl();
         pcStorm.setAspectCartesian(new double[] {1.0, (double) (matrizPintada.length/(double) matrizPintada[0].length)});
         
-        addWheelFunctionality(displayStorm);
+        hydroScalingAPI.tools.VisadTools.addWheelFunctionality(displayStorm);
         
         displayPlot= new DisplayImplJ3D("displayPlot",new visad.java3d.TwoDDisplayRendererJ3D());
         
@@ -392,36 +392,6 @@ public class Rainfall_Runoff_Model extends javax.swing.JDialog implements Displa
         jPanel2.add("Center",displayDEM.getComponent());
         firstTouchTab[0]=true;
         
-    }
-    
-    private void addWheelFunctionality(final visad.java3d.DisplayImplJ3D display){
-        final visad.java3d.DisplayRendererJ3D dr=(visad.java3d.DisplayRendererJ3D)display.getDisplayRenderer();
-        display.getComponent().addMouseWheelListener(new java.awt.event.MouseWheelListener() {
-                public void mouseWheelMoved(java.awt.event.MouseWheelEvent e) {
-                    int rot = e.getWheelRotation();
-                    try{
-                        visad.ProjectionControl pc = display.getProjectionControl();
-                        double[] scaleMatrix = dr.getMouseBehavior().make_matrix(0.0, 0.0, 0.0,
-                                1.0, 1.0, 1.0,
-                                0.0, 0.0, 0.0);
-                        double[] currentMatrix = pc.getMatrix();
-                        // Zoom in
-                        if (rot < 0){
-                            scaleMatrix = dr.getMouseBehavior().make_matrix(0.0, 0.0, 0.0,
-                                                                            1.1, 1.1, 1.1,
-                                                                            0.0, 0.0, 0.0);
-                        }
-                        // Zoom out
-                        if (rot > 0){
-                            scaleMatrix = dr.getMouseBehavior().make_matrix(0.0, 0.0, 0.0,
-                                                                            0.9, 0.9, 0.9,
-                                                                            0.0, 0.0, 0.0);
-                        }
-                        scaleMatrix = dr.getMouseBehavior().multiply_matrix(scaleMatrix,currentMatrix);
-                        pc.setMatrix(scaleMatrix);
-                    } catch (java.rmi.RemoteException re) {} catch (visad.VisADException ve) {}
-                }
-            });
     }
     
     private void plotNetwork(DisplayImpl display) throws java.io.IOException, TypeException, VisADException{

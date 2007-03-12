@@ -84,7 +84,7 @@ public class MapEditor extends javax.swing.JDialog  implements DisplayListener{
         ProjectionControl pc = display.getProjectionControl();
         pc.setAspectCartesian(new double[] {1.0, (double) (matrixData.length/(double) matrixData[0].length)});
         
-        addWheelFunctionality(display);
+        hydroScalingAPI.tools.VisadTools.addWheelFunctionality(display);
         display.enableEvent(visad.DisplayEvent.MOUSE_MOVED);
         display.addDisplayListener(this);
         
@@ -96,36 +96,6 @@ public class MapEditor extends javax.swing.JDialog  implements DisplayListener{
         
         for(int i=-5;i<6;i++) dataTable.setValueAt("  "+(i>0?"+":"")+i,i+5,0);
         
-    }
-    
-    private void addWheelFunctionality(final visad.java3d.DisplayImplJ3D display){
-        final visad.java3d.DisplayRendererJ3D dr=(visad.java3d.DisplayRendererJ3D)display.getDisplayRenderer();
-        display.getComponent().addMouseWheelListener(new java.awt.event.MouseWheelListener() {
-            public void mouseWheelMoved(java.awt.event.MouseWheelEvent e) {
-                int rot = e.getWheelRotation();
-                try{
-                    visad.ProjectionControl pc = display.getProjectionControl();
-                    double[] scaleMatrix = dr.getMouseBehavior().make_matrix(0.0, 0.0, 0.0,
-                            1.0, 1.0, 1.0,
-                            0.0, 0.0, 0.0);
-                    double[] currentMatrix = pc.getMatrix();
-                    // Zoom in
-                    if (rot < 0){
-                        scaleMatrix = dr.getMouseBehavior().make_matrix(0.0, 0.0, 0.0,
-                                1.1, 1.1, 1.1,
-                                0.0, 0.0, 0.0);
-                    }
-                    // Zoom out
-                    if (rot > 0){
-                        scaleMatrix = dr.getMouseBehavior().make_matrix(0.0, 0.0, 0.0,
-                                0.9, 0.9, 0.9,
-                                0.0, 0.0, 0.0);
-                    }
-                    scaleMatrix = dr.getMouseBehavior().multiply_matrix(scaleMatrix,currentMatrix);
-                    pc.setMatrix(scaleMatrix);
-                } catch (java.rmi.RemoteException re) {} catch (visad.VisADException ve) {}
-            }
-        });
     }
     
     /** This method is called from within the constructor to

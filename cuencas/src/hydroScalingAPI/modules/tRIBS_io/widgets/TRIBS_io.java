@@ -109,7 +109,6 @@ public class TRIBS_io extends javax.swing.JDialog {
         
         myCuenca=new hydroScalingAPI.util.geomorphology.objects.Basin(x,y,matDir,metaDatos);
         linksStructure=new hydroScalingAPI.util.geomorphology.objects.LinksAnalysis(myCuenca, metaDatos, matDir);
-
         thisNetworkGeom=new hydroScalingAPI.modules.rainfallRunoffModel.objects.LinksInfo(linksStructure);
         
         //Graphical structure for aggregated response
@@ -139,32 +138,8 @@ public class TRIBS_io extends javax.swing.JDialog {
         display_TIN_I.addMap(northMap_I);
         display_TIN_I.addMap(pointsMap_I);
         
-        display_TIN_I.getComponent().addMouseWheelListener(new java.awt.event.MouseWheelListener() {
-            public void mouseWheelMoved(java.awt.event.MouseWheelEvent e) {
-                int rot = e.getWheelRotation();
-                try{
-                    ProjectionControl pc1 = display_TIN_I.getProjectionControl();
-                    double[] scaleMatrix = drI.getMouseBehavior().make_matrix(0.0, 0.0, 0.0,
-                            1.0, 1.0, 1.0,
-                            0.0, 0.0, 0.0);
-                    double[] currentMatrix = pc1.getMatrix();
-                    // Zoom in
-                    if (rot < 0){
-                        scaleMatrix = drI.getMouseBehavior().make_matrix(0.0, 0.0, 0.0,
-                                                                        1.1, 1.1, 1.1,
-                                                                        0.0, 0.0, 0.0);
-                    }
-                    // Zoom out
-                    if (rot > 0){
-                        scaleMatrix = drI.getMouseBehavior().make_matrix(0.0, 0.0, 0.0,
-                                                                        0.9, 0.9, 0.9,
-                                                                        0.0, 0.0, 0.0);
-                    }
-                    scaleMatrix = drI.getMouseBehavior().multiply_matrix(scaleMatrix,currentMatrix);
-                    pc1.setMatrix(scaleMatrix);
-                } catch (java.rmi.RemoteException re) {} catch (visad.VisADException ve) {}
-            }
-        });
+        hydroScalingAPI.tools.VisadTools.addWheelFunctionality(display_TIN_I);
+        
         
         initializePoints();
         jPanel12.add("Center",display_TIN_I.getComponent());
@@ -186,32 +161,7 @@ public class TRIBS_io extends javax.swing.JDialog {
         display_TIN_O.addMap(northMap_O);
         display_TIN_O.addMap(pointsMap_O);
         
-        display_TIN_O.getComponent().addMouseWheelListener(new java.awt.event.MouseWheelListener() {
-            public void mouseWheelMoved(java.awt.event.MouseWheelEvent e) {
-                int rot = e.getWheelRotation();
-                try{
-                    ProjectionControl pc1 = display_TIN_O.getProjectionControl();
-                    double[] scaleMatrix = drO.getMouseBehavior().make_matrix(0.0, 0.0, 0.0,
-                            1.0, 1.0, 1.0,
-                            0.0, 0.0, 0.0);
-                    double[] currentMatrix = pc1.getMatrix();
-                    // Zoom in
-                    if (rot < 0){
-                        scaleMatrix = drO.getMouseBehavior().make_matrix(0.0, 0.0, 0.0,
-                                                                        1.1, 1.1, 1.1,
-                                                                        0.0, 0.0, 0.0);
-                    }
-                    // Zoom out
-                    if (rot > 0){
-                        scaleMatrix = drO.getMouseBehavior().make_matrix(0.0, 0.0, 0.0,
-                                                                        0.9, 0.9, 0.9,
-                                                                        0.0, 0.0, 0.0);
-                    }
-                    scaleMatrix = drO.getMouseBehavior().multiply_matrix(scaleMatrix,currentMatrix);
-                    pc1.setMatrix(scaleMatrix);
-                } catch (java.rmi.RemoteException re) {} catch (visad.VisADException ve) {}
-            }
-        });
+        hydroScalingAPI.tools.VisadTools.addWheelFunctionality(display_TIN_O);
         
         jPanel17.add("Center",display_TIN_O.getComponent());
         
