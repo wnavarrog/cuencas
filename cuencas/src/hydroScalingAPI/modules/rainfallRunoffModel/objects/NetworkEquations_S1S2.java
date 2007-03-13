@@ -44,7 +44,7 @@ public class NetworkEquations_S1S2 implements hydroScalingAPI.util.ordDiffEqSolv
     //public double pcoe;
     
     /* PF ADDITION - START ... */
-    private float[][] cheziArray, widthArray, lengthArray, slopeArray;
+    private float[][] cheziArray, widthArray, lengthArray, slopeArray, constantvelArray;
     private float[][] areasHillArray;
     
     private int hilltype, routingtype;
@@ -69,6 +69,7 @@ public class NetworkEquations_S1S2 implements hydroScalingAPI.util.ordDiffEqSolv
         lengthArray=linksHydraulicInfo.getLengthInKmArray();
         for (int i=0;i<lengthArray[0].length;i++) lengthArray[0][i]=lengthArray[0][i]*1000;
         slopeArray=linksHydraulicInfo.getSlopeArray();
+        constantvelArray=linksHydraulicInfo.getConstantVelArray();
         
     }
     
@@ -117,7 +118,7 @@ public class NetworkEquations_S1S2 implements hydroScalingAPI.util.ordDiffEqSolv
         
         // Conditions for hillslope-channel processes
         hilltype = 1 ;
-        routingtype = 1 ; // 1 = const vel w/var l, 4 = mannings
+        routingtype = 1 ; // 1 = const vel w/var l, 4 = mannings, 3 = chezy
         output=new double[input.length];
         
         //output_vc=new double[nLi];
@@ -193,8 +194,10 @@ public class NetworkEquations_S1S2 implements hydroScalingAPI.util.ordDiffEqSolv
                     double area_m2 = area_km2*1e6;
                     
                     //if (i==1) System.out.println(basinHillSlopesInfo.precipitation(1,time));
-                    //System.out.println(i);
-                    //System.out.println(prec_mmphr);
+                    //System.out.print("Rainfall");
+                    //System.out.println(i + "   " + basinHillSlopesInfo.precipitation(i,time));
+                    //System.out.print(prec_mmphr);
+                    //System.out.print(prec_mphr);
                     
                     
                     /*HILLSLOPE FLUX CONDITIONS */
@@ -246,11 +249,11 @@ public class NetworkEquations_S1S2 implements hydroScalingAPI.util.ordDiffEqSolv
                     switch (routingtype) {
                         
                         case 0 :   /* Constant velocity and link length. For Goodwin, mean length = 221.8 and assume velocity 0.5 m/s */
-                            K_Q = 0.5/221.8 ;  // units 1/s
+                            K_Q = constantvelArray[0][i ] / 221.8 ;  // units 1/s
                             break ;
                             
                         case 1 :    /* Constant velocity. For Goodwin, assume velocity 0.5 m/s */
-                            K_Q = 0.5f*Math.pow(lengthArray[0][i],-1);  // units 1/s
+                            K_Q = constantvelArray[0][i]*Math.pow(lengthArray[0][i],-1);  // units 1/s
                             //K_Q = 1.0*Math.pow(lengthArray[0][i],-1);  // units 1/s
                             //K_Q = 2.0*Math.pow(linksHydraulicInfo.Length(i),-1);  // units 1/s
                             break ;
@@ -295,6 +298,8 @@ public class NetworkEquations_S1S2 implements hydroScalingAPI.util.ordDiffEqSolv
                     /* OUTPUT */
                     //LINK dQ/dt; big () term is m^3/s, 60*K_Q is 1/min
                     output[i]= 60.0D*K_Q*((1.0D/3600.)*(qd+qs)+Q_trib-input[i]);  //units (m^3/s)/min
+                    //if (i == 423) System.out.println("test  "+ qd + " " +output[i]);
+                    //if (i == 423) System.out.println(output[i]);
                     
                     //LINK dQs/dt
                     output[i+nLi]= 60.0D*K_Q*((1.0D/3600.)*(qs)+Qs_trib-input[i+nLi]);  //units (m^3/s)/min
