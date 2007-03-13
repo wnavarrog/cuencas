@@ -69,7 +69,7 @@ public class DemViewer3D extends hydroScalingAPI.subGUIs.widgets.RasterViewer im
         display.addMap(longitudeMap);
         
         float[][] dataValues=localField.getFloats();
-        hydroScalingAPI.tools.Stats statsVar=new hydroScalingAPI.tools.Stats(dataValues[0]);
+        hydroScalingAPI.util.statistics.Stats statsVar=new hydroScalingAPI.util.statistics.Stats(dataValues[0]);
         
         heightMap=new visad.ScalarMap(visad.RealType.Altitude, visad.Display.ZAxis);
         heightMap.getAxisScale().setFont(font);
