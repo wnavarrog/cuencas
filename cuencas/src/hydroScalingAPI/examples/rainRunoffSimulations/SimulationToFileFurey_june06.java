@@ -15,14 +15,17 @@ package hydroScalingAPI.examples.rainRunoffSimulations;
 import visad.*;
 import java.io.*;
 
-public class SimulationToFileFurey extends java.lang.Object {
+public class SimulationToFileFurey_june06 extends java.lang.Object {
     
     private hydroScalingAPI.io.MetaRaster metaDatos;
     private byte[][] matDir;
    
             
     /** Creates new simulationsRep3 */
-    public SimulationToFileFurey(int x, int y, byte[][] direcc, int[][] magnitudes, hydroScalingAPI.io.MetaRaster md, java.io.File stormFile, float infiltRate) throws java.io.IOException, VisADException{
+    public SimulationToFileFurey_june06(String [] sim_metadata, byte[][] direcc, int[][] magnitudes, hydroScalingAPI.io.MetaRaster md, java.io.File stormFile, float infiltRate) throws java.io.IOException, VisADException{
+        
+        int x = java.lang.Integer.parseInt(sim_metadata[3]);
+        int y = java.lang.Integer.parseInt(sim_metadata[4]);
         matDir=direcc;
         metaDatos=md;
         
@@ -33,10 +36,6 @@ public class SimulationToFileFurey extends java.lang.Object {
         hydroScalingAPI.modules.rainfallRunoffModel.objects.LinksInfo thisNetworkGeom=new hydroScalingAPI.modules.rainfallRunoffModel.objects.LinksInfo(linksStructure);
         hydroScalingAPI.modules.rainfallRunoffModel.objects.HillSlopesInfo thisHillsInfo=new hydroScalingAPI.modules.rainfallRunoffModel.objects.HillSlopesInfo(linksStructure);
         
-        //CHEZY VELOCITY ...
-        //hydroScalingAPI.modules.rainfallRunoffModel.objects.ChezyVelocities vchannels=new hydroScalingAPI.modules.rainfallRunoffModel.objects.ChezyVelocities(linksStructure,thisHillsInfo,thisNetworkGeom);    
-        //System.out.println(vchannels);
-        
         System.out.println(stormFile);
         
         System.out.println("Loading Storm ...");
@@ -45,39 +44,8 @@ public class SimulationToFileFurey extends java.lang.Object {
         if (!storm.isCompleted()) return;
         
         thisHillsInfo.setStormManager(storm);
-                
-        /*
-                Escribo en un archivo lo siguiente: 
-                        Numero de links
-                        Numero de links Completos
-                        lista de Links Completos
-                        Area aguas arriba de los Links Completos
-                        Orden de los Links Completos
-                        maximos de la WF para los links completos
-                        Longitud simulacion
-                        Resulatdos
-                
-                */
-        
-        /* Walnut Gulch, AZ output path ...*/
-        //String output_path="/home/furey/HSJ/walnut_az/simulations/";
-        /* Goodwin Creek, MS output path ...*/
-        //String output_path="/home/furey/HSJ/goodwin_ms/23jan04_gauss_KQvarl_tests/01min_rain_steps/sims_01min_2p0/";
-        //String output_path="/home/furey/HSJ/goodwin_ms/08mar04_gauss_Chezy_tests/01min_rain_steps/sims_01min/var_runoffrat_uniform/";
-        //String output_path="/home/furey/HSJ/goodwin_ms/sims_KQvarl_evs05min/";
-        //String output_path="/home/furey/HSJ/goodwin_ms/sims_KQvarl_evs05min_x0p5/";
-        //String output_path="/home/furey/HSJ/goodwin_ms/sims_KQvarl_gauss05min/";
-        
-        //String output_path="/home/furey/Data/goodwin_ms/rain_interp_hillts/";
-        //String output_path="/home/furey/Data/goodwin_ms/rg_interpfield_hillts/events_good8195_auto/";
-        
-        //String output_path="/home/furey/HSJ/goodwin_ms/08jun04_wb_tests/05min_rain_steps/sims_01min/";
 
-        //String output_path="/home/furey/Sims_Analysis/HSJ/goodwin_ms/09may05_instant_KQvarl_tests/01min_rain_pulse/sims_01min/rain_equals_runoff/";
-        //String output_path="/home/furey/Sims_Analysis/HSJ/goodwin_ms/15jun05_instant_KQvarl_tests/10sec_rain_pulse/sims_01min/rain_equals_runoff/velocity_0p5mps/latest_simulation/";
-        //String output_path="/home/furey/Sims_Analysis/HSJ/goodwin_ms/20jun05_instant_Mannings_tests/10sec_rain_pulse/sims_01min/rain_equals_runoff/latest_simulation/";
-        //String output_path="/home/furey/Sims_Analysis/HSJ/goodwin_ms/24jun05_instant_Chezy_tests/10sec_rain_pulse/sims_01min/rain_equals_runoff/latest_simulation/";
-        String output_path="/data/phlebas1/furey_data/HSJ/goodwin_ms/24may06_proposalexample/event021_dated15may83/sims_05min/rain_equals_runoff/latest_simulation/";
+        String output_path=sim_metadata[2];
         
         String demName=md.getLocationBinaryFile().getName().substring(0,md.getLocationBinaryFile().getName().lastIndexOf("."));
         
@@ -115,7 +83,7 @@ public class SimulationToFileFurey extends java.lang.Object {
       
         float binsize=1;
         double[][] laWFunc;
-        float[][] linkLengths=linksStructure.getVarValues(1);   // [1][n] ** HERE varValues are link lengths ... rename ... linkLengths[0][j] is length
+        float[][] linkLengths=linksStructure.getVarValues(1);   // [1][n] ** HERE varValues are link lengths ... rename ... linkLengths[0][j]
         
         if (metric == 0) {    
             binsize=new hydroScalingAPI.tools.Stats(linkLengths).meanValue;
@@ -124,9 +92,9 @@ public class SimulationToFileFurey extends java.lang.Object {
             for (int i=0;i<linkLengths.length;i++) linkLengths[0][i] = 1;
         }
 
-        RealType numLinks= RealType.getRealType("numLinks"), distanceToOut = RealType.getRealType("distanceToOut");
-        FlatField vals_ff_W,hist;
-        Linear1DSet binsSet;
+        //RealType numLinks= RealType.getRealType("numLinks"), distanceToOut = RealType.getRealType("distanceToOut");
+        //FlatField vals_ff_W,hist;
+        //Linear1DSet binsSet;
 
         for (int i=0;i<linksStructure.completeStreamLinksArray.length;i++){
             if (linksStructure.magnitudeArray[linksStructure.completeStreamLinksArray[i]] > 1) {
@@ -170,44 +138,66 @@ public class SimulationToFileFurey extends java.lang.Object {
         
         System.out.println("Termina calculo de WFs");
         
-        
-        //hydroScalingAPI.modules.rainfallRunoffModel.objects.NetworkEquations_S1S2 thisBasinEqSys=new hydroScalingAPI.modules.rainfallRunoffModel.objects.NetworkEquations_S1S2(linksStructure,thisHillsInfo,thisNetworkGeom);
-        //double[] initialCondition=new double[linksStructure.contactsArray.length*2];
-        
-        
+       
         /* PF ADDITION - START ... */
         
         int nLi = linksStructure.contactsArray.length;
         System.out.println("nLi ="+nLi);
         
         /* Define HG relationships for widths and chezy values. */
-       float[] hgwidth_params = { 5.6f, 0.46f } ;         // Goodwin Creek coeff, exp for widths
-       float[] hgchezy_params = { 14.2f, -1/3.f } ;       // General coeff, exp for Chezy 
-       thisNetworkGeom.setWidthsHG( hgwidth_params[0], hgwidth_params[1] ) ;
-       thisNetworkGeom.setCheziHG( hgchezy_params[0], hgchezy_params[1] ) ;     
+       float width_coe = java.lang.Float.parseFloat(sim_metadata[17]);
+       float width_exp = java.lang.Float.parseFloat(sim_metadata[18]);
+       float constvelocity = java.lang.Float.parseFloat(sim_metadata[21]);
+       float chezy_coe = java.lang.Float.parseFloat(sim_metadata[22]);
+       float chezy_exp = java.lang.Float.parseFloat(sim_metadata[23]);      
+       float[] width_params = { width_coe, width_exp } ;
+       float[] chezy_params = { chezy_coe, chezy_exp } ;
+       thisNetworkGeom.setWidthsHG( width_params[0], width_params[1] ) ;
+       thisNetworkGeom.setConstantVelHG( constvelocity ) ;
+       thisNetworkGeom.setCheziHG( chezy_params[0], chezy_params[1] ) ;     
        
-        /* Define initial channel conditions.*/
+        /*  DEFINE INITIAL CONDITIONS  for NetworkEquations_S0S2.java .*/
         // Below, initial_qs is not defined because inital_s2 determines
         // initial_qs in NetworkEquations
         double[] initialCondition=new double[4*nLi];
-        double initial_q, initial_excdepth, initial_s0, initial_s1, initial_s2;
-        float[][] areasHillArray=thisHillsInfo.getAreasArray();
-              
+        double initial_s0_depth, initial_s0, initial_s1, initial_s2, initial_link_depth, initial_link_width, initial_q;
+        float hillslopeLength;
+        float[][] areasHillArray=thisHillsInfo.getAreasArray();     
         for (int i=0;i<nLi;i++){
-            //initial_q  = thisNetworkGeom.upStreamArea(i)*0.0D; //*0.0;*0.01,*0.1
-            initial_excdepth = 0.0;  // m ... equals 1mm,  used 0.004
-            initial_s0 = areasHillArray[0][i]*1e6*initial_excdepth;  // m^3
-            initial_q  = initial_s0 / ( linkLengths[0][i]*1e3 ) ;       // m^3/s ... q = S*(v/l) where v=1m/s
-            //initial_q  = Math.pow(thisNetworkGeom.upStreamArea(i)*0.0175,3.0); //*0.0;*0.01,*0.1
-            initial_s1 = thisHillsInfo.S2max(i)*0.0D; //*0.0, *0.2; 
-            initial_s2 = thisHillsInfo.S2max(i)*0.0D; //*0.0, *0.2;
-            initialCondition[i] = initial_q;  //for link discharge
-            initialCondition[i+(2*nLi)]= initial_s1;  //for s1 zone volume
-            initialCondition[i+(3*nLi)]= initial_s2;  //for s2 zone volume
+            initial_link_depth =  java.lang.Float.parseFloat(sim_metadata[16]);
+            initial_link_width = 0.0; //thisNetworkGeom.Width(i);
+            initial_s0_depth = java.lang.Float.parseFloat(sim_metadata[12]);  // m
+            initial_s0 = initial_s0_depth*(areasHillArray[0][i]*1e6);  // m^3
+            initial_s2 = thisHillsInfo.S2max(i)* java.lang.Double.parseDouble(sim_metadata[14]); //*0.0, *0.2;
+            //initial_q  = (initial_link_depth*areasHillArray[0][i]*1e6) * (   constvelocity  / (linkLengths[0][i]*1e3)   ) ;       // m^3/s ... q = S*(v/l) where v in m/s =  java.lang.Float.parseFloat(sim_metadata[21])
+            initial_q  = (initial_link_depth*linkLengths[0][i]*1e3*initial_link_width) * (   constvelocity /(linkLengths[0][i]*1e3)   );  // initial_q = 0 here
+            initialCondition[i] = initial_q;                   //  m^3/s, for link discharge
+            hillslopeLength = ((areasHillArray[0][i]*1e6f) / (linkLengths[0][i] *1e3f)) / 2.0f ;    // length on one hillslope (one side of link) is half of link length
+            initialCondition[i+(2*nLi)]= initial_s0 * (1.0*constvelocity/hillslopeLength   );  // m^3/s, for s0 zone discharge
+            initialCondition[i+(3*nLi)]= initial_s2;      //for s2 zone volume
         }
+       
+        /*  DEFINE INITIAL CONDITIONS  for NetworkEquations_S1S2.java .*/
+        // Below, initial_qs is not defined because inital_s2 determines
+        // initial_qs in NetworkEquations
+        /* double[] initialCondition=new double[4*nLi];
+        double initial_s0_depth, initial_s0, initial_s1, initial_s2, initial_link_depth, initial_link_width, initial_q;
+        float[][] areasHillArray=thisHillsInfo.getAreasArray();     
+        for (int i=0;i<nLi;i++){
+            initial_link_depth =  java.lang.Float.parseFloat(sim_metadata[16]);
+            initial_link_width = 0.0;
+            initial_s1 = thisHillsInfo.S2max(i)* java.lang.Double.parseDouble(sim_metadata[13]); //*0.0, *0.2; 
+            initial_s2 = thisHillsInfo.S2max(i)* java.lang.Double.parseDouble(sim_metadata[14]); //*0.0, *0.2;
+            //initial_q  = thisNetworkGeom.upStreamArea(i)*0.0D; //*0.0;*0.01,*0.1
+            //initial_q  = Math.pow(thisNetworkGeom.upStreamArea(i)*0.0175,3.0); //*0.0;*0.01,*0.1
+            initial_q  = (initial_link_depth*linkLengths[0][i]*1e3*initial_link_width) * (   constvelocity /(linkLengths[0][i]*1e3)   );
+            initialCondition[i] = initial_q;                   //  m^3/s, for link discharge
+            initialCondition[i+(2*nLi)]= initial_s1;    //for s1 zone volume
+            initialCondition[i+(3*nLi)]= initial_s2;      //for s2 zone volume
+        } */
         
         /* Define RKF resoution */
-        float rkf_resolution = 1E-3f ;
+        float rkf_resolution =  java.lang.Float.parseFloat(sim_metadata[8]);
         
         /* Make file specs_hillslope.txt */
         int j=-1;
@@ -253,18 +243,8 @@ public class SimulationToFileFurey extends java.lang.Object {
         networkspecs.write("Mean link width = " + (width_tot/nLi) + '\n');
         networkspecs.write("Mean link length = " + (length_tot/nLi) + '\n');
         networkspecs.write("Mean link slope = " + (slope_tot/nLi) + '\n'+'\n'+'\n');
-        networkspecs.write("HG width-area params : coeff =" + hgwidth_params[0] + ", expon =" + hgwidth_params[1]+'\n');
+        networkspecs.write("HG width-area params : coeff =" + width_params[0] + ", expon =" + width_params[1]+'\n');
         networkspecs.close();
-        
-        /* Make specs_channel.txt */
-        FileWriter channelspecs = new FileWriter(output_path + "specs_channel.txt");
-        channelspecs.write("HG chezy-slope params : coeff =" + hgchezy_params[0] + ", expon =" + hgchezy_params[1]+'\n');
-        channelspecs.close();
-        
-        /* Make specs_rkf.txt */
-        FileWriter rkfspecs = new FileWriter(output_path + "specs_rkf.txt");
-        rkfspecs.write("RKF Resolution = " + rkf_resolution + '\n');
-        rkfspecs.close();
         
         // Additional info for GOODWIN CREEK ...Contact point (x,y) values used below, except for basin outlet.
         FileWriter sg_IDvals = new FileWriter(output_path + "sg_arrayIDs.txt");
@@ -287,8 +267,8 @@ public class SimulationToFileFurey extends java.lang.Object {
         
         /* PF ADDITION - ... END */
         
-        
-        hydroScalingAPI.modules.rainfallRunoffModel.objects.NetworkEquations_S1S2 thisBasinEqSys=new hydroScalingAPI.modules.rainfallRunoffModel.objects.NetworkEquations_S1S2(linksStructure,thisHillsInfo,thisNetworkGeom);
+        hydroScalingAPI.modules.rainfallRunoffModel.objects.NetworkEquations_S0S2 thisBasinEqSys=new hydroScalingAPI.modules.rainfallRunoffModel.objects.NetworkEquations_S0S2(linksStructure,thisHillsInfo,thisNetworkGeom);        
+        //hydroScalingAPI.modules.rainfallRunoffModel.objects.NetworkEquations_S1S2 thisBasinEqSys=new hydroScalingAPI.modules.rainfallRunoffModel.objects.NetworkEquations_S1S2(linksStructure,thisHillsInfo,thisNetworkGeom);        
         
         hydroScalingAPI.util.ordDiffEqSolver.RKF rainRunoffRaining=new hydroScalingAPI.util.ordDiffEqSolver.RKF(thisBasinEqSys,rkf_resolution,10/60.);
         
@@ -302,20 +282,20 @@ public class SimulationToFileFurey extends java.lang.Object {
         System.out.println(thisDate.getTime());
         //*System.out.println("Initial time " + storm.stormInitialTimeInMinutes());
         
-        //SET INITIAL STORM TIME
-        //double storm_initialTime = storm.stormInitialTimeInMinutes();  // Uses current time, so it changes between simulations
-        double storm_initialTime = 0.0d ;                                                       // Uses fixed time
+        //SET STORM CONDITIONS
+        // Do not fix time, or else precitation becomes zero via workings of *.getPrec class. (ie. no ... double storm_initialTime = 0.0d)
+        double storm_initialTime = storm.stormInitialTimeInMinutes();  // Uses current time, so it changes between simulations
+        double timestep_res, norain_duration ;
         
         //OUTPUT DURING RAINFALL - DISCHARGE [m3/s] AND STORAGE [m3] VALUES WRITTEN TO FILE
         //Duration is determined by the rainfall file used in subMain2,Time step (resolution) is 1 minute ... when RecordResolutionInMinutes(),1.0
         //NOTE: jumpsRunToFile is a method in RKF class.
         //Need to set incremental time in jumpsRunToFile (eg. 5 min, or 15 min)
+        timestep_res = java.lang.Double.parseDouble(sim_metadata[5]);     //eg. 5 min
         for (int k=0;k<numPeriods;k++) {
-            //System.out.println("File "+k);
-            //System.out.println(storm.stormRecordResolutionInMinutes());
-            rainRunoffRaining.jumpsRunToFile(storm_initialTime+k*storm.stormRecordResolutionInMinutes(),storm_initialTime+(k+1)*storm.stormRecordResolutionInMinutes(),1.0,initialCondition,newfile);
+            rainRunoffRaining.jumpsRunToFile(storm_initialTime+k*storm.stormRecordResolutionInMinutes(),storm_initialTime+(k+1)*storm.stormRecordResolutionInMinutes(),timestep_res,initialCondition,newfile);
             initialCondition=rainRunoffRaining.finalCond;
-            rainRunoffRaining.setBasicTimeStep(10/60.);
+            rainRunoffRaining.setBasicTimeStep(10/60.);     //1/6 min = 10 sec.
         }
 	java.util.Date interTime=new java.util.Date();
         System.out.println("Intermedia Time:"+interTime.toString());
@@ -323,8 +303,11 @@ public class SimulationToFileFurey extends java.lang.Object {
         
         //OUTPUT AFTER RAINFALL - DISCHARGE [m3/s] AND STORAGE [m3] VALUES WRITTEN TO FILE
         //Duration is 400 minutes, Time step (resolution) is 10 minutes ... when +400,10
+        timestep_res = java.lang.Double.parseDouble(sim_metadata[6]);           //eg. 10
+        norain_duration = java.lang.Double.parseDouble(sim_metadata[7]);      //eg. 400
+        System.out.println(timestep_res + "  "+ norain_duration);
         initialCondition=rainRunoffRaining.finalCond;
-        rainRunoffRaining.jumpsRunToFile(storm_initialTime+numPeriods*storm.stormRecordResolutionInMinutes(),storm_initialTime+(numPeriods*5)+500.,1,initialCondition,newfile);
+        rainRunoffRaining.jumpsRunToFile(storm_initialTime+numPeriods*storm.stormRecordResolutionInMinutes(),storm_initialTime+(numPeriods*5)+norain_duration,timestep_res,initialCondition,newfile);
         
         System.out.println("Termina simulacion RKF");
         java.util.Date endTime=new java.util.Date();
@@ -340,6 +323,7 @@ public class SimulationToFileFurey extends java.lang.Object {
             newfile.writeDouble(thisHillsInfo.Area(i));
         }
         
+        //System.out.println(numPeriods);
         newfile.writeInt(numPeriods);
         
         for (int k=0;k<numPeriods;k++) {
@@ -398,18 +382,46 @@ public class SimulationToFileFurey extends java.lang.Object {
     }
     
     public static void subMain1 (String args[]) throws java.io.IOException, VisADException {
+         
+        String [] sim_metadata = new String[24];
+        int count = 0;
+        boolean eof = false;
+        String metafile_path = "/data/cora3/furey/cuencas_simoutput/goodwin_ms/26jun06_instant_KQvarl_tests/latest_simulation/SimsToFileFurey.meta";
+        System.out.println("Accessing " + metafile_path);
         
-        /* Goodwin Creek, MS ... */
-        //String topo_path = "/hidrosigDataBases/Goodwin_Creek_MS_database/Rasters/Topography/1_ArcSec_USGS/newDEM/goodwinCreek-nov03.metaDEM";
-        //String topo_path = "/hidrosigDataBases/DataBaseNSF_Project/BDRaster/Topografia/1_ArcSec/goodwin_MS/goodwinMS.metaMDT";
-        String topo_path = "/data/phlebas1/cuencas_databases/Goodwin_Creek_MS_database/Rasters/Topography/1_ArcSec_USGS/newDEM/goodwinCreek-nov03.metaDEM";
+        try{
+        java.io.File metafile=new java.io.File(metafile_path);
+        java.io.BufferedReader input  = new java.io.BufferedReader(new java.io.FileReader(metafile));
+        while(!eof){
+              String line0=input.readLine();
+              if (line0==null) {
+                    eof=true;
+                    System.out.println("Finished reading simulation metafile");
+               }
+               else {
+                    if (count < 24) {             //(line0.charAt(0)=='[') 
+                    String line1=input.readLine();
+                    String line2=input.readLine();
+                    //System.out.println(line1);
+                    //System.out.println(line2);
+                    sim_metadata[count] = line1;
+                    count=count+1;
+                   }
+               }
+        }
+        input.close();
+        } catch (java.io.IOException IOE){
+            System.err.println("An Error has ocurred while reading metafile");
+            System.err.println(IOE);
+        }
         
-        //String rain_path = "/hidrosigDataBases/Goodwin_Creek_MS_database/Rasters/Hydrology/precipitation/storms/interpolated_events/05min_ts/";
-        //String rain_path = "/hidrosigDataBases/DataBaseNSF_Project/BDRaster/Hidrologia/precipitation/storm/dataOverGoodwinCreek/05min_ts/";  
-        //String rain_path = "/hidrosigDataBases/Goodwin_Creek_MS_database/Rasters/Hydrology/precipitation/storms/interpolated_events/05min_ts/";
-        //String rain_path = "/hidrosigDataBases/Goodwin_Creek_MS_database/Rasters/Hydrology/precipitation/storms/shortpulse_events/01min/";
-        //String rain_path = "/hidrosigDataBases/Goodwin_Creek_MS_database/Rasters/Hydrology/precipitation/storms/shortpulse_events/10sec/";
-        String rain_path = "/data/phlebas1/cuencas_databases/Goodwin_Creek_MS_database/Rasters/Hydrology/precipitation/storms/interpolated_events/05min_ts/";
+        /* for (int i=0;i<sim_metadata.length;i++) {
+          System.out.print(sim_metadata[i]);
+          System.out.print(" ");
+        } */
+        
+        String topo_path =sim_metadata[0];
+        String rain_path = sim_metadata[1];
         
         java.io.File theFile=new java.io.File(topo_path);
 
@@ -424,59 +436,55 @@ public class SimulationToFileFurey extends java.lang.Object {
         metaModif.setFormat("Integer");
         int [][] magnitudes=new hydroScalingAPI.io.DataRaster(metaModif).getInt();
         
-        hydroScalingAPI.mainGUI.ParentGUI tempFrame=new hydroScalingAPI.mainGUI.ParentGUI();
+        //hydroScalingAPI.mainGUI.ParentGUI tempFrame=new hydroScalingAPI.mainGUI.ParentGUI();
         
         java.io.File stormFile;
         
-        /* OUTLET COORDS EXAMINED BELOW (x,y) ...
-           WALNUT GULCH, AZ ... (210,330),(855,194),(736,401)
-           Goodwin Creek, MS ...  (44,111) */
-        
-        //int[] events={21,32,36,47,48,49,63,66};  //events with R^2=0.99
-        //int[] events={8,29,35,52}; //events with R^2=0.98,0.97
-        //int[] events={1,2,};
-        //int[] events = new int[72];
-        int[] events = {21}; //,16,17,18,19,20};
+        // INTERPOLATED DATA NAMES:
+        int[] event_num={1};
+        //int[] event_num={21,32,36,47,48,49,63,66};  //events with R^2=0.99
+        //int[] event_num={8,29,35,52}; //events with R^2=0.98,0.97
+        //int[] event_num = new int[72];
+        //int[] event_num = {21}; //,16,17,18,19,20};
         //for (int count=0;count<72;count++) events[count]=count+1;
-        //int[] events={5,6,7,8};
-        //int[] events={11}; //,12,13,14,15};
-        //String[] gauss_types=
-        //    {"_sd0p01_coe1p00","_sd0p05_coe1p00","_sd0p10_coe1p00","_sd0p20_coe1p00",
-        //   "_sd0p30_coe1p00","_sd0p40_coe1p00","_sd0p01_coe0p25","_sd0p05_coe0p85","_sd0p10_coe0p95"}; // in order of event number
-        //String[] gauss_types={"_sd0p05_coe1p00_L","_sd0p20_coe1p00_L","_sd0p40_coe1p00_L"};
-        //String[] gauss_types={"_sd0p05_coe1p00_R","_sd0p20_coe1p00_R","_sd0p40_coe1p00_R"};
-        //String[] gauss_types={"_sd1p00_coe2p85","_sd2p00_coe2p85","_sd4p00_coe2p85","_sd6p00_coe2p85"};
-        //String[] gauss_types={"_sd1p00_coe1p42","_sd2p00_coe1p42","_sd4p00_coe1p42","_sd6p00_coe1p42"};
-        //String[] gauss_types={"_sd2p00_coe1p42" };  //{"_sd2p00_coe1p42","_sd2p00_coe2p85","_sd2p00_coe4p27","_sd2p00_coe5p70","_sd2p00_coe7p12"};
-        //String[] gauss_types={"_sd6p00_coe7p12" };  //{"_sd6p00_coe1p42","_sd6p00_coe2p85","_sd6p00_coe4p27","_sd6p00_coe5p70","_sd6p00_coe7p12"};
-        //String[] pulse_types={"_005_001"};  // 005 = 5 mm/hr rate, 001 = 1 min duration
-        //String[] pulse_types={"_0p0_010"};  // 030 = 30 mm/hr rate, 001 = 1 min duration
-        //String[] pulse_types={"_120_001"};  // 120 = 120 mm/hr = 2 mm/min, 001 = 1 min duration
+        //int[] event_num={5,6,7,8};
+        //int[] event_num={11}; //,12,13,14,15};
+        // ARTIFICIAL GAUSS DATA NAMES:
+        //String[] event_type= {"_sd0p01_coe1p00","_sd0p05_coe1p00","_sd0p10_coe1p00","_sd0p20_coe1p00", "_sd0p30_coe1p00","_sd0p40_coe1p00","_sd0p01_coe0p25","_sd0p05_coe0p85","_sd0p10_coe0p95"}; // in order of event number
+        //String[] event_type={"_sd0p05_coe1p00_L","_sd0p20_coe1p00_L","_sd0p40_coe1p00_L"};
+        //String[] event_type={"_sd0p05_coe1p00_R","_sd0p20_coe1p00_R","_sd0p40_coe1p00_R"};
+        //String[] event_type={"_sd1p00_coe2p85","_sd2p00_coe2p85","_sd4p00_coe2p85","_sd6p00_coe2p85"};
+        //String[] event_type={"_sd1p00_coe1p42","_sd2p00_coe1p42","_sd4p00_coe1p42","_sd6p00_coe1p42"};
+        //String[] event_type={"_sd2p00_coe1p42" };  //{"_sd2p00_coe1p42","_sd2p00_coe2p85","_sd2p00_coe4p27","_sd2p00_coe5p70","_sd2p00_coe7p12"};
+        //String[] event_type={"_sd6p00_coe7p12" };  //{"_sd6p00_coe1p42","_sd6p00_coe2p85","_sd6p00_coe4p27","_sd6p00_coe5p70","_sd6p00_coe7p12"};
+        // ARTIFICIAL PULSE DATA NAMES:
+        //String[] event_type={"_005_001"};  // 005 = 5 mm/hr rate, 001 = 1 min duration
+        //String[] event_type={"_120_001"};  // 120 = 120 mm/hr = 2 mm/min, 001 = 1 min duration
+        String[] event_type={"_0p0_010"};  //  0 mm/10sec rate, 010 = 10 sec duration
+        //String[] event_type={"_720_010"};  // 1 mm/10sec rate, 010= 10 sec duration
         
+        // CREATE stormFile AND RUN SIMULATION ...
         String evNUM,evStamp;
-        for (int eventsid=0;eventsid<events.length;eventsid++){
-        //for (int eventsid=0;eventsid<1;eventsid++){
-            int evID = events[eventsid];
+        for (int eventsid=0;eventsid<event_num.length;eventsid++){
+            // INTERPOLATED DATA NAMES:
+            int evID = event_num[eventsid];
             //evNUM=(""+(evID/100.+0.001)).substring(2,4);
-            evNUM=(""+(evID/1000.+0.0001)).substring(2,5);
-            evStamp="_ev"+evNUM;
-            System.out.println("Event number ="+evNUM+" Stamp ="+evStamp);
+            //evNUM=(""+(evID/1000.+0.0001)).substring(2,5);   // events as 001 instead of 01
+            //evStamp="_ev"+evNUM;
+            //System.out.println("Event number ="+evNUM+",   Stamp ="+evStamp);
             //stormFile=new java.io.File(rain_path+"event_"+evNUM+"/precipitation_interpolated"+evStamp+".metaVHC");
             //stormFile=new java.io.File(rain_path+"event_"+evNUM+"/precipitation_meanrgts"+evStamp+".metaVHC");
             //stormFile=new java.io.File(rain_path+"event_"+evNUM+"/precipitation_meanfdts"+evStamp+".metaVHC");
+            //stormFile=new java.io.File(rain_path+"events_singpeakB_rain01"+"/event_"+evNUM+"/precipitation_interpolated"+evStamp+".metaVHC");
+            // ARTIFICIAL GAUSS DATA NAMES:
             //stormFile=new java.io.File(rain_path+"event_"+evNUM+gauss_types[eventsid]+"/precipitation_gaussian"+evStamp+".metaVHC");
             //stormFile=new java.io.File(rain_path+"event_"+evNUM+gauss_types[eventsid]+"/precipitation_gaussianL"+evStamp+".metaVHC");
             //stormFile=new java.io.File(rain_path+"event_"+evNUM+gauss_types[eventsid]+"/precipitation_gaussianR"+evStamp+".metaVHC");
-            stormFile=new java.io.File(rain_path+"events_singpeakB_rain01"+"/event_"+evNUM+"/precipitation_interpolated"+evStamp+".metaVHC");
-            System.out.println(rain_path+"events_singpeakB_rain01"+"/event_"+evNUM+"/precipitation_interpolated"+evStamp+".metaVHC");
-            
-            //System.out.println(rain_path+"precipitation_shortpulse"+pulse_types[0]+".metaVHC");
-            //stormFile=new java.io.File(rain_path+"precipitation_shortpulse"+pulse_types[0]+".metaVHC");
-            
-            //new simulationsRep4(210,330,matDirs,matDirsPruned,magnitudes,metaModif,stormFile,0.0f);
-            //new simulationsRep4(210,330,matDirs,matDirsPruned,magnitudes,metaModif,stormFile,50.0f);
-            //new SimulationToFileFurey(310,378,matDirs,magnitudes,metaModif,stormFile,0.0f);
-            new SimulationToFileFurey(44,111,matDirs,magnitudes,metaModif,stormFile,0.0f);
+             // ARTIFICIAL PULSE DATA NAMES:
+            stormFile=new java.io.File(rain_path+"precipitation_shortpulse"+event_type[0]+".metaVHC");
+
+            //System.out.println(stormFile);
+            new SimulationToFileFurey_june06(sim_metadata,matDirs,magnitudes,metaModif,stormFile,0.0f);
             
         }
         
