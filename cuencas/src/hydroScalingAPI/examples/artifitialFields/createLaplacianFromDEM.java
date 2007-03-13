@@ -290,7 +290,7 @@ public class createLaplacianFromDEM {
                 //System.out.println(">"+exponent);
                 //if(BasMask[i][j] == 1 && Xs.length > 10) System.exit(0);
 
-                if(BasMask[i][j] == 1) System.out.println(">"+exponent);
+                if(BasMask[i][j] == 1) System.out.println(">"+analysisY.maxValue);
                 
                 for(int k=0;k<pathSize;k++){
                     int[] pos=(int[])vIndexes.get(k);

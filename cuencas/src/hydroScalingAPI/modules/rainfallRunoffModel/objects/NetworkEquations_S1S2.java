@@ -69,7 +69,7 @@ public class NetworkEquations_S1S2 implements hydroScalingAPI.util.ordDiffEqSolv
         lengthArray=linksHydraulicInfo.getLengthInKmArray();
         for (int i=0;i<lengthArray[0].length;i++) lengthArray[0][i]=lengthArray[0][i]*1000;
         slopeArray=linksHydraulicInfo.getSlopeArray();
-        constantvelArray=linksHydraulicInfo.getConstantVelArray();
+        //constantvelArray=linksHydraulicInfo.getConstantVelArray();
         
     }
     

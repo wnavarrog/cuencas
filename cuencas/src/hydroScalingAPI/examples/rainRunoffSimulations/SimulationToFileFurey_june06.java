@@ -86,7 +86,7 @@ public class SimulationToFileFurey_june06 extends java.lang.Object {
         float[][] linkLengths=linksStructure.getVarValues(1);   // [1][n] ** HERE varValues are link lengths ... rename ... linkLengths[0][j]
         
         if (metric == 0) {    
-            binsize=new hydroScalingAPI.tools.Stats(linkLengths).meanValue;
+            binsize=new hydroScalingAPI.util.statistics.Stats(linkLengths).meanValue;
         }
         if (metric == 1) {
             for (int i=0;i<linkLengths.length;i++) linkLengths[0][i] = 1;
@@ -152,9 +152,9 @@ public class SimulationToFileFurey_june06 extends java.lang.Object {
        float chezy_exp = java.lang.Float.parseFloat(sim_metadata[23]);      
        float[] width_params = { width_coe, width_exp } ;
        float[] chezy_params = { chezy_coe, chezy_exp } ;
-       thisNetworkGeom.setWidthsHG( width_params[0], width_params[1] ) ;
-       thisNetworkGeom.setConstantVelHG( constvelocity ) ;
-       thisNetworkGeom.setCheziHG( chezy_params[0], chezy_params[1] ) ;     
+       thisNetworkGeom.setWidthsHG( width_params[0], width_params[1] ,0) ;
+       //thisNetworkGeom.setConstantVelHG( constvelocity ) ;
+       thisNetworkGeom.setCheziHG( chezy_params[0], chezy_params[1]) ;     
        
         /*  DEFINE INITIAL CONDITIONS  for NetworkEquations_S0S2.java .*/
         // Below, initial_qs is not defined because inital_s2 determines
