@@ -27,7 +27,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.subGUIs.widgets;
 
 /**
- * The master GIS frame for displaying maps and overlaying vector and sites
+ * The internal GIS frame for displaying maps and overlaying vector and sites
  * @author Ricardo Mantilla
  */
 
@@ -1030,7 +1030,7 @@ public abstract class RasterViewer extends javax.swing.JInternalFrame {
         jLabel31 = new javax.swing.JLabel();
         longitudeLabel = new javax.swing.JLabel();
         jPanel62 = new javax.swing.JPanel();
-        jLabel32 = new javax.swing.JLabel();
+        jLabel323 = new javax.swing.JLabel();
         valueLabel = new javax.swing.JLabel();
         layersPanel = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
@@ -1272,9 +1272,9 @@ public abstract class RasterViewer extends javax.swing.JInternalFrame {
 
         jPanel62.setLayout(new java.awt.BorderLayout());
 
-        jLabel32.setFont(new java.awt.Font("Dialog", 1, 10));
-        jLabel32.setText("Value : ");
-        jPanel62.add(jLabel32, java.awt.BorderLayout.WEST);
+        jLabel323.setFont(new java.awt.Font("Dialog", 1, 10));
+        jLabel323.setText("Value : ");
+        jPanel62.add(jLabel323, java.awt.BorderLayout.WEST);
 
         valueLabel.setFont(new java.awt.Font("Dialog", 0, 10));
         valueLabel.setText("0000");
@@ -1575,7 +1575,7 @@ public abstract class RasterViewer extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel31;
-    private javax.swing.JLabel jLabel32;
+    private javax.swing.JLabel jLabel323;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
