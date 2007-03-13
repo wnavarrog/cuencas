@@ -123,7 +123,7 @@ public class createLaplacianFromDEM {
         
         writer.close();
         
-        hydroScalingAPI.tools.Stats statLap=new hydroScalingAPI.tools.Stats(LAP);
+        hydroScalingAPI.util.statistics.Stats statLap=new hydroScalingAPI.util.statistics.Stats(LAP);
         System.out.println(statLap.toString());
         
         //Calculates distance to nearest stream
@@ -268,22 +268,43 @@ public class createLaplacianFromDEM {
                 for(int k=0;k<pathSize;k++){
                     Xs[k]=((Float)vDists.get(k)).floatValue();
                     Ys[k]=((Float)vDrops.get(k)).floatValue();
+                    //System.out.println(">>>"+Xs[k]+" "+Ys[k]);
                 }
-                hydroScalingAPI.tools.XYStats analysis=new hydroScalingAPI.tools.XYStats(Xs,Ys,true);
+                
+                hydroScalingAPI.util.statistics.Stats analysisX=new hydroScalingAPI.util.statistics.Stats(Xs);
+                hydroScalingAPI.util.statistics.Stats analysisY=new hydroScalingAPI.util.statistics.Stats(Ys);
+                for(int k=0;k<pathSize;k++){
+                    Xs[k]/=analysisX.maxValue;
+                    Xs[k]=(float)Math.log(Xs[k]);
+                    Ys[k]/=analysisY.maxValue;
+                    Ys[k]=(float)Math.log(Ys[k]);
+                }
+                
+                float exponent=1.0f;
+                if(Xs.length > 1){
+                    java.util.Hashtable paramsReg=hydroScalingAPI.util.statistics.Regressions.LinearRegressionCrossAtZero(Xs,Ys);
+                
+                    exponent=((Double)paramsReg.get("slope")).floatValue();
+                }
+                
+                //System.out.println(">"+exponent);
+                //if(BasMask[i][j] == 1 && Xs.length > 10) System.exit(0);
+
+                if(BasMask[i][j] == 1) System.out.println(">"+exponent);
                 
                 for(int k=0;k<pathSize;k++){
                     int[] pos=(int[])vIndexes.get(k);
-                    if(analysis.yStats.dataCount > 1){
-                        if(!Float.isNaN(analysis.slope)){
-                            curvatParam[pos[0]][pos[1]]=analysis.slope;
+                    if(Xs.length > 1){
+                        if(!Float.isNaN(exponent)){
+                            curvatParam[pos[0]][pos[1]]=exponent;
                         } else{
                             
                         }
                     } else {
                         curvatParam[pos[0]][pos[1]]=0;
                     }
-                    volumeParam[pos[0]][pos[1]]=(float)Math.exp(analysis.yStats.total);
-                    reliefParam[pos[0]][pos[1]]=(float)Math.exp(analysis.yStats.maxValue);
+                    volumeParam[pos[0]][pos[1]]=(float)Math.exp(analysisY.total);
+                    reliefParam[pos[0]][pos[1]]=(float)Math.exp(analysisY.maxValue);
                     
                 }
 //                if(Math.random() > 0.99) {

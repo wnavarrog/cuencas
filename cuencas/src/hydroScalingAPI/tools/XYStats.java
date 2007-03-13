@@ -19,7 +19,7 @@ public class XYStats {
     public float slope;
     public float intercept;
     public float R2;
-    public hydroScalingAPI.tools.Stats yStats,xStats;
+    public hydroScalingAPI.util.statistics.Stats yStats,xStats;
     
     /** Creates a new instance of XYStats */
     public XYStats(float[] Xs, float[] Ys,boolean takeLogs) {
@@ -30,8 +30,8 @@ public class XYStats {
             }
         }
         
-        xStats = new hydroScalingAPI.tools.Stats(Xs);
-        yStats = new hydroScalingAPI.tools.Stats(Ys);
+        xStats = new hydroScalingAPI.util.statistics.Stats(Xs);
+        yStats = new hydroScalingAPI.util.statistics.Stats(Ys);
         
         Covariance=0.0f;
         

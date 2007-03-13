@@ -547,8 +547,8 @@ public class HortonAnalysis extends java.lang.Object {
             }
         }
         
-        hydroScalingAPI.tools.Stats estadY = new hydroScalingAPI.tools.Stats(Ys);
-        hydroScalingAPI.tools.Stats estadX = new hydroScalingAPI.tools.Stats(Xs);
+        hydroScalingAPI.util.statistics.Stats estadY = new hydroScalingAPI.util.statistics.Stats(Ys);
+        hydroScalingAPI.util.statistics.Stats estadX = new hydroScalingAPI.util.statistics.Stats(Xs);
         
         float covar=0.0f;
         

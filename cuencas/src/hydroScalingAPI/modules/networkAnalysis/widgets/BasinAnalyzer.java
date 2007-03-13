@@ -606,7 +606,7 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
         
         if (metric == 0) {
             float[][] varValues=myLinksStructure.getVarValues(1);
-            binsizeWidth=new hydroScalingAPI.tools.Stats(varValues).meanValue;
+            binsizeWidth=new hydroScalingAPI.util.statistics.Stats(varValues).meanValue;
             disMap.setScalarName("Distance [km]");
             binSizeTextField.setText(binsizeWidth+" km");
             binSizeSlider.setValue(5);
@@ -961,7 +961,7 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
             float[][] thisDist=new float[1][varDistrib[i].length];
             
             
-            hydroScalingAPI.tools.Stats stats=new hydroScalingAPI.tools.Stats(varDistrib[i]);
+            hydroScalingAPI.util.statistics.Stats stats=new hydroScalingAPI.util.statistics.Stats(varDistrib[i]);
             java.util.Arrays.sort(varDistrib[i]);
             
             for (int j=0;j<varDistrib[i].length;j++)
@@ -1128,7 +1128,7 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
                     varValues[0][i]=(float)Math.log(varValues[0][i]);
                 }
             }
-            hydroScalingAPI.tools.Stats varStats=new hydroScalingAPI.tools.Stats(varValues);
+            hydroScalingAPI.util.statistics.Stats varStats=new hydroScalingAPI.util.statistics.Stats(varValues);
             binsizeHistogram=(float)(varStats.standardDeviation/10.0);
             minXVarValue=varStats.minValue;
             maxXVarValue=varStats.maxValue;
@@ -1150,7 +1150,7 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
         
         java.util.Arrays.sort(varValues[0]);
         
-        hydroScalingAPI.tools.Stats stats=new hydroScalingAPI.tools.Stats(varValues[0]);
+        hydroScalingAPI.util.statistics.Stats stats=new hydroScalingAPI.util.statistics.Stats(varValues[0]);
         
         vals_ff_Li = new FlatField( func_bins_frequencies, new Linear1DSet(bins,1,varValues[0].length,varValues[0].length));
         vals_ff_Li.setSamples( varValues );
@@ -1227,8 +1227,8 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
                     for(int i=0;i<yVarValues[0].length;i++) 
                         yVarValues[0][i]=(float)Math.log(yVarValues[0][i]);
                 
-                hydroScalingAPI.tools.Stats xVarStats=new hydroScalingAPI.tools.Stats(xVarValues);
-                hydroScalingAPI.tools.Stats yVarStats=new hydroScalingAPI.tools.Stats(yVarValues);
+                hydroScalingAPI.util.statistics.Stats xVarStats=new hydroScalingAPI.util.statistics.Stats(xVarValues);
+                hydroScalingAPI.util.statistics.Stats yVarStats=new hydroScalingAPI.util.statistics.Stats(yVarValues);
                 
                 minXVarValue=xVarStats.minValue;
                 maxXVarValue=xVarStats.maxValue;
@@ -1388,7 +1388,7 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
             float[][] thisDist=new float[1][varDistrib[i].length];
             
             
-            hydroScalingAPI.tools.Stats stats=new hydroScalingAPI.tools.Stats(varDistrib[i]);
+            hydroScalingAPI.util.statistics.Stats stats=new hydroScalingAPI.util.statistics.Stats(varDistrib[i]);
             java.util.Arrays.sort(varDistrib[i]);
             
             for (int j=0;j<varDistrib[i].length;j++)

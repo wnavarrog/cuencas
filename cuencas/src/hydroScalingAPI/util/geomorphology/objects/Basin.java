@@ -518,7 +518,7 @@ public class Basin extends Object{
            a+=bin*accumElev[i];             
         }
         
-        hydroScalingAPI.tools.Stats s = new hydroScalingAPI.tools.Stats(keyElev);
+        hydroScalingAPI.util.statistics.Stats s = new hydroScalingAPI.util.statistics.Stats(keyElev);
         float mean = s.meanValue;
         float sd = s.standardDeviation;
         float kur = s.kurtosis;

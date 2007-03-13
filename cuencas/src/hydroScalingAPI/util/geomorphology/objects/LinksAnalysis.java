@@ -364,7 +364,7 @@ public class LinksAnalysis extends java.lang.Object {
                     for (int i=0;i<wFunc[0].length;i++)
                         gWFunc[0][i]=wFunc[metric][i];
                     
-                    hydroScalingAPI.tools.Stats distStats=new hydroScalingAPI.tools.Stats(gWFunc);
+                    hydroScalingAPI.util.statistics.Stats distStats=new hydroScalingAPI.util.statistics.Stats(gWFunc);
                     
                     if(metric == 0){
                         binsize=0.2f;  //This can be improved by using the mean link lenght

@@ -116,7 +116,7 @@ public class WidthFuncToFileFurey extends java.lang.Object {
                 java.util.Arrays.sort(wFunc[metric]);
                
                 float[][] varValues=itsLinksStructure.getVarValues(1);
-                binsize=new hydroScalingAPI.tools.Stats(varValues).meanValue;
+                binsize=new hydroScalingAPI.util.statistics.Stats(varValues).meanValue;
                 //binsize=new hydroScalingAPI.tools.Stats(varValues).minValue;
                 //System.out.println(binsize);
                 newfile.writeFloat(binsize);   // binsize for the order-n basin

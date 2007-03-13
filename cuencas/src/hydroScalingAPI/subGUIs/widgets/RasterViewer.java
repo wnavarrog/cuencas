@@ -1529,7 +1529,7 @@ public abstract class RasterViewer extends javax.swing.JInternalFrame {
                         localField=metaData.getField();
                         float[][] dataValues=localField.getFloats();
                         if(heightMap != null) {
-                            hydroScalingAPI.tools.Stats statsVar=new hydroScalingAPI.tools.Stats(dataValues[0]);
+                            hydroScalingAPI.util.statistics.Stats statsVar=new hydroScalingAPI.util.statistics.Stats(dataValues[0]);
                             heightMap.setRange(statsVar.minValue,statsVar.maxValue+2*(statsVar.maxValue-statsVar.minValue));
                         }
                     } catch (visad.VisADException ve){

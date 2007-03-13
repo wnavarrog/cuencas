@@ -189,7 +189,7 @@ public class StormManager {
                 System.out.println("--> Loading data from "+arCron[i].fileName.getName());
                 dataSnapShot=new hydroScalingAPI.io.DataRaster(metaStorm).getDouble();
                 
-                hydroScalingAPI.tools.Stats rainStats=new hydroScalingAPI.tools.Stats(dataSnapShot,-999);
+                hydroScalingAPI.util.statistics.Stats rainStats=new hydroScalingAPI.util.statistics.Stats(dataSnapShot,-999);
                 System.out.println("    --> Stats of the File Max: "+rainStats.maxValue+" Min: "+rainStats.minValue+" Mean: "+rainStats.meanValue);
                 
                 

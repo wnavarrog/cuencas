@@ -248,12 +248,12 @@ public class Rainfall_Runoff_Model extends javax.swing.JDialog implements Displa
         ProjectionControl pcDEM = displayDEM.getProjectionControl();
         pcDEM.setAspect(new double[] {1.0, (double) (alturasCuenca[0].length/(double) alturasCuenca[0][0].length),1.0});
 
-        hydroScalingAPI.tools.Stats varStat= new hydroScalingAPI.tools.Stats(alturasCuenca[0],new Float(metaDatos.getMissing()).floatValue());
+        hydroScalingAPI.util.statistics.Stats varStat= new hydroScalingAPI.util.statistics.Stats(alturasCuenca[0],new Float(metaDatos.getMissing()).floatValue());
         NumMinAltura=(int) varStat.minValue;
         NumMaxAltura=(int) (varStat.maxValue+2*(varStat.maxValue-varStat.minValue));
         altMapDEM.setRange(NumMinAltura,NumMaxAltura);
         
-        varStat= new hydroScalingAPI.tools.Stats(alturasCuenca[1],new Float(metaDatos.getMissing()).floatValue());
+        varStat= new hydroScalingAPI.util.statistics.Stats(alturasCuenca[1],new Float(metaDatos.getMissing()).floatValue());
         NumMinAltura=(int) varStat.minValue;
         NumMaxAltura=(int) varStat.maxValue;
         varMapDEM.setRange(NumMinAltura,NumMaxAltura);

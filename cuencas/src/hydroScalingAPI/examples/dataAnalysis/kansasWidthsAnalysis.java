@@ -116,11 +116,11 @@ public class kansasWidthsAnalysis {
 
                     double[][] laWFunc=hist.getValues();
                     
-                    float twfMax=new hydroScalingAPI.tools.Stats(laWFunc[0]).maxValue;
+                    float twfMax=new hydroScalingAPI.util.statistics.Stats(laWFunc[0]).maxValue;
                     
                     metric=0;
                     float[][] varValues=linksStructure.getVarValues(1);
-                    binsize=new hydroScalingAPI.tools.Stats(varValues).meanValue;
+                    binsize=new hydroScalingAPI.util.statistics.Stats(varValues).meanValue;
                     
                     wFunc=linksStructure.getDistancesToOutlet();
                     java.util.Arrays.sort(wFunc[metric]);
@@ -140,7 +140,7 @@ public class kansasWidthsAnalysis {
 
                     laWFunc=hist.getValues();
                     
-                    float gwfMax=new hydroScalingAPI.tools.Stats(laWFunc[0]).maxValue;
+                    float gwfMax=new hydroScalingAPI.util.statistics.Stats(laWFunc[0]).maxValue;
                     
                     
                     System.out.println(cooLabel[1].trim()+","+linksStructure.basinMagnitude+","+thisNetworkGeom.basinArea()+","+twfMax+","+gwfMax+","+siteWidth+","+siteDepth);

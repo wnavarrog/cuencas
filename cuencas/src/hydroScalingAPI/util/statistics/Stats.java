@@ -18,7 +18,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
 
-package hydroScalingAPI.tools;
+package hydroScalingAPI.util.statistics;
 
 /**
  * An object that calculates the principal statistics of an array or matrix of
@@ -250,7 +250,7 @@ public class Stats{
                          {0.0f,0.0f,0.0f},
                          {0.0f,0.0f,0.0f},
                          {0.0f,0.0f,0.0f}};*/
-        hydroScalingAPI.tools.Stats algo= new Stats(estat,0);
+        hydroScalingAPI.util.statistics.Stats algo= new Stats(estat,0);
         System.out.println(algo.toString());
     }
     

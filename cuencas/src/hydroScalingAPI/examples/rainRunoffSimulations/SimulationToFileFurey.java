@@ -135,7 +135,7 @@ public class SimulationToFileFurey extends java.lang.Object {
         float[][] linkLengths=linksStructure.getVarValues(1);   // [1][n] ** HERE varValues are link lengths ... rename ... linkLengths[0][j] is length
         
         if (metric == 0) {    
-            binsize=new hydroScalingAPI.tools.Stats(linkLengths).meanValue;
+            binsize=new hydroScalingAPI.util.statistics.Stats(linkLengths).meanValue;
         }
         if (metric == 1) {
             for (int i=0;i<linkLengths.length;i++) linkLengths[0][i] = 1;

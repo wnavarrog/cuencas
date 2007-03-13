@@ -473,8 +473,8 @@ public class TRIBS_io extends javax.swing.JDialog {
         vals_ff_Li.setSamples( xyLinkValues );
         
         
-        hydroScalingAPI.tools.Stats eastStats=new hydroScalingAPI.tools.Stats(xyLinkValues[1]);
-        hydroScalingAPI.tools.Stats nortStats=new hydroScalingAPI.tools.Stats(xyLinkValues[0]);
+        hydroScalingAPI.util.statistics.Stats eastStats=new hydroScalingAPI.util.statistics.Stats(xyLinkValues[1]);
+        hydroScalingAPI.util.statistics.Stats nortStats=new hydroScalingAPI.util.statistics.Stats(xyLinkValues[0]);
         
         ProjectionControl pc = display_TIN_O.getProjectionControl();
         
@@ -1020,8 +1020,8 @@ public class TRIBS_io extends javax.swing.JDialog {
             pointsInTriangulation.add(utm[i]);
         }
         
-        hydroScalingAPI.tools.Stats eastStats=new hydroScalingAPI.tools.Stats(xyLinkValues[1]);
-        hydroScalingAPI.tools.Stats nortStats=new hydroScalingAPI.tools.Stats(xyLinkValues[0]);
+        hydroScalingAPI.util.statistics.Stats eastStats=new hydroScalingAPI.util.statistics.Stats(xyLinkValues[1]);
+        hydroScalingAPI.util.statistics.Stats nortStats=new hydroScalingAPI.util.statistics.Stats(xyLinkValues[0]);
         
         ProjectionControl pc = display_TIN_I.getProjectionControl();
         

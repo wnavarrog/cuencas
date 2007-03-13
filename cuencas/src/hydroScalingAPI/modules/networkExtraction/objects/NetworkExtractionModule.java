@@ -286,7 +286,7 @@ public class NetworkExtractionModule implements Runnable {
     /**
      * Statstics associated to the DEM
      */
-    public hydroScalingAPI.tools.Stats DEMstats;
+    public hydroScalingAPI.util.statistics.Stats DEMstats;
     
     private boolean firstCorrection = true;
     
@@ -385,7 +385,7 @@ public class NetworkExtractionModule implements Runnable {
         
         tempDEM = null;
         
-        DEMstats=new hydroScalingAPI.tools.Stats(DEM,-1.0);
+        DEMstats=new hydroScalingAPI.util.statistics.Stats(DEM,-1.0);
 
         dy = 6378.0*metaDEM.getResLat()*Math.PI/(3600.0*180.0);
         dx = new double[nfila+1];

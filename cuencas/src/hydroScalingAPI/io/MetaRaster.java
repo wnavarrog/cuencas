@@ -544,7 +544,7 @@ public class MetaRaster{
             valueAndColor[1]=(theData.getFloatLineEqualized())[0];
         } else {
             valueAndColor[1]=(theData.getFloatLine())[0];
-            hydroScalingAPI.tools.Stats statColors=new hydroScalingAPI.tools.Stats(valueAndColor[1]);
+            hydroScalingAPI.util.statistics.Stats statColors=new hydroScalingAPI.util.statistics.Stats(valueAndColor[1]);
             for (int i=0;i<valueAndColor[1].length;i++) 
                 valueAndColor[1][i]=240*(valueAndColor[1][i]-statColors.minValue)/(statColors.maxValue-statColors.minValue)+1;
         }

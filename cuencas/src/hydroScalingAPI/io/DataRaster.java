@@ -171,7 +171,7 @@ public class DataRaster extends Object {
         float[][] aDatosFloat=getFloatLine();
         
         float faltante=new Float(localMetaData.getProperty("[Missing]")).floatValue();
-        hydroScalingAPI.tools.Stats statDatos= new hydroScalingAPI.tools.Stats(aDatosFloat,faltante);
+        hydroScalingAPI.util.statistics.Stats statDatos= new hydroScalingAPI.util.statistics.Stats(aDatosFloat,faltante);
         noFaltantes = statDatos.dataCount;
         FDA=new float[statDatos.dataCount];
         int conDat=0;
@@ -206,7 +206,7 @@ public class DataRaster extends Object {
         float[][] aDatosFloat=getFloat();
         
         float faltante=new Float(localMetaData.getProperty("[Missing]")).floatValue();
-        hydroScalingAPI.tools.Stats statDatos= new hydroScalingAPI.tools.Stats(aDatosFloat,faltante);
+        hydroScalingAPI.util.statistics.Stats statDatos= new hydroScalingAPI.util.statistics.Stats(aDatosFloat,faltante);
         noFaltantes = statDatos.dataCount;
         FDA=new float[statDatos.dataCount];
         int conDat=0;
