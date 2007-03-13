@@ -54,6 +54,11 @@ public class LinksAnalysis extends java.lang.Object {
     public int OuletLinkNum;
     
     /**
+     * Simulation ID for a given (x,y) coordinate
+     */
+    public int ressimID=0;
+    
+    /**
      * The Shreve's magnitude associated to the river network
      */
     public int basinMagnitude=0;
@@ -364,7 +369,7 @@ public class LinksAnalysis extends java.lang.Object {
                     for (int i=0;i<wFunc[0].length;i++)
                         gWFunc[0][i]=wFunc[metric][i];
                     
-                    hydroScalingAPI.util.statistics.Stats distStats=new hydroScalingAPI.util.statistics.Stats(gWFunc);
+                    hydroScalingAPI.tools.Stats distStats=new hydroScalingAPI.tools.Stats(gWFunc);
                     
                     if(metric == 0){
                         binsize=0.2f;  //This can be improved by using the mean link lenght
@@ -448,7 +453,8 @@ public class LinksAnalysis extends java.lang.Object {
                                 ".corrDEM",     /*10*/
                                 ".lcp",         /*11*/
                                 ".magn",        /*12*/
-                                ".tcd"          /*13*/
+                                ".tcd",         /*13*/
+                                ".areas"        /*14*/
                                 };
     
         float[][] quantityArray=new float[1][tailsArray.length];
@@ -600,8 +606,13 @@ public class LinksAnalysis extends java.lang.Object {
                 }
                 
                 break;
-                
-                
+            case 14:
+                // Links Upstream Area at Head
+                for (int i=0;i<quantityArray[0].length;i++){
+                    fileQuantity.seek(4*headsArray[i]);
+                    quantityArray[0][i]=fileQuantity.readFloat();
+                }
+                break;            
         }
         
         fileQuantity.close();
@@ -650,6 +661,16 @@ public class LinksAnalysis extends java.lang.Object {
         
         return OuletLinkNum;
         
+    }
+    
+    public int getResSimID(int x, int y){       
+        int contactsID = x+(y*localMetaRaster.getNumCols());     
+        ressimID=-1;
+        for (int i=0;i<contactsArray.length;i++){
+            if (contactsArray[i]==contactsID) ressimID=i+1;
+            //Add 1 to ressimID because link ids in resSimul array in idl code start at 1.        
+        }
+        return ressimID;
     }
         
     /**
