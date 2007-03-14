@@ -26,6 +26,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 package hydroScalingAPI.modules.networkAnalysis.widgets;
 
+import java.util.Iterator;
 import visad.*;
 import visad.java3d.DisplayImplJ3D;
 import java.rmi.RemoteException;
@@ -67,7 +68,8 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
                                         "Link's Absolute Elevation [m]",
                                         "Longest Channel Length [km]",
                                         "Binary Link Address",
-                                        "Total Channel Drop"};
+                                        "Total Channel Drop",
+                                        "Upstream area at links head [km^2]"};
         
         
     
@@ -987,7 +989,7 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
         
     }
     
-    private float[][] getFilteredLinkValues() throws java.io.IOException{
+    private float[][] getFilteredLinkValues(boolean onlyType) throws java.io.IOException{
         float[][] varValues=myLinksStructure.getVarValues(xvarList.getSelectedIndex());
         if(xLog.isSelected()){
             for(int i=0;i<varValues[0].length;i++) varValues[0][i]=(float)Math.log(varValues[0][i]);
@@ -1003,7 +1005,7 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
             filterVar=false;
             if(includeInterior.isSelected() && magnitudes[0][i] > 1) filterVar=true;
             if(includeExterior.isSelected() && magnitudes[0][i] == 1) filterVar=true;
-            if(filterVar){
+            if(filterVar && !onlyType){
                 filterVar&=(varValues[0][i] >= minXVarValueCurrent) && (varValues[0][i] <= maxXVarValueCurrent);
             }
             valuesToKeep[i]=filterVar;
@@ -1018,7 +1020,6 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
                 k++;
             }
         }
-        
         return varValuesFiltered;
     }
     
@@ -1121,13 +1122,10 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
     private void plotLinksVarHistogram(Float bin) throws RemoteException, VisADException, java.io.IOException{
         float binsize=0;
 
+        
+        
         if(bin == null) {
-            float[][] varValues=myLinksStructure.getVarValues(xvarList.getSelectedIndex());
-            if(xLog.isSelected()){
-                for(int i=0;i<varValues[0].length;i++) {
-                    varValues[0][i]=(float)Math.log(varValues[0][i]);
-                }
-            }
+            float[][] varValues=getFilteredLinkValues(true);
             hydroScalingAPI.util.statistics.Stats varStats=new hydroScalingAPI.util.statistics.Stats(varValues);
             binsizeHistogram=(float)(varStats.standardDeviation/10.0);
             minXVarValue=varStats.minValue;
@@ -1143,14 +1141,10 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
             binsize=bin.floatValue();
         }
         
-        
-        float[][] varValues=getFilteredLinkValues();
-        
+        float[][] varValues=getFilteredLinkValues(false);
         histoBinSizeTextField.setText(""+binsize);
         
         java.util.Arrays.sort(varValues[0]);
-        
-        hydroScalingAPI.util.statistics.Stats stats=new hydroScalingAPI.util.statistics.Stats(varValues[0]);
         
         vals_ff_Li = new FlatField( func_bins_frequencies, new Linear1DSet(bins,1,varValues[0].length,varValues[0].length));
         vals_ff_Li.setSamples( varValues );
@@ -1160,7 +1154,6 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
         //binSizeSlider.setValue(Math.round(binsize/gWFunc[0][gWFunc[0].length-1]));
         
         Linear1DSet binsSet = new Linear1DSet(frequencies,varValues[0][0]-binsize, varValues[0][varValues[0].length-1]+binsize,(int) (varValues[0][varValues[0].length-1]/binsize));
-        
         FlatField hist = visad.math.Histogram.makeHistogram(vals_ff_Li, binsSet);
         
         float[][] laLinea=binsSet.getSamples();
@@ -1209,6 +1202,7 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
         
         display_Links.removeAllReferences();
         display_Links.addReference( data_refLi );
+                
         
     }
     private void rePlotXYvalues(){
@@ -1429,7 +1423,6 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
             int[][] headsTails=myRSNAnalysis.getHeadsAndTails(scale);
             
             int maxColor=headsTails[0].length+1;
-            System.out.println(headsTails[0].length);
             float[][] estaTabla=new float[3][maxColor];
             
             for (int i=1;i<estaTabla[0].length;i++){
@@ -1488,7 +1481,7 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
             
             
         } catch (java.io.IOException IOE){
-            System.out.println(IOE);
+            IOE.printStackTrace();
             return;
         }
         
@@ -3265,13 +3258,13 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
 //            hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
 //            metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Topography/1_ArcSec_USGS/walnutGulchUpdated.dir"));
             
-//            java.io.File theFile=new java.io.File("/hidrosigDataBases/Gila River DB/Rasters/Topography/1_ArcSec/mogollon.metaDEM");
-//            hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
-//            metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Gila River DB/Rasters/Topography/1_ArcSec/mogollon.dir"));
-            
-            java.io.File theFile=new java.io.File("/hidrosigDataBases/Rio Salado DB/Rasters/Topography/NED_26084992.metaDEM");
+            java.io.File theFile=new java.io.File("/hidrosigDataBases/Gila River DB/Rasters/Topography/1_ArcSec/mogollon.metaDEM");
             hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
-            metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Rio Salado DB/Rasters/Topography/NED_26084992.dir"));
+            metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Gila River DB/Rasters/Topography/1_ArcSec/mogollon.dir"));
+            
+//            java.io.File theFile=new java.io.File("/hidrosigDataBases/Rio Salado DB/Rasters/Topography/NED_26084992.metaDEM");
+//            hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
+//            metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Rio Salado DB/Rasters/Topography/NED_26084992.dir"));
 
             String formatoOriginal=metaModif.getFormat();
             metaModif.setFormat("Byte");
@@ -3282,8 +3275,8 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
             //new BasinAnalyzer(tempFrame,2,96,matDirs,metaModif).setVisible(true);
             //new BasinAnalyzer(tempFrame,1063,496,matDirs,metaModif).show();
             //new BasinAnalyzer(tempFrame,82,260,matDirs,metaModif).setVisible(true);
-            //new BasinAnalyzer(tempFrame,282,298,matDirs,metaModif).setVisible(true);
-            new BasinAnalyzer(tempFrame,5173,1252,matDirs,metaModif).setVisible(true);
+            new BasinAnalyzer(tempFrame,282,298,matDirs,metaModif).setVisible(true);
+            //new BasinAnalyzer(tempFrame,5173,1252,matDirs,metaModif).setVisible(true);
             
         } catch (java.io.IOException IOE){
             System.err.println(IOE);
@@ -3462,9 +3455,9 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
                 }
             }
         } catch (java.io.IOException IOE){
-            System.out.print(IOE);
+            IOE.printStackTrace();
         } catch (VisADException v){
-            System.out.print(v);
+            v.printStackTrace();
         }
         
     }
@@ -3535,9 +3528,9 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
             else
                 displayCDF.removeReference(data_refHDis[i]);
         } catch (java.io.IOException IOE){
-            System.out.print(IOE);
+            IOE.printStackTrace();
         } catch (VisADException v){
-            System.out.print(v);
+            v.printStackTrace();
         }
     }
     
@@ -3556,9 +3549,9 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
             else
                 display_Hortonian_Dists.removeReference(data_refHDis_Hortonian[i]);
         } catch (java.io.IOException IOE){
-            System.out.print(IOE);
+            IOE.printStackTrace();
         } catch (VisADException v){
-            System.out.print(v);
+            v.printStackTrace();
         }
     }
     
@@ -3577,9 +3570,9 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
             else
                 displayMap_Hortonian.removeReference(data_refSubBasins[i]);
         } catch (java.io.IOException IOE){
-            System.out.print(IOE);
+            IOE.printStackTrace();
         } catch (VisADException v){
-            System.out.print(v);
+            v.printStackTrace();
         }
     }
 

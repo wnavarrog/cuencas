@@ -434,6 +434,7 @@ public class LinksAnalysis extends java.lang.Object {
      * <p>11: Longest Channel Length</p>
      * <p>12: Binary Link Address</p>
      * <p>13: Total Channel Drop</p>
+     * <p>14: Upstream area at links head</p>
      * @param varIndex An integer indicating the desired variable associated to the group of links
      * @return A float[1][numLinks]
      * @throws java.io.IOException Throws errors while reading information from raster files
