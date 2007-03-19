@@ -489,8 +489,9 @@ public class Basin extends Object{
      * Computes the hypsometric curve and some statistical parameters: area, mean, standard deviation, skewness, and kurtosis.
      * @return Vector object with: a/A, h/H, mean, sd, kurtosis, skewness
      */
-    public java.util.Vector getHypCurve() throws java.io.IOException{
-        java.util.Vector hyp = new java.util.Vector();
+    public java.util.Hashtable getHypCurve() throws java.io.IOException{
+        
+        java.util.Hashtable hyp = new java.util.Hashtable();
         float[] eleBasin=this.getElevations();
         java.util.Arrays.sort(eleBasin);
         float localMinElev = eleBasin[0];
@@ -510,12 +511,15 @@ public class Basin extends Object{
             }
         }
         
+
+        
         float a = 0f;
         
         for (int i=0;i<keyElev.length;i++){
             if(i==0 || i==keyElev.length-1)
                 a+=bin/2f*accumElev[i];
-           a+=bin*accumElev[i];             
+           a+=bin*accumElev[i];    
+
         }
         
         hydroScalingAPI.util.statistics.Stats s = new hydroScalingAPI.util.statistics.Stats(keyElev);
@@ -524,12 +528,10 @@ public class Basin extends Object{
         float kur = s.kurtosis;
         float ske = s.skewness;
         
-        hyp.addElement(accumElev);
-        hyp.addElement(keyElev);
-        hyp.addElement(mean);
-        hyp.addElement(sd);
-        hyp.addElement(kur);
-        hyp.addElement(ske);
+        hyp.put("areas",accumElev);
+        hyp.put("elevs",keyElev);
+        hyp.put("stat",s);
+        hyp.put("integral",a);
         
         return hyp;
         

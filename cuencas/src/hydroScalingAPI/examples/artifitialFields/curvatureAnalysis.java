@@ -334,7 +334,8 @@ public byte [][] maskHill;
             hydroScalingAPI.io.MetaRaster metaRaster= new hydroScalingAPI.io.MetaRaster(new java.io.File(args[0]));
             metaRaster.setLocationBinaryFile(new java.io.File(args[1]));
             hydroScalingAPI.io.DataRaster datosRaster = new hydroScalingAPI.io.DataRaster(metaRaster);
-            float [] b1 = {0.1f, 0.2f, 0.5f, 1f, 2f, 5f, 10f};
+            //float [] b1 = {0.1f, 0.2f, 0.5f, 1f, 2f, 5f, 10f};
+            float [] b1 = {0.5f, 1f, 2f};
             float [] b2 = {0.1f, 0.2f, 0.5f, 1f, 2f, 5f, 10f};
             new curvatureAnalysis(x,y,metaRaster,datosRaster,b1,b2);
         } catch(java.io.IOException ioe){
