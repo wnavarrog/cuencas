@@ -166,10 +166,10 @@ public byte [][] maskHill;
         
         out.mkdirs();
         
+        metaOut.setFormat("Float");
         metaOut.setLocationMeta(new java.io.File(metaOrig.getLocationMeta().getParent()+"/"+folderName+"/"+folderName+".metaDEM"));
         saveFile=new java.io.File(metaOrig.getLocationMeta().getParent()+"/"+folderName+"/"+folderName+".dem");
         metaOut.setLocationBinaryFile(saveFile);
-        metaOut.setFormat("Float");
         metaOut.writeMetaRaster(metaOut.getLocationMeta());
         
         java.io.DataOutputStream writer = new java.io.DataOutputStream(new java.io.BufferedOutputStream(new java.io.FileOutputStream(saveFile)));
@@ -180,18 +180,25 @@ public byte [][] maskHill;
         
         writer.close();
         
+        
         new hydroScalingAPI.modules.networkExtraction.objects.NetworkExtractionModule(metaOut, new hydroScalingAPI.io.DataRaster(metaOut));
+        
+        
+        String path_out = metaOut.getLocationMeta().getPath().substring(0,metaOut.getLocationMeta().getPath().lastIndexOf("."));
 
-        metaOut.setLocationBinaryFile(new java.io.File(path+".dir"));
+        metaOut.setLocationBinaryFile(new java.io.File(path_out+".dir"));
         metaOut.setFormat(hydroScalingAPI.tools.ExtensionToFormat.getFormat(".dir"));
         byte [][] DIR_out = new hydroScalingAPI.io.DataRaster(metaOut).getByte();
+        metaOut.setLocationBinaryFile(new java.io.File(saveFile.getPath()));
+        metaOut.setFormat("Float");
 
+        
         hydroScalingAPI.util.geomorphology.objects.Basin bas = new hydroScalingAPI.util.geomorphology.objects.Basin(xB,yB,DIR_out,metaOut);
         java.util.Hashtable hyp = bas.getHypCurve();
         hypsoData.put(folderName,hyp);
         printHypsoCurve(folderName,hyp);
       
-        
+       
     }
     
     public void getConstrainsTopography()throws java.io.IOException{
@@ -320,22 +327,16 @@ public byte [][] maskHill;
 //                                 "/Users/jesusgomez/Documents/ensayo/walnutGulchUpdated.dem"};
 //            int x = 193;
 //            int y = 281;
-   
-            args=new String[] { "C:/SurfaceMogollon/mogollon.metaDEM",
-                                 "C:/SurfaceMogollon/mogollon.dem"};
+               
+            args=new String[] { "/Users/jesusgomez/Documents/ensayo_Mogollon/mogollon.metaDEM",
+                                 "/Users/jesusgomez/Documents/ensayo_Mogollon/mogollon.dem"};
             int x = 275;
             int y = 311;
-            
-//            args=new String[] { "/Users/jesusgomez/Documents/ensayo/Gila River DB/Rasters/Topography/1_ArcSec/mogollon.metaDEM",
-//                                 "/Users/jesusgomez/Documents/ensayo/Gila River DB/Rasters/Topography/1_ArcSec/mogollon.dem"};
-//            int x = 275;
-//            int y = 311;
              
             hydroScalingAPI.io.MetaRaster metaRaster= new hydroScalingAPI.io.MetaRaster(new java.io.File(args[0]));
             metaRaster.setLocationBinaryFile(new java.io.File(args[1]));
             hydroScalingAPI.io.DataRaster datosRaster = new hydroScalingAPI.io.DataRaster(metaRaster);
-            //float [] b1 = {0.1f, 0.2f, 0.5f, 1f, 2f, 5f, 10f};
-            float [] b1 = {0.5f, 1f, 2f};
+            float [] b1 = {0.1f, 0.2f, 0.5f, 1f, 2f, 5f, 10f};
             float [] b2 = {0.1f, 0.2f, 0.5f, 1f, 2f, 5f, 10f};
             new curvatureAnalysis(x,y,metaRaster,datosRaster,b1,b2);
         } catch(java.io.IOException ioe){

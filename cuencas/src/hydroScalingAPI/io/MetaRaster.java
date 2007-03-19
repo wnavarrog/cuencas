@@ -61,6 +61,7 @@ public class MetaRaster{
     public MetaRaster(MetaRaster mr){
         
         properties=mr.cloneProperties();
+        originalFormat=(String)properties.get("[Format]");
         
     }
     
