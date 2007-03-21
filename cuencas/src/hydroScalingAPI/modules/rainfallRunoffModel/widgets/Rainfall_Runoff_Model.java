@@ -1008,10 +1008,26 @@ public class Rainfall_Runoff_Model extends javax.swing.JDialog implements Displa
     public static void main (String args[]) {
         
         try{
-            java.io.File theFile=new java.io.File("/hidrosigDataBases/Demo_database/Rasters/Topography/3_ArcSec/TestCases/NewHS/testdem.metaDEM");
-            hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster (theFile);
-            metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Demo_database/Rasters/Topography/3_ArcSec/TestCases/NewHS/testdem.dir"));
+                        //java.io.File theFile=new java.io.File("/hidrosigDataBases/Demo_database/Rasters/Topography/3_ArcSec/TestCases/NewHS/testdem.metaDEM");
+            //hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
+            //metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Demo_database/Rasters/Topography/3_ArcSec/TestCases/NewHS/testdem.dir"));
             
+            //java.io.File theFile=new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS/Whitewaters.metaDEM");
+            //hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
+            //metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS/Whitewaters.dir"));
+            
+//            java.io.File theFile=new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Topography/1_ArcSec_USGS/walnutGulchUpdated.metaDEM");
+//            hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
+//            metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Topography/1_ArcSec_USGS/walnutGulchUpdated.dir"));
+            
+            java.io.File theFile=new java.io.File("/hidrosigDataBases/Gila River DB/Rasters/Topography/1_ArcSec/mogollon.metaDEM");
+            hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
+            metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Gila River DB/Rasters/Topography/1_ArcSec/mogollon.dir"));
+            
+//            java.io.File theFile=new java.io.File("/hidrosigDataBases/Rio Salado DB/Rasters/Topography/NED_26084992.metaDEM");
+//            hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
+//            metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Rio Salado DB/Rasters/Topography/NED_26084992.dir"));
+
             String formatoOriginal=metaModif.getFormat();
             metaModif.setFormat("Byte");
             byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
@@ -1022,9 +1038,11 @@ public class Rainfall_Runoff_Model extends javax.swing.JDialog implements Displa
             
             hydroScalingAPI.mainGUI.ParentGUI tempFrame=new hydroScalingAPI.mainGUI.ParentGUI();
             
-            new Rainfall_Runoff_Model(tempFrame, 3, 96,matDirs,magnitudes,metaModif).setVisible(true);
-            
-            
+            //new Rainfall_Runoff_Model(tempFrame,2,96,matDirs,magnitudes,metaModif).setVisible(true);
+            //new Rainfall_Runoff_Model(tempFrame,1063,496,matDirs,magnitudes,metaModif).show();
+            //new Rainfall_Runoff_Model(tempFrame,82,260,matDirs,magnitudes,metaModif).setVisible(true);
+            new Rainfall_Runoff_Model(tempFrame,282,298,matDirs,magnitudes,metaModif).setVisible(true);
+            //new Rainfall_Runoff_Model(tempFrame,5173,1252,matDirs,magnitudes,metaModif).setVisible(true);
             
         } catch (java.io.IOException IOE){
             System.out.print(IOE);

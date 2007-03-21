@@ -9,8 +9,4 @@
         <attr name="class_dependency_java.io.FileFilter" stringvalue="DotFilter"/>
         <attr name="class_dependency_java.lang.Object" stringvalue="DotFilter"/>
     </fileobject>
-    <fileobject name="NameDotFilter.java">
-        <attr name="class_dependency_java.io.FileFilter" stringvalue="NameDotFilter"/>
-        <attr name="class_dependency_java.lang.Object" stringvalue="NameDotFilter"/>
-    </fileobject>
 </attributes>

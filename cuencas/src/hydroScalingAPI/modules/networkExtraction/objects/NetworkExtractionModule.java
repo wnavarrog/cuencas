@@ -948,7 +948,9 @@ public class NetworkExtractionModule implements Runnable {
             for(int k=0; k<1; k++){
                 buffs[k].close(); datas[k].close();
             }
-        }catch(java.io.IOException e){e.printStackTrace();}
+        }catch(java.io.IOException e){
+            e.printStackTrace();
+        }
     }
     
     
@@ -994,7 +996,9 @@ public class NetworkExtractionModule implements Runnable {
             for(int k=0; k<1; k++){
                 buffs[k].close(); datas[k].close();
             }
-        }catch(java.io.IOException e){e.printStackTrace();}
+        }catch(java.io.IOException e){
+            e.printStackTrace();
+        }
     }
     
     

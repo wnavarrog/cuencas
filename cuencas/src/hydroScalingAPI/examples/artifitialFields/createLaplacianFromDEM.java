@@ -18,6 +18,8 @@ package hydroScalingAPI.examples.artifitialFields;
  */
 public class createLaplacianFromDEM {
     
+    int[][] toMark;
+    
     /** Creates a new instance of createLaplacianFromDEM */
     public createLaplacianFromDEM(int xOut, int yOut,java.io.File metaFile, java.io.File outputDir) throws java.io.IOException{
         
@@ -37,6 +39,9 @@ public class createLaplacianFromDEM {
         metaData.setLocationBinaryFile(new java.io.File(metaFile.getPath().substring(0,metaFile.getPath().lastIndexOf("."))+".gdo"));
         metaData.setFormat(hydroScalingAPI.tools.ExtensionToFormat.getFormat(".gdo"));
         float[][] GDO=new hydroScalingAPI.io.DataRaster(metaData).getFloat();
+        metaData.setLocationBinaryFile(new java.io.File(metaFile.getPath().substring(0,metaFile.getPath().lastIndexOf("."))+".areas"));
+        metaData.setFormat(hydroScalingAPI.tools.ExtensionToFormat.getFormat(".areas"));
+        float[][] ARE=new hydroScalingAPI.io.DataRaster(metaData).getFloat();
         
         hydroScalingAPI.util.geomorphology.objects.Basin myCuenca=new hydroScalingAPI.util.geomorphology.objects.Basin(xOut,yOut,DIR,metaData);
         int[][] xyBas=myCuenca.getXYBasin();
@@ -290,7 +295,7 @@ public class createLaplacianFromDEM {
                 //System.out.println(">"+exponent);
                 //if(BasMask[i][j] == 1 && Xs.length > 10) System.exit(0);
 
-                if(BasMask[i][j] == 1) System.out.println(">"+analysisY.maxValue);
+                //if(BasMask[i][j] == 1) System.out.println(">"+analysisY.maxValue);
                 
                 for(int k=0;k<pathSize;k++){
                     int[] pos=(int[])vIndexes.get(k);
@@ -360,12 +365,24 @@ public class createLaplacianFromDEM {
         writer.close();
         
         //Calculates an artificial DEM
-        float m1=0.5f;
-        float m2=0.5f;
+        float m1=-0.5f; //exponent for the S/So=(A/Ao)^m1 relationship
+        float So=0.01f;
+        float Ao=ARE[yOut][xOut];
+        float m2=0.5f;  //exponent for the h/hmax=(d/dmax)^m2 relationship
         
-        float[][] fakeDEM=DEM.clone();
+        float[][] fakeDEM=new float[DEM.length][DEM[0].length];
+        
+        java.util.Vector idsBasin=new java.util.Vector();
+        
+        toMark=new int[1][]; toMark[0]=new int[] {xOut,yOut};
+        fakeDEM[yOut][xOut]=DEM[yOut][xOut];
+        idsBasin.add(toMark[0]);
+        while(toMark != null){
+            markBasin(DIR, idsBasin,toMark,fakeDEM,Ao,So,m1,ARE,GDO,MAG);
+        }
+        
         for(int i=1;i<DEM.length-1;i++) for(int j=1;j<DEM[0].length-1;j++){
-            if(MAG[i][j] <= 0){
+            if(MAG[i][j] <= 0 && BasMask[i][j] ==1){
                 int iPn = i-1+(DIR[i][j]-1)/3;
                 int jPn = j-1+(DIR[i][j]-1)%3;
                 
@@ -378,9 +395,9 @@ public class createLaplacianFromDEM {
                     iPv=iPn;
                     jPv=jPn;
                 }
-                fakeDEM[i][j]=(float)(40*Math.pow(dToNearChannel[i][j]/0.2,m2))+(float)(1000*Math.pow(GDO[iPn][jPn]/1000.0,m1));
-            } else{
-                fakeDEM[i][j]=(float)(1000*Math.pow(GDO[i][j]/1000.0,m1));;
+                fakeDEM[i][j]=(float)(40*Math.pow(dToNearChannel[i][j]/0.2,m2))+fakeDEM[iPn][jPn];
+            } else {
+                fakeDEM[i][j]=DEM[i][j];
             }
         }
         
@@ -399,6 +416,39 @@ public class createLaplacianFromDEM {
         writer.close();
         
         
+    }
+    
+    private void markBasin(byte [][] fullDirMatrix, java.util.Vector idsBasin,int[][] ijs, float[][] fakeDEM,float Ao,float So,float m1,float[][] ARE, float[][] GDO,int[][] MAG){
+        java.util.Vector tribsVector=new java.util.Vector();
+        
+        for(int incoming=0;incoming<ijs.length;incoming++){
+            int j=ijs[incoming][0];
+            int i=ijs[incoming][1];
+            for (int k=0; k <= 8; k++){
+                if (fullDirMatrix[i+(k/3)-1][j+(k%3)-1] == 9-k && MAG[i+(k/3)-1][j+(k%3)-1]>0){
+                    tribsVector.add(new int[] {j+(k%3)-1,i+(k/3)-1});
+                    
+                    float DeltaH=So*(float)Math.pow(ARE[i+(k/3)-1][j+(k%3)-1]/Ao,m1)*(GDO[i+(k/3)-1][j+(k%3)-1]-GDO[i][j])*1000.0f;
+                    
+                    System.out.println(DeltaH+" "+(GDO[i+(k/3)-1][j+(k%3)-1]-GDO[i][j]));
+                    
+                    fakeDEM[i+(k/3)-1][j+(k%3)-1]=fakeDEM[i][j]+DeltaH;
+                    //getBasin(i+(k/3)-1,j+(k%3)-1, fullDirMatrix,idsBasin);
+                }
+            }
+        }
+        int countTribs=tribsVector.size();
+        //System.out.println(countTribs);
+        if(countTribs != 0){
+            toMark=new int[countTribs][2];
+            for(int k=0;k<countTribs;k++){
+                toMark[k]=(int[])tribsVector.get(k);
+                idsBasin.add(toMark[k]);
+                //System.out.println(">>"+toMark[k][0]+" "+toMark[k][1]);
+            }
+        } else {
+            toMark=null;
+        }
     }
     
     /**
