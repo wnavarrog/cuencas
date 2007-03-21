@@ -153,6 +153,7 @@ public class SimulationToFileFurey_june06 extends java.lang.Object {
        float[] width_params = { width_coe, width_exp } ;
        float[] chezy_params = { chezy_coe, chezy_exp } ;
        thisNetworkGeom.setWidthsHG( width_params[0], width_params[1] ,0) ;
+       thisNetworkGeom.setVqParams(constvelocity,0,0,0);
        //thisNetworkGeom.setConstantVelHG( constvelocity ) ;
        thisNetworkGeom.setCheziHG( chezy_params[0], chezy_params[1]) ;     
        
