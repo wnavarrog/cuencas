@@ -31,7 +31,7 @@ package hydroScalingAPI.util.fileUtilities;
  * predetermined extension
  * @author Ricardo Mantilla
  */
-public class DotFilter extends Object implements java.io.FileFilter{
+public class DotFilter extends javax.swing.filechooser.FileFilter implements java.io.FileFilter{
 
     String[] myExt;
     
@@ -54,5 +54,9 @@ public class DotFilter extends Object implements java.io.FileFilter{
         boolean extExists=false;
         for(int i=0;i<myExt.length;i++) extExists|=p1.getName().toLowerCase().lastIndexOf("."+myExt[i]) != -1;
         return extExists;
+    }
+    
+    public String getDescription(){
+        return null;
     }
 }

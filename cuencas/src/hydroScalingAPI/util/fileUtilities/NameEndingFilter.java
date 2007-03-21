@@ -38,8 +38,8 @@ public class NameEndingFilter extends Object implements java.io.FileFilter{
     String myEnding;
     
     /**
-     * Creates new NameDotFilter
-     * @param ext The desired extension
+     * Creates new NameEndingFilter
+     * @param end The desired file name ending (last letters in the extension)
      * @param name The base name for the group of files
      */
     public NameEndingFilter(String name,String end) {
@@ -53,8 +53,12 @@ public class NameEndingFilter extends Object implements java.io.FileFilter{
      * @return A boolean flag indicating sucess or failure of the test
      */
     public boolean accept(java.io.File file) {
-        return file.getName().toLowerCase().lastIndexOf(myEnding) != -1 && 
-               file.getName().lastIndexOf(myName) != -1;
+        int posPeriod=(int)Math.max(file.getName().lastIndexOf("."),0);
+        return file.getName().substring(posPeriod).toLowerCase().lastIndexOf(myEnding) != -1 && 
+               file.getName().lastIndexOf(myName+".") != -1 &&
+               !file.getName().substring(posPeriod+1).toLowerCase().equalsIgnoreCase("tri") &&
+               !file.getName().substring(posPeriod+1).toLowerCase().equalsIgnoreCase("edges") &&
+               !file.getName().substring(posPeriod+1).toLowerCase().equalsIgnoreCase("nodes");
     }
     
 }

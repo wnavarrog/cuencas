@@ -32,7 +32,7 @@ package hydroScalingAPI.util.fileUtilities;
  * name*ext)
  * @author Ricardo Mantilla
  */
-public class NameDotFilter extends Object implements java.io.FileFilter{
+public class NameDotFilter extends javax.swing.filechooser.FileFilter implements java.io.FileFilter{
     
     String myName;
     String myExt;
@@ -55,6 +55,10 @@ public class NameDotFilter extends Object implements java.io.FileFilter{
     public boolean accept(java.io.File file) {
         return file.getName().toLowerCase().lastIndexOf("."+myExt) != -1 && 
                file.getName().lastIndexOf(myName) != -1;
+    }
+    
+    public String getDescription(){
+        return null;
     }
     
 }

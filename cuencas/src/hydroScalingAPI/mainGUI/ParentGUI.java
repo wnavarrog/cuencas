@@ -549,6 +549,10 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         jSeparator8 = new javax.swing.JSeparator();
         rain_simulator = new javax.swing.JMenuItem();
         rainfall_runoff_simulator = new javax.swing.JMenuItem();
+        jSeparator12 = new javax.swing.JSeparator();
+        jMenu1 = new javax.swing.JMenu();
+        tRIBS_input = new javax.swing.JMenuItem();
+        tRIBS_output = new javax.swing.JMenuItem();
         window = new javax.swing.JMenu();
         arrange = new javax.swing.JMenuItem();
         jSeparator9 = new javax.swing.JSeparator();
@@ -1308,6 +1312,28 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         rainfall_runoff_simulator.setText("Rainfall Runoff Simulator");
         modules.add(rainfall_runoff_simulator);
 
+        modules.add(jSeparator12);
+
+        jMenu1.setText("tRIBS I/O Module");
+        jMenu1.setFont(new java.awt.Font("Verdana", 0, 10));
+        tRIBS_input.setFont(new java.awt.Font("Verdana", 0, 10));
+        tRIBS_input.setMnemonic('o');
+        tRIBS_input.setText("Input Module");
+        jMenu1.add(tRIBS_input);
+
+        tRIBS_output.setFont(new java.awt.Font("Verdana", 0, 10));
+        tRIBS_output.setMnemonic('o');
+        tRIBS_output.setText("Output Module");
+        tRIBS_output.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tRIBS_outputActionPerformed(evt);
+            }
+        });
+
+        jMenu1.add(tRIBS_output);
+
+        modules.add(jMenu1);
+
         jMenuBar1.add(modules);
 
         window.setMnemonic('w');
@@ -1361,6 +1387,17 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void tRIBS_outputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tRIBS_outputActionPerformed
+        javax.swing.JFileChooser fc=new javax.swing.JFileChooser("/");
+        fc.setFileSelectionMode(fc.FILES_ONLY);
+        fc.setDialogTitle("tRIBS Output Directory");
+        javax.swing.filechooser.FileFilter dirFilter = new hydroScalingAPI.util.fileUtilities.DirFilter();
+        fc.addChoosableFileFilter(dirFilter);
+        int result = fc.showDialog(this,"Select");
+        if (result == javax.swing.JFileChooser.CANCEL_OPTION) return;
+        if (!fc.getSelectedFile().isFile()) return;
+    }//GEN-LAST:event_tRIBS_outputActionPerformed
 
     private void editDBNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editDBNameActionPerformed
         new hydroScalingAPI.subGUIs.widgets.ChangeDBName(this).setVisible(true);
@@ -2060,6 +2097,7 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
     private javax.swing.JMenuItem importSitesFromGazetteer;
     private javax.swing.JMenuItem importSitesFromWaterUSGS;
     private javax.swing.JMenuItem index;
+    private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenu jMenuExport;
     private javax.swing.JMenu jMenuImport;
@@ -2090,6 +2128,7 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator10;
     private javax.swing.JSeparator jSeparator11;
+    private javax.swing.JSeparator jSeparator12;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
     private javax.swing.JSeparator jSeparator4;
@@ -2139,6 +2178,8 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
     private javax.swing.JPanel sites;
     private javax.swing.JSplitPane splitPane;
     private javax.swing.JDesktopPane subGUIs_container;
+    private javax.swing.JMenuItem tRIBS_input;
+    private javax.swing.JMenuItem tRIBS_output;
     private javax.swing.JMenu tools;
     private javax.swing.JTree topoTree;
     private javax.swing.JMenuItem ts_analysis;

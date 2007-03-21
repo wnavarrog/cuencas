@@ -30,7 +30,7 @@ package hydroScalingAPI.util.fileUtilities;
  * An implementation of the {@link java.io.FileFilter} that allows directories only
  * @author Ricardo Mantilla
  */
-public class DirFilter extends Object implements java.io.FileFilter{
+public class DirFilter extends javax.swing.filechooser.FileFilter implements java.io.FileFilter{
 
     /** Creates new filtroExtenciones */
     public DirFilter() {
@@ -44,5 +44,9 @@ public class DirFilter extends Object implements java.io.FileFilter{
      */
     public boolean accept(final java.io.File p1) {
         return p1.isDirectory();
+    }
+    
+    public String getDescription(){
+        return null;
     }
 }

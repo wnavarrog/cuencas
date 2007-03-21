@@ -21,24 +21,25 @@ import geotransform.transforms.*;
  * for/from the tRIBS program developed at MIT
  * @author Ricardo Mantilla
  */
-public class TRIBS_io extends javax.swing.JDialog {
+public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListener{
     
     private RealType    xIndex=RealType.getRealType("xIndex"),
                         xEasting =RealType.getRealType("xEasting"),
                         yNorthing=RealType.getRealType("yNorthing"),
-                        nodeColor=RealType.getRealType("posXY");
+                        nodeColor=RealType.getRealType("posXY"),
+                        voiColor=RealType.getRealType("voiColor");
     
     private RealTupleType   espacioXLYL=new RealTupleType(new RealType[] {xEasting,yNorthing,nodeColor}),
                             domainXLYL=new RealTupleType(new RealType[] {xEasting,yNorthing});
     
     private FunctionType func_xEasting_yNorthing=new FunctionType(xIndex, espacioXLYL),
-                         func_xEasting_yNorthing_to_Color=new FunctionType(domainXLYL,nodeColor);
+                         func_xEasting_yNorthing_to_Color=new FunctionType(domainXLYL,voiColor);
     
     private hydroScalingAPI.mainGUI.ParentGUI mainFrame;
     
     private DisplayImplJ3D display_TIN_I,display_TIN_O;
-    private ScalarMap eastMap_I,northMap_I,pointsMap_I,
-                      eastMap_O,northMap_O,pointsMap_O;
+    private ScalarMap eastMap_I,northMap_I,pointsMap_I,voiColorMap_I,
+                      eastMap_O,northMap_O,pointsMap_O,voiColorMap_O;
     
     private hydroScalingAPI.util.plot.XYJPanel PpanelRTF;
     private hydroScalingAPI.util.plot.XYJPanel PpanelQOUT;
@@ -90,10 +91,15 @@ public class TRIBS_io extends javax.swing.JDialog {
     public TRIBS_io(hydroScalingAPI.mainGUI.ParentGUI parent, java.io.File outputsDirectory, String baseName) throws RemoteException, VisADException, java.io.IOException{
         this(parent);
         panel_IO.setSelectedIndex(1);
+        pathTextField.setText(outputsDirectory.getPath());
+        baseNameTextField.setText(baseName);
         basTIN_O=new hydroScalingAPI.modules.tRIBS_io.objects.BasinTIN(findTriEdgNodes(outputsDirectory),baseName);
+        
         fmrfm=new hydroScalingAPI.modules.tRIBS_io.objects.FileMrfManager(findMRF(outputsDirectory));
         frftm=new hydroScalingAPI.modules.tRIBS_io.objects.FileRftManager(findRFT(outputsDirectory));
         fqm=new hydroScalingAPI.modules.tRIBS_io.objects.FileQoutManager(findQouts(outputsDirectory));
+        fim=new hydroScalingAPI.modules.tRIBS_io.objects.FileIntegratedManager(findIntegratedOutput(outputsDirectory),basTIN_O.getNumVoi());
+        fdm=new hydroScalingAPI.modules.tRIBS_io.objects.FileDynamicManager(findDynamicOutput(outputsDirectory),basTIN_O.getNumVoi());
         initializeOutputTabs();
     }
     
@@ -163,12 +169,17 @@ public class TRIBS_io extends javax.swing.JDialog {
         northMap_O = new ScalarMap( yNorthing , Display.YAxis );
         northMap_O.setScalarName("North Coordinate");
         pointsMap_O=new ScalarMap( nodeColor , Display.RGB );
+        voiColorMap_O=new ScalarMap( voiColor , Display.RGB );
 
         display_TIN_O.addMap(eastMap_O);
         display_TIN_O.addMap(northMap_O);
         display_TIN_O.addMap(pointsMap_O);
+        display_TIN_O.addMap(voiColorMap_O);
         
         hydroScalingAPI.tools.VisadTools.addWheelFunctionality(display_TIN_O);
+        
+        display_TIN_O.enableEvent(visad.DisplayEvent.MOUSE_MOVED);
+        display_TIN_O.addDisplayListener(this);
         
         jPanel17.add("Center",display_TIN_O.getComponent());
     }
@@ -251,6 +262,60 @@ public class TRIBS_io extends javax.swing.JDialog {
         if(stageBox.isSelected()) PpanelQOUT.addDatos(fqm.getTime(theKey),fqm.getSeries(theKey,2),-9999,java.awt.Color.RED,1);
     }
     
+    private java.io.File[] findIntegratedOutput(java.io.File iniDir){
+        java.io.File[] fileNodesCand=iniDir.listFiles(new hydroScalingAPI.util.fileUtilities.NameEndingFilter(baseNameTextField.getText(),"i"));
+        if(fileNodesCand.length > 0){
+            return fileNodesCand;
+        }else{
+            java.io.File[] dirsToDig=iniDir.listFiles(new hydroScalingAPI.util.fileUtilities.DirFilter());
+            for (int i = 0; i < dirsToDig.length; i++) {
+                java.io.File[] resSearch=findIntegratedOutput(dirsToDig[i]);
+                if (resSearch != null) return resSearch;
+            }
+        }
+        return null;
+    }
+    
+    private void paintParametersVoronoiPolygons(int index){
+        
+        float[][] values=new float[1][];
+        
+        int locAndCol=ListOfVariables.spatialVarSource[index];
+        if(locAndCol >= 2000){
+            values[0] = fdm.getValues(baseNameTextField.getText()+".0000_00d",locAndCol-2000);
+        } else {
+            values[0] = fim.getValues(baseNameTextField.getText()+".0000_00i",locAndCol-1000);
+        }
+        
+        values[0]=basTIN_O.valuesToVoroValues(values[0]);
+        
+        try {
+            basTIN_O.getValuesFlatField().setSamples(values);
+            voiColorMap_O.setRange(0,20000);
+        } catch (RemoteException ex) {
+            ex.printStackTrace();
+        } catch (VisADException ex) {
+            ex.printStackTrace();
+        }
+        
+    }
+    
+    private java.io.File[] findDynamicOutput(java.io.File iniDir){
+        System.out.println(baseNameTextField.getText());
+        java.io.File[] fileNodesCand=iniDir.listFiles(new hydroScalingAPI.util.fileUtilities.NameEndingFilter(baseNameTextField.getText(),"d"));
+        if(fileNodesCand.length > 0){
+            return fileNodesCand;
+        }else{
+            java.io.File[] dirsToDig=iniDir.listFiles(new hydroScalingAPI.util.fileUtilities.DirFilter());
+            for (int i = 0; i < dirsToDig.length; i++) {
+                java.io.File[] resSearch=findDynamicOutput(dirsToDig[i]);
+                if (resSearch != null) return resSearch;
+            }
+        }
+        return null;
+    }
+    
+    
     private void plotOutputPoints() throws RemoteException, VisADException, java.io.IOException{
         java.io.File outputsDirectory=findTriEdgNodes(new java.io.File(pathTextField.getText()));
         String baseName=baseNameTextField.getText();
@@ -328,7 +393,44 @@ public class TRIBS_io extends javax.swing.JDialog {
         qNodesCombo.setModel(new javax.swing.DefaultComboBoxModel(fqm.getKeys()));
         qNodesCombo.setSelectedItem("Outlet");
         
-        spaceParamsCombo.setModel(new javax.swing.DefaultComboBoxModel(listOfVariables.spatialParams));
+        spaceParamsCombo.setModel(new javax.swing.DefaultComboBoxModel(ListOfVariables.spatialParams));
+        
+    }
+    
+    /**
+     * A required method to handle interaction with the various visad.Display
+     * @param DispEvt The interaction event
+     * @throws visad.VisADException Errors while handling VisAD objects
+     * @throws java.rmi.RemoteException Errors while assigning data to VisAD objects
+     */
+    public void displayChanged(visad.DisplayEvent DispEvt) throws visad.VisADException, java.rmi.RemoteException {
+        
+        int id = DispEvt.getId();
+        visad.DisplayRenderer dr=display_TIN_O.getDisplayRenderer();
+        
+        try {
+            if (id == DispEvt.MOUSE_MOVED) {
+                
+                visad.VisADRay ray = dr.getMouseBehavior().findRay(DispEvt.getX(), DispEvt.getY());
+                
+                float resultX= eastMap_O.inverseScaleValues(new float[] {(float)ray.position[0]})[0];
+                float resultY= northMap_O.inverseScaleValues(new float[] {(float)ray.position[1]})[0];
+                
+                longitudeLabel.setText(""+resultX);
+                latitudeLabel.setText(""+resultY);
+                visad.Real spotValue=(visad.Real) basTIN_O.getValuesFlatField().evaluate(new visad.RealTuple(domainXLYL, new double[] {resultX,resultY}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
+                
+                /*java.text.NumberFormat number4 = java.text.NumberFormat.getNumberInstance();
+                java.text.DecimalFormat dpoint4 = (java.text.DecimalFormat)number4;
+                dpoint4.applyPattern("0.00000000000000000000000");*/
+                
+                valueLabel.setText(""+spotValue);
+                
+            }
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         
     }
     
@@ -406,6 +508,16 @@ public class TRIBS_io extends javax.swing.JDialog {
         voronoiCheckBox_O = new javax.swing.JCheckBox();
         valuesCheckBox_O = new javax.swing.JCheckBox();
         jPanel15 = new javax.swing.JPanel();
+        jPanel28 = new javax.swing.JPanel();
+        jPanel61 = new javax.swing.JPanel();
+        jLabel31 = new javax.swing.JLabel();
+        longitudeLabel = new javax.swing.JLabel();
+        jPanel29 = new javax.swing.JPanel();
+        jLabel7 = new javax.swing.JLabel();
+        latitudeLabel = new javax.swing.JLabel();
+        jPanel62 = new javax.swing.JPanel();
+        jLabel323 = new javax.swing.JLabel();
+        valueLabel = new javax.swing.JLabel();
         jPanel18 = new javax.swing.JPanel();
         changePath = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
@@ -828,6 +940,12 @@ public class TRIBS_io extends javax.swing.JDialog {
 
         spaceParamsCombo.setFont(new java.awt.Font("Lucida Grande", 0, 10));
         spaceParamsCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Available Variables", "Variable 01", "Variable 02", "Variable 03", "Variable 04" }));
+        spaceParamsCombo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                spaceParamsComboActionPerformed(evt);
+            }
+        });
+
         jPanel27.add(spaceParamsCombo);
 
         jPanel26.add(jPanel27, java.awt.BorderLayout.NORTH);
@@ -912,7 +1030,47 @@ public class TRIBS_io extends javax.swing.JDialog {
 
         getContentPane().add(panel_IO, java.awt.BorderLayout.CENTER);
 
-        jPanel15.setLayout(new java.awt.GridLayout(2, 1, 0, 3));
+        jPanel15.setLayout(new java.awt.GridLayout(3, 1, 0, 3));
+
+        jPanel28.setLayout(new java.awt.GridLayout(1, 3));
+
+        jPanel61.setLayout(new java.awt.BorderLayout());
+
+        jLabel31.setFont(new java.awt.Font("Dialog", 1, 10));
+        jLabel31.setText("Easting : ");
+        jPanel61.add(jLabel31, java.awt.BorderLayout.WEST);
+
+        longitudeLabel.setFont(new java.awt.Font("Dialog", 0, 10));
+        longitudeLabel.setText("00:00:00.00 W [000]");
+        jPanel61.add(longitudeLabel, java.awt.BorderLayout.CENTER);
+
+        jPanel28.add(jPanel61);
+
+        jPanel29.setLayout(new java.awt.BorderLayout());
+
+        jLabel7.setFont(new java.awt.Font("Dialog", 1, 10));
+        jLabel7.setText("Northing : ");
+        jPanel29.add(jLabel7, java.awt.BorderLayout.WEST);
+
+        latitudeLabel.setFont(new java.awt.Font("Dialog", 0, 10));
+        latitudeLabel.setText("00:00:00.00 N [000]");
+        jPanel29.add(latitudeLabel, java.awt.BorderLayout.CENTER);
+
+        jPanel28.add(jPanel29);
+
+        jPanel62.setLayout(new java.awt.BorderLayout());
+
+        jLabel323.setFont(new java.awt.Font("Dialog", 1, 10));
+        jLabel323.setText("Value : ");
+        jPanel62.add(jLabel323, java.awt.BorderLayout.WEST);
+
+        valueLabel.setFont(new java.awt.Font("Dialog", 0, 10));
+        valueLabel.setText("0000");
+        jPanel62.add(valueLabel, java.awt.BorderLayout.CENTER);
+
+        jPanel28.add(jPanel62);
+
+        jPanel15.add(jPanel28);
 
         jPanel18.setLayout(new java.awt.BorderLayout());
 
@@ -950,6 +1108,10 @@ public class TRIBS_io extends javax.swing.JDialog {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void spaceParamsComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_spaceParamsComboActionPerformed
+        paintParametersVoronoiPolygons(spaceParamsCombo.getSelectedIndex());
+    }//GEN-LAST:event_spaceParamsComboActionPerformed
 
     private void qNodesComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_qNodesComboActionPerformed
         plotQouts();
@@ -1206,12 +1368,12 @@ public class TRIBS_io extends javax.swing.JDialog {
     }//GEN-LAST:event_pointsCheckBox_IActionPerformed
 
     private void zrSliderMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_zrSliderMouseReleased
-        try{
+        try {
             plotPoints(zrSlider.getValue());
-        } catch (VisADException v){
-            System.out.print(v);
-        } catch (RemoteException r){
-            System.out.print(r);
+        } catch (RemoteException ex) {
+            ex.printStackTrace();
+        } catch (VisADException ex) {
+            ex.printStackTrace();
         }
     }//GEN-LAST:event_zrSliderMouseReleased
 
@@ -1289,9 +1451,12 @@ public class TRIBS_io extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel31;
+    private javax.swing.JLabel jLabel323;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
@@ -1312,10 +1477,14 @@ public class TRIBS_io extends javax.swing.JDialog {
     private javax.swing.JPanel jPanel25;
     private javax.swing.JPanel jPanel26;
     private javax.swing.JPanel jPanel27;
+    private javax.swing.JPanel jPanel28;
+    private javax.swing.JPanel jPanel29;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel61;
+    private javax.swing.JPanel jPanel62;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
@@ -1330,6 +1499,8 @@ public class TRIBS_io extends javax.swing.JDialog {
     private javax.swing.JRadioButton jRadioButton7;
     private javax.swing.JRadioButton jRadioButton8;
     private javax.swing.JRadioButton jRadioButton9;
+    private javax.swing.JLabel latitudeLabel;
+    private javax.swing.JLabel longitudeLabel;
     private javax.swing.ButtonGroup mrfButtonGroup;
     private javax.swing.JPanel mrfPanel;
     private javax.swing.JTabbedPane panelInputs;
@@ -1347,6 +1518,7 @@ public class TRIBS_io extends javax.swing.JDialog {
     private javax.swing.JCheckBox stageBox;
     private javax.swing.JCheckBox trianglesCheckBox_I;
     private javax.swing.JCheckBox trianglesCheckBox_O;
+    private javax.swing.JLabel valueLabel;
     private javax.swing.JCheckBox valuesCheckBox_O;
     private javax.swing.JCheckBox voronoiCheckBox_I;
     private javax.swing.JCheckBox voronoiCheckBox_O;
@@ -1355,18 +1527,18 @@ public class TRIBS_io extends javax.swing.JDialog {
     
 }
 
-class listOfVariables{
+class ListOfVariables{
     public static int[] spatialVarSource={  -1,
-                                            1000,
-                                            1001,
-                                            1002,
-                                            2003,
-                                            2004,
-                                            2005,
-                                            2006,
-                                            2007,
-                                            2008,
-                                            2009,
+                                            2000,
+                                            2001,
+                                            2002,
+                                            1003,
+                                            1004,
+                                            1005,
+                                            1006,
+                                            1007,
+                                            1008,
+                                            1009,
                                             2025,
                                             2026};
 

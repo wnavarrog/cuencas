@@ -47,8 +47,11 @@ public class BasinTIN {
                              filteredElevationOfPoint;
     private Delaunay delaun;
     private int numPointsBasin=0;
+    private int countNoBorder;
     
     private visad.FlatField demField,theColors;
+    private int[] nodesPerPolygon;
+    private int totalPolygonNodes;
     
     private FlatField vals_ff_Li;
     private float[][] xyLinkValues;
@@ -309,7 +312,7 @@ public class BasinTIN {
         
         //Getting data
         
-        int countNoBorder=0;
+        countNoBorder=0;
         
         //Read nodes file
         java.io.File nodeFile=new java.io.File(pathToTriang.getPath()+"/"+baseName+".nodes");
@@ -402,39 +405,46 @@ public class BasinTIN {
         
         Gridded2DSet[] polygons=new Gridded2DSet[countNoBorder];
         Irregular2DSet[] regions=new Irregular2DSet[countNoBorder];
+        nodesPerPolygon=new int[countNoBorder];
 
         lines=new float[2][];
 
         for(int j=0;j<countNoBorder;j++){
-            lines = new float[2][voroPolys[j].size()];
+            nodesPerPolygon[j]=voroPolys[j].size();
+
+            lines = new float[2][nodesPerPolygon[j]];
             
-            for(int i=0;i<voroPolys[j].size()-1;i++){
+            for(int i=0;i<nodesPerPolygon[j]-1;i++){
                 String[] lineData=((String)voroPolys[j].get(i)).split(",");
                 lines[0][i]=Float.parseFloat(lineData[0]);
                 lines[1][i]=Float.parseFloat(lineData[1]);
             }
-            lines[0][voroPolys[j].size()-1]=lines[0][0];
-            lines[1][voroPolys[j].size()-1]=lines[1][0];
+            lines[0][nodesPerPolygon[j]-1]=lines[0][0];
+            lines[1][nodesPerPolygon[j]-1]=lines[1][0];
 
             polygons[j]=new Gridded2DSet(domainXLYL,lines,lines[0].length);
 
 //            Delaunay dela1=new DelaunayClarkson(lines);
 //            
             regions[j] = DelaunayCustom.fill(polygons[j]);
+            
+            nodesPerPolygon[j]=regions[j].getLength();
+            totalPolygonNodes+=nodesPerPolygon[j];
 
             //float theColor=3.0f*(float)Math.random();
             //for (int i = j*4; i < (j+1)*4; i++) colors[0][i]=theColor;
+            
         }
 
         allPoly=new UnionSet(domainXLYL,polygons);
         
         UnionSet allRegions=new UnionSet(domainXLYL,regions);
 
-        float[][] colors=new float[1][allRegions.getLength()];
+        float[][] colors=new float[1][countNoBorder];
         for (int i = 0; i < colors[0].length; i++) {
             colors[0][i]=2.6f*(float)Math.random();
         }
-        
+        colors[0]=valuesToVoroValues(colors[0]);
         theColors=new FlatField(func_xEasting_yNorthing_to_Color,allRegions);
         theColors.setSamples(colors);
         
@@ -506,8 +516,6 @@ public class BasinTIN {
         vals_ff_Li = new FlatField( func_xEasting_yNorthing, xVarIndex);
         vals_ff_Li.setSamples( xyLinkValues );
         
-        System.out.println("creo nuevo field");
-        
         if(Zr > 70){
             float[][] samples=new float[2][];
             samples[0]=xyLinkValues[0];//.clone();
@@ -536,9 +544,7 @@ public class BasinTIN {
             
             
             Gridded2DSet[] triangles=new Gridded2DSet[delaun.Tri.length];
-            Irregular2DSet[] regions=new Irregular2DSet[delaun.Tri.length];
             
-            float[][] colors=new float[1][4*delaun.Tri.length];
             float[][] lines=new float[2][4];
             
             for(int j=0;j<delaun.Tri.length;j++){
@@ -551,10 +557,6 @@ public class BasinTIN {
                 
                 triangles[j]=new Gridded2DSet(domainXLYL,lines,lines[0].length);
                 
-                regions[j] = new Irregular2DSet(domainXLYL,lines);
-                
-                float theColor=3.0f*(float)Math.random();
-                for (int i = j*4; i < (j+1)*4; i++) colors[0][i]=theColor;
             }
             
             allTriang=new UnionSet(domainXLYL,triangles);
@@ -566,6 +568,10 @@ public class BasinTIN {
             
             float[] s0 = samples[0];
             float[] s1 = samples[1];
+            
+            countNoBorder=numValidPoints-1;
+            
+            nodesPerPolygon=new int[countNoBorder];
             
             Gridded2DSet[] polygons=new Gridded2DSet[numValidPoints-1];
             int kp=0;
@@ -632,7 +638,8 @@ public class BasinTIN {
                     lines1[0][delaun.Vertices[k].length]=lines1[0][0];
                     lines1[1][delaun.Vertices[k].length]=lines1[1][0];
                     
-                    polygons[kp++]=new Gridded2DSet(domainXLYL,lines1,lines1[0].length);
+                    polygons[kp]=new Gridded2DSet(domainXLYL,lines1,lines1[0].length);
+                    nodesPerPolygon[kp++]=lines1[0].length;
                 }
             }
             allPoly=new UnionSet(domainXLYL,polygons);
@@ -934,6 +941,24 @@ public class BasinTIN {
         double[] answ={xi,yi};
         
         return answ;
+    }
+    
+    public int getNumVoi(){
+        return countNoBorder;
+    }
+    
+    public float[] valuesToVoroValues(float[] theValues){
+        if(theValues.length != countNoBorder) return null;
+        
+        float[] voroValues=new float[totalPolygonNodes];
+        int k=0;
+        for (int i = 0; i < theValues.length; i++) {
+            for (int j = 0; j < nodesPerPolygon[i]; j++) {
+                voroValues[k++]=theValues[i];
+            }
+        }
+        return voroValues;
+        
     }
     
     

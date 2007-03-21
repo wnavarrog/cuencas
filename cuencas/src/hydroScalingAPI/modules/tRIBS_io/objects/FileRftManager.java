@@ -27,7 +27,6 @@ public class FileRftManager {
     public FileRftManager(java.io.File pRft) {
         
         pathToRft=pRft;
-        System.out.println(pathToRft);
         try {
             
             java.io.BufferedReader fileRft = new java.io.BufferedReader(new java.io.FileReader(pathToRft));
