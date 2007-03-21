@@ -301,7 +301,6 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
     }
     
     private java.io.File[] findDynamicOutput(java.io.File iniDir){
-        System.out.println(baseNameTextField.getText());
         java.io.File[] fileNodesCand=iniDir.listFiles(new hydroScalingAPI.util.fileUtilities.NameEndingFilter(baseNameTextField.getText(),"d"));
         if(fileNodesCand.length > 0){
             return fileNodesCand;

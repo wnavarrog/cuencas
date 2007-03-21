@@ -25,15 +25,12 @@ public class InfoRequest extends javax.swing.JDialog {
         java.awt.Rectangle thisMarco=this.getBounds();
         setBounds(marcoParent.x+marcoParent.width/2-thisMarco.width/2,marcoParent.y+marcoParent.height/2-thisMarco.height/2,thisMarco.width,thisMarco.height);
         
-        try{
-                java.io.FileReader reader = new java.io.FileReader(mainGUI.getInfoManager().dataBaseNamePath);
-                java.io.BufferedReader buffer=new java.io.BufferedReader(reader);
-                nameTextField.setText(buffer.readLine());
-                buffer.close();
-            } catch (java.io.IOException IOE){
-                System.err.println("An Error has ocurred while reading name.txt");
-                IOE.printStackTrace();
-            }
+        nameTextField.setText("");
+        
+    }
+    
+    public String getBaseName(){
+        return nameTextField.getText();
     }
     
     /** This method is called from within the constructor to

@@ -61,7 +61,6 @@ class FileIntegrated {
     public FileIntegrated(java.io.File pInt,int nv) {
         pathToIntegrated=pInt;
         numVoi=nv;
-        System.out.println(pathToIntegrated);
         try {
             
             java.io.BufferedReader fileInteg = new java.io.BufferedReader(new java.io.FileReader(pathToIntegrated));

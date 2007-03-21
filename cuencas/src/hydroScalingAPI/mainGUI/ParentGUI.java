@@ -27,6 +27,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.mainGUI;
 
 import java.io.IOException;
+import java.rmi.RemoteException;
+import visad.VisADException;
 
 /**
  * This class creates the main Graphical User Iterface to the GIS component of
@@ -1390,13 +1392,28 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
 
     private void tRIBS_outputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tRIBS_outputActionPerformed
         javax.swing.JFileChooser fc=new javax.swing.JFileChooser("/");
-        fc.setFileSelectionMode(fc.FILES_ONLY);
+        fc.setFileSelectionMode(fc.DIRECTORIES_ONLY);
         fc.setDialogTitle("tRIBS Output Directory");
-        javax.swing.filechooser.FileFilter dirFilter = new hydroScalingAPI.util.fileUtilities.DirFilter();
-        fc.addChoosableFileFilter(dirFilter);
+//        javax.swing.filechooser.FileFilter dirFilter = new hydroScalingAPI.util.fileUtilities.DirFilter();
+//        fc.addChoosableFileFilter(dirFilter);
         int result = fc.showDialog(this,"Select");
         if (result == javax.swing.JFileChooser.CANCEL_OPTION) return;
-        if (!fc.getSelectedFile().isFile()) return;
+        
+        hydroScalingAPI.mainGUI.widgets.InfoRequest ir=new hydroScalingAPI.mainGUI.widgets.InfoRequest(this);
+        ir.setVisible(true);
+        System.out.println(fc.getSelectedFile().getPath());
+        System.out.println(ir.getBaseName());
+        try {
+            
+            new hydroScalingAPI.modules.tRIBS_io.widgets.TRIBS_io(this,fc.getSelectedFile(),ir.getBaseName()).setVisible(true);
+        } catch (RemoteException ex) {
+            ex.printStackTrace();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } catch (VisADException ex) {
+            ex.printStackTrace();
+        }
+        
     }//GEN-LAST:event_tRIBS_outputActionPerformed
 
     private void editDBNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editDBNameActionPerformed
