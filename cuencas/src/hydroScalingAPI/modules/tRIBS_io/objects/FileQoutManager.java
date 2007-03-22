@@ -71,27 +71,30 @@ class FileQout{
         pathToQ=qf;
         try {
             
-            java.io.BufferedReader fileRft = new java.io.BufferedReader(new java.io.FileReader(pathToQ));
+            java.io.BufferedReader fileQout = new java.io.BufferedReader(new java.io.FileReader(pathToQ));
             String fullLine;
             do{
-                fullLine=fileRft.readLine();
+                fullLine=fileQout.readLine();
                 countTimes++;
             } while (fullLine!=null);
-            fileRft.close();
+            fileQout.close();
             
-            fileRft = new java.io.BufferedReader(new java.io.FileReader(pathToQ));
+            fileQout = new java.io.BufferedReader(new java.io.FileReader(pathToQ));
 
-            fullLine=fileRft.readLine();
+            fullLine=fileQout.readLine();
             String[] elements=fullLine.split("\t");
             
             if(elements[0].equalsIgnoreCase("1-Time,hr")){
                 countTimes--;
+            } else {
+                fileQout.close();
+                fileQout = new java.io.BufferedReader(new java.io.FileReader(pathToQ));
             }
             
             QhData=new double[3][countTimes];
             
             for (int i = 0; i < countTimes; i++) {
-                fullLine=fileRft.readLine();
+                fullLine=fileQout.readLine();
                 elements=fullLine.split("\t");
                 elements=fullLine.split("\t");
                 for (int j = 0; j < QhData.length; j++) {
@@ -99,7 +102,7 @@ class FileQout{
                 }
             }
             
-            fileRft.close();
+            fileQout.close();
         } catch (NumberFormatException ex) {
             ex.printStackTrace();
         } catch (FileNotFoundException ex) {

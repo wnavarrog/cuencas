@@ -43,6 +43,9 @@ public class FileMrfManager {
             if(elements[0].equalsIgnoreCase("time")){
                 fullLine=fileMrf.readLine();
                 countTimes-=2;
+            } else {
+                fileMrf.close();
+                fileMrf = new java.io.BufferedReader(new java.io.FileReader(pathToMRF));
             }
             
             mrfData=new double[13][countTimes];
@@ -78,7 +81,7 @@ public class FileMrfManager {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        new FileMrfManager(new java.io.File("/home/ricardo/workFiles/tribsWork/sampleTribs/SMALLBASIN/Output/hyd/smallbasin0018_00.mrf"));
+        new FileMrfManager(new java.io.File("/Users/ricardo/workFiles/tribsWork/sampleTribs/JEMEZ_TRIBS_RUM/Output/hyd/jm0009_00.mrf"));
     }
     
 }

@@ -45,6 +45,9 @@ public class FileRftManager {
             if(elements[0].equalsIgnoreCase("time")){
                 fullLine=fileRft.readLine();
                 countTimes-=2;
+            } else {
+                fileRft.close();
+                fileRft = new java.io.BufferedReader(new java.io.FileReader(pathToRft));
             }
             
             RftData=new double[5][countTimes];
