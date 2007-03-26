@@ -23,17 +23,14 @@ import geotransform.transforms.*;
  */
 public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListener{
     
-    private RealType    xIndex=RealType.getRealType("xIndex"),
+    private RealType    posIndex=RealType.getRealType("posIndex"),
                         xEasting =RealType.getRealType("xEasting"),
                         yNorthing=RealType.getRealType("yNorthing"),
-                        nodeColor=RealType.getRealType("posXY"),
+                        nodeColor=RealType.getRealType("nodeColor"),
                         voiColor=RealType.getRealType("voiColor");
     
     private RealTupleType   espacioXLYL=new RealTupleType(new RealType[] {xEasting,yNorthing,nodeColor}),
                             domainXLYL=new RealTupleType(new RealType[] {xEasting,yNorthing});
-    
-    private FunctionType func_xEasting_yNorthing=new FunctionType(xIndex, espacioXLYL),
-                         func_xEasting_yNorthing_to_Color=new FunctionType(domainXLYL,voiColor);
     
     private hydroScalingAPI.mainGUI.ParentGUI mainFrame;
     
@@ -169,8 +166,11 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         northMap_O = new ScalarMap( yNorthing , Display.YAxis );
         northMap_O.setScalarName("North Coordinate");
         pointsMap_O=new ScalarMap( nodeColor , Display.RGB );
+        pointsMap_O.setRange(0,4);
         voiColorMap_O=new ScalarMap( voiColor , Display.RGB );
-
+        voiColorMap_O.setRange(0,10);
+                
+                
         display_TIN_O.addMap(eastMap_O);
         display_TIN_O.addMap(northMap_O);
         display_TIN_O.addMap(pointsMap_O);
@@ -275,23 +275,33 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         }
         return null;
     }
-    
-    private void paintParametersVoronoiPolygons(int index){
+    private void paintParametersVoronoiPolygons(int locAndCol){
+        if(locAndCol >= 2000){
+            paintParametersVoronoiPolygons(locAndCol,baseNameTextField.getText()+".0000_00d");
+        } else {
+            paintParametersVoronoiPolygons(locAndCol,"Initial Condition");
+        }
+    }
+    private void paintParametersVoronoiPolygons(int locAndCol,Object fileKey){
+        
+        System.out.println("It is going to plot "+fileKey+" var# "+locAndCol);
         
         float[][] values=new float[1][];
         
-        int locAndCol=ListOfVariables.spatialVarSource[index];
         if(locAndCol >= 2000){
-            values[0] = fdm.getValues(baseNameTextField.getText()+".0000_00d",locAndCol-2000);
+            values[0] = fdm.getValues((String)fileKey,locAndCol-2000);
         } else {
-            values[0] = fim.getValues(baseNameTextField.getText()+".0000_00i",locAndCol-1000);
+            values[0] = fim.getValues((String)fileKey,locAndCol-1000);
         }
+
+        hydroScalingAPI.util.statistics.Stats
+                fieldStats=new hydroScalingAPI.util.statistics.Stats(values[0]);
         
         values[0]=basTIN_O.valuesToVoroValues(values[0]);
         
         try {
+            voiColorMap_O.setRange(fieldStats.minValue,fieldStats.maxValue);
             basTIN_O.getValuesFlatField().setSamples(values);
-            voiColorMap_O.setRange(0,20000);
         } catch (RemoteException ex) {
             ex.printStackTrace();
         } catch (VisADException ex) {
@@ -393,6 +403,11 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         qNodesCombo.setSelectedItem("Outlet");
         
         spaceParamsCombo.setModel(new javax.swing.DefaultComboBoxModel(ListOfVariables.spatialParams));
+        
+        Object[] spatialMoments=new String[] {"Available Times","Initial Condition","Final State"};
+        
+        spatialMoments=hydroScalingAPI.tools.ArrayTools.concatentate(spatialMoments,fdm.getKeys());
+        avaTimesCombo.setModel(new javax.swing.DefaultComboBoxModel(spatialMoments));
         
     }
     
@@ -957,10 +972,22 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
 
         avaTimesCombo.setFont(new java.awt.Font("Lucida Grande", 0, 10));
         avaTimesCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Available Times", "Time 01", "Time 02", "Time 03", "Time 04", "Time-integrated Spatial Output" }));
+        avaTimesCombo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                avaTimesComboActionPerformed(evt);
+            }
+        });
+
         jPanel20.add(avaTimesCombo);
 
         avaVariablesCombo.setFont(new java.awt.Font("Lucida Grande", 0, 10));
-        avaVariablesCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Available Variables", "Variable 01", "Variable 02", "Variable 03", "Variable 04" }));
+        avaVariablesCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Available Variables" }));
+        avaVariablesCombo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                avaVariablesComboActionPerformed(evt);
+            }
+        });
+
         jPanel20.add(avaVariablesCombo);
 
         jPanel17.add(jPanel20, java.awt.BorderLayout.NORTH);
@@ -1108,8 +1135,74 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void avaVariablesComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_avaVariablesComboActionPerformed
+        if(avaVariablesCombo.getSelectedIndex() == 0){
+            try {
+                voiColorMap_O.setRange(0,0);
+            } catch (RemoteException ex) {
+                ex.printStackTrace();
+            } catch (VisADException ex) {
+                ex.printStackTrace();
+            }
+        }
+        if(avaTimesCombo.getSelectedIndex() < 3){
+            paintParametersVoronoiPolygons(1000+avaVariablesCombo.getSelectedIndex()+9,avaTimesCombo.getSelectedItem());
+            return;
+        }
+        paintParametersVoronoiPolygons(2000+avaVariablesCombo.getSelectedIndex()+2,avaTimesCombo.getSelectedItem());
+    }//GEN-LAST:event_avaVariablesComboActionPerformed
+
+    private void avaTimesComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_avaTimesComboActionPerformed
+        if(avaTimesCombo.getSelectedIndex() == 0){
+            try {
+                voiColorMap_O.setRange(0,0);
+            } catch (RemoteException ex) {
+                ex.printStackTrace();
+            } catch (VisADException ex) {
+                ex.printStackTrace();
+            }
+            Object[] spatialVariables=new String[] {"Available Variables"};
+            avaVariablesCombo.setModel(new javax.swing.DefaultComboBoxModel(spatialVariables));
+            return;
+        }
+        if(avaTimesCombo.getSelectedIndex() < 3){
+            if(((String)avaVariablesCombo.getItemAt(0)).equalsIgnoreCase("Available Integrated Variables")){
+                paintParametersVoronoiPolygons(1000+avaVariablesCombo.getSelectedIndex()+9,avaTimesCombo.getSelectedItem());
+            } else {
+                try {
+                    voiColorMap_O.setRange(0,0);
+                } catch (RemoteException ex) {
+                    ex.printStackTrace();
+                } catch (VisADException ex) {
+                    ex.printStackTrace();
+                }
+                Object[] spatialVariables=new String[] {"Available Integrated Variables"};
+                spatialVariables=hydroScalingAPI.tools.ArrayTools.concatentate(spatialVariables,ListOfVariables.integratedOutput);
+                avaVariablesCombo.setModel(new javax.swing.DefaultComboBoxModel(spatialVariables));
+            }
+            return;
+        }
+
+        if(((String)avaVariablesCombo.getItemAt(0)).equalsIgnoreCase("Available Dynamic Variables")){
+            paintParametersVoronoiPolygons(2000+avaVariablesCombo.getSelectedIndex()+2,avaTimesCombo.getSelectedItem());
+        } else {
+            try {
+                voiColorMap_O.setRange(0,0);
+            } catch (RemoteException ex) {
+                ex.printStackTrace();
+            } catch (VisADException ex) {
+                ex.printStackTrace();
+            }
+            Object[] spatialVariables=new String[] {"Available Dynamic Variables"};
+            spatialVariables=hydroScalingAPI.tools.ArrayTools.concatentate(spatialVariables,ListOfVariables.dynamicOutput);
+            avaVariablesCombo.setModel(new javax.swing.DefaultComboBoxModel(spatialVariables));
+        }
+        
+    }//GEN-LAST:event_avaTimesComboActionPerformed
+
     private void spaceParamsComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_spaceParamsComboActionPerformed
-        paintParametersVoronoiPolygons(spaceParamsCombo.getSelectedIndex());
+        if(spaceParamsCombo.getSelectedIndex() == 0) return;
+        paintParametersVoronoiPolygons(ListOfVariables.spatialVarSource[spaceParamsCombo.getSelectedIndex()]);
     }//GEN-LAST:event_spaceParamsComboActionPerformed
 
     private void qNodesComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_qNodesComboActionPerformed
@@ -1188,11 +1281,37 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
       if ( panelOutputs.getSelectedIndex()==2) {
           jPanel26.add("Center",display_TIN_O.getComponent());
           jPanel26.add("South",jPanel22);
+          if(spaceParamsCombo.getSelectedIndex() == 0) {
+              try {
+                    voiColorMap_O.setRange(0,0);
+                } catch (RemoteException ex) {
+                    ex.printStackTrace();
+                } catch (VisADException ex) {
+                    ex.printStackTrace();
+                }
+          } else{
+            paintParametersVoronoiPolygons(ListOfVariables.spatialVarSource[spaceParamsCombo.getSelectedIndex()]);
+          }
       }
 
       if ( panelOutputs.getSelectedIndex()==3) {
           jPanel17.add("Center",display_TIN_O.getComponent());
           jPanel17.add("South",jPanel22);
+          if(avaTimesCombo.getSelectedIndex() == 0) {
+              try {
+                  voiColorMap_O.setRange(0,0);
+              } catch (RemoteException ex) {
+                  ex.printStackTrace();
+              } catch (VisADException ex) {
+                  ex.printStackTrace();
+              }
+          } else{
+              if(((String)avaVariablesCombo.getItemAt(0)).equalsIgnoreCase("Available Integrated Variables")){
+                  paintParametersVoronoiPolygons(1000+avaVariablesCombo.getSelectedIndex()+9,avaTimesCombo.getSelectedItem());
+              } else {
+                  paintParametersVoronoiPolygons(2000+avaVariablesCombo.getSelectedIndex()+2,avaTimesCombo.getSelectedItem());
+              }
+          }
       }
     }//GEN-LAST:event_panelOutputsStateChanged
 
@@ -1423,7 +1542,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
             //new TRIBS_io(tempFrame, 56,79,matDirs,magnitudes,metaModif).setVisible(true);
             //new TRIBS_io(tempFrame, 111,80,matDirs,magnitudes,metaModif).setVisible(true);
             
-            new TRIBS_io(tempFrame, new java.io.File("/home/ricardo/workFiles/tribsWork/sampleTribs/MOGOLLON/Output/"),"mogollon").setVisible(true);
+            new TRIBS_io(tempFrame, new java.io.File("/home/ricardo/workFiles/tribsWork/sampleTribs/SMALLBASIN/Output/"),"smallbasin").setVisible(true);
         } catch (java.io.IOException IOE){
             System.out.print(IOE);
             System.exit(0);
@@ -1555,18 +1674,7 @@ class ListOfVariables{
                                             "Soil Type []",
                                             "Land Use Type []"};
     
-    public static String[] integratedOutput={   "Available Variables",
-                                                "Node Identification, ID [id]",
-                                                "Boundary Flag, BndCd [ ]",
-                                                "Elevation, Z [m]",
-                                                "Voronoi Area, VAr [m2]",
-                                                "Contributing Area, CAr [km2]",
-                                                "Curvature, Curv [ ]",
-                                                "Flow Edge Length, EdgL [m]",
-                                                "Tangent of Flow Edge Slope, tan(Slp) [ ]",
-                                                "Width of Voronoi Flow Window, FWidth [m]",
-                                                "Site Aspect as Angle from North, Aspect [radian]",
-                                                "Average Soil Moisture, top 10 cm, AvSM [m3/m3]",
+    public static String[] integratedOutput={   "Average Soil Moisture, top 10 cm, AvSM [m3/m3]",
                                                 "Average Root Zone Moisture, top 1 m, AvRtM [m3/m3]",
                                                 "Infiltration-excess Runoff Occurences, HOccr [# of TIMESTEP]",
                                                 "Infiltration-excess Runoff Average Rate, HRt [mm/hr]",
@@ -1581,12 +1689,7 @@ class ListOfVariables{
                                                 "Average Evapotranspiration, AveET [mm/hr]",
                                                 "Evaporative Fraction, EvpFrct [ ]"};
     
-    public static String[] dynamicOutput={  "Available Variables",
-                                            "Node Identification, ID",
-                                            "Elevation, Z [m]",
-                                            "Slope, S [|radian|]",
-                                            "Contributing Area, CAr [m2]",
-                                            "Depth to groundwater table, Nwt [mm]",
+    public static String[] dynamicOutput={  "Depth to groundwater table, Nwt [mm]",
                                             "Total moisture above the water table, Mu [mm]",
                                             "Moisture content in the initialization profile, Mi [mm]",
                                             "Wetting front depth, Nf [mm]",

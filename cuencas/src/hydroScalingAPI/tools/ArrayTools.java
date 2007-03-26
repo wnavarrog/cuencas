@@ -33,6 +33,21 @@ package hydroScalingAPI.tools;
 public abstract class ArrayTools {
     
     /**
+     * Concatenates two Object Arrays
+     * @param StArr1 The first Object array
+     * @param StArr2 The second Object array
+     * @return A new concatenated Object array
+     */
+    public static Object[] concatentate(Object[] StArr1,Object[] StArr2){
+        Object[] concat = new Object[StArr1.length+StArr2.length];
+        for (int i=0;i<StArr1.length;i++){
+            concat[i] = StArr1[i];
+        }
+        for (int i=0;i<StArr2.length;i++){
+            concat[StArr1.length+i] = StArr2[i];
+        }
+        return concat;
+    }/**
      * Casts float values to int
      * @param theFloatArray The original array with float falues
      * @return A new array of integers

@@ -23,13 +23,18 @@ import geotransform.transforms.*;
  */
 public class BasinTIN {
     
-    private RealType    xIndex=RealType.getRealType("xIndex"),
+    private RealType    posIndex=RealType.getRealType("posIndex"),
                         xEasting =RealType.getRealType("xEasting"),
                         yNorthing=RealType.getRealType("yNorthing"),
-                        nodeColor=RealType.getRealType("posXY");
+                        nodeColor=RealType.getRealType("nodeColor"),
+                        voiColor=RealType.getRealType("voiColor");
     
-    private RealTupleType domain,espacioXLYL,domainXLYL;
-    private FunctionType func_xEasting_yNorthing,func_xEasting_yNorthing_to_Color;
+    private RealTupleType   domain=new visad.RealTupleType(visad.RealType.Longitude,visad.RealType.Latitude),
+                            espacioXLYL=new RealTupleType(new RealType[] {xEasting,yNorthing,nodeColor}),
+                            domainXLYL=new RealTupleType(new RealType[] {xEasting,yNorthing});
+    
+    private FunctionType func_Inex_to_xEasting_yNorthing_Color=new FunctionType(posIndex, espacioXLYL),
+                         func_xEasting_yNorthing_to_Color=new FunctionType(domainXLYL,voiColor);
     
     private hydroScalingAPI.util.geomorphology.objects.Basin myCuenca;
     private byte[][] matDir;
@@ -54,7 +59,7 @@ public class BasinTIN {
     private int totalPolygonNodes;
     
     private FlatField vals_ff_Li;
-    private float[][] xyLinkValues;
+    private float[][] pointProps;
     private UnionSet allTriang,allPoly;
     
     /** Creates a new instance of BasinTIN */
@@ -63,14 +68,6 @@ public class BasinTIN {
         matDir=direcc;
         metaDatos=md;
         magnitudes=magnit;
-        
-        //Initializing VisAD data spaces
-        domain=new visad.RealTupleType(visad.RealType.Longitude,visad.RealType.Latitude);
-        espacioXLYL=new RealTupleType(new RealType[] {xEasting,yNorthing,nodeColor});
-        domainXLYL=new RealTupleType(new RealType[] {xEasting,yNorthing});
-    
-        func_xEasting_yNorthing=new FunctionType(xIndex, espacioXLYL);
-        func_xEasting_yNorthing_to_Color=new FunctionType(domainXLYL,nodeColor);
         
         //Getting data
         
@@ -274,24 +271,24 @@ public class BasinTIN {
         
         pointsInTriangulation.removeAllElements();
         
-        xyLinkValues=new float[3][numPoints];
+        pointProps=new float[3][numPoints];
         
         for(int i=0;i<numPoints;i++){
-            xyLinkValues[0][i]=(float)utm[i].x;
-            xyLinkValues[1][i]=(float)utm[i].y;
-            xyLinkValues[2][i]=(float)((int[])typeOfPoint.get(i))[0];
+            pointProps[0][i]=(float)utm[i].x;
+            pointProps[1][i]=(float)utm[i].y;
+            pointProps[2][i]=(float)((int[])typeOfPoint.get(i))[0];
             pointsInTriangulation.add(utm[i]);
         }
         
-        float[][] linkAccumAVal=new float[1][xyLinkValues[1].length];
-        for(int i=0;i<xyLinkValues[0].length;i++){
-            linkAccumAVal[0][i]=(float)i;//xyLinkValues[0][i];
+        float[][] pointIndex=new float[1][pointProps[1].length];
+        for(int i=0;i<pointProps[0].length;i++){
+            pointIndex[0][i]=(float)i;//xyLinkValues[0][i];
         }
         
-        Irregular1DSet xVarIndex=new Irregular1DSet(xIndex,linkAccumAVal);
+        Irregular1DSet xVarIndex=new Irregular1DSet(posIndex,pointIndex);
         
-        vals_ff_Li = new FlatField( func_xEasting_yNorthing, xVarIndex);
-        vals_ff_Li.setSamples( xyLinkValues );
+        vals_ff_Li = new FlatField( func_Inex_to_xEasting_yNorthing_Color, xVarIndex);
+        vals_ff_Li.setSamples( pointProps );
         
         filteredPointsInTriangulation=(java.util.Vector)pointsInTriangulation.clone();
         filteredTypeOfPoint=(java.util.Vector)typeOfPoint.clone();
@@ -301,14 +298,6 @@ public class BasinTIN {
     
     /** Creates a new instance of BasinTIN */
     public BasinTIN(java.io.File pathToTriang, String baseName) throws RemoteException, VisADException, java.io.IOException{
-        
-        //Initializing VisAD data spaces
-        domain=new visad.RealTupleType(visad.RealType.Longitude,visad.RealType.Latitude);
-        espacioXLYL=new RealTupleType(new RealType[] {xEasting,yNorthing,nodeColor});
-        domainXLYL=new RealTupleType(new RealType[] {xEasting,yNorthing});
-    
-        func_xEasting_yNorthing=new FunctionType(xIndex, espacioXLYL);
-        func_xEasting_yNorthing_to_Color=new FunctionType(domainXLYL,nodeColor);
         
         //Getting data
         
@@ -321,26 +310,26 @@ public class BasinTIN {
         fullLine=bufferNodes.readLine();
         fullLine=bufferNodes.readLine();
         int localNumPoints=Integer.parseInt(fullLine);
-        xyLinkValues=new float[3][localNumPoints];
+        pointProps=new float[3][localNumPoints];
         for (int i = 0; i < localNumPoints; i++) {
             String[] lineData=bufferNodes.readLine().split(" ");
-            xyLinkValues[0][i]=Float.parseFloat(lineData[0]);
-            xyLinkValues[1][i]=Float.parseFloat(lineData[1]);
-            xyLinkValues[2][i]=Float.parseFloat(lineData[3]);
-            if(xyLinkValues[2][i] != 1 && xyLinkValues[2][i] != 2) countNoBorder++;
+            pointProps[0][i]=Float.parseFloat(lineData[0]);
+            pointProps[1][i]=Float.parseFloat(lineData[1]);
+            pointProps[2][i]=Float.parseFloat(lineData[3]);
+            if(pointProps[2][i] != 1 && pointProps[2][i] != 2) countNoBorder++;
             
         }
         bufferNodes.close();
         
-        float[][] linkAccumAVal=new float[1][xyLinkValues[1].length];
-        for(int i=0;i<xyLinkValues[0].length;i++){
+        float[][] linkAccumAVal=new float[1][pointProps[1].length];
+        for(int i=0;i<pointProps[0].length;i++){
             linkAccumAVal[0][i]=(float)i;//xyLinkValues[0][i];
         }
         
-        Irregular1DSet xVarIndex=new Irregular1DSet(xIndex,linkAccumAVal);
+        Irregular1DSet xVarIndex=new Irregular1DSet(posIndex,linkAccumAVal);
         
-        vals_ff_Li = new FlatField( func_xEasting_yNorthing, xVarIndex);
-        vals_ff_Li.setSamples( xyLinkValues );
+        vals_ff_Li = new FlatField( func_Inex_to_xEasting_yNorthing_Color, xVarIndex);
+        vals_ff_Li.setSamples( pointProps );
         
         //Read triangles file
         java.io.File trianFile=new java.io.File(pathToTriang.getPath()+"/"+baseName+".tri");
@@ -359,8 +348,8 @@ public class BasinTIN {
         bufferTrian.close();
         
         float[][] samples=new float[2][];
-        samples[0]=xyLinkValues[0];//.clone();
-        samples[1]=xyLinkValues[1];//.clone();
+        samples[0]=pointProps[0];//.clone();
+        samples[1]=pointProps[1];//.clone();
         System.out.println("the DelaunayClarkson algorithm.");
         long start = System.currentTimeMillis();
         delaun = new DelaunayCustom(samples,triangulation);
@@ -442,7 +431,7 @@ public class BasinTIN {
 
         float[][] colors=new float[1][countNoBorder];
         for (int i = 0; i < colors[0].length; i++) {
-            colors[0][i]=2.6f*(float)Math.random();
+            colors[0][i]=10f*(float)Math.random();
         }
         colors[0]=valuesToVoroValues(colors[0]);
         theColors=new FlatField(func_xEasting_yNorthing_to_Color,allRegions);
@@ -451,8 +440,8 @@ public class BasinTIN {
     }
     
     public double[] getAspect(){
-        hydroScalingAPI.util.statistics.Stats eastStats=new hydroScalingAPI.util.statistics.Stats(xyLinkValues[1]);
-        hydroScalingAPI.util.statistics.Stats nortStats=new hydroScalingAPI.util.statistics.Stats(xyLinkValues[0]);
+        hydroScalingAPI.util.statistics.Stats eastStats=new hydroScalingAPI.util.statistics.Stats(pointProps[1]);
+        hydroScalingAPI.util.statistics.Stats nortStats=new hydroScalingAPI.util.statistics.Stats(pointProps[0]);
         
         return new double[] {Math.min(1,(nortStats.maxValue-nortStats.minValue)/(eastStats.maxValue-eastStats.minValue)), 
                              Math.min(1,(eastStats.maxValue-eastStats.minValue)/(nortStats.maxValue-nortStats.minValue))};
@@ -511,9 +500,9 @@ public class BasinTIN {
             linkAccumAVal[0][i]=(float)i;//xyLinkValues[0][i];
         }
         
-        Irregular1DSet xVarIndex=new Irregular1DSet(xIndex,linkAccumAVal);
+        Irregular1DSet xVarIndex=new Irregular1DSet(posIndex,linkAccumAVal);
         
-        vals_ff_Li = new FlatField( func_xEasting_yNorthing, xVarIndex);
+        vals_ff_Li = new FlatField( func_Inex_to_xEasting_yNorthing_Color, xVarIndex);
         vals_ff_Li.setSamples( xyLinkValues );
         
         if(Zr > 70){

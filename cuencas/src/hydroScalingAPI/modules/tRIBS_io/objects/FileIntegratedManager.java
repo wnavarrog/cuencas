@@ -24,9 +24,8 @@ public class FileIntegratedManager {
     /** Creates a new instance of FileIntegratedManager */
     public FileIntegratedManager(java.io.File[] pInt,int nv) {
         availableIntegrated=new java.util.Hashtable();
-        for (int i = 0; i < pInt.length; i++) {
-            availableIntegrated.put(pInt[i].getName(),new FileIntegrated(pInt[i],nv));
-        }
+        availableIntegrated.put("Initial Condition",new FileIntegrated(pInt[0],nv));
+        availableIntegrated.put("Final State",new FileIntegrated(pInt[1],nv));
     }
     
     public float[] getValues(Object theKey,int varIndex){
