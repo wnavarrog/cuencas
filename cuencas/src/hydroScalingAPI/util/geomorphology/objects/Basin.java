@@ -517,16 +517,12 @@ public class Basin extends Object{
         
         for (int i=0;i<keyElev.length;i++){
             if(i==0 || i==keyElev.length-1)
-                a+=bin/2f*accumElev[i];
-           a+=bin*accumElev[i];    
+                a+=1f/99f/2f*accumElev[i];
+           a+=1f/99f*accumElev[i];    
 
         }
         
         hydroScalingAPI.util.statistics.Stats s = new hydroScalingAPI.util.statistics.Stats(keyElev);
-        float mean = s.meanValue;
-        float sd = s.standardDeviation;
-        float kur = s.kurtosis;
-        float ske = s.skewness;
         
         hyp.put("areas",accumElev);
         hyp.put("elevs",keyElev);
