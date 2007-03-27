@@ -33,6 +33,21 @@ package hydroScalingAPI.tools;
 public abstract class ArrayTools {
     
     /**
+     * Removes a given position from the array
+     * @param theFloatArray The original array with float falues
+     * @param pos The position to remove
+     * @return A new array of integers
+     */
+    public static float[] eliminate(float[] theFloatArray,int pos){
+        float[] theTrimmedArray = new float[theFloatArray.length-1];
+        int ks=0;
+        for (int i=0;i<theFloatArray.length;i++){
+            if(i != pos) theTrimmedArray[ks++] = theFloatArray[i];
+        }
+        return theTrimmedArray;
+    }
+    
+    /**
      * Concatenates two Object Arrays
      * @param StArr1 The first Object array
      * @param StArr2 The second Object array
@@ -47,7 +62,9 @@ public abstract class ArrayTools {
             concat[StArr1.length+i] = StArr2[i];
         }
         return concat;
-    }/**
+    }
+    
+    /**
      * Casts float values to int
      * @param theFloatArray The original array with float falues
      * @return A new array of integers

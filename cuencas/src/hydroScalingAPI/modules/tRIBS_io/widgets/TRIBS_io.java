@@ -90,13 +90,19 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         panel_IO.setSelectedIndex(1);
         pathTextField.setText(outputsDirectory.getPath());
         baseNameTextField.setText(baseName);
+        System.out.println(">>Loading TIN");
         basTIN_O=new hydroScalingAPI.modules.tRIBS_io.objects.BasinTIN(findTriEdgNodes(outputsDirectory),baseName);
-        
+        System.out.println(">>Loading MRF");
         fmrfm=new hydroScalingAPI.modules.tRIBS_io.objects.FileMrfManager(findMRF(outputsDirectory));
+        System.out.println(">>Loading RFT");
         frftm=new hydroScalingAPI.modules.tRIBS_io.objects.FileRftManager(findRFT(outputsDirectory));
+        System.out.println(">>Loading Qouts");
         fqm=new hydroScalingAPI.modules.tRIBS_io.objects.FileQoutManager(findQouts(outputsDirectory));
+        System.out.println(">>Loading Integrated Files");
         fim=new hydroScalingAPI.modules.tRIBS_io.objects.FileIntegratedManager(findIntegratedOutput(outputsDirectory),basTIN_O.getNumVoi());
+        System.out.println(">>Loading Dynamic Files");
         fdm=new hydroScalingAPI.modules.tRIBS_io.objects.FileDynamicManager(findDynamicOutput(outputsDirectory),basTIN_O.getNumVoi());
+        System.out.println(">>Initializing Interface");
         initializeOutputTabs();
     }
     
@@ -108,7 +114,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
      * @throws java.io.IOException Captures errors while reading information
      */
     public TRIBS_io(hydroScalingAPI.mainGUI.ParentGUI parent) throws RemoteException, VisADException, java.io.IOException{
-        super(parent, true);
+        super(parent, false);
         initComponents();
         
         mainFrame=parent;
@@ -372,18 +378,21 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
     private void initializeOutputTabs() throws RemoteException, VisADException, java.io.IOException {
         
         ProjectionControl pc = display_TIN_O.getProjectionControl();
-        pc.setAspectCartesian(basTIN_O.getAspect());        
+        pc.setAspectCartesian(basTIN_O.getAspect());
         
+        System.out.println("Step 1");
         data_refPoints_O = new DataReferenceImpl("data_ref_Points");
         data_refPoints_O.setData(basTIN_O.getPointsFlatField());
         pointsCMap_O = new ConstantMap[] {new ConstantMap( 10.50f, Display.PointSize)};
         display_TIN_O.addReference( data_refPoints_O,pointsCMap_O );
         
+        System.out.println("Step 2");
         data_refTr_O = new DataReferenceImpl("data_ref_TRIANG");
         data_refTr_O.setData(basTIN_O.getTrianglesUnionSet());
         trianglesCMap_O = new ConstantMap[] {new ConstantMap( 0.50f, Display.LineWidth)};
         display_TIN_O.addReference( data_refTr_O,trianglesCMap_O );
         
+        System.out.println("Step 3");
         data_refPoly_O = new DataReferenceImpl("data_ref_poly");
         data_refPoly_O.setData(basTIN_O.getPolygonsUnionSet());
         polygonsCMap_O = new ConstantMap[] {    new ConstantMap( 1.0f, Display.Red),
@@ -392,10 +401,15 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
                                                 new ConstantMap( 1.50f, Display.LineWidth)};
         display_TIN_O.addReference( data_refPoly_O,polygonsCMap_O );
         
+        System.out.println("Step 4");
         data_refFill_O = new DataReferenceImpl("data_ref_Fill");
         data_refFill_O.setData(basTIN_O.getValuesFlatField());
         display_TIN_O.addReference( data_refFill_O );
         
+        if(basTIN_O.getNumVoi() > 50000) display_TIN_O.disableEvent(visad.DisplayEvent.MOUSE_MOVED);
+        
+        
+        System.out.println("Step 5");
         plotMrf(2);
         plotRft();
         
@@ -408,6 +422,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         
         spatialMoments=hydroScalingAPI.tools.ArrayTools.concatentate(spatialMoments,fdm.getKeys());
         avaTimesCombo.setModel(new javax.swing.DefaultComboBoxModel(spatialMoments));
+        System.out.println("Step done");
         
     }
     
@@ -423,7 +438,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         visad.DisplayRenderer dr=display_TIN_O.getDisplayRenderer();
         
         try {
-            if (id == DispEvt.MOUSE_MOVED) {
+            if(DispEvt.getId() == visad.DisplayEvent.MOUSE_RELEASED_CENTER){
                 
                 visad.VisADRay ray = dr.getMouseBehavior().findRay(DispEvt.getX(), DispEvt.getY());
                 
@@ -434,9 +449,23 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
                 latitudeLabel.setText(""+resultY);
                 visad.Real spotValue=(visad.Real) basTIN_O.getValuesFlatField().evaluate(new visad.RealTuple(domainXLYL, new double[] {resultX,resultY}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
                 
-                /*java.text.NumberFormat number4 = java.text.NumberFormat.getNumberInstance();
-                java.text.DecimalFormat dpoint4 = (java.text.DecimalFormat)number4;
-                dpoint4.applyPattern("0.00000000000000000000000");*/
+                valueLabel.setText(""+spotValue);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        try {
+            if (id == DispEvt.MOUSE_MOVED) {
+                
+                visad.VisADRay ray = dr.getMouseBehavior().findRay(DispEvt.getX(), DispEvt.getY());
+                
+                float resultX= eastMap_O.inverseScaleValues(new float[] {(float)ray.position[0]})[0];
+                float resultY= northMap_O.inverseScaleValues(new float[] {(float)ray.position[1]})[0];
+                
+                longitudeLabel.setText(""+resultX);
+                latitudeLabel.setText(""+resultY);
+                visad.Real spotValue=(visad.Real) basTIN_O.getValuesFlatField().evaluate(new visad.RealTuple(domainXLYL, new double[] {resultX,resultY}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
                 
                 valueLabel.setText(""+spotValue);
                 
@@ -1542,7 +1571,9 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
             //new TRIBS_io(tempFrame, 56,79,matDirs,magnitudes,metaModif).setVisible(true);
             //new TRIBS_io(tempFrame, 111,80,matDirs,magnitudes,metaModif).setVisible(true);
             
-            new TRIBS_io(tempFrame, new java.io.File("/home/ricardo/workFiles/tribsWork/sampleTribs/SMALLBASIN/Output/"),"smallbasin").setVisible(true);
+            ///home/ricardo/workFiles/tribsWork/sampleTribs/SMALLBASIN/Output/"),"smallbasin"
+            ///home/ricardo/workFiles/tribsWork/sampleTribs/Output_Mar23a_07/"),"urp"
+            new TRIBS_io(tempFrame, new java.io.File("/home/ricardo/workFiles/tribsWork/sampleTribs/SMALLBASIN_ORIG/Output/"),"smallbasin").setVisible(true);
         } catch (java.io.IOException IOE){
             System.out.print(IOE);
             System.exit(0);

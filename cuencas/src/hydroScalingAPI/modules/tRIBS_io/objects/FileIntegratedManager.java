@@ -24,8 +24,12 @@ public class FileIntegratedManager {
     /** Creates a new instance of FileIntegratedManager */
     public FileIntegratedManager(java.io.File[] pInt,int nv) {
         availableIntegrated=new java.util.Hashtable();
-        availableIntegrated.put("Initial Condition",new FileIntegrated(pInt[0],nv));
-        availableIntegrated.put("Final State",new FileIntegrated(pInt[1],nv));
+        FileIntegrated ic=new FileIntegrated(pInt[0],nv);
+        ic.start();
+        availableIntegrated.put("Initial Condition",ic);
+        FileIntegrated fs=new FileIntegrated(pInt[1],nv);
+        fs.start();
+        availableIntegrated.put("Final State",fs);
     }
     
     public float[] getValues(Object theKey,int varIndex){
@@ -48,18 +52,22 @@ public class FileIntegratedManager {
     
 }
 
-class FileIntegrated {
+class FileIntegrated extends Thread{
     
     private java.io.File pathToIntegrated;
     private int numVoi;
     private float[][] integData;
     private int countTimes=-1;
+    private boolean fullyLoaded=false;
     
     
     /** Creates a new instance of FileIntegratedManager */
     public FileIntegrated(java.io.File pInt,int nv) {
         pathToIntegrated=pInt;
         numVoi=nv;
+    }
+    
+    public void run(){
         try {
             
             java.io.BufferedReader fileInteg = new java.io.BufferedReader(new java.io.FileReader(pathToIntegrated));
@@ -85,6 +93,8 @@ class FileIntegrated {
             }
             
             fileInteg.close();
+            fullyLoaded=true;
+            System.out.println(">>>> "+pathToIntegrated+" has been fully loaded");
         } catch (NumberFormatException ex) {
             ex.printStackTrace();
         } catch (FileNotFoundException ex) {
@@ -95,6 +105,7 @@ class FileIntegrated {
     }
     
     public float[] getValues(int varIndex){
+        if(!fullyLoaded) return null;
         return integData[varIndex];
     }
     

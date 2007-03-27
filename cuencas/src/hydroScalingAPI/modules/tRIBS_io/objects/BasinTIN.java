@@ -303,19 +303,32 @@ public class BasinTIN {
         
         countNoBorder=0;
         
-        //Read nodes file
+        System.out.println(">>>> Reading Edges");
+        double minX=Double.MAX_VALUE;
+        double minY=Double.MAX_VALUE;
         java.io.File nodeFile=new java.io.File(pathToTriang.getPath()+"/"+baseName+".nodes");
         java.io.BufferedReader bufferNodes = new java.io.BufferedReader(new java.io.FileReader(nodeFile));
         String fullLine;
         fullLine=bufferNodes.readLine();
         fullLine=bufferNodes.readLine();
         int localNumPoints=Integer.parseInt(fullLine);
+        for (int i = 0; i < localNumPoints; i++) {
+            String[] lineData=bufferNodes.readLine().split(" ");
+            minX=Math.min(minX,Double.parseDouble(lineData[0]));
+            minY=Math.min(minY,Double.parseDouble(lineData[1]));
+        }
+        bufferNodes.close();
+        
+        nodeFile=new java.io.File(pathToTriang.getPath()+"/"+baseName+".nodes");
+        bufferNodes = new java.io.BufferedReader(new java.io.FileReader(nodeFile));
+        fullLine=bufferNodes.readLine();
+        fullLine=bufferNodes.readLine();
         pointProps=new float[3][localNumPoints];
         for (int i = 0; i < localNumPoints; i++) {
             String[] lineData=bufferNodes.readLine().split(" ");
-            pointProps[0][i]=Float.parseFloat(lineData[0]);
-            pointProps[1][i]=Float.parseFloat(lineData[1]);
-            pointProps[2][i]=Float.parseFloat(lineData[3]);
+            pointProps[0][i]=(float)(Double.parseDouble(lineData[0])-minX);
+            pointProps[1][i]=(float)(Double.parseDouble(lineData[1])-minY);
+            pointProps[2][i]=(float)(Double.parseDouble(lineData[3]));
             if(pointProps[2][i] != 1 && pointProps[2][i] != 2) countNoBorder++;
             
         }
@@ -331,7 +344,7 @@ public class BasinTIN {
         vals_ff_Li = new FlatField( func_Inex_to_xEasting_yNorthing_Color, xVarIndex);
         vals_ff_Li.setSamples( pointProps );
         
-        //Read triangles file
+        System.out.println(">>>> Reading Triangles");
         java.io.File trianFile=new java.io.File(pathToTriang.getPath()+"/"+baseName+".tri");
         java.io.BufferedReader bufferTrian = new java.io.BufferedReader(new java.io.FileReader(trianFile));
         fullLine=bufferTrian.readLine();
@@ -375,7 +388,7 @@ public class BasinTIN {
 
         allTriang=new UnionSet(domainXLYL,triangles);
 
-        //Read voronoi file
+        System.out.println(">>>> Reading Voronoi Polygons");
         java.io.File voroFile=new java.io.File(pathToTriang.getPath()+"/"+baseName+"_voi");
         java.io.BufferedReader bufferVoro = new java.io.BufferedReader(new java.io.FileReader(voroFile));
         
@@ -397,6 +410,7 @@ public class BasinTIN {
         nodesPerPolygon=new int[countNoBorder];
 
         lines=new float[2][];
+        double[][] newLines=new double[2][];
 
         for(int j=0;j<countNoBorder;j++){
             nodesPerPolygon[j]=voroPolys[j].size();
@@ -405,23 +419,19 @@ public class BasinTIN {
             
             for(int i=0;i<nodesPerPolygon[j]-1;i++){
                 String[] lineData=((String)voroPolys[j].get(i)).split(",");
-                lines[0][i]=Float.parseFloat(lineData[0]);
-                lines[1][i]=Float.parseFloat(lineData[1]);
+                lines[0][i]=(float)(Double.parseDouble(lineData[0])-minX);
+                lines[1][i]=(float)(Double.parseDouble(lineData[1])-minY);
             }
             lines[0][nodesPerPolygon[j]-1]=lines[0][0];
             lines[1][nodesPerPolygon[j]-1]=lines[1][0];
 
             polygons[j]=new Gridded2DSet(domainXLYL,lines,lines[0].length);
-
-//            Delaunay dela1=new DelaunayClarkson(lines);
-//            
+            
             regions[j] = DelaunayCustom.fill(polygons[j]);
             
             nodesPerPolygon[j]=regions[j].getLength();
             totalPolygonNodes+=nodesPerPolygon[j];
 
-            //float theColor=3.0f*(float)Math.random();
-            //for (int i = j*4; i < (j+1)*4; i++) colors[0][i]=theColor;
             
         }
 
@@ -429,13 +439,7 @@ public class BasinTIN {
         
         UnionSet allRegions=new UnionSet(domainXLYL,regions);
 
-        float[][] colors=new float[1][countNoBorder];
-        for (int i = 0; i < colors[0].length; i++) {
-            colors[0][i]=10f*(float)Math.random();
-        }
-        colors[0]=valuesToVoroValues(colors[0]);
         theColors=new FlatField(func_xEasting_yNorthing_to_Color,allRegions);
-        theColors.setSamples(colors);
         
     }
     

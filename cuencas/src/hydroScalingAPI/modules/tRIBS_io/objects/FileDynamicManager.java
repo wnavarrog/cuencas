@@ -25,7 +25,9 @@ public class FileDynamicManager {
     public FileDynamicManager(java.io.File[] pInt,int nv) {
         availableDynamic=new java.util.Hashtable();
         for (int i = 0; i < pInt.length; i++) {
-            availableDynamic.put(pInt[i].getName(),new FileDynamic(pInt[i],nv));
+            FileDynamic fd=new FileDynamic(pInt[i],nv);
+            fd.start();
+            availableDynamic.put(pInt[i].getName(),fd);
         }
     }
     
@@ -49,21 +51,25 @@ public class FileDynamicManager {
     
 }
 
-class FileDynamic {
+class FileDynamic extends Thread{
     
-    private java.io.File pathToIntegrated;
+    private java.io.File pathToDynamic;
     private int numVoi;
     private float[][] integData;
     private int countTimes=-1;
+    private boolean fullyLoaded=false;
     
     
     /** Creates a new instance of FileIntegratedManager */
     public FileDynamic(java.io.File pInt,int nv) {
-        pathToIntegrated=pInt;
+        pathToDynamic=pInt;
         numVoi=nv;
+    }
+    
+    public void run(){
         try {
             
-            java.io.BufferedReader fileDyna = new java.io.BufferedReader(new java.io.FileReader(pathToIntegrated));
+            java.io.BufferedReader fileDyna = new java.io.BufferedReader(new java.io.FileReader(pathToDynamic));
             String fullLine;
 
             fullLine=fileDyna.readLine();
@@ -72,7 +78,7 @@ class FileDynamic {
             
             if(!elements[0].equalsIgnoreCase("ID")){
                 fileDyna.close();
-                fileDyna = new java.io.BufferedReader(new java.io.FileReader(pathToIntegrated));
+                fileDyna = new java.io.BufferedReader(new java.io.FileReader(pathToDynamic));
             }
             
             integData=new float[countTimes][numVoi];
@@ -86,6 +92,8 @@ class FileDynamic {
             }
             
             fileDyna.close();
+            fullyLoaded=true;
+            System.out.println(">>>> "+pathToDynamic+" has been fully loaded");
         } catch (NumberFormatException ex) {
             ex.printStackTrace();
         } catch (FileNotFoundException ex) {
@@ -96,6 +104,7 @@ class FileDynamic {
     }
     
     public float[] getValues(int varIndex){
+        if(!fullyLoaded) return null;
         return integData[varIndex];
     }
     
