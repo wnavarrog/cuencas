@@ -514,15 +514,50 @@ public class Basin extends Object{
 
         
         float a = 0f;
+        float moment_1 = 0;
+        float moment_2 = 0;
+        float moment_3 = 0;
+        float moment_4 = 0;
         
         for (int i=0;i<keyElev.length;i++){
             if(i==0 || i==keyElev.length-1)
-                a+=1f/99f/2f*accumElev[i];
-           a+=1f/99f*accumElev[i];    
+                a+=(1f/99f)/2f*accumElev[i];
+           a+=1f/99f*accumElev[i];
+           moment_1 += (accumElev[i] + accumElev[i-1])*(keyElev[i] + keyElev[i-1])*(accumElev[i] - accumElev[i-1])/4f;         
 
         }
         
-        hydroScalingAPI.util.statistics.Stats s = new hydroScalingAPI.util.statistics.Stats(keyElev);
+        moment_1 += (accumElev[keyElev.length-1] + accumElev[keyElev.length-1-1])*(keyElev[keyElev.length-1] + keyElev[keyElev.length-1-1])*(accumElev[keyElev.length-1] - accumElev[keyElev.length-1-1])/4;
+        moment_1 = moment_1/a;
+        
+        for (int i=1;i<keyElev.length;i++){
+            
+           moment_2 += ((accumElev[i] + accumElev[i-1])/2f - moment_1)*((accumElev[i] + accumElev[i-1])/2f - moment_1)*
+                   (keyElev[i] + keyElev[i-1])*(accumElev[i] - accumElev[i-1])/2f; 
+
+           moment_3 += ((accumElev[i] + accumElev[i-1])/2f - moment_1)*((accumElev[i] + accumElev[i-1])/2f - moment_1)*
+                   ((accumElev[i] + accumElev[i-1])/2f - moment_1)*(keyElev[i] + keyElev[i-1])*(accumElev[i] - accumElev[i-1])/2f;             
+           
+           moment_4 += ((accumElev[i] + accumElev[i-1])/2f - moment_1)*((accumElev[i] + accumElev[i-1])/2f - moment_1)*
+                   ((accumElev[i] + accumElev[i-1])/2f - moment_1)*((accumElev[i] + accumElev[i-1])/2f - moment_1)*
+                   (keyElev[i] + keyElev[i-1])*(accumElev[i] - accumElev[i-1])/2f;             
+           
+            
+        }
+        
+        moment_2 = moment_2/a;
+        moment_3 = moment_3/a;
+        moment_4 = moment_4/a;
+
+        float sk = moment_3/(float)Math.pow((double)moment_2,1.5d);
+        float kur = moment_4/(float)Math.pow((double)moment_2,2d);
+        
+        hydroScalingAPI.util.statistics.Stats s = new hydroScalingAPI.util.statistics.Stats();
+        
+        s.meanValue = moment_1;
+        s.standardDeviation = (float)Math.pow((double)moment_2,0.5d);
+        s.kurtosis = kur;
+        s.skewness = sk;
         
         hyp.put("areas",accumElev);
         hyp.put("elevs",keyElev);

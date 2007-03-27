@@ -107,6 +107,13 @@ public class Stats{
     }
     
     /**
+     * Creates a new Stats. Paramters must be assigned after.
+     */
+    public Stats() {
+    
+    }
+    
+    /**
      * Creates new Stats
      * @param missing The missing value
      * @param data The data array
