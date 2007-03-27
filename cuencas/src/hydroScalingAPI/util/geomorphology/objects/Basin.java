@@ -519,9 +519,11 @@ public class Basin extends Object{
         float moment_3 = 0;
         float moment_4 = 0;
         
-        for (int i=0;i<keyElev.length;i++){
-            if(i==0 || i==keyElev.length-1)
-                a+=(1f/99f)/2f*accumElev[i];
+        a+=(1f/99f)/2f*accumElev[0];
+        a+=(1f/99f)/2f*accumElev[keyElev.length-1];
+        
+        for (int i=1;i<keyElev.length-1;i++){
+
            a+=1f/99f*accumElev[i];
            moment_1 += (accumElev[i] + accumElev[i-1])*(keyElev[i] + keyElev[i-1])*(accumElev[i] - accumElev[i-1])/4f;         
 
