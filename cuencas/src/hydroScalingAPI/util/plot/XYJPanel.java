@@ -131,6 +131,16 @@ public class XYJPanel extends javax.swing.JPanel {
         Pplot.create();
         repaint();
     }
+    
+    public void addDatos(float[] datosx,float[] datosy,double falt,java.awt.Color c,int t){
+        double[][] tranformedDatos=new double[2][datosx.length];
+        for (int i = 0; i < datosx.length; i++) {
+            tranformedDatos[0][i]=datosx[i];
+            tranformedDatos[1][i]=datosy[i];
+        }
+        addDatos(tranformedDatos[0],tranformedDatos[1],falt,c,t);
+    }
+    
     public void addDatos(double[] datosx,double[] datosy,double falt,java.awt.Color c,int t){
         Pplot.addDoubles(new double[][]{datosx,datosy},c,t,falt);
         Pplot.create();

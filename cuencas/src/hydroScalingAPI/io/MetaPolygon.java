@@ -26,6 +26,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 package hydroScalingAPI.io;
 
+import java.io.IOException;
+import visad.VisADException;
+
 /**
  * This class interacts with *.poly files.  It reads their contents and produce
  * appropriate outputs for graphic and other purposes.
@@ -217,6 +220,61 @@ public class MetaPolygon {
     }
     
     /**
+     * Calculates the average value of a spatially variable field inside the polygon
+     * @param localField The visad.FlatField to be integrated
+     */
+    public double getAverage(visad.FlatField localField){
+        try {
+            
+            visad.RealTupleType domain=new visad.RealTupleType(visad.RealType.Longitude,visad.RealType.Latitude);
+            
+            float[][] LonLatCoords=getLonLatPolygon();
+            
+            int[][] XYCoords=new int[2][LonLatCoords[0].length];
+            for (int i = 0; i < LonLatCoords[0].length; i++) {
+                XYCoords[0][i]=(int)(LonLatCoords[0][i]*1e7);
+                XYCoords[1][i]=(int)(LonLatCoords[1][i]*1e7);
+            }
+            
+            java.awt.Polygon intPoly=new java.awt.Polygon(XYCoords[0],XYCoords[1],XYCoords[0].length);
+            
+            hydroScalingAPI.util.statistics.Stats xStats=new hydroScalingAPI.util.statistics.Stats(LonLatCoords[0]);
+            hydroScalingAPI.util.statistics.Stats yStats=new hydroScalingAPI.util.statistics.Stats(LonLatCoords[1]);
+            
+            java.util.Vector coordVector=new java.util.Vector();
+            float[][] coorField=localField.getDomainSet().getSamples();
+            for (int i = 0; i < coorField[0].length; i++) {
+                if(intPoly.contains((int)(coorField[0][i]*1e7),(int)(coorField[1][i]*1e7)))
+                    coordVector.add(new float[]{coorField[0][i],coorField[1][i]});
+            }
+            double accum=0;
+            int nPoints=coordVector.size();
+            for (int i = 0; i < nPoints; i++) {
+                float[] pos=(float[])coordVector.get(i);
+                visad.RealTuple spotValue=(visad.RealTuple) localField.evaluate(new visad.RealTuple(domain, new double[] {pos[0],pos[1]}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
+                accum+=spotValue.getValues()[0];
+            }
+            for (int i = 0; i < LonLatCoords[0].length; i++) {
+                visad.RealTuple spotValue=(visad.RealTuple) localField.evaluate(new visad.RealTuple(domain, new double[] {LonLatCoords[0][i],LonLatCoords[1][i]}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
+                accum+=spotValue.getValues()[0];
+            }
+            
+            accum/=(double)(nPoints+LonLatCoords[0].length);
+
+            return accum;
+            
+            
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } catch (VisADException ex) {
+            ex.printStackTrace();
+        }
+        
+        return -9999;
+        
+    }
+    
+    /**
      * Writes an *.poly file in the specified path
      * @param newMetaLocation The File descriptor where the information will be written.
      * @throws java.io.IOException Captures errors while writing the file
@@ -255,7 +313,25 @@ public class MetaPolygon {
             hydroScalingAPI.io.MetaPolygon metaPoly1=new hydroScalingAPI.io.MetaPolygon (new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Polygons/walnutGulch_Divide.poly"));
             System.out.println(metaPoly1.getProperty("[name]"));
             float[][] xyContour=metaPoly1.getLonLatPolygon();
-            System.out.println(xyContour[0][0]+" "+xyContour[1][0]);
+            
+            hydroScalingAPI.io.MetaRaster metaRaster1=new hydroScalingAPI.io.MetaRaster (new java.io.File("/hidrosigDataBases/MeltonBasins_DB/Rasters/Hydrology/I1/t1.metaVHC"));
+            metaRaster1.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/MeltonBasins_DB/Rasters/Hydrology/I1/t1.vhc"));
+            try {
+                System.out.println(metaPoly1.getAverage(metaRaster1.getField()));
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            } catch (VisADException ex) {
+                ex.printStackTrace();
+            }
+            
+            
+            javax.swing.JFrame frame=new javax.swing.JFrame();
+            hydroScalingAPI.util.plot.XYJPanel panel=new hydroScalingAPI.util.plot.XYJPanel("Polygon","longitude","latitude");
+            panel.addDatos(xyContour[0],xyContour[1],-9999,java.awt.Color.BLACK,0);
+            frame.add(panel);
+            frame.setBounds(0,0,500,500);
+            frame.setVisible(true);
+            
         } catch (java.io.IOException IOE){
             System.out.print(IOE);
             System.exit(0);
