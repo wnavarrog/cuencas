@@ -56,7 +56,7 @@ public class scanForLogsAndIntegrate {
                     hydroScalingAPI.io.MetaPolygon metaPolyToUse=new hydroScalingAPI.io.MetaPolygon ();
                     metaPolyToUse.setName(thisBasin.toString());
                     metaPolyToUse.setCoordinates(thisBasin.getLonLatBasinDivide());
-                    System.out.println(basinLabel[1]+" "+metaPolyToUse.getAverage(field1));
+                    System.out.println(basinLabel[1]+" "+metaPolyToUse.getAverage(field1)+" "+metaPolyToUse.getAverage(field2));
                 }
 
             }
