@@ -1573,7 +1573,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
             
             ///home/ricardo/workFiles/tribsWork/sampleTribs/SMALLBASIN/Output/"),"smallbasin"
             ///home/ricardo/workFiles/tribsWork/sampleTribs/Output_Mar23a_07/"),"urp"
-            new TRIBS_io(tempFrame, new java.io.File("/home/ricardo/workFiles/tribsWork/sampleTribs/SMALLBASIN_ORIG/Output/"),"smallbasin").setVisible(true);
+            new TRIBS_io(tempFrame, new java.io.File("/home/ricardo/workFiles/tribsWork/sampleTribs/SMALLBASIN/Output/"),"smallbasin").setVisible(true);
         } catch (java.io.IOException IOE){
             System.out.print(IOE);
             System.exit(0);
@@ -1581,9 +1581,6 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
             System.out.print(v);
             System.exit(0);
         }
-        
-
-        System.exit(0);
     }
     
     

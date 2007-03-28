@@ -400,8 +400,8 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
         
         hydroScalingAPI.tools.VisadTools.addWheelFunctionality(displayMap_RSNs);
         
-        myRSNAnalysis=new hydroScalingAPI.modules.networkAnalysis.objects.RSNDecomposition(myLinksStructure);
-        plotRSNTiles(myHortonStructure.getBasinOrder()-1);
+        //myRSNAnalysis=new hydroScalingAPI.modules.networkAnalysis.objects.RSNDecomposition(myLinksStructure);
+        //plotRSNTiles(myHortonStructure.getBasinOrder()-1);
         plotNetwork(displayMap_RSNs,myHortonStructure.getBasinOrder()-1);
         
         //Inicio los Hilos que cargan datos en la Interfaz
