@@ -32,7 +32,6 @@ public class scanForLogsAndIntegrate {
             hydroScalingAPI.io.MetaRaster metaRaster2=new hydroScalingAPI.io.MetaRaster (new java.io.File("/hidrosigDataBases/MeltonBasins_DB/Rasters/Hydrology/sum_p_pet_i/sum_p_pet_i.metaVHC"));
             metaRaster2.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/MeltonBasins_DB/Rasters/Hydrology/sum_p_pet_i/sum_p_pet_i.vhc"));
             visad.FlatField field2=metaRaster2.getField();
-
             
             java.util.Vector carrier=new java.util.Vector();
             findLogFiles(pathToScan,carrier);
@@ -45,6 +44,14 @@ public class scanForLogsAndIntegrate {
                 metaData.setFormat("Byte");
                 byte [][] fullDirMatrix=new hydroScalingAPI.io.DataRaster(metaData).getByte();
                 
+                metaData.setLocationBinaryFile(new java.io.File(theLog.getPath().substring(0,theLog.getPath().lastIndexOf("."))+".ltc"));
+                metaData.setFormat("Float");
+                float [][] ltc=new hydroScalingAPI.io.DataRaster(metaData).getFloat();
+                
+                metaData.setLocationBinaryFile(new java.io.File(theLog.getPath().substring(0,theLog.getPath().lastIndexOf("."))+".areas"));
+                metaData.setFormat("Float");
+                float [][] areas=new hydroScalingAPI.io.DataRaster(metaData).getFloat();
+                
                 String[] toPrint=new hydroScalingAPI.io.BasinsLogReader(theLog).getPresetBasins();
                 for (int j = 0; j < toPrint.length; j++) {
                     String[] basinLabel=toPrint[j].split(" ; ");
@@ -56,7 +63,7 @@ public class scanForLogsAndIntegrate {
                     hydroScalingAPI.io.MetaPolygon metaPolyToUse=new hydroScalingAPI.io.MetaPolygon ();
                     metaPolyToUse.setName(thisBasin.toString());
                     metaPolyToUse.setCoordinates(thisBasin.getLonLatBasinDivide());
-                    System.out.println(basinLabel[1]+" "+metaPolyToUse.getAverage(field1)+" "+metaPolyToUse.getAverage(field2));
+                    System.out.println(basinLabel[1]+",drainage density,"+ltc[MatY][MatX]/areas[MatY][MatX]+",t1,"+metaPolyToUse.getAverage(field1)+",sum_p_pet_i,"+metaPolyToUse.getAverage(field2));
                 }
 
             }
