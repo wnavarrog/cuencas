@@ -32,6 +32,9 @@ public float[][] DEM;
 public byte[][] DIR;
 public int[][] MAG;
 public float[][] GDO;
+public byte [][] HOR;
+public double[][] SLP;
+public float [][] AREA;
 public float[][] dToNearChannel;
 public float [][] hNearChannel;
 public float Dmn = -1;
@@ -39,6 +42,8 @@ public float Dmh = -1;
 public float Hmn = -1;
 public float Hmh = -1;
 public byte [][] maskHill;
+public int[][] toMark;
+public float[][] fakeDEM;
     
     
     /** Creates a new instance of curvatureAnalysis */
@@ -60,7 +65,8 @@ public byte [][] maskHill;
 
         getInitialParameters();
         
-        
+        getSyntheticDEM_AS(2f,-2f);
+        getAreaSlope();
 //        ensayo();
         
         System.out.println("**** Starting iteration process  ****");
@@ -88,6 +94,16 @@ public byte [][] maskHill;
         metaOrig.setLocationBinaryFile(new java.io.File(path+".gdo"));
         metaOrig.setFormat(hydroScalingAPI.tools.ExtensionToFormat.getFormat(".gdo"));
         GDO = new hydroScalingAPI.io.DataRaster(metaOrig).getFloat();
+
+        metaOrig.setLocationBinaryFile(new java.io.File(path+".horton"));
+        metaOrig.setFormat(hydroScalingAPI.tools.ExtensionToFormat.getFormat(".horton"));
+        HOR = new hydroScalingAPI.io.DataRaster(metaOrig).getByte();
+        metaOrig.setLocationBinaryFile(new java.io.File(path+".slope"));
+        metaOrig.setFormat(hydroScalingAPI.tools.ExtensionToFormat.getFormat(".slope"));
+        SLP = new hydroScalingAPI.io.DataRaster(metaOrig).getDouble();
+        metaOrig.setLocationBinaryFile(new java.io.File(path+".areas"));
+        metaOrig.setFormat(hydroScalingAPI.tools.ExtensionToFormat.getFormat(".areas"));
+        AREA = new hydroScalingAPI.io.DataRaster(metaOrig).getFloat();
         
         basinOrig = new hydroScalingAPI.util.geomorphology.objects.Basin(xB,yB,DIR,metaOrig);
         String folderName = "b1_-1_b2_-1";
@@ -98,7 +114,11 @@ public byte [][] maskHill;
          //Calculates distance to nearest stream
         dToNearChannel=new float[DEM.length][DEM[0].length];
         hNearChannel=new float[DEM.length][DEM[0].length];
+        fakeDEM=new float[DEM.length][DEM[0].length];
         for(int i=1;i<DEM.length-1;i++) for(int j=1;j<DEM[0].length-1;j++){
+            
+            fakeDEM[i][j] = DEM[i][j];
+            
             if(MAG[i][j] <= 0){
                 int iPn = i-1+(DIR[i][j]-1)/3;
                 int jPn = j-1+(DIR[i][j]-1)%3;
@@ -130,7 +150,6 @@ public byte [][] maskHill;
         //b1 Network
         //b2 Hillslope
         
-        float[][] fakeDEM=new float[DEM.length][DEM[0].length];
         for(int i=1;i<DEM.length-1;i++) for(int j=1;j<DEM[0].length-1;j++){
             if(maskHill[i][j]!=1){
                 
@@ -200,6 +219,106 @@ public byte [][] maskHill;
       
        
     }
+ 
+    public void getSyntheticDEM_AS(float m1,float m2)throws java.io.IOException{
+    
+        //Calculates a synthetic DEM
+        //b1 Network
+        //b2 Hillslope
+        
+        
+        //exponent for the river network S = c1 * A^m1 relationship
+        //exponent for the hillslope S = c2 * A^m2 relationship
+        
+        float So=(float)SLP[yB][xB];
+        float Ao=AREA[yB][xB];
+        
+        java.util.Vector idsBasin=new java.util.Vector();
+        byte [][] BasMask = basinOrig.getBasinMask();
+        int [][] toMark = new int[1][]; toMark[0]=new int[] {xB,yB};
+        idsBasin.add(toMark[0]);
+        
+        while(toMark != null){
+            markBasin(DIR, idsBasin,toMark,Ao,So,m1,m2,AREA,GDO,MAG);
+        }
+        
+        
+        String folderName = "b1_"+Float.toString(m1)+"_b2_"+Float.toString(m2);
+
+        java.io.File out = new java.io.File(metaOrig.getLocationMeta().getParent()+"/"+folderName);
+        
+        hydroScalingAPI.io.MetaRaster metaOut=new hydroScalingAPI.io.MetaRaster(metaOrig);
+        java.io.File saveFile;
+        
+        
+        out.mkdirs();
+        
+        metaOut.setFormat("Float");
+        metaOut.setLocationMeta(new java.io.File(metaOrig.getLocationMeta().getParent()+"/"+folderName+"/"+folderName+".metaDEM"));
+        saveFile=new java.io.File(metaOrig.getLocationMeta().getParent()+"/"+folderName+"/"+folderName+".dem");
+        metaOut.setLocationBinaryFile(saveFile);
+        metaOut.writeMetaRaster(metaOut.getLocationMeta());
+        
+        java.io.DataOutputStream writer = new java.io.DataOutputStream(new java.io.BufferedOutputStream(new java.io.FileOutputStream(saveFile)));
+        
+        for(int i=0;i<DEM.length;i++) for(int j=0;j<DEM[0].length;j++){
+            writer.writeFloat(fakeDEM[i][j]);
+        }
+        
+        writer.close();
+        
+        
+        new hydroScalingAPI.modules.networkExtraction.objects.NetworkExtractionModule(metaOut, new hydroScalingAPI.io.DataRaster(metaOut));
+        
+        
+        String path_out = metaOut.getLocationMeta().getPath().substring(0,metaOut.getLocationMeta().getPath().lastIndexOf("."));
+
+        metaOut.setLocationBinaryFile(new java.io.File(path_out+".dir"));
+        metaOut.setFormat(hydroScalingAPI.tools.ExtensionToFormat.getFormat(".dir"));
+        byte [][] DIR_out = new hydroScalingAPI.io.DataRaster(metaOut).getByte();
+        metaOut.setLocationBinaryFile(new java.io.File(saveFile.getPath()));
+        metaOut.setFormat("Float");
+
+        
+        hydroScalingAPI.util.geomorphology.objects.Basin bas = new hydroScalingAPI.util.geomorphology.objects.Basin(xB,yB,DIR_out,metaOut);
+        java.util.Hashtable hyp = bas.getHypCurve();
+        hypsoData.put(folderName,hyp);
+        printHypsoCurve(folderName,hyp);
+      
+       
+    } 
+    
+    private void markBasin(byte [][] fullDirMatrix, java.util.Vector idsBasin,int[][] ijs,float Ao,float So,float m1,float m2,float[][] ARE, float[][] GDO,int[][] MAG){
+        java.util.Vector tribsVector=new java.util.Vector();
+        
+        for(int incoming=0;incoming<ijs.length;incoming++){
+            int j=ijs[incoming][0];
+            int i=ijs[incoming][1];
+            for (int k=0; k <= 8; k++){
+                if (fullDirMatrix[i+(k/3)-1][j+(k%3)-1] == 9-k){
+                    
+                    tribsVector.add(new int[] {j+(k%3)-1,i+(k/3)-1});
+                    
+                    float DeltaH = So*(float)Math.pow(AREA[i+(k/3)-1][j+(k%3)-1]/Ao,m1)*(GDO[i+(k/3)-1][j+(k%3)-1]-GDO[i][j])*1000.0f;
+                    if(MAG[i+(k/3)-1][j+(k%3)-1]<=0){
+                        DeltaH=So*(float)Math.pow(AREA[i+(k/3)-1][j+(k%3)-1]/Ao,m2)*(GDO[i+(k/3)-1][j+(k%3)-1]-GDO[i][j])*1000.0f;
+                    }
+                    
+                    fakeDEM[i+(k/3)-1][j+(k%3)-1]=fakeDEM[i][j]+DeltaH;
+                }
+            }
+        }
+        int countTribs=tribsVector.size();
+        if(countTribs != 0){
+            toMark=new int[countTribs][2];
+            for(int k=0;k<countTribs;k++){
+                toMark[k]=(int[])tribsVector.get(k);
+                idsBasin.add(toMark[k]);
+            }
+        } else {
+            toMark=null;
+        }
+    }    
     
     public void getConstrainsTopography()throws java.io.IOException{
         
@@ -317,6 +436,59 @@ public byte [][] maskHill;
         
     }
 
+    public void getAreaSlope()throws java.io.IOException{
+        
+        maskHill = basinOrig.getBasinMask();
+        
+        int ncol = metaOrig.getNumCols(); 
+        int nrow = metaOrig.getNumRows();
+        
+        java.util.Vector net = new java.util.Vector();
+        java.util.Vector hill = new java.util.Vector();
+        
+        for(int i = 0; i<nrow; i++){
+            for(int j = 0; j<ncol; j++){
+                
+                float d = GDO[i][j] - GDO[yB][xB];
+                float hh = DEM[i][j] - hNearChannel[i][j];
+                float hn = DEM[i][j] - DEM[yB][xB];
+                float area = AREA[i][j];
+                float slope = (float)SLP[i][j];
+                float hor = (float)HOR[i][j];
+                
+                if(MAG[i][j]>0 && maskHill[i][j]==1)
+                    net.addElement(new float[]{d,hn,area,slope,hor});
+                if(MAG[i][j]<=0 && maskHill[i][j]==1)
+                    hill.addElement(new float[]{dToNearChannel[i][j],hh,area,slope,hor});
+            
+            }
+        
+        } 
+        
+        
+        java.io.File saveFile = new java.io.File(metaOrig.getLocationMeta().getParent() + "/" +"hillslopeAnalysisMogollon.txt");   
+        java.io.BufferedWriter writer = new java.io.BufferedWriter(new java.io.FileWriter(saveFile));
+       
+        for(int i=0;i<hill.size();i++){
+            float[] tmp = (float[])hill.get(i);
+            writer.write(tmp[0]+ "\t"+ tmp[1]+ "\t"+ tmp[2]+ "\t"+ tmp[3]+ "\t"+ tmp[4] + "\n");
+        }
+                     
+        writer.close();    
+        
+        saveFile = new java.io.File(metaOrig.getLocationMeta().getParent() + "/" +"networkAnalysisMogollon.txt");   
+        writer = new java.io.BufferedWriter(new java.io.FileWriter(saveFile));
+       
+        for(int i=0;i<net.size();i++){
+            float[] tmp = (float[])net.get(i);
+            writer.write(tmp[0]+ "\t"+ tmp[1]+ "\t"+ tmp[2]+ "\t"+ tmp[3]+ "\t"+ tmp[4] + "\n");
+        }
+                     
+        writer.close();         
+        
+    }    
+    
+    
     /**
      * @param args the command line arguments
      */
@@ -328,8 +500,11 @@ public byte [][] maskHill;
 //            int x = 193;
 //            int y = 281;
                
-            args=new String[] { "/Users/jesusgomez/Documents/ensayo_Mogollon/mogollon.metaDEM",
-                                 "/Users/jesusgomez/Documents/ensayo_Mogollon/mogollon.dem"};
+//            args=new String[] { "/Users/jesusgomez/Documents/ensayo_Mogollon/mogollon.metaDEM",
+//                                 "/Users/jesusgomez/Documents/ensayo_Mogollon/mogollon.dem"};
+            args=new String[] { "/Users/jesusgomez/Documents/ensayo_Mogollon_2/mogollon.metaDEM",
+                                 "/Users/jesusgomez/Documents/ensayo_Mogollon_2/mogollon.dem"};
+            
             int x = 275;
             int y = 311;
              
