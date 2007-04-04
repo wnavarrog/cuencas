@@ -65,7 +65,9 @@ public float[][] fakeDEM;
 
         getInitialParameters();
         
-        getSyntheticDEM_AS(2f,-2f);
+        getSyntheticDEM_AS(2f,0f);
+        System.exit(0);
+        
         getAreaSlope();
 //        ensayo();
         
@@ -115,10 +117,12 @@ public float[][] fakeDEM;
         dToNearChannel=new float[DEM.length][DEM[0].length];
         hNearChannel=new float[DEM.length][DEM[0].length];
         fakeDEM=new float[DEM.length][DEM[0].length];
+        
+        
         for(int i=1;i<DEM.length-1;i++) for(int j=1;j<DEM[0].length-1;j++){
             
+//            fakeDEM[i][j] = f;
             fakeDEM[i][j] = DEM[i][j];
-            
             if(MAG[i][j] <= 0){
                 int iPn = i-1+(DIR[i][j]-1)/3;
                 int jPn = j-1+(DIR[i][j]-1)%3;
@@ -232,10 +236,11 @@ public float[][] fakeDEM;
         
         float So=(float)SLP[yB][xB];
         float Ao=AREA[yB][xB];
+        fakeDEM[yB][xB] = DEM[yB][xB];
         
         java.util.Vector idsBasin=new java.util.Vector();
         byte [][] BasMask = basinOrig.getBasinMask();
-        int [][] toMark = new int[1][]; toMark[0]=new int[] {xB,yB};
+        toMark = new int[1][]; toMark[0]=new int[] {xB,yB};
         idsBasin.add(toMark[0]);
         
         while(toMark != null){
@@ -267,6 +272,7 @@ public float[][] fakeDEM;
         
         writer.close();
         
+//        System.exit(0);
         
         new hydroScalingAPI.modules.networkExtraction.objects.NetworkExtractionModule(metaOut, new hydroScalingAPI.io.DataRaster(metaOut));
         
@@ -284,6 +290,19 @@ public float[][] fakeDEM;
         java.util.Hashtable hyp = bas.getHypCurve();
         hypsoData.put(folderName,hyp);
         printHypsoCurve(folderName,hyp);
+        
+        
+        float f = Float.valueOf(metaOrig.getMissing()).floatValue();
+        byte[][] mask_sym = bas.getBasinMask(); 
+        writer = new java.io.DataOutputStream(new java.io.BufferedOutputStream(new java.io.FileOutputStream(saveFile)));
+        
+        for(int i=0;i<DEM.length;i++) for(int j=0;j<DEM[0].length;j++){
+            writer.writeFloat(f);
+            if(mask_sym[i][j] == 1)
+                writer.writeFloat(fakeDEM[i][j]);
+        }
+        
+        writer.close();       
       
        
     } 
@@ -304,7 +323,9 @@ public float[][] fakeDEM;
                         DeltaH=So*(float)Math.pow(AREA[i+(k/3)-1][j+(k%3)-1]/Ao,m2)*(GDO[i+(k/3)-1][j+(k%3)-1]-GDO[i][j])*1000.0f;
                     }
                     
-                    fakeDEM[i+(k/3)-1][j+(k%3)-1]=fakeDEM[i][j]+DeltaH;
+                    fakeDEM[i+(k/3)-1][j+(k%3)-1] = fakeDEM[i][j]+DeltaH;
+                    
+//                    System.out.println("i = " + (j+(k%3)-1) + " j = " + (i+(k/3)-1));
                 }
             }
         }
@@ -376,6 +397,7 @@ public float[][] fakeDEM;
             writer.write(elevs[i] + "\n");
             
         writer.close();
+        
     }
     
     public void getCurvatureAnalysis(float[] b1, float[] b2)throws java.io.IOException{
@@ -499,18 +521,32 @@ public float[][] fakeDEM;
 //                                 "/Users/jesusgomez/Documents/ensayo/walnutGulchUpdated.dem"};
 //            int x = 193;
 //            int y = 281;
+
+            // For mac   
+//            args=new String[] { "/Users/jesusgomez/Documents/ensayo_Mogollon/mogollon.metaDEM",
+//                                 "/Users/jesusgomez/Documents/ensayo_Mogollon/mogollon.dem"};
+            
+            // For Windows
+                    
+            args=new String[] { "C:/5_temp/Running_Mogollon_040307/mogollon.metaDEM",
+                                 "C:/5_temp/Running_Mogollon_040307/mogollon.dem"};
+                    
+                    
+
                
 //            args=new String[] { "/Users/jesusgomez/Documents/ensayo_Mogollon/mogollon.metaDEM",
 //                                 "/Users/jesusgomez/Documents/ensayo_Mogollon/mogollon.dem"};
-            args=new String[] { "/Users/jesusgomez/Documents/ensayo_Mogollon_2/mogollon.metaDEM",
-                                 "/Users/jesusgomez/Documents/ensayo_Mogollon_2/mogollon.dem"};
+//            args=new String[] { "/Users/jesusgomez/Documents/ensayo_Mogollon_2/mogollon.metaDEM",
+//                                 "/Users/jesusgomez/Documents/ensayo_Mogollon_2/mogollon.dem"};
             
+
             int x = 275;
             int y = 311;
              
             hydroScalingAPI.io.MetaRaster metaRaster= new hydroScalingAPI.io.MetaRaster(new java.io.File(args[0]));
             metaRaster.setLocationBinaryFile(new java.io.File(args[1]));
             hydroScalingAPI.io.DataRaster datosRaster = new hydroScalingAPI.io.DataRaster(metaRaster);
+
             float [] b1 = {0.1f, 0.2f, 0.5f, 1f, 2f, 5f, 10f};
             float [] b2 = {0.1f, 0.2f, 0.5f, 1f, 2f, 5f, 10f};
             new curvatureAnalysis(x,y,metaRaster,datosRaster,b1,b2);

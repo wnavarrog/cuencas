@@ -526,7 +526,6 @@ public class Basin extends Object{
 
            a+=1f/99f*accumElev[i];
            moment_1 += (accumElev[i] + accumElev[i-1])*(keyElev[i] + keyElev[i-1])*(accumElev[i] - accumElev[i-1])/4f;         
-
         }
         
         moment_1 += (accumElev[keyElev.length-1] + accumElev[keyElev.length-1-1])*(keyElev[keyElev.length-1] + keyElev[keyElev.length-1-1])*(accumElev[keyElev.length-1] - accumElev[keyElev.length-1-1])/4;
