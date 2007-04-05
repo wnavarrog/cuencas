@@ -65,7 +65,7 @@ public float[][] fakeDEM;
 
         getInitialParameters();
         
-        getSyntheticDEM_AS(2f,0f);
+        getSyntheticDEM_AS(2f,-2f);
         System.exit(0);
         
         getAreaSlope();
@@ -293,13 +293,16 @@ public float[][] fakeDEM;
         
         
         float f = Float.valueOf(metaOrig.getMissing()).floatValue();
-        byte[][] mask_sym = bas.getBasinMask(); 
+        byte[][] mask_syn = bas.getBasinMask(); 
         writer = new java.io.DataOutputStream(new java.io.BufferedOutputStream(new java.io.FileOutputStream(saveFile)));
         
         for(int i=0;i<DEM.length;i++) for(int j=0;j<DEM[0].length;j++){
-            writer.writeFloat(f);
-            if(mask_sym[i][j] == 1)
+            
+            if(mask_syn[i][j] != 1){
+                writer.writeFloat(f);
+            }else{
                 writer.writeFloat(fakeDEM[i][j]);
+            }
         }
         
         writer.close();       
@@ -382,8 +385,11 @@ public float[][] fakeDEM;
         
         float [] areas =  (float [])hyp.get("areas");
         float [] elevs =  (float [])hyp.get("elevs");
+        float [] density =  (float [])hyp.get("density");
         hydroScalingAPI.util.statistics.Stats s = (hydroScalingAPI.util.statistics.Stats) hyp.get("stat");
         float integral = ((Float)hyp.get("integral")).floatValue();
+        float dsk = ((Float)hyp.get("dsk")).floatValue();
+        float dkur = ((Float)hyp.get("dkur")).floatValue();
         
         writer.write(s.meanValue + "\n");
         writer.write(s.standardDeviation + "\n");
@@ -395,7 +401,10 @@ public float[][] fakeDEM;
             writer.write(areas[i] + "\n");
         for(int i=0;i<elevs.length;i++)
             writer.write(elevs[i] + "\n");
-            
+        writer.write(dkur + "\n");
+        writer.write(dsk + "\n");
+        for(int i=0;i<elevs.length;i++)
+            writer.write(density[i] + "\n");
         writer.close();
         
     }

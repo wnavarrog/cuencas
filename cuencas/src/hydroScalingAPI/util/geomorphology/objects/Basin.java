@@ -499,6 +499,7 @@ public class Basin extends Object{
         
         float[] keyElev = new float[100];
         float[] accumElev = new float[100];
+        float[] keyElev_Dens = new float[100];
         int k=0;
         float bin = (localMaxElev-localMinElev)/99.0f;
         for(int i=0;i<eleBasin.length;i++){
@@ -511,26 +512,45 @@ public class Basin extends Object{
             }
         }
         
-
+        keyElev_Dens[0] = -1f*(keyElev[1] - keyElev[0])/(accumElev[1] - accumElev[0]);
+        keyElev_Dens[keyElev_Dens.length - 1] = -1f*(keyElev[keyElev_Dens.length - 1-1] - keyElev[keyElev_Dens.length - 1])/(accumElev[keyElev_Dens.length - 1-1] - accumElev[keyElev_Dens.length - 1]);
+        for(int i=1;i<keyElev_Dens.length-1;i++)            
+            keyElev_Dens[i] = -1f*(keyElev[i+1] - keyElev[i-1])/(accumElev[i+1] - accumElev[i-1]);
+       
         
         float a = 0f;
         float moment_1 = 0;
         float moment_2 = 0;
         float moment_3 = 0;
         float moment_4 = 0;
+        float ad = 0f;
+        float moment_1d = 0;
+        float moment_2d = 0;
+        float moment_3d = 0;
+        float moment_4d = 0;
         
         a+=(1f/99f)/2f*accumElev[0];
         a+=(1f/99f)/2f*accumElev[keyElev.length-1];
+        ad+= (accumElev[1] - accumElev[0])/2f*keyElev_Dens[0];
+        ad+=(accumElev[keyElev.length-1] - accumElev[keyElev.length-1-1])/2f*keyElev_Dens[keyElev.length-1];
         
         for (int i=1;i<keyElev.length-1;i++){
 
            a+=1f/99f*accumElev[i];
-           moment_1 += (accumElev[i] + accumElev[i-1])*(keyElev[i] + keyElev[i-1])*(accumElev[i] - accumElev[i-1])/4f;         
+           moment_1 += (accumElev[i] + accumElev[i-1])*(keyElev[i] + keyElev[i-1])*(accumElev[i] - accumElev[i-1])/4f; 
+
+           ad+=(accumElev[i+1] - accumElev[i-1])/2f*keyElev_Dens[i];
+           moment_1d += (accumElev[i] + accumElev[i-1])*(keyElev_Dens[i] + keyElev_Dens[i-1])*(accumElev[i] - accumElev[i-1])/4f; 
+           
         }
+
         
         moment_1 += (accumElev[keyElev.length-1] + accumElev[keyElev.length-1-1])*(keyElev[keyElev.length-1] + keyElev[keyElev.length-1-1])*(accumElev[keyElev.length-1] - accumElev[keyElev.length-1-1])/4;
         moment_1 = moment_1/a;
-        
+
+        moment_1d += (accumElev[keyElev.length-1] + accumElev[keyElev.length-1-1])*(keyElev_Dens[keyElev.length-1] + keyElev_Dens[keyElev.length-1-1])*(accumElev[keyElev.length-1] - accumElev[keyElev.length-1-1])/4;
+        moment_1d = moment_1d/ad;
+
         for (int i=1;i<keyElev.length;i++){
             
            moment_2 += ((accumElev[i] + accumElev[i-1])/2f - moment_1)*((accumElev[i] + accumElev[i-1])/2f - moment_1)*
@@ -543,6 +563,15 @@ public class Basin extends Object{
                    ((accumElev[i] + accumElev[i-1])/2f - moment_1)*((accumElev[i] + accumElev[i-1])/2f - moment_1)*
                    (keyElev[i] + keyElev[i-1])*(accumElev[i] - accumElev[i-1])/2f;             
            
+           moment_2d += ((accumElev[i] + accumElev[i-1])/2f - moment_1d)*((accumElev[i] + accumElev[i-1])/2f - moment_1d)*
+                   (keyElev_Dens[i] + keyElev_Dens[i-1])*(accumElev[i] - accumElev[i-1])/2f; 
+
+           moment_3d += ((accumElev[i] + accumElev[i-1])/2f - moment_1d)*((accumElev[i] + accumElev[i-1])/2f - moment_1d)*
+                   ((accumElev[i] + accumElev[i-1])/2f - moment_1d)*(keyElev_Dens[i] + keyElev_Dens[i-1])*(accumElev[i] - accumElev[i-1])/2f;             
+           
+           moment_4d += ((accumElev[i] + accumElev[i-1])/2f - moment_1d)*((accumElev[i] + accumElev[i-1])/2f - moment_1d)*
+                   ((accumElev[i] + accumElev[i-1])/2f - moment_1d)*((accumElev[i] + accumElev[i-1])/2f - moment_1d)*
+                   (keyElev_Dens[i] + keyElev_Dens[i-1])*(accumElev[i] - accumElev[i-1])/2f;             
             
         }
         
@@ -550,8 +579,14 @@ public class Basin extends Object{
         moment_3 = moment_3/a;
         moment_4 = moment_4/a;
 
+        moment_2d = moment_2d/ad;
+        moment_3d = moment_3d/ad;
+        moment_4d = moment_4d/ad;
+
         float sk = moment_3/(float)Math.pow((double)moment_2,1.5d);
         float kur = moment_4/(float)Math.pow((double)moment_2,2d);
+        float dsk = moment_3d/(float)Math.pow((double)moment_2d,1.5d);
+        float dkur = moment_4d/(float)Math.pow((double)moment_2d,2d);
         
         hydroScalingAPI.util.statistics.Stats s = new hydroScalingAPI.util.statistics.Stats();
         
@@ -564,6 +599,9 @@ public class Basin extends Object{
         hyp.put("elevs",keyElev);
         hyp.put("stat",s);
         hyp.put("integral",a);
+        hyp.put("density",keyElev_Dens);
+        hyp.put("dsk",dsk);
+        hyp.put("dkur",dkur);
         
         return hyp;
         
