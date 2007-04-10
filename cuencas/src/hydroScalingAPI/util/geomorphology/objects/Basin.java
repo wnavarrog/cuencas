@@ -514,9 +514,12 @@ public class Basin extends Object{
         
         keyElev_Dens[0] = -1f*(keyElev[1] - keyElev[0])/(accumElev[1] - accumElev[0]);
         keyElev_Dens[keyElev_Dens.length - 1] = -1f*(keyElev[keyElev_Dens.length - 1-1] - keyElev[keyElev_Dens.length - 1])/(accumElev[keyElev_Dens.length - 1-1] - accumElev[keyElev_Dens.length - 1]);
-        for(int i=1;i<keyElev_Dens.length-1;i++)            
+        for(int i=1;i<keyElev_Dens.length-1;i++){
             keyElev_Dens[i] = -1f*(keyElev[i+1] - keyElev[i-1])/(accumElev[i+1] - accumElev[i-1]);
-       
+            if(Float.isInfinite(keyElev_Dens[i]))
+                keyElev_Dens[i] = -9999f;
+        }            
+        
         
         float a = 0f;
         float moment_1 = 0;
