@@ -366,7 +366,7 @@ public java.util.Vector AreaBasin = new java.util.Vector();
                     
                     fakeDEM[i+(k/3)-1][j+(k%3)-1] = fakeDEM[i][j]+DeltaH;
                     
-                    System.out.println("i = " + (j+(k%3)-1) + " j = " + (i+(k/3)-1)+ " delta = " + DeltaH + " Area = " + AREA[i+(k/3)-1][j+(k%3)-1]);
+//                    System.out.println("i = " + (j+(k%3)-1) + " j = " + (i+(k/3)-1)+ " delta = " + DeltaH + " Area = " + AREA[i+(k/3)-1][j+(k%3)-1]);
                 }
             }
         }
@@ -484,7 +484,7 @@ public java.util.Vector AreaBasin = new java.util.Vector();
         java.io.BufferedWriter writer = new java.io.BufferedWriter(new java.io.FileWriter(saveFile));
         
         for(int i = 0; i<b1.length;i++) for(int j = 0; j<b2.length; j++){
-            writer.write(b1[i] + "\t"+b2[j]+"\t"+ AreaBasin.get(i*b1.length + j)+ "\t"+DrainageDensity.get(i*b1.length + j)+ "\n");
+            writer.write(b1[i] + "\t"+b2[j]+"\t"+ AreaBasin.get(i*b2.length + j)+ "\t"+DrainageDensity.get(i*b2.length + j)+ "\n");
         }
 
         writer.close();        
@@ -632,16 +632,16 @@ public java.util.Vector AreaBasin = new java.util.Vector();
             
             // For Windows
                     
-//            args=new String[] { "C:/5_temp/Running_Mogollon_040307/mogollon.metaDEM",
-//                                 "C:/5_temp/Running_Mogollon_040307/mogollon.dem"};
+            args=new String[] { "C:/5_temp/Running_Mogollon_040307/mogollon.metaDEM",
+                                 "C:/5_temp/Running_Mogollon_040307/mogollon.dem"};
                     
                     
 
                
 //            args=new String[] { "/Users/jesusgomez/Documents/ensayo_Mogollon/mogollon.metaDEM",
 //                                 "/Users/jesusgomez/Documents/ensayo_Mogollon/mogollon.dem"};
-            args=new String[] { "/Users/jesusgomez/Documents/ensayo_Mogollon_2/mogollon.metaDEM",
-                                 "/Users/jesusgomez/Documents/ensayo_Mogollon_2/mogollon.dem"};
+//            args=new String[] { "/Users/jesusgomez/Documents/ensayo_Mogollon_2/mogollon.metaDEM",
+//                                 "/Users/jesusgomez/Documents/ensayo_Mogollon_2/mogollon.dem"};
             
 
             int x = 275;
@@ -652,7 +652,7 @@ public java.util.Vector AreaBasin = new java.util.Vector();
             hydroScalingAPI.io.DataRaster datosRaster = new hydroScalingAPI.io.DataRaster(metaRaster);
 
 //            float [] b1 = {0.1f, 0.2f, 0.5f, 1f, 2f, 5f, 10f};
-            float [] b1 = {-1f, -0.5f,-0.2f, 0f, 1f, 5f, 10f};
+            float [] b1 = {-0.8f, -0.6f,-0.5f,-0.4f,-0.2f, 0f, 1f, 5f, 10f};
             float [] b2 = {0.1f, 0.2f, 0.5f, 1f, 2f, 5f, 10f};
             new curvatureAnalysis(x,y,metaRaster,datosRaster,b1,b2);
         } catch(java.io.IOException ioe){
