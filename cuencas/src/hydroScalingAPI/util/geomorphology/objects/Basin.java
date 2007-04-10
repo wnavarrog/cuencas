@@ -538,19 +538,23 @@ public class Basin extends Object{
 
            a+=1f/99f*accumElev[i];
            moment_1 += (accumElev[i] + accumElev[i-1])*(keyElev[i] + keyElev[i-1])*(accumElev[i] - accumElev[i-1])/4f; 
-
-           ad+=(accumElev[i+1] - accumElev[i-1])/2f*keyElev_Dens[i];
-           moment_1d += (accumElev[i] + accumElev[i-1])*(keyElev_Dens[i] + keyElev_Dens[i-1])*(accumElev[i] - accumElev[i-1])/4f; 
+           
+           if(keyElev_Dens[i] != -9999f && keyElev_Dens[i-1]!=-9999f){
+               ad+=(accumElev[i+1] - accumElev[i-1])/2f*keyElev_Dens[i];
+               moment_1d += (accumElev[i] + accumElev[i-1])*(keyElev_Dens[i] + keyElev_Dens[i-1])*(accumElev[i] - accumElev[i-1])/4f;            
+           }
            
         }
 
         
         moment_1 += (accumElev[keyElev.length-1] + accumElev[keyElev.length-1-1])*(keyElev[keyElev.length-1] + keyElev[keyElev.length-1-1])*(accumElev[keyElev.length-1] - accumElev[keyElev.length-1-1])/4;
         moment_1 = moment_1/a;
-
-        moment_1d += (accumElev[keyElev.length-1] + accumElev[keyElev.length-1-1])*(keyElev_Dens[keyElev.length-1] + keyElev_Dens[keyElev.length-1-1])*(accumElev[keyElev.length-1] - accumElev[keyElev.length-1-1])/4;
+        
+        if(keyElev_Dens[keyElev.length-1-1] != -9999f && keyElev_Dens[keyElev.length-1]!=-9999f){
+            moment_1d += (accumElev[keyElev.length-1] + accumElev[keyElev.length-1-1])*(keyElev_Dens[keyElev.length-1] + keyElev_Dens[keyElev.length-1-1])*(accumElev[keyElev.length-1] - accumElev[keyElev.length-1-1])/4;
+        }
         moment_1d = moment_1d/ad;
-
+        
         for (int i=1;i<keyElev.length;i++){
             
            moment_2 += ((accumElev[i] + accumElev[i-1])/2f - moment_1)*((accumElev[i] + accumElev[i-1])/2f - moment_1)*
@@ -563,15 +567,19 @@ public class Basin extends Object{
                    ((accumElev[i] + accumElev[i-1])/2f - moment_1)*((accumElev[i] + accumElev[i-1])/2f - moment_1)*
                    (keyElev[i] + keyElev[i-1])*(accumElev[i] - accumElev[i-1])/2f;             
            
-           moment_2d += ((accumElev[i] + accumElev[i-1])/2f - moment_1d)*((accumElev[i] + accumElev[i-1])/2f - moment_1d)*
-                   (keyElev_Dens[i] + keyElev_Dens[i-1])*(accumElev[i] - accumElev[i-1])/2f; 
+           if(keyElev_Dens[i] != -9999f && keyElev_Dens[i-1]!=-9999f){
+               
+               moment_2d += ((accumElev[i] + accumElev[i-1])/2f - moment_1d)*((accumElev[i] + accumElev[i-1])/2f - moment_1d)*
+                       (keyElev_Dens[i] + keyElev_Dens[i-1])*(accumElev[i] - accumElev[i-1])/2f; 
 
-           moment_3d += ((accumElev[i] + accumElev[i-1])/2f - moment_1d)*((accumElev[i] + accumElev[i-1])/2f - moment_1d)*
-                   ((accumElev[i] + accumElev[i-1])/2f - moment_1d)*(keyElev_Dens[i] + keyElev_Dens[i-1])*(accumElev[i] - accumElev[i-1])/2f;             
-           
-           moment_4d += ((accumElev[i] + accumElev[i-1])/2f - moment_1d)*((accumElev[i] + accumElev[i-1])/2f - moment_1d)*
-                   ((accumElev[i] + accumElev[i-1])/2f - moment_1d)*((accumElev[i] + accumElev[i-1])/2f - moment_1d)*
-                   (keyElev_Dens[i] + keyElev_Dens[i-1])*(accumElev[i] - accumElev[i-1])/2f;             
+               moment_3d += ((accumElev[i] + accumElev[i-1])/2f - moment_1d)*((accumElev[i] + accumElev[i-1])/2f - moment_1d)*
+                       ((accumElev[i] + accumElev[i-1])/2f - moment_1d)*(keyElev_Dens[i] + keyElev_Dens[i-1])*(accumElev[i] - accumElev[i-1])/2f;             
+
+               moment_4d += ((accumElev[i] + accumElev[i-1])/2f - moment_1d)*((accumElev[i] + accumElev[i-1])/2f - moment_1d)*
+                       ((accumElev[i] + accumElev[i-1])/2f - moment_1d)*((accumElev[i] + accumElev[i-1])/2f - moment_1d)*
+                       (keyElev_Dens[i] + keyElev_Dens[i-1])*(accumElev[i] - accumElev[i-1])/2f; 
+               
+           }
             
         }
         

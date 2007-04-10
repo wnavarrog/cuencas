@@ -615,6 +615,25 @@ public java.util.Vector AreaBasin = new java.util.Vector();
     }
     
     
+    public void getScaleAnalysis()throws java.io.IOException{
+
+        hydroScalingAPI.util.geomorphology.objects.HortonAnalysis myHortonStructure=new hydroScalingAPI.util.geomorphology.objects.HortonAnalysis(basinOrig, metaOrig, DIR);
+        
+ 
+        for(int i=2;i<3;i++) {
+            for(int j=0;j<myHortonStructure.contactsArray[i].length;j++) {
+                //System.out.print(myHortonStructure.contactsArray[i][j]+" ");
+                int xxx=(int)(myHortonStructure.contactsArray[i][j]%metaOrig.getNumCols());
+                int yyy=(int)(myHortonStructure.contactsArray[i][j]/metaOrig.getNumCols());
+                hydroScalingAPI.util.geomorphology.objects.Basin theCuenca=new hydroScalingAPI.util.geomorphology.objects.Basin(xxx,yyy,DIR,metaOrig);
+                System.out.print(theCuenca.getXYBasin()[0].length+" ");
+            }
+            System.out.println(myHortonStructure.contactsArray[i].length);
+        }        
+    
+    }
+    
+    
     /**
      * @param args the command line arguments
      */
