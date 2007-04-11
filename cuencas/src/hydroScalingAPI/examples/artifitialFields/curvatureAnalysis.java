@@ -259,21 +259,25 @@ public java.util.Vector AreaBasin = new java.util.Vector();
         
 //        It will mark the hillslopes using the ridges as reference
         
-//        for(int i = 1; i<DEM.length;i++) for(int j=0;j<DEM[0].length;j++){
-//            if(maskHill[i][j]==1 && MAG[i][j]<0){
-//                
-//                byte count = 0;
-//                for(int k=0; k <= 8; k++){
-//                    if(DIR[i+(k/3)-1][j+(k%3)-1] == 9-k)
-//                        count+=1;
-//                }
-//                
-//                if(count == 0){
-//                    followRidge(i,j,m2);
-//                }
-//            }
-//        
-//        }
+        for(int i = 1; i<DEM.length;i++) for(int j=0;j<DEM[0].length;j++){
+            
+            if(i == 584 && j == 269){
+                System.out.println("listo!!!");
+            }
+            if(maskHill[i][j]==1 && MAG[i][j]<0){
+                
+                byte count = 0;
+                for(int k=0; k <= 8; k++){
+                    if(DIR[i+(k/3)-1][j+(k%3)-1] == 9-k)
+                        count+=1;
+                }
+                
+                if(count == 0){
+                    followRidge(i,j,m2);
+                }
+            }
+        
+        }
         
         
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////        
@@ -366,7 +370,8 @@ public java.util.Vector AreaBasin = new java.util.Vector();
                     fakeDEM[i+(k/3)-1][j+(k%3)-1] = fakeDEM[i][j]+DeltaH;
                     
                     System.out.println("j = " + (j+(k%3)-1) + " i = " + (i+(k/3)-1)+ " delta = " + DeltaH + " Area = " + AREA[i+(k/3)-1][j+(k%3)-1] + " H = " + fakeDEM[i+(k/3)-1][j+(k%3)-1]
-                           + " HOR = " + HOR[i+(k/3)-1][j+(k%3)-1] + " Dis = " + (GDO[i+(k/3)-1][j+(k%3)-1]-GDO[yB][xB])*1000.0f );
+                           + " HOR = " + HOR[i+(k/3)-1][j+(k%3)-1] + " Dis = " + (GDO[i+(k/3)-1][j+(k%3)-1]-GDO[yB][xB])*1000.0f
+                            + " SLP = " + So*(float)Math.pow(AREA[i+(k/3)-1][j+(k%3)-1]/Ao,m1));
                 }
             }
         }
@@ -651,16 +656,16 @@ public java.util.Vector AreaBasin = new java.util.Vector();
             
             // For Windows
                     
-            args=new String[] { "C:/5_temp/Running_Mogollon_040307/mogollon.metaDEM",
-                                 "C:/5_temp/Running_Mogollon_040307/mogollon.dem"};
+//            args=new String[] { "C:/5_temp/Running_Mogollon_040307/mogollon.metaDEM",
+//                                 "C:/5_temp/Running_Mogollon_040307/mogollon.dem"};
                     
                     
 
                
 //            args=new String[] { "/Users/jesusgomez/Documents/ensayo_Mogollon/mogollon.metaDEM",
 //                                 "/Users/jesusgomez/Documents/ensayo_Mogollon/mogollon.dem"};
-//            args=new String[] { "/Users/jesusgomez/Documents/ensayo_Mogollon_2/mogollon.metaDEM",
-//                                 "/Users/jesusgomez/Documents/ensayo_Mogollon_2/mogollon.dem"};
+            args=new String[] { "/Users/jesusgomez/Documents/ensayo_Mogollon_2/mogollon.metaDEM",
+                                 "/Users/jesusgomez/Documents/ensayo_Mogollon_2/mogollon.dem"};
             
 
             int x = 275;
