@@ -39,6 +39,7 @@ public float[][] dToNearChannel;
 public float [][] hNearChannel;
 public int [][] iNearChannel;
 public int [][] jNearChannel;
+public float [][] fakeSLP;
 
 public float Dmn = -1;
 public float Dmh = -1;
@@ -125,6 +126,7 @@ public java.util.Vector AreaBasin = new java.util.Vector();
         iNearChannel=new int[DEM.length][DEM[0].length];
         jNearChannel=new int[DEM.length][DEM[0].length];
         fakeDEM=new float[DEM.length][DEM[0].length];
+        fakeSLP=new float[DEM.length][DEM[0].length];
         
         
         for(int i=1;i<DEM.length-1;i++) for(int j=1;j<DEM[0].length-1;j++){
@@ -261,9 +263,9 @@ public java.util.Vector AreaBasin = new java.util.Vector();
         
         for(int i = 1; i<DEM.length;i++) for(int j=0;j<DEM[0].length;j++){
             
-            if(i == 584 && j == 269){
-                System.out.println("listo!!!");
-            }
+//            if(i == 584 && j == 269){
+//                System.out.println("listo!!!");
+//            }
             if(maskHill[i][j]==1 && MAG[i][j]<0){
                 
                 byte count = 0;
@@ -357,6 +359,7 @@ public java.util.Vector AreaBasin = new java.util.Vector();
     private void markBasin(byte [][] fullDirMatrix, java.util.Vector idsBasin,int[][] ijs,float Ao,float So,float m1,float[][] ARE, float[][] GDO,int[][] MAG){
         java.util.Vector tribsVector=new java.util.Vector();
         float DeltaH = 0f;
+        float slope = 0f;
         for(int incoming=0;incoming<ijs.length;incoming++){
             int j=ijs[incoming][0];
             int i=ijs[incoming][1];
@@ -364,14 +367,25 @@ public java.util.Vector AreaBasin = new java.util.Vector();
                 if (MAG[i+(k/3)-1][j+(k%3)-1]>0 && fullDirMatrix[i+(k/3)-1][j+(k%3)-1] == 9-k){
                     
                     tribsVector.add(new int[] {j+(k%3)-1,i+(k/3)-1});
+                    slope = So*(float)Math.pow(AREA[i+(k/3)-1][j+(k%3)-1]/Ao,m1);
+
+//            if(i == 383 && j == 250){
+//                System.out.println("listo!!!");
+//            }                    
                     
-                    DeltaH = So*(float)Math.pow(AREA[i+(k/3)-1][j+(k%3)-1]/Ao,m1)*(GDO[i+(k/3)-1][j+(k%3)-1]-GDO[i][j])*1000.0f;
+                    
+                    if(HOR[i+(k/3)-1][j+(k%3)-1] <= 4 &&  slope > 2)
+                        slope = fakeSLP[i][j] + fakeSLP[i][j]*0.005f;
+                    
+                    fakeSLP[i+(k/3)-1][j+(k%3)-1] = slope;
+                            
+                    DeltaH = slope*(GDO[i+(k/3)-1][j+(k%3)-1]-GDO[i][j])*1000.0f;
                     
                     fakeDEM[i+(k/3)-1][j+(k%3)-1] = fakeDEM[i][j]+DeltaH;
                     
                     System.out.println("j = " + (j+(k%3)-1) + " i = " + (i+(k/3)-1)+ " delta = " + DeltaH + " Area = " + AREA[i+(k/3)-1][j+(k%3)-1] + " H = " + fakeDEM[i+(k/3)-1][j+(k%3)-1]
                            + " HOR = " + HOR[i+(k/3)-1][j+(k%3)-1] + " Dis = " + (GDO[i+(k/3)-1][j+(k%3)-1]-GDO[yB][xB])*1000.0f
-                            + " SLP = " + So*(float)Math.pow(AREA[i+(k/3)-1][j+(k%3)-1]/Ao,m1));
+                            + " SLP = " + slope);
                 }
             }
         }
@@ -656,16 +670,16 @@ public java.util.Vector AreaBasin = new java.util.Vector();
             
             // For Windows
                     
-//            args=new String[] { "C:/5_temp/Running_Mogollon_040307/mogollon.metaDEM",
-//                                 "C:/5_temp/Running_Mogollon_040307/mogollon.dem"};
+            args=new String[] { "C:/5_temp/Running_Mogollon_040307/mogollon.metaDEM",
+                                 "C:/5_temp/Running_Mogollon_040307/mogollon.dem"};
                     
                     
 
                
 //            args=new String[] { "/Users/jesusgomez/Documents/ensayo_Mogollon/mogollon.metaDEM",
 //                                 "/Users/jesusgomez/Documents/ensayo_Mogollon/mogollon.dem"};
-            args=new String[] { "/Users/jesusgomez/Documents/ensayo_Mogollon_2/mogollon.metaDEM",
-                                 "/Users/jesusgomez/Documents/ensayo_Mogollon_2/mogollon.dem"};
+//            args=new String[] { "/Users/jesusgomez/Documents/ensayo_Mogollon_2/mogollon.metaDEM",
+//                                 "/Users/jesusgomez/Documents/ensayo_Mogollon_2/mogollon.dem"};
             
 
             int x = 275;
