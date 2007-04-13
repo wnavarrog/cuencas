@@ -195,7 +195,7 @@ public class NetworkEquations_S0S2 implements hydroScalingAPI.util.ordDiffEqSolv
                     
                     // Define K_Qhill ...
                     hillslopeLength = ((float) area_m2 / lengthArray[0][i]) / 2.0f;       // length on one hillslope (one side of link) is half of link length; lengthArray in m
-                    K_Qhill = (1.0*constantvelArray[0][i])*Math.pow(hillslopeLength,-1);  // units 1/s
+                    K_Qhill = (0.1*constantvelArray[0][i])*Math.pow(hillslopeLength,-1);  // units 1/s
                     
                     if (input[i]==0.0D) K_Q=1e-10;
                     
