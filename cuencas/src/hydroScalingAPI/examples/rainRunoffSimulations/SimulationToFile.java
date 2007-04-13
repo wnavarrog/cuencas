@@ -176,7 +176,7 @@ public class SimulationToFile extends java.lang.Object {
         }
         java.io.File theFile=new java.io.File(Directory+demName+"-"+storm.stormName()+"-IR_"+infiltRate+"-Routing_"+routingString+".dat");
         if(infiltMetaRaster == null)
-            theFile=new java.io.File(Directory+demName+"-"+storm.stormName()+"-IR_"+infiltRate+"-Routing_"+routingString+".dat");
+            theFile=new java.io.File(Directory+demName+"-"+storm.stormName()+"-IR_"+infiltRate+"-Routing_"+routingString+"_params_"+widthCoeff+"_"+widthExponent+"_"+widthStdDev+"_"+chezyCoeff+"_"+chezyExponent+".dat");
         else
             theFile=new java.io.File(Directory+demName+"-"+storm.stormName()+"-IR_"+infiltMetaRaster.getLocationMeta().getName().substring(0,infiltMetaRaster.getLocationMeta().getName().lastIndexOf(".metaVHC"))+"-Routing_"+routingString+"_params_"+widthCoeff+"_"+widthExponent+"_"+widthStdDev+"_"+chezyCoeff+"_"+chezyExponent+".dat");
         System.out.println(theFile);
@@ -510,7 +510,7 @@ public class SimulationToFile extends java.lang.Object {
 
         for(float ce=0f;ce<=0.5;ce+=0.05){
             routingParams.put("chezyExponent",ce);
-            new SimulationToFile(82,260,matDirs,magnitudes,metaModif,stormFile,0.0f,2,routingParams);
+            new SimulationToFile(82,260,matDirs,magnitudes,metaModif,stormFile,0.0f,0,routingParams);
         }
 
         
