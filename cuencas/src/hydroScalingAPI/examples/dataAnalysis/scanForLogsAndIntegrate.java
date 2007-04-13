@@ -63,7 +63,7 @@ public class scanForLogsAndIntegrate {
                     hydroScalingAPI.io.MetaPolygon metaPolyToUse=new hydroScalingAPI.io.MetaPolygon ();
                     metaPolyToUse.setName(thisBasin.toString());
                     metaPolyToUse.setCoordinates(thisBasin.getLonLatBasinDivide());
-                    System.out.println(basinLabel[1]+",drainage density,"+ltc[MatY][MatX]/areas[MatY][MatX]+",t1,"+metaPolyToUse.getAverage(field1)+",sum_p_pet_i,"+metaPolyToUse.getAverage(field2));
+                    System.out.println(basinLabel[1]+"("+metaData.getLocationMeta().getPath()+")"+",drainage density,"+ltc[MatY][MatX]/areas[MatY][MatX]+",t1,"+metaPolyToUse.getAverage(field1)+",sum_p_pet_i,"+metaPolyToUse.getAverage(field2)+",area,"+areas[MatY][MatX]);
                 }
 
             }

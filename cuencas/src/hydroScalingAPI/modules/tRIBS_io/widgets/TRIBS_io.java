@@ -346,6 +346,8 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
     private void plotPoints(float Zr) throws RemoteException, VisADException{
         basTIN_I.filterPoints(true,Zr);
         data_refPoints_I.setData(basTIN_I.getPointsFlatField());
+        data_refTr_I.setData(basTIN_I.getTrianglesUnionSet());
+        data_refPoly_I.setData(basTIN_I.getPolygonsUnionSet());
     }
     
     private void initializeInputTabs() throws RemoteException, VisADException, java.io.IOException {
@@ -1573,7 +1575,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
             
             ///home/ricardo/workFiles/tribsWork/sampleTribs/SMALLBASIN/Output/"),"smallbasin"
             ///home/ricardo/workFiles/tribsWork/sampleTribs/Output_Mar23a_07/"),"urp"
-            new TRIBS_io(tempFrame, new java.io.File("/home/ricardo/workFiles/tribsWork/sampleTribs/SMALLBASIN/Output/"),"smallbasin").setVisible(true);
+            new TRIBS_io(tempFrame, new java.io.File("/home/ricardo/workFiles/tribsWork/sampleTribs/SMALLBASIN_ORIG/Output/"),"smallbasin").setVisible(true);
         } catch (java.io.IOException IOE){
             System.out.print(IOE);
             System.exit(0);

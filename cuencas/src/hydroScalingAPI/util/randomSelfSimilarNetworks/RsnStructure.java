@@ -80,10 +80,10 @@ public class RsnStructure {
         for(int i=0;i<rsnTreeDecoding.length;i++){
             if(rsnTreeDecoding[i].contains("E")){
                 linkAreas[0][i]=myDis_Areas_E.sample();
-                linkLengths[0][i]=(float)(1.31*Math.pow(linkAreas[0][i],0.63)*Math.exp(rn.nextGaussian()*0.7));
+                linkLengths[0][i]=(float)(1.1*Math.pow(linkAreas[0][i],1.3)*Math.exp(rn.nextGaussian()*0.0));//1.31,0.63,0.7
             } else{
                 linkAreas[0][i]=myDis_Areas_I.sample();
-                linkLengths[0][i]=(float)(1.17*Math.pow(linkAreas[0][i],0.55)*Math.exp(rn.nextGaussian()*0.5));
+                linkLengths[0][i]=(float)(1.1*Math.pow(linkAreas[0][i],1.3)*Math.exp(rn.nextGaussian()*0.0));//1.17,0.55,,0.5
             }
         }
         
@@ -438,8 +438,8 @@ public class RsnStructure {
     public static void main(String[] args) {
         //main0(args); //Test features of this Object
         //main1(args); //Test write-read feature
-        //main2(args); //Test Dd vs A relationship for RSNs
-        main3(args); //Read Info from Embeded trees
+        main2(args); //Test Dd vs A relationship for RSNs
+        //main3(args); //Read Info from Embeded trees
     }
     
     private static void main0(String[] args) {
@@ -509,17 +509,17 @@ public class RsnStructure {
     
     private static void main2(String[] args) {
          
-        hydroScalingAPI.util.probability.DiscreteDistribution myUD_I=new hydroScalingAPI.util.probability.GeometricDistribution(0.42,0);
-        hydroScalingAPI.util.probability.DiscreteDistribution myUD_E=new hydroScalingAPI.util.probability.GeometricDistribution(0.49,1);
+        hydroScalingAPI.util.probability.DiscreteDistribution myUD_I=new hydroScalingAPI.util.probability.GeometricDistribution(0.45,0);
+        hydroScalingAPI.util.probability.DiscreteDistribution myUD_E=new hydroScalingAPI.util.probability.GeometricDistribution(0.52,1);
 
         float Elae=0.1f;
         float SDlae=0.2f;
 
         hydroScalingAPI.util.probability.ContinuousDistribution myLinkAreaDistro_E=new hydroScalingAPI.util.probability.LogGaussianDistribution(Elae,SDlae);
-        hydroScalingAPI.util.probability.ContinuousDistribution myLinkAreaDistro_I=new hydroScalingAPI.util.probability.LogGaussianDistribution(0.01f+0.88f*Elae,0.04f+0.85f*SDlae);
-                        
-        //RsnStructure myRsnStruc=new RsnStructure(5,myUD_I,myUD_E, myLinkAreaDistro_E, myLinkAreaDistro_I);
-        RsnStructure myRsnStruc=new RsnStructure(6,myUD_I,myUD_E);
+        //hydroScalingAPI.util.probability.ContinuousDistribution myLinkAreaDistro_I=new hydroScalingAPI.util.probability.LogGaussianDistribution(0.01f+0.88f*Elae,0.04f+0.85f*SDlae);
+        hydroScalingAPI.util.probability.ContinuousDistribution myLinkAreaDistro_I=new hydroScalingAPI.util.probability.LogGaussianDistribution(Elae,SDlae);
+        RsnStructure myRsnStruc=new RsnStructure(8,myUD_I,myUD_E, myLinkAreaDistro_E, myLinkAreaDistro_I);
+        //RsnStructure myRsnStruc=new RsnStructure(8,myUD_I,myUD_E);
         
         float[][] upAreas=myRsnStruc.getUpAreas();
         float[][] upLength=myRsnStruc.getUpLength();
@@ -528,8 +528,18 @@ public class RsnStructure {
         
         int[] compLinks=myRsnStruc.getCompleteStreamLinksArray();
         
+        float[] averDd=new float[myRsnStruc.getNetworkOrder()];
+        float[] ordCount=new float[myRsnStruc.getNetworkOrder()];
+        
         for (int i=0;i<compLinks.length;i++){
-            if(upOrder[0][compLinks[i]]>2)System.out.println(i+" "+upAreas[0][compLinks[i]]+" "+upLength[0][compLinks[i]]+" "+upOrder[0][compLinks[i]]+" "+longLength[0][compLinks[i]]);
+            //if(upOrder[0][compLinks[i]]>2)System.out.println(i+" "+upAreas[0][compLinks[i]]+" "+upLength[0][compLinks[i]]+" "+upOrder[0][compLinks[i]]+" "+longLength[0][compLinks[i]]);
+            averDd[(int)upOrder[0][compLinks[i]]-1]+=upLength[0][compLinks[i]]/upAreas[0][compLinks[i]];
+            ordCount[(int)upOrder[0][compLinks[i]]-1]++;
+        }
+        System.out.println("DD vs Order");
+        for (int i = 0; i < averDd.length; i++) {
+            averDd[i]/=ordCount[i];
+            System.out.println((i+1)+" "+averDd[i]);
         }
         
     }
