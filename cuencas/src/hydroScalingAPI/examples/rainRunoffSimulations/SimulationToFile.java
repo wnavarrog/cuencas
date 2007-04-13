@@ -325,7 +325,7 @@ public class SimulationToFile extends java.lang.Object {
         System.out.println("Intermedia Time:"+interTime.toString());
         System.out.println("Running Time:"+(.001*(interTime.getTime()-startTime.getTime()))+" seconds");
         
-        rainRunoffRaining.jumpsRunToFile(storm.stormInitialTimeInMinutes()+numPeriods*storm.stormRecordResolutionInMinutes(),(storm.stormInitialTimeInMinutes()+(numPeriods+1)*storm.stormRecordResolutionInMinutes())+1000,5,initialCondition,newfile);
+        rainRunoffRaining.jumpsRunToFile(storm.stormInitialTimeInMinutes()+numPeriods*storm.stormRecordResolutionInMinutes(),(storm.stormInitialTimeInMinutes()+(numPeriods+1)*storm.stormRecordResolutionInMinutes())+5000,5,initialCondition,newfile);
         
         System.out.println("Termina simulacion RKF");
         java.util.Date endTime=new java.util.Date();
