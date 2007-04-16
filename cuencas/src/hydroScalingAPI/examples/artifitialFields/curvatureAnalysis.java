@@ -48,6 +48,8 @@ public float Hmh = -1;
 public byte [][] maskHill;
 public int[][] toMark;
 public float[][] fakeDEM;
+public float[][] refA;
+public float[][] refS;
 
 public java.util.Vector DrainageDensity = new java.util.Vector();
 public java.util.Vector AreaBasin = new java.util.Vector();
@@ -127,7 +129,8 @@ public java.util.Vector AreaBasin = new java.util.Vector();
         jNearChannel=new int[DEM.length][DEM[0].length];
         fakeDEM=new float[DEM.length][DEM[0].length];
         fakeSLP=new float[DEM.length][DEM[0].length];
-        
+        refA=new float[DEM.length][DEM[0].length];
+        refS=new float[DEM.length][DEM[0].length];
         
         for(int i=1;i<DEM.length-1;i++) for(int j=1;j<DEM[0].length-1;j++){
             
@@ -154,7 +157,8 @@ public java.util.Vector AreaBasin = new java.util.Vector();
                 
         }
         
-        getConstrainsTopography();    
+        getConstrainsTopography(); 
+        getStandardParameters();
         
     }
     
@@ -367,15 +371,15 @@ public java.util.Vector AreaBasin = new java.util.Vector();
                 if (MAG[i+(k/3)-1][j+(k%3)-1]>0 && fullDirMatrix[i+(k/3)-1][j+(k%3)-1] == 9-k){
                     
                     tribsVector.add(new int[] {j+(k%3)-1,i+(k/3)-1});
-                    slope = So*(float)Math.pow(AREA[i+(k/3)-1][j+(k%3)-1]/Ao,m1);
+                    slope = refS[i+(k/3)-1][j+(k%3)-1]*(float)Math.pow(AREA[i+(k/3)-1][j+(k%3)-1]/refA[i+(k/3)-1][j+(k%3)-1],m1);
 
 //            if(i == 383 && j == 250){
 //                System.out.println("listo!!!");
 //            }                    
                     
                     
-                    if(HOR[i+(k/3)-1][j+(k%3)-1] <= 4 &&  slope > 2)
-                        slope = fakeSLP[i][j] + fakeSLP[i][j]*0.005f;
+//                    if(HOR[i+(k/3)-1][j+(k%3)-1] <= 4 &&  slope > 2)
+//                        slope = fakeSLP[i][j] + fakeSLP[i][j]*0.005f;
                     
                     fakeSLP[i+(k/3)-1][j+(k%3)-1] = slope;
                             
@@ -497,6 +501,7 @@ public java.util.Vector AreaBasin = new java.util.Vector();
         for(int i = 0; i<b1.length;i++) for(int j = 0; j<b2.length; j++){
 //            getSyntheticDEM(b1[i],b2[j]);
             getSyntheticDEM_AS(b1[i],b2[j]);
+            System.exit(0);
         }
         
         java.io.File saveFile = new java.io.File(metaOrig.getLocationMeta().getParent() + "/BasinsParameters.txt");   
@@ -653,6 +658,55 @@ public java.util.Vector AreaBasin = new java.util.Vector();
     }
     
     
+    public void getStandardParameters(){
+        
+        java.util.Vector idsBasin=new java.util.Vector();
+        int [][] ijs = new int[1][]; ijs[0]=new int[] {xB,yB};
+        idsBasin.add(ijs[0]);
+        refA[yB][xB] = AREA[yB][xB];
+        refS[yB][xB] = (float)SLP[yB][xB];
+        
+        while(ijs != null){
+
+            
+                java.util.Vector tribsVector=new java.util.Vector();
+
+                for(int incoming=0;incoming<ijs.length;incoming++){
+                    int j=ijs[incoming][0];
+                    int i=ijs[incoming][1];
+                    for (int k=0; k <= 8; k++){
+                        if (MAG[i+(k/3)-1][j+(k%3)-1]>0 && DIR[i+(k/3)-1][j+(k%3)-1] == 9-k){
+
+                            tribsVector.add(new int[] {j+(k%3)-1,i+(k/3)-1});
+                            
+                            if(HOR[i+(k/3)-1][j+(k%3)-1] == HOR[i][j]){
+                                refA[i+(k/3)-1][j+(k%3)-1] = refA[i][j];
+                                refS[i+(k/3)-1][j+(k%3)-1] = refS[i][j];
+                            }else{
+                                refA[i+(k/3)-1][j+(k%3)-1] = AREA[i+(k/3)-1][j+(k%3)-1];
+                                refS[i+(k/3)-1][j+(k%3)-1] = (float)SLP[i+(k/3)-1][j+(k%3)-1];
+                                
+                            }
+                        }
+                    }
+                }
+
+                int countTribs=tribsVector.size();
+                if(countTribs != 0){
+                    ijs=new int[countTribs][2];
+                    for(int k=0;k<countTribs;k++){
+                        ijs[k]=(int[])tribsVector.get(k);
+                        idsBasin.add(ijs[k]);
+                    }
+                } else {
+                    ijs=null;
+                }            
+        }
+    
+    
+    }
+    
+    
     /**
      * @param args the command line arguments
      */
@@ -670,16 +724,16 @@ public java.util.Vector AreaBasin = new java.util.Vector();
             
             // For Windows
                     
-            args=new String[] { "C:/5_temp/Running_Mogollon_040307/mogollon.metaDEM",
-                                 "C:/5_temp/Running_Mogollon_040307/mogollon.dem"};
+//            args=new String[] { "C:/5_temp/Running_Mogollon_040307/mogollon.metaDEM",
+//                                 "C:/5_temp/Running_Mogollon_040307/mogollon.dem"};
                     
                     
 
                
 //            args=new String[] { "/Users/jesusgomez/Documents/ensayo_Mogollon/mogollon.metaDEM",
 //                                 "/Users/jesusgomez/Documents/ensayo_Mogollon/mogollon.dem"};
-//            args=new String[] { "/Users/jesusgomez/Documents/ensayo_Mogollon_2/mogollon.metaDEM",
-//                                 "/Users/jesusgomez/Documents/ensayo_Mogollon_2/mogollon.dem"};
+            args=new String[] { "/Users/jesusgomez/Documents/ensayo_Mogollon_2/mogollon.metaDEM",
+                                 "/Users/jesusgomez/Documents/ensayo_Mogollon_2/mogollon.dem"};
             
 
             int x = 275;
