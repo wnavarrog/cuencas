@@ -64,9 +64,7 @@ public java.util.Vector AreaBasin = new java.util.Vector();
         yB = yBasin;
         hypsoData = new java.util.Hashtable();
         
-//        new hydroScalingAPI.modules.networkExtraction.objects.NetworkExtractionModule(metaOrig, dataOrig);
-        
-        System.out.println("**** Correction Original Finished  ****");
+        System.out.println("**** Original DEM ready!!! ****");
         
         java.io.File fileMeta =  metaOrig.getLocationMeta();
         
@@ -74,19 +72,23 @@ public java.util.Vector AreaBasin = new java.util.Vector();
 
         getInitialParameters();
         
-//        getSyntheticDEM_AS(10f,10f);
-//        System.exit(0);
+        getScaleAnalysis();
+        
+        System.exit(0);
         
         getAreaSlope();
-//        ensayo();
+        
+//        getSyntheticDEM_AS(10f,10f);
+//        System.exit(0);
+
+        System.out.println("**** Initial Parameters Obtained ****");
         
         System.out.println("**** Starting iteration process  ****");
-        
+              
         getCurvatureAnalysis(b1,b2);
         
         System.out.println("**** Iteration process finished ****");
-        
-      
+
     }
     
     public void getInitialParameters()throws java.io.IOException{
@@ -134,7 +136,6 @@ public java.util.Vector AreaBasin = new java.util.Vector();
         
         for(int i=1;i<DEM.length-1;i++) for(int j=1;j<DEM[0].length-1;j++){
             
-//            fakeDEM[i][j] = f;
             fakeDEM[i][j] = DEM[i][j];
             if(MAG[i][j] <= 0){
                 int iPn = i-1+(DIR[i][j]-1)/3;
@@ -249,7 +250,7 @@ public java.util.Vector AreaBasin = new java.util.Vector();
         //exponent for the river network S = Sout * ( A /Aout )^m1 relationship
         //exponent for the hillslope h = Hmax * (A/Dmax)^m2 relationship
         
-        float So=(float)SLP[yB][xB];
+        float So=0.01f;//(float)SLP[yB][xB];
         float Ao=AREA[yB][xB];
         fakeDEM[yB][xB] = DEM[yB][xB];
         
@@ -259,17 +260,13 @@ public java.util.Vector AreaBasin = new java.util.Vector();
         
 //        It will mark the river network with the relationship Slope-Area
         
-        while(toMark != null){
-            markBasin(DIR, idsBasin,toMark,Ao,So,m1,AREA,GDO,MAG);
-        }
-        
+//        while(toMark != null){
+//            markBasin(DIR, idsBasin,toMark,Ao,So,m1,AREA,GDO,MAG);
+//        }
+//        
 //        It will mark the hillslopes using the ridges as reference
         
         for(int i = 1; i<DEM.length;i++) for(int j=0;j<DEM[0].length;j++){
-            
-//            if(i == 584 && j == 269){
-//                System.out.println("listo!!!");
-//            }
             if(maskHill[i][j]==1 && MAG[i][j]<0){
                 
                 byte count = 0;
@@ -312,9 +309,7 @@ public java.util.Vector AreaBasin = new java.util.Vector();
         }
         
         writer.close();
-        
-        System.exit(0);
-        
+
         new hydroScalingAPI.modules.networkExtraction.objects.NetworkExtractionModule(metaOut, new hydroScalingAPI.io.DataRaster(metaOut));
         
         
@@ -372,21 +367,15 @@ public java.util.Vector AreaBasin = new java.util.Vector();
                     
                     tribsVector.add(new int[] {j+(k%3)-1,i+(k/3)-1});
                     slope = refS[i+(k/3)-1][j+(k%3)-1]*(float)Math.pow(AREA[i+(k/3)-1][j+(k%3)-1]/refA[i+(k/3)-1][j+(k%3)-1],m1);
-
-//            if(i == 383 && j == 250){
-//                System.out.println("listo!!!");
-//            }                    
-                    
-                    
-//                    if(HOR[i+(k/3)-1][j+(k%3)-1] <= 4 &&  slope > 2)
-//                        slope = fakeSLP[i][j] + fakeSLP[i][j]*0.005f;
-                    
+                    slope = So*(float)Math.pow(AREA[i+(k/3)-1][j+(k%3)-1]/Ao,m1);
+              
+              
                     fakeSLP[i+(k/3)-1][j+(k%3)-1] = slope;
                             
                     DeltaH = slope*(GDO[i+(k/3)-1][j+(k%3)-1]-GDO[i][j])*1000.0f;
                     
-                    fakeDEM[i+(k/3)-1][j+(k%3)-1] = fakeDEM[i][j]+DeltaH;
-                    
+                    fakeDEM[i+(k/3)-1][j+(k%3)-1] = fakeDEM[i][j]+DeltaH; 
+
                     System.out.println("j = " + (j+(k%3)-1) + " i = " + (i+(k/3)-1)+ " delta = " + DeltaH + " Area = " + AREA[i+(k/3)-1][j+(k%3)-1] + " H = " + fakeDEM[i+(k/3)-1][j+(k%3)-1]
                            + " HOR = " + HOR[i+(k/3)-1][j+(k%3)-1] + " Dis = " + (GDO[i+(k/3)-1][j+(k%3)-1]-GDO[yB][xB])*1000.0f
                             + " SLP = " + slope);
@@ -499,9 +488,7 @@ public java.util.Vector AreaBasin = new java.util.Vector();
     public void getCurvatureAnalysis(float[] b1, float[] b2)throws java.io.IOException{
     
         for(int i = 0; i<b1.length;i++) for(int j = 0; j<b2.length; j++){
-//            getSyntheticDEM(b1[i],b2[j]);
             getSyntheticDEM_AS(b1[i],b2[j]);
-            System.exit(0);
         }
         
         java.io.File saveFile = new java.io.File(metaOrig.getLocationMeta().getParent() + "/BasinsParameters.txt");   
@@ -644,12 +631,15 @@ public java.util.Vector AreaBasin = new java.util.Vector();
         hydroScalingAPI.util.geomorphology.objects.HortonAnalysis myHortonStructure=new hydroScalingAPI.util.geomorphology.objects.HortonAnalysis(basinOrig, metaOrig, DIR);
         
  
-        for(int i=2;i<3;i++) {
+        for(int i=0;i<myHortonStructure.contactsArray.length;i++) {
             for(int j=0;j<myHortonStructure.contactsArray[i].length;j++) {
-                //System.out.print(myHortonStructure.contactsArray[i][j]+" ");
                 int xxx=(int)(myHortonStructure.contactsArray[i][j]%metaOrig.getNumCols());
                 int yyy=(int)(myHortonStructure.contactsArray[i][j]/metaOrig.getNumCols());
                 hydroScalingAPI.util.geomorphology.objects.Basin theCuenca=new hydroScalingAPI.util.geomorphology.objects.Basin(xxx,yyy,DIR,metaOrig);
+                
+                String folderName = "h_" + (i+1) + "_id_"+(j+1) + "_i_" + yyy + "_j_" + xxx;
+                java.util.Hashtable hyp = theCuenca.getHypCurve();
+                printHypsoCurve(folderName,hyp);
                 System.out.print(theCuenca.getXYBasin()[0].length+" ");
             }
             System.out.println(myHortonStructure.contactsArray[i].length);
@@ -724,16 +714,16 @@ public java.util.Vector AreaBasin = new java.util.Vector();
             
             // For Windows
                     
-//            args=new String[] { "C:/5_temp/Running_Mogollon_040307/mogollon.metaDEM",
-//                                 "C:/5_temp/Running_Mogollon_040307/mogollon.dem"};
+            args=new String[] { "C:/5_temp/Running_Mogollon_040307/mogollon.metaDEM",
+                                 "C:/5_temp/Running_Mogollon_040307/mogollon.dem"};
                     
                     
 
                
 //            args=new String[] { "/Users/jesusgomez/Documents/ensayo_Mogollon/mogollon.metaDEM",
 //                                 "/Users/jesusgomez/Documents/ensayo_Mogollon/mogollon.dem"};
-            args=new String[] { "/Users/jesusgomez/Documents/ensayo_Mogollon_2/mogollon.metaDEM",
-                                 "/Users/jesusgomez/Documents/ensayo_Mogollon_2/mogollon.dem"};
+//            args=new String[] { "/Users/jesusgomez/Documents/ensayo_Mogollon_2/mogollon.metaDEM",
+//                                 "/Users/jesusgomez/Documents/ensayo_Mogollon_2/mogollon.dem"};
             
 
             int x = 275;
@@ -743,8 +733,8 @@ public java.util.Vector AreaBasin = new java.util.Vector();
             metaRaster.setLocationBinaryFile(new java.io.File(args[1]));
             hydroScalingAPI.io.DataRaster datosRaster = new hydroScalingAPI.io.DataRaster(metaRaster);
 
-//            float [] b1 = {0.1f, 0.2f, 0.5f, 1f, 2f, 5f, 10f};
-            float [] b1 = {-0.8f, -0.6f,-0.5f,-0.4f,-0.2f, 0f, 1f, 5f, 10f};
+//            float [] b1 = {-0.8f, -0.6f,-0.5f,-0.4f,-0.2f, 0f, 1f, 5f, 10f};
+            float [] b1 = {-1f};
             float [] b2 = {0.1f, 0.2f, 0.5f, 1f, 2f, 5f, 10f};
             new curvatureAnalysis(x,y,metaRaster,datosRaster,b1,b2);
         } catch(java.io.IOException ioe){
