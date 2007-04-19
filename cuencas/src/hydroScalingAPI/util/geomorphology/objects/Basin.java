@@ -512,8 +512,14 @@ public class Basin extends Object{
             }
         }
         
-        keyElev_Dens[0] = -1f*(keyElev[1] - keyElev[0])/(accumElev[1] - accumElev[0]);
+        keyElev_Dens[0] = -1f*(keyElev[1] - keyElev[0])/(accumElev[1] - accumElev[0]);        
         keyElev_Dens[keyElev_Dens.length - 1] = -1f*(keyElev[keyElev_Dens.length - 1-1] - keyElev[keyElev_Dens.length - 1])/(accumElev[keyElev_Dens.length - 1-1] - accumElev[keyElev_Dens.length - 1]);
+
+        if(Float.isInfinite(keyElev_Dens[0]))
+            keyElev_Dens[0] = -9999f;     
+        if(Float.isInfinite(keyElev_Dens[keyElev_Dens.length - 1]))
+            keyElev_Dens[keyElev_Dens.length - 1] = -9999f;     
+
         for(int i=1;i<keyElev_Dens.length-1;i++){
             keyElev_Dens[i] = -1f*(keyElev[i+1] - keyElev[i-1])/(accumElev[i+1] - accumElev[i-1]);
             if(Float.isInfinite(keyElev_Dens[i]))
@@ -534,8 +540,11 @@ public class Basin extends Object{
         
         a+=(1f/99f)/2f*accumElev[0];
         a+=(1f/99f)/2f*accumElev[keyElev.length-1];
-        ad+= (accumElev[1] - accumElev[0])/2f*keyElev_Dens[0];
-        ad+=(accumElev[keyElev.length-1] - accumElev[keyElev.length-1-1])/2f*keyElev_Dens[keyElev.length-1];
+        
+        if(keyElev_Dens[0] != -9999f)
+            ad+= (accumElev[1] - accumElev[0])/2f*keyElev_Dens[0];
+        if(keyElev.length-1 != -9999f)
+            ad+=(accumElev[keyElev.length-1] - accumElev[keyElev.length-1-1])/2f*keyElev_Dens[keyElev.length-1];
         
         for (int i=1;i<keyElev.length-1;i++){
 

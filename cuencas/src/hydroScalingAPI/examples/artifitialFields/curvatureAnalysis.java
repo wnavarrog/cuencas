@@ -72,9 +72,11 @@ public java.util.Vector AreaBasin = new java.util.Vector();
 
         getInitialParameters();
         
+        System.out.println("**** Starting scale analysis  ****");
+        
         getScaleAnalysis();
         
-        System.exit(0);
+        System.out.println("**** Scale analysis finished ****");
         
         getAreaSlope();
         
@@ -485,6 +487,41 @@ public java.util.Vector AreaBasin = new java.util.Vector();
         
     }
     
+    
+    public void printHypsoCurveScale(String iteration, java.util.Hashtable hyp, float a)throws java.io.IOException{
+    
+
+        java.io.File saveFile = new java.io.File(metaOrig.getLocationMeta().getParent() + "/" + iteration + ".txt");   
+        java.io.BufferedWriter writer = new java.io.BufferedWriter(new java.io.FileWriter(saveFile));
+
+        
+        float [] areas =  (float [])hyp.get("areas");
+        float [] elevs =  (float [])hyp.get("elevs");
+        float [] density =  (float [])hyp.get("density");
+        hydroScalingAPI.util.statistics.Stats s = (hydroScalingAPI.util.statistics.Stats) hyp.get("stat");
+        float integral = ((Float)hyp.get("integral")).floatValue();
+        float dsk = ((Float)hyp.get("dsk")).floatValue();
+        float dkur = ((Float)hyp.get("dkur")).floatValue();
+        
+        writer.write(s.meanValue + "\n");
+        writer.write(s.standardDeviation + "\n");
+        writer.write(s.kurtosis + "\n");
+        writer.write(s.skewness + "\n");
+        writer.write(integral + "\n");
+        
+        for(int i=0;i<areas.length;i++)
+            writer.write(areas[i] + "\n");
+        for(int i=0;i<elevs.length;i++)
+            writer.write(elevs[i] + "\n");
+        writer.write(dkur + "\n");
+        writer.write(dsk + "\n");
+        for(int i=0;i<elevs.length;i++)
+            writer.write(density[i] + "\n");
+        writer.write(a + "\n");
+        writer.close();
+        
+    }    
+    
     public void getCurvatureAnalysis(float[] b1, float[] b2)throws java.io.IOException{
     
         for(int i = 0; i<b1.length;i++) for(int j = 0; j<b2.length; j++){
@@ -639,11 +676,15 @@ public java.util.Vector AreaBasin = new java.util.Vector();
                 
                 String folderName = "h_" + (i+1) + "_id_"+(j+1) + "_i_" + yyy + "_j_" + xxx;
                 java.util.Hashtable hyp = theCuenca.getHypCurve();
-                printHypsoCurve(folderName,hyp);
+                printHypsoCurveScale(folderName,hyp,AREA[yyy][xxx]);
                 System.out.print(theCuenca.getXYBasin()[0].length+" ");
             }
             System.out.println(myHortonStructure.contactsArray[i].length);
-        }        
+        }      
+        
+//                DrainageDensity.addElement(getDD(bas,metaOut,DIR_out));
+//        AreaBasin.addElement(AREA_out[yB][xB]);
+
     
     }
     
@@ -714,8 +755,8 @@ public java.util.Vector AreaBasin = new java.util.Vector();
             
             // For Windows
                     
-            args=new String[] { "C:/5_temp/Running_Mogollon_040307/mogollon.metaDEM",
-                                 "C:/5_temp/Running_Mogollon_040307/mogollon.dem"};
+//            args=new String[] { "C:/5_temp/Running_Mogollon_040307/mogollon.metaDEM",
+//                                 "C:/5_temp/Running_Mogollon_040307/mogollon.dem"};
                     
                     
 
@@ -726,8 +767,15 @@ public java.util.Vector AreaBasin = new java.util.Vector();
 //                                 "/Users/jesusgomez/Documents/ensayo_Mogollon_2/mogollon.dem"};
             
 
-            int x = 275;
-            int y = 311;
+//            int x = 275; mogollon
+//            int y = 311;
+            
+            
+            args=new String[] { "C:/5_temp/Running_WalnutGulch_040307/walnutGulchUpdated.metaDEM",
+                                 "C:/5_temp/Running_WalnutGulch_040307/walnutGulchUpdated.dem"};
+            
+            int x = 302;
+            int y = 318;
              
             hydroScalingAPI.io.MetaRaster metaRaster= new hydroScalingAPI.io.MetaRaster(new java.io.File(args[0]));
             metaRaster.setLocationBinaryFile(new java.io.File(args[1]));
