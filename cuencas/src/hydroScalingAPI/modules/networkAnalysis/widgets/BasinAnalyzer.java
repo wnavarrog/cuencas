@@ -226,20 +226,6 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
         myHortonStructure=new hydroScalingAPI.util.geomorphology.objects.HortonAnalysis(myCuenca, metaDatos, matDir);
         
         myLinksStructure=new hydroScalingAPI.util.geomorphology.objects.LinksAnalysis(myCuenca, metaDatos, matDir);
- 
-//        SAMPLE CODE FOR CHUCHO
-//        THEN CHECK THE 
-//        for(int i=2;i<3;i++) {
-//            for(int j=0;j<myHortonStructure.contactsArray[i].length;j++) {
-//                //System.out.print(myHortonStructure.contactsArray[i][j]+" ");
-//                int xxx=(int)(myHortonStructure.contactsArray[i][j]%metaDatos.getNumCols());
-//                int yyy=(int)(myHortonStructure.contactsArray[i][j]/metaDatos.getNumCols());
-//                hydroScalingAPI.util.geomorphology.objects.Basin theCuenca=new hydroScalingAPI.util.geomorphology.objects.Basin(xxx,yyy,direcc,metaDatos);
-//                System.out.print(theCuenca.getXYBasin()[0].length+" ");
-//            }
-//            System.out.println(myHortonStructure.contactsArray[i].length);
-//        }
-//        System.exit(0);
         
         minRegOrderSlider.setMinimum(1);
         minRegOrderSlider.setMaximum(myHortonStructure.getBasinOrder());
@@ -400,8 +386,8 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
         
         hydroScalingAPI.tools.VisadTools.addWheelFunctionality(displayMap_RSNs);
         
-        //myRSNAnalysis=new hydroScalingAPI.modules.networkAnalysis.objects.RSNDecomposition(myLinksStructure);
-        //plotRSNTiles(myHortonStructure.getBasinOrder()-1);
+        myRSNAnalysis=new hydroScalingAPI.modules.networkAnalysis.objects.RSNDecomposition(myLinksStructure);
+        plotRSNTiles(myHortonStructure.getBasinOrder()-1);
         plotNetwork(displayMap_RSNs,myHortonStructure.getBasinOrder()-1);
         
         //Inicio los Hilos que cargan datos en la Interfaz

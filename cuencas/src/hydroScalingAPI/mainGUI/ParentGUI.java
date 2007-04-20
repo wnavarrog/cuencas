@@ -1057,7 +1057,7 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
 
         createDB.setFont(new java.awt.Font("Verdana", 0, 10));
         createDB.setMnemonic('c');
-        createDB.setText("Create a Data Base");
+        createDB.setText("Create New Data Base");
         createDB.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 createDBActionPerformed(evt);
@@ -1224,7 +1224,7 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         file.add(jMenuRecentFiles);
 
         jMenuRecentDB.setMnemonic('b');
-        jMenuRecentDB.setText("Recent Data Bases");
+        jMenuRecentDB.setText("Recent Databases");
         jMenuRecentDB.setFont(new java.awt.Font("Dialog", 0, 10));
         file.add(jMenuRecentDB);
 
@@ -1428,6 +1428,7 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
 
     private void launchTSAnalyzerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_launchTSAnalyzerActionPerformed
         Object[] toView=activeGaugesContainer.getSelectedValues();
+        if(toView.length == 0) return;
         hydroScalingAPI.io.MetaGauge gaugeInfo=(hydroScalingAPI.io.MetaGauge)toView[0];
         hydroScalingAPI.modules.analysis_TS.widgets.TimeSeriesViewer gauView=new hydroScalingAPI.modules.analysis_TS.widgets.TimeSeriesViewer(this,gaugeInfo);
         gauView.setVisible(true);

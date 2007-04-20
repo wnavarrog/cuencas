@@ -109,6 +109,63 @@ public abstract class GetRasterNetwork extends Object {
     }
     
     /**
+     * Corrects extra intersections at points of change in the river network
+     * @param Proc The parent {@link hydroScalingAPI.modules.networkExtraction.objects.NetworkExtractionModule}
+     */
+    public static void fixIntersections(NetworkExtractionModule Proc){
+        if (Proc.printDebug) System.out.println(">>> Fixing Intersections");
+        
+        int[][] fixedDirs=new int[3][3];
+        
+        int[][] fork={  {0,1,2},
+                        {1,2,5},
+                        {2,5,8},
+                        {3,0,1},
+                        {4,4,4},
+                        {5,8,7},
+                        {6,3,0},
+                        {7,6,3},
+                        {8,7,6}};
+                        
+        int[] fixing={2,6,6,2,5,8,4,4,8};
+        
+        for (int i=1; i<Proc.DIR.length-1; i++){
+            for (int j=1; j<Proc.DIR[0].length-1; j++){
+                if(Proc.RedRas[i][j]==1){
+                    int llegan=0;
+                    for (int k=0; k <= 8; k++){
+                        if (Proc.RedRas[i+(k/3)-1][j+(k%3)-1]==1 && Proc.DIR[i+(k/3)-1][j+(k%3)-1]==9-k) llegan++;
+                    }
+                    if(llegan > 1){
+                        //System.out.println("Working on x= "+(j-1)+" y = "+(i-1));
+                        for (int k=0; k <= 8; k++){
+                            int k1=fork[k][0];
+                            int k2=fork[k][1];
+                            int k3=fork[k][2];
+                            
+                            boolean c1=Proc.DIR[i+(k1/3)-1][j+(k1%3)-1]==9-k1;
+                            boolean c2=Proc.RedRas[i+(k2/3)-1][j+(k2%3)-1] == 0 && Proc.DIR[i+(k2/3)-1][j+(k2%3)-1]==9-k2;
+                            boolean c3=Proc.DIR[i+(k3/3)-1][j+(k3%3)-1]==9-k3;
+                            
+                            
+                            if (c1 && c2 && c3){
+                                //System.out.println("    At x= "+(j+(k2%3)-2)+" y = "+(i+(k2/3)-2)+" changed "+Proc.DIR[i+(k2/3)-1][j+(k2%3)-1]+" by "+fixing[Proc.DIR[i+(k2/3)-1][j+(k2%3)-1]-1]);
+                                fixedDirs[(k2/3)][(k2%3)]=fixing[Proc.DIR[i+(k2/3)-1][j+(k2%3)-1]-1];
+                            } else {
+                                //System.out.println("    Nothing at "+(j+(k2%3)-2)+" y = "+(i+(k2/3)-2)+" because "+c1+Proc.DIR[i+(k1/3)-1][j+(k1%3)-1]+c2+Proc.DIR[i+(k2/3)-1][j+(k2%3)-1]+c3+Proc.DIR[i+(k3/3)-1][j+(k3%3)-1]);
+                                fixedDirs[(k2/3)][(k2%3)]=Proc.DIR[i+(k2/3)-1][j+(k2%3)-1];
+                            }
+                        }
+                        for (int k=0; k <= 8; k++){
+                            Proc.DIR[i+(k/3)-1][j+(k%3)-1]=fixedDirs[(k/3)][(k%3)];
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    /**
      * Removes short streams from the raster network.  This is because external channels
      * that are only one pixel long are usualy errors.
      * @param Proc The parent {@link hydroScalingAPI.modules.networkExtraction.objects.NetworkExtractionModule}

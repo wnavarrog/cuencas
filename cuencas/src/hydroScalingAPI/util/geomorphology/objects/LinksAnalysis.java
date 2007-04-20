@@ -241,10 +241,10 @@ public class LinksAnalysis extends java.lang.Object {
         int myOrder,frontOrder;
         
         for(int i=0;i<nextLinkArray.length;i++){
+            fileHorton.seek(contactsArray[i]);
+            myOrder=fileHorton.readByte();
+            basinOrder=Math.max(basinOrder,myOrder);
             if (nextLinkArray[i] > 0){
-                fileHorton.seek(contactsArray[i]);
-                myOrder=fileHorton.readByte();
-                basinOrder=Math.max(basinOrder,myOrder);
                 fileHorton.seek(contactsArray[nextLinkArray[i]]);
                 frontOrder=fileHorton.readByte();
                 if (frontOrder>myOrder){
