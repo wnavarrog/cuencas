@@ -319,6 +319,9 @@ public class BasinTIN {
         }
         bufferNodes.close();
         
+        pointsInTriangulation=new java.util.Vector();
+        typeOfPoint=new java.util.Vector();
+        
         nodeFile=new java.io.File(pathToTriang.getPath()+"/"+baseName+".nodes");
         bufferNodes = new java.io.BufferedReader(new java.io.FileReader(nodeFile));
         fullLine=bufferNodes.readLine();
@@ -330,7 +333,9 @@ public class BasinTIN {
             pointProps[1][i]=(float)(Double.parseDouble(lineData[1])-minY);
             pointProps[2][i]=(float)(Double.parseDouble(lineData[3]));
             if(pointProps[2][i] != 1 && pointProps[2][i] != 2) countNoBorder++;
-            
+            Utm_Coord_3d thisUtm=new Utm_Coord_3d(); thisUtm.x=pointProps[0][i]; thisUtm.y=pointProps[1][i];
+            pointsInTriangulation.add(thisUtm);
+            typeOfPoint.add(pointProps[2][i]);
         }
         bufferNodes.close();
         
@@ -639,6 +644,21 @@ public class BasinTIN {
             
             
         }
+    }
+    
+    /**
+     * Creates a {@link visad.RealTuple} to be plotted in a {@link visad.Display}
+     * @return The {@link visad.RealTuple}
+     * @throws visad.VisADException Captures errors while creating the {@link visad.RealTuple}
+     * @throws java.rmi.RemoteException Captures errors while creating the {@link visad.RealTuple}
+     */
+    public visad.RealTuple getPositionTuple(int index) throws visad.VisADException, java.rmi.RemoteException{
+        Utm_Coord_3d thePointInfo = (Utm_Coord_3d)pointsInTriangulation.get(index);
+        double xx=thePointInfo.x;
+        double yy=thePointInfo.y;
+        visad.Real[] rtd1 = {new visad.Real(xEasting, xx),
+                             new visad.Real(yNorthing,  yy)};
+        return new visad.RealTuple(rtd1);
     }
     
     public visad.FlatField getPointsFlatField(){

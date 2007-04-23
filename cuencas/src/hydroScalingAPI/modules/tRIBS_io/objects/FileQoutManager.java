@@ -9,14 +9,13 @@
 
 package hydroScalingAPI.modules.tRIBS_io.objects;
 
-import ij.util.Java2;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
 
 /**
  *
- * @author ricardo
+ * @author Ricardo Mantilla
  */
 public class FileQoutManager {
     
@@ -53,8 +52,8 @@ public class FileQoutManager {
      */
     public static void main(String[] args) {
         java.io.File[] files = {new java.io.File("/home/ricardo/workFiles/tribsWork/sampleTribs/SMALLBASIN/Output/hyd/smallbasin_Outlet.qout"),
-                                new java.io.File("/home/ricardo/workFiles/tribsWork/sampleTribs/SMALLBASIN/Output/hyd/smallbasin_1148.qout"),
-                                new java.io.File("/home/ricardo/workFiles/tribsWork/sampleTribs/SMALLBASIN/Output/hyd/smallbasin_1166.qout")};
+                                new java.io.File("/home/ricardo/workFiles/tribsWork/sampleTribs/SMALLBASIN/Output/hyd/smallbasin_5549.qout"),
+                                new java.io.File("/home/ricardo/workFiles/tribsWork/sampleTribs/SMALLBASIN/Output/hyd/smallbasin_5637.qout")};
         new FileQoutManager(files);
     }
     
@@ -95,7 +94,6 @@ class FileQout{
             
             for (int i = 0; i < countTimes; i++) {
                 fullLine=fileQout.readLine();
-                elements=fullLine.split("\t");
                 elements=fullLine.split("\t");
                 for (int j = 0; j < QhData.length; j++) {
                     QhData[j][i]=Float.parseFloat(elements[j]);

@@ -47,6 +47,12 @@ public class InfoRequest extends javax.swing.JDialog {
         setTitle("Base Name");
         nameTextField.setFont(new java.awt.Font("Lucida Grande", 0, 10));
         nameTextField.setText("jTextField1");
+        nameTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                nameTextFieldActionPerformed(evt);
+            }
+        });
+
         getContentPane().add(nameTextField, java.awt.BorderLayout.CENTER);
 
         applyChange.setFont(new java.awt.Font("Lucida Grande", 0, 10));
@@ -61,6 +67,10 @@ public class InfoRequest extends javax.swing.JDialog {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void nameTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nameTextFieldActionPerformed
+        setVisible(false);
+    }//GEN-LAST:event_nameTextFieldActionPerformed
 
     private void applyChangeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_applyChangeActionPerformed
         setVisible(false);
