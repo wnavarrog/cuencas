@@ -214,14 +214,21 @@ public class SimulationToFileFurey_april07 extends java.lang.Object {
         networkspecs.close();
         
         // Additional info for GOODWIN CREEK ...Contact point (x,y) values used below, except for basin outlet.
+        // These are coords for pixel before link joins others downstream.
         FileWriter sg_IDvals = new FileWriter(output_path + "sg_arrayIDs.txt");
         sg_IDvals.write("Basin, resSimul ID for flow at outlet, Area (km^2)" + '\n'+'\n');
         for(int i=0;i<14;i++){
             int[] sg_nums= {1,2,3,4,5,6,7,8,9,10,11,12,13,14};
+            // IDS from GCEW extracted prior to 16 April 2007
             int[][] xyval = {{55,114},{111,180},{204,219},{196,209},{256,227}, //sgs 1 - 5
             {240,256},{243,199},{325,249},{325,250},{319,225},{344,233},                //sgs 6-11
             {369,239},{127,187},{172,191}};                                     //sgs 12-14
+            // IDS from GCEW extracted on 16 April 2007
+            //int[][] xyval = {{54,114},{111,180},{204,219},{198,209},{257,226}, //sgs 1 - 5
+            //{240,256},{241,199},{326,249},{326,250},{322,226},{345,236},                //sgs 6-11
+            //{372,240},{129,187},{171,191}};                                     //sgs 12-14
             int resSimID = linksStructure.getResSimID(xyval[i][0],xyval[i][1]);
+            //System.out.println(resSimID);
             sg_IDvals.write(sg_nums[i] + "   " + resSimID + "  " + thisNetworkGeom.upStreamArea(resSimID-1) + '\n');
             //System.out.println(linksStructure.contactsArray(xyval[i][0],xyval[i][1]).length);   //contactsArray.length
         }
@@ -319,8 +326,6 @@ public class SimulationToFileFurey_april07 extends java.lang.Object {
         
         System.out.println("Termina escritura de Resultados");
         
-    
-        
     }
 
     /**
@@ -381,11 +386,6 @@ public class SimulationToFileFurey_april07 extends java.lang.Object {
             System.err.println(IOE);
         }
         
-        /* for (int i=0;i<sim_metadata.length;i++) {
-          System.out.print(sim_metadata[i]);
-          System.out.print(" ");
-        } */
-        
         String topo_path =sim_metadata[0];
         String rain_path = sim_metadata[1];
         
@@ -407,7 +407,7 @@ public class SimulationToFileFurey_april07 extends java.lang.Object {
         java.io.File stormFile;
         
         // INTERPOLATED DATA NAMES:
-        int[] event_num={1};
+        //int[] event_num={1};
         //int[] event_num={21,32,36,47,48,49,63,66};  //events with R^2=0.99
         //int[] event_num={8,29,35,52}; //events with R^2=0.98,0.97
         //int[] event_num = new int[72];
@@ -415,6 +415,17 @@ public class SimulationToFileFurey_april07 extends java.lang.Object {
         //for (int count=0;count<72;count++) events[count]=count+1;
         //int[] event_num={5,6,7,8};
         //int[] event_num={11}; //,12,13,14,15};
+        int s_event = 1;
+        int e_event=  20;
+        String[] event_nums = new String[e_event-s_event+1];
+        for(int i=s_event;i<e_event+1;i++) {
+            if ( i<10 ) event_nums[i-s_event] = "00"+java.lang.Integer.toString( i );
+            if (( i>9 )  &&  (i<100 )) event_nums[i-s_event] = "0"+java.lang.Integer.toString( i );
+            if ( i>99 ) event_nums[i-s_event] = java.lang.Integer.toString( i );
+        }
+        //System.out.println(event_nums[0]);
+        //System.out.println(event_nums[1]);
+        
         // ARTIFICIAL GAUSS DATA NAMES:
         //String[] event_type= {"_sd0p01_coe1p00","_sd0p05_coe1p00","_sd0p10_coe1p00","_sd0p20_coe1p00", "_sd0p30_coe1p00","_sd0p40_coe1p00","_sd0p01_coe0p25","_sd0p05_coe0p85","_sd0p10_coe0p95"}; // in order of event number
         //String[] event_type={"_sd0p05_coe1p00_L","_sd0p20_coe1p00_L","_sd0p40_coe1p00_L"};
@@ -426,14 +437,14 @@ public class SimulationToFileFurey_april07 extends java.lang.Object {
         // ARTIFICIAL PULSE DATA NAMES:
         //String[] event_type={"_005_001"};  // 005 = 5 mm/hr rate, 001 = 1 min duration
         //String[] event_type={"_120_001"};  // 120 = 120 mm/hr = 2 mm/min, 001 = 1 min duration
-        String[] event_type={"_0p0_010"};  //  0 mm/10sec rate, 010 = 10 sec duration
+        //String[] event_type={"_0p0_010"};  //  0 mm/10sec rate, 010 = 10 sec duration
         //String[] event_type={"_720_010"};  // 1 mm/10sec rate, 010= 10 sec duration
         
         // CREATE stormFile AND RUN SIMULATION ...
-        String evNUM,evStamp;
-        for (int eventsid=0;eventsid<event_num.length;eventsid++){
+        //String evNUM,evStamp;
+        for (int i=0;i<event_nums.length;i++){
             // INTERPOLATED DATA NAMES:
-            int evID = event_num[eventsid];
+            //int evID = event_num[i];
             //evNUM=(""+(evID/100.+0.001)).substring(2,4);
             //evNUM=(""+(evID/1000.+0.0001)).substring(2,5);   // events as 001 instead of 01
             //evStamp="_ev"+evNUM;
@@ -441,17 +452,17 @@ public class SimulationToFileFurey_april07 extends java.lang.Object {
             //stormFile=new java.io.File(rain_path+"event_"+evNUM+"/precipitation_interpolated"+evStamp+".metaVHC");
             //stormFile=new java.io.File(rain_path+"event_"+evNUM+"/precipitation_meanrgts"+evStamp+".metaVHC");
             //stormFile=new java.io.File(rain_path+"event_"+evNUM+"/precipitation_meanfdts"+evStamp+".metaVHC");
-            //stormFile=new java.io.File(rain_path+"events_singpeakB_rain01"+"/event_"+evNUM+"/precipitation_interpolated"+evStamp+".metaVHC");
+            stormFile=new java.io.File(rain_path+"event_"+event_nums[i]+"/precipitation_interpolated_ev"+event_nums[i]+".metaVHC");
             // ARTIFICIAL GAUSS DATA NAMES:
             //stormFile=new java.io.File(rain_path+"event_"+evNUM+gauss_types[eventsid]+"/precipitation_gaussian"+evStamp+".metaVHC");
             //stormFile=new java.io.File(rain_path+"event_"+evNUM+gauss_types[eventsid]+"/precipitation_gaussianL"+evStamp+".metaVHC");
             //stormFile=new java.io.File(rain_path+"event_"+evNUM+gauss_types[eventsid]+"/precipitation_gaussianR"+evStamp+".metaVHC");
              // ARTIFICIAL PULSE DATA NAMES:
-            stormFile=new java.io.File(rain_path+"precipitation_shortpulse"+event_type[0]+".metaVHC");
+            //stormFile=new java.io.File(rain_path+"precipitation_shortpulse"+event_type[0]+".metaVHC");
 
-            //System.out.println(stormFile);
+            System.out.println(stormFile);
             new SimulationToFileFurey_april07(sim_metadata,matDirs,magnitudes,metaModif,stormFile,0f);
-            
+         
         }
         
         System.exit(0);
