@@ -115,9 +115,7 @@ class FilePixel extends Thread{
             
             fileQout.close();
             
-            System.out.println(java.util.Arrays.toString( QhData[2]));
             fullyLoaded=true;
-            System.out.println(">>>> "+pathToP+" has been fully loaded");
         } catch (NumberFormatException ex) {
             ex.printStackTrace();
         } catch (FileNotFoundException ex) {
