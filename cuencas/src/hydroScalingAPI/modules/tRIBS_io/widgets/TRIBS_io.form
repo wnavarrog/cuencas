@@ -374,7 +374,7 @@
                                   <Font name="Lucida Grande" size="10" style="0"/>
                                 </Property>
                                 <Property name="selected" type="boolean" value="true"/>
-                                <Property name="text" type="java.lang.String" value="Mean Areal Precipitation"/>
+                                <Property name="text" type="java.lang.String" value="Mean Areal Precipitation [mm/h]"/>
                                 <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
                                   <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
                                     <EmptyBorder bottom="0" left="0" right="0" top="0"/>
@@ -396,7 +396,7 @@
                                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                                   <Font name="Lucida Grande" size="10" style="0"/>
                                 </Property>
-                                <Property name="text" type="java.lang.String" value="Maximum Rainfall Rate"/>
+                                <Property name="text" type="java.lang.String" value="Maximum Rainfall Rate [mm/h]"/>
                                 <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
                                   <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
                                     <EmptyBorder bottom="0" left="0" right="0" top="0"/>
@@ -418,7 +418,7 @@
                                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                                   <Font name="Lucida Grande" size="10" style="0"/>
                                 </Property>
-                                <Property name="text" type="java.lang.String" value="Minimum Rainfall Rate"/>
+                                <Property name="text" type="java.lang.String" value="Minimum Rainfall Rate [mm/h]"/>
                                 <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
                                   <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
                                     <EmptyBorder bottom="0" left="0" right="0" top="0"/>
@@ -440,7 +440,7 @@
                                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                                   <Font name="Lucida Grande" size="10" style="0"/>
                                 </Property>
-                                <Property name="text" type="java.lang.String" value="Forecast State"/>
+                                <Property name="text" type="java.lang.String" value="Forecast State [ ]"/>
                                 <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
                                   <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
                                     <EmptyBorder bottom="0" left="0" right="0" top="0"/>
@@ -462,7 +462,7 @@
                                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                                   <Font name="Lucida Grande" size="10" style="0"/>
                                 </Property>
-                                <Property name="text" type="java.lang.String" value="Mean Surface Soil Moisture"/>
+                                <Property name="text" type="java.lang.String" value="Mean Surface Soil Moisture [m^3/m^3]"/>
                                 <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
                                   <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
                                     <EmptyBorder bottom="0" left="0" right="0" top="0"/>
@@ -484,7 +484,7 @@
                                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                                   <Font name="Lucida Grande" size="10" style="0"/>
                                 </Property>
-                                <Property name="text" type="java.lang.String" value="Mean Soil Moisture in Root Zone"/>
+                                <Property name="text" type="java.lang.String" value="Mean Soil Moisture in Root Zone [m^3/m^3]"/>
                                 <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
                                   <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
                                     <EmptyBorder bottom="0" left="0" right="0" top="0"/>
@@ -506,7 +506,7 @@
                                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                                   <Font name="Lucida Grande" size="10" style="0"/>
                                 </Property>
-                                <Property name="text" type="java.lang.String" value="Mean Soil Moisture in Unsaturated Zone"/>
+                                <Property name="text" type="java.lang.String" value="Mean Soil Moisture in Unsaturated Zone [m^3/m^3]"/>
                                 <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
                                   <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
                                     <EmptyBorder bottom="0" left="0" right="0" top="0"/>
@@ -528,7 +528,7 @@
                                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                                   <Font name="Lucida Grande" size="10" style="0"/>
                                 </Property>
-                                <Property name="text" type="java.lang.String" value="Mean Depth to Groundwater"/>
+                                <Property name="text" type="java.lang.String" value="Mean Depth to Groundwater [mm]"/>
                                 <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
                                   <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
                                     <EmptyBorder bottom="0" left="0" right="0" top="0"/>
@@ -550,7 +550,7 @@
                                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                                   <Font name="Lucida Grande" size="10" style="0"/>
                                 </Property>
-                                <Property name="text" type="java.lang.String" value="Mean Evapotranspiration"/>
+                                <Property name="text" type="java.lang.String" value="Mean Evapotranspiration [mm]"/>
                                 <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
                                   <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
                                     <EmptyBorder bottom="0" left="0" right="0" top="0"/>
@@ -572,7 +572,7 @@
                                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                                   <Font name="Lucida Grande" size="10" style="0"/>
                                 </Property>
-                                <Property name="text" type="java.lang.String" value="Areal Fraction of Surface Saturation"/>
+                                <Property name="text" type="java.lang.String" value="Areal Fraction of Surface Saturation [ ]"/>
                                 <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
                                   <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
                                     <EmptyBorder bottom="0" left="0" right="0" top="0"/>
@@ -594,7 +594,7 @@
                                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                                   <Font name="Lucida Grande" size="10" style="0"/>
                                 </Property>
-                                <Property name="text" type="java.lang.String" value="Areal Fraction of Rainfall"/>
+                                <Property name="text" type="java.lang.String" value="Areal Fraction of Rainfall [ ]"/>
                                 <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
                                   <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
                                     <EmptyBorder bottom="0" left="0" right="0" top="0"/>

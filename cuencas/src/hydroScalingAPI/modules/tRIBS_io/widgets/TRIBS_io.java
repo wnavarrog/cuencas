@@ -132,13 +132,13 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         
         //Graphical structure for aggregated response
         PpanelRTF = 
-                new hydroScalingAPI.util.plot.XYJPanel( "RTF File", "time [h]" , "Runoff [m^3/s]");
+                new hydroScalingAPI.util.plot.XYJPanel( "Runoff Mechanism Response", "Simulation time [h]" , "Runoff [m^3/s]");
         PpanelQOUT = 
-                new hydroScalingAPI.util.plot.XYJPanel( "qout Files", "Relative Time [h]" , "Discharge [m^3/s] / Stage [m]");
+                new hydroScalingAPI.util.plot.XYJPanel( "Hydrographs", "Simulation time [h]" , "Discharge [m^3/s] / Stage [m]");
         PpanelMRF = 
-                new hydroScalingAPI.util.plot.XYJPanel( "MRF File", "Relative Time [h]" , "Value");
+                new hydroScalingAPI.util.plot.XYJPanel( "Basin-Averaged Response", "Simulation time [h]" , "Value");
         PpanelPixel = 
-                new hydroScalingAPI.util.plot.XYJPanel( "Pixel File", "Relative Time [h]" , "Value");
+                new hydroScalingAPI.util.plot.XYJPanel( "Local Response", "Simulation time [h]" , "Value");
         
         rftPanel.add("Center",PpanelRTF);
         qoutPanel.add("Center",PpanelQOUT);
@@ -787,7 +787,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         mrfButtonGroup.add(jRadioButton1);
         jRadioButton1.setFont(new java.awt.Font("Lucida Grande", 0, 10));
         jRadioButton1.setSelected(true);
-        jRadioButton1.setText("Mean Areal Precipitation");
+        jRadioButton1.setText("Mean Areal Precipitation [mm/h]");
         jRadioButton1.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         jRadioButton1.setMargin(new java.awt.Insets(0, 0, 0, 0));
         jRadioButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -800,7 +800,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
 
         mrfButtonGroup.add(jRadioButton2);
         jRadioButton2.setFont(new java.awt.Font("Lucida Grande", 0, 10));
-        jRadioButton2.setText("Maximum Rainfall Rate");
+        jRadioButton2.setText("Maximum Rainfall Rate [mm/h]");
         jRadioButton2.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         jRadioButton2.setMargin(new java.awt.Insets(0, 0, 0, 0));
         jRadioButton2.addActionListener(new java.awt.event.ActionListener() {
@@ -813,7 +813,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
 
         mrfButtonGroup.add(jRadioButton3);
         jRadioButton3.setFont(new java.awt.Font("Lucida Grande", 0, 10));
-        jRadioButton3.setText("Minimum Rainfall Rate");
+        jRadioButton3.setText("Minimum Rainfall Rate [mm/h]");
         jRadioButton3.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         jRadioButton3.setMargin(new java.awt.Insets(0, 0, 0, 0));
         jRadioButton3.addActionListener(new java.awt.event.ActionListener() {
@@ -826,7 +826,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
 
         mrfButtonGroup.add(jRadioButton4);
         jRadioButton4.setFont(new java.awt.Font("Lucida Grande", 0, 10));
-        jRadioButton4.setText("Forecast State");
+        jRadioButton4.setText("Forecast State [ ]");
         jRadioButton4.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         jRadioButton4.setMargin(new java.awt.Insets(0, 0, 0, 0));
         jRadioButton4.addActionListener(new java.awt.event.ActionListener() {
@@ -839,7 +839,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
 
         mrfButtonGroup.add(jRadioButton5);
         jRadioButton5.setFont(new java.awt.Font("Lucida Grande", 0, 10));
-        jRadioButton5.setText("Mean Surface Soil Moisture");
+        jRadioButton5.setText("Mean Surface Soil Moisture [m^3/m^3]");
         jRadioButton5.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         jRadioButton5.setMargin(new java.awt.Insets(0, 0, 0, 0));
         jRadioButton5.addActionListener(new java.awt.event.ActionListener() {
@@ -852,7 +852,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
 
         mrfButtonGroup.add(jRadioButton6);
         jRadioButton6.setFont(new java.awt.Font("Lucida Grande", 0, 10));
-        jRadioButton6.setText("Mean Soil Moisture in Root Zone");
+        jRadioButton6.setText("Mean Soil Moisture in Root Zone [m^3/m^3]");
         jRadioButton6.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         jRadioButton6.setMargin(new java.awt.Insets(0, 0, 0, 0));
         jRadioButton6.addActionListener(new java.awt.event.ActionListener() {
@@ -865,7 +865,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
 
         mrfButtonGroup.add(jRadioButton7);
         jRadioButton7.setFont(new java.awt.Font("Lucida Grande", 0, 10));
-        jRadioButton7.setText("Mean Soil Moisture in Unsaturated Zone");
+        jRadioButton7.setText("Mean Soil Moisture in Unsaturated Zone [m^3/m^3]");
         jRadioButton7.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         jRadioButton7.setMargin(new java.awt.Insets(0, 0, 0, 0));
         jRadioButton7.addActionListener(new java.awt.event.ActionListener() {
@@ -878,7 +878,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
 
         mrfButtonGroup.add(jRadioButton8);
         jRadioButton8.setFont(new java.awt.Font("Lucida Grande", 0, 10));
-        jRadioButton8.setText("Mean Depth to Groundwater");
+        jRadioButton8.setText("Mean Depth to Groundwater [mm]");
         jRadioButton8.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         jRadioButton8.setMargin(new java.awt.Insets(0, 0, 0, 0));
         jRadioButton8.addActionListener(new java.awt.event.ActionListener() {
@@ -891,7 +891,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
 
         mrfButtonGroup.add(jRadioButton9);
         jRadioButton9.setFont(new java.awt.Font("Lucida Grande", 0, 10));
-        jRadioButton9.setText("Mean Evapotranspiration");
+        jRadioButton9.setText("Mean Evapotranspiration [mm]");
         jRadioButton9.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         jRadioButton9.setMargin(new java.awt.Insets(0, 0, 0, 0));
         jRadioButton9.addActionListener(new java.awt.event.ActionListener() {
@@ -904,7 +904,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
 
         mrfButtonGroup.add(jRadioButton10);
         jRadioButton10.setFont(new java.awt.Font("Lucida Grande", 0, 10));
-        jRadioButton10.setText("Areal Fraction of Surface Saturation");
+        jRadioButton10.setText("Areal Fraction of Surface Saturation [ ]");
         jRadioButton10.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         jRadioButton10.setMargin(new java.awt.Insets(0, 0, 0, 0));
         jRadioButton10.addActionListener(new java.awt.event.ActionListener() {
@@ -917,7 +917,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
 
         mrfButtonGroup.add(jRadioButton11);
         jRadioButton11.setFont(new java.awt.Font("Lucida Grande", 0, 10));
-        jRadioButton11.setText("Areal Fraction of Rainfall");
+        jRadioButton11.setText("Areal Fraction of Rainfall [ ]");
         jRadioButton11.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         jRadioButton11.setMargin(new java.awt.Insets(0, 0, 0, 0));
         jRadioButton11.addActionListener(new java.awt.event.ActionListener() {
@@ -1155,7 +1155,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
 
         panelOutputs.addTab("Spatial Response", jPanel17);
 
-        jPanel30.setLayout(new java.awt.GridLayout());
+        jPanel30.setLayout(new java.awt.GridLayout(1, 0));
 
         pixelPanel.setLayout(new java.awt.BorderLayout());
 
