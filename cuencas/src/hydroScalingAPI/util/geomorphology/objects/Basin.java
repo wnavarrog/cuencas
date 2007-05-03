@@ -461,14 +461,14 @@ public class Basin extends Object{
      * Returns and array of the same size of the DEM with 1s in the positions that are network and belong to the basin
      * @return A byte[][] with the basin network mask
      */
-    public  byte[][] getNetworkMask(){
+    public  byte[][] getEncapsulatedNetworkMask(){
         try{
             String pathToRasterNetwork=localMetaRaster.getLocationBinaryFile().getPath();
             pathToRasterNetwork=pathToRasterNetwork.subSequence(0, pathToRasterNetwork.lastIndexOf("."))+".redRas";
             localMetaRaster.setLocationBinaryFile(new java.io.File(pathToRasterNetwork));
             localMetaRaster.setFormat("Byte");
 
-                byte [][] rasterNetwork=new hydroScalingAPI.io.DataRaster(localMetaRaster).getByte();
+            byte [][] rasterNetwork=new hydroScalingAPI.io.DataRaster(localMetaRaster).getByte();
 
             byte[][] basinMask = new byte[maxY-minY+1][maxX-minX+1];
             for (int i=0;i<xyBasin[0].length;i++){
@@ -482,6 +482,59 @@ public class Basin extends Object{
             System.err.println(ioe);
         }
         return null;
+    }
+    
+    /**
+     * Returns and array of the same size of the DEM with and ID in the positions that belong to the basin.
+     * Points with the same ID correspond to a unique pseudo-hillslope at the level Omega
+     * @param myRSNAnalysis 
+     * @param level 
+     * @return A byte[][] with the basin network mask
+     */
+     public  int[][] getEncapsulatedHillslopesMask(byte[][] matDir, hydroScalingAPI.modules.networkAnalysis.objects.RSNDecomposition myRSNAnalysis, int level){
+        try{
+            java.io.File hortFile=new java.io.File(localMetaRaster.getLocationBinaryFile().getPath().substring(0,localMetaRaster.getLocationBinaryFile().getPath().lastIndexOf("."))+".horton");
+            localMetaRaster.setLocationBinaryFile(hortFile);
+            localMetaRaster.setFormat("Byte");
+            byte [][] matOrders=new hydroScalingAPI.io.DataRaster(localMetaRaster).getByte();
+            
+            localMetaRaster.restoreOriginalFormat();
+            
+            int[][] matrizPintada=new int[maxY-minY+3][maxX-minX+3];
+            int[][] headsTails=myRSNAnalysis.getHeadsAndTails(level);
+            
+            hydroScalingAPI.modules.networkAnalysis.objects.RsnTile myTileActual;
+            
+            int numCols=localMetaRaster.getNumCols();
+            
+            for(int i=0;i<headsTails[0].length;i++){
+                int xOulet=headsTails[0][i]%numCols;
+                int yOulet=headsTails[0][i]/numCols;
+                
+                int xSource=headsTails[2][i]%numCols;
+                int ySource=headsTails[2][i]/numCols;
+                
+                if(headsTails[3][i] == 0){
+                    xSource=-1;
+                    ySource=-1;
+                }
+                
+                int tileColor=i+1;
+                //System.out.println("Head: "+xOulet+","+yOulet+" Tail: "+xSource+","+ySource+" Color: "+tileColor+" Scale: "+(scale+1));
+                
+                myTileActual=new hydroScalingAPI.modules.networkAnalysis.objects.RsnTile(xOulet,yOulet,xSource,ySource,matDir,matOrders,localMetaRaster,level+1);
+                int elementsInTile=myTileActual.getXYRsnTile()[0].length;
+                for (int j=0;j<elementsInTile;j++){
+                    matrizPintada[myTileActual.getXYRsnTile()[1][j]-minY+1][myTileActual.getXYRsnTile()[0][j]-minX+1]=tileColor;
+                }
+            }
+            
+            return matrizPintada;
+            
+        }  catch (java.io.IOException ioe){
+            ioe.printStackTrace();
+            return null;
+        }
     }
     
     

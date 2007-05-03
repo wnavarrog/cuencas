@@ -1034,7 +1034,7 @@ public class ExtractionOptions extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         jPanelRedRas.add(jPanelOp_AreaPend, gridBagConstraints);
 
-        jTabbedPane1.addTab("Drainaje Network Prunning", null, jPanelRedRas, "");
+        jTabbedPane1.addTab("Drainage Network Pruning", null, jPanelRedRas, "");
 
         jPanelArea_Pend.setLayout(new java.awt.BorderLayout());
 
@@ -1080,7 +1080,7 @@ public class ExtractionOptions extends javax.swing.JDialog {
 
         jPanelArea_Pend.add(jPanel6, java.awt.BorderLayout.SOUTH);
 
-        jTabbedPane1.addTab("Area-Slople Analysis", null, jPanelArea_Pend, "");
+        jTabbedPane1.addTab("Area-Slope Analysis", null, jPanelArea_Pend, "");
 
         getContentPane().add(jTabbedPane1, java.awt.BorderLayout.CENTER);
 

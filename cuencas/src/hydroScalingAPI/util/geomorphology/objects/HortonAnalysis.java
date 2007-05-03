@@ -88,7 +88,7 @@ public class HortonAnalysis extends java.lang.Object {
         basin=bas;
         fullDirMatrix=DM;
         
-        byte[][] basinMask=basin.getNetworkMask();
+        byte[][] basinMask=basin.getEncapsulatedNetworkMask();
 
         //abrir los archivos .stream . link .point
         

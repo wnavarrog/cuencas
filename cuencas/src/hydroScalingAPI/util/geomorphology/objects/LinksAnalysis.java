@@ -121,7 +121,7 @@ public class LinksAnalysis extends java.lang.Object {
         localMetaRaster=metaR;
         basin=bas;
         
-        byte[][] basinMask=basin.getNetworkMask();
+        byte[][] basinMask=basin.getEncapsulatedNetworkMask();
         
         //abrir los archivos .stream . link .point
         
@@ -319,7 +319,7 @@ public class LinksAnalysis extends java.lang.Object {
             
             float[][] shortGroupDists=new float[2][distToInclue.size()];
             for(int i=0;i<shortGroupDists[0].length;i++){
-                int[] myDists=(int[])distToInclue.get(i);
+                float[] myDists=(float[])distToInclue.get(i);
                 shortGroupDists[0][i]=myDists[0];
                 shortGroupDists[1][i]=myDists[1];
             }

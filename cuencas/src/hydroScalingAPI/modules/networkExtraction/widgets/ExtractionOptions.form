@@ -618,8 +618,8 @@
           </Properties>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-              <JTabbedPaneConstraints tabName="Drainaje Network Prunning" toolTip="">
-                <Property name="tabTitle" type="java.lang.String" value="Drainaje Network Prunning"/>
+              <JTabbedPaneConstraints tabName="Drainage Network Pruning" toolTip="">
+                <Property name="tabTitle" type="java.lang.String" value="Drainage Network Pruning"/>
                 <Property name="tabToolTip" type="java.lang.String" value=""/>
               </JTabbedPaneConstraints>
             </Constraint>
@@ -1015,8 +1015,8 @@
           </Properties>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-              <JTabbedPaneConstraints tabName="Area-Slople Analysis" toolTip="">
-                <Property name="tabTitle" type="java.lang.String" value="Area-Slople Analysis"/>
+              <JTabbedPaneConstraints tabName="Area-Slope Analysis" toolTip="">
+                <Property name="tabTitle" type="java.lang.String" value="Area-Slope Analysis"/>
                 <Property name="tabToolTip" type="java.lang.String" value=""/>
               </JTabbedPaneConstraints>
             </Constraint>

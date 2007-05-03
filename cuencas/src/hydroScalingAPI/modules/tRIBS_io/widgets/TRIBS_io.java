@@ -372,7 +372,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
     }
     
     private void plotPoints(float Zr) throws RemoteException, VisADException{
-        basTIN_I.filterPoints(true,Zr);
+        basTIN_I.filterPoints(ridgeLevelCombo.getSelectedIndex(),Zr);
         data_refPoints_I.setData(basTIN_I.getPointsFlatField());
         data_refTr_I.setData(basTIN_I.getTrianglesUnionSet());
         data_refPoly_I.setData(basTIN_I.getPolygonsUnionSet());
@@ -432,7 +432,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         data_refFill_O.setData(basTIN_O.getValuesFlatField());
         display_TIN_Os.addReference( data_refFill_O );
         
-        if(basTIN_O.getNumVoi() > 50000) display_TIN_Os.disableEvent(visad.DisplayEvent.MOUSE_MOVED);
+        if(basTIN_O.getNumVoi() > 10000) display_TIN_Os.disableEvent(visad.DisplayEvent.MOUSE_MOVED);
         
         
         plotMrf(2);
@@ -560,11 +560,15 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         panelInputs = new javax.swing.JTabbedPane();
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
-        zrSlider = new javax.swing.JSlider();
-        jLabel1 = new javax.swing.JLabel();
         jPanel5 = new javax.swing.JPanel();
         exportTriButton = new javax.swing.JButton();
         exportPoiButton = new javax.swing.JButton();
+        jPanel32 = new javax.swing.JPanel();
+        jLabel9 = new javax.swing.JLabel();
+        ridgeLevelCombo = new javax.swing.JComboBox();
+        jPanel33 = new javax.swing.JPanel();
+        zrSlider = new javax.swing.JSlider();
+        jLabel1 = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
         pointsCheckBox_I = new javax.swing.JCheckBox();
         trianglesCheckBox_I = new javax.swing.JCheckBox();
@@ -659,22 +663,6 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
 
         jPanel2.setLayout(new java.awt.BorderLayout());
 
-        zrSlider.setFont(new java.awt.Font("Lucida Grande", 0, 10));
-        zrSlider.setValue(0);
-        zrSlider.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                zrSliderMouseReleased(evt);
-            }
-        });
-
-        jPanel2.add(zrSlider, java.awt.BorderLayout.CENTER);
-
-        jLabel1.setFont(new java.awt.Font("Lucida Grande", 0, 10));
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("Zr");
-        jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jPanel2.add(jLabel1, java.awt.BorderLayout.WEST);
-
         jPanel5.setLayout(new java.awt.GridLayout(2, 1));
 
         exportTriButton.setText("Export Trinangulation");
@@ -696,6 +684,46 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         jPanel5.add(exportPoiButton);
 
         jPanel2.add(jPanel5, java.awt.BorderLayout.EAST);
+
+        jPanel32.setLayout(new java.awt.GridLayout(2, 0));
+
+        jLabel9.setFont(new java.awt.Font("Lucida Grande", 0, 12));
+        jLabel9.setText("Ridges Level");
+        jPanel32.add(jLabel9);
+
+        ridgeLevelCombo.setFont(new java.awt.Font("Lucida Grande", 0, 10));
+        ridgeLevelCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "No Ridges", "Level 1", "Level 2", "Level 3", "Level 4", "Level 5", "Level 6" }));
+        ridgeLevelCombo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ridgeLevelComboActionPerformed(evt);
+            }
+        });
+
+        jPanel32.add(ridgeLevelCombo);
+
+        jPanel2.add(jPanel32, java.awt.BorderLayout.WEST);
+
+        jPanel33.setLayout(new java.awt.BorderLayout());
+
+        zrSlider.setFont(new java.awt.Font("Lucida Grande", 0, 10));
+        zrSlider.setPaintLabels(true);
+        zrSlider.setPaintTicks(true);
+        zrSlider.setValue(0);
+        zrSlider.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                zrSliderMouseReleased(evt);
+            }
+        });
+
+        jPanel33.add(zrSlider, java.awt.BorderLayout.CENTER);
+
+        jLabel1.setFont(new java.awt.Font("Lucida Grande", 0, 10));
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel1.setText("Zr");
+        jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jPanel33.add(jLabel1, java.awt.BorderLayout.NORTH);
+
+        jPanel2.add(jPanel33, java.awt.BorderLayout.CENTER);
 
         jPanel1.add(jPanel2, java.awt.BorderLayout.SOUTH);
 
@@ -1059,6 +1087,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
 
         spaceParamsCombo.setFont(new java.awt.Font("Lucida Grande", 0, 10));
         spaceParamsCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Available Variables", "Variable 01", "Variable 02", "Variable 03", "Variable 04" }));
+        spaceParamsCombo.setLightWeightPopupEnabled(false);
         spaceParamsCombo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 spaceParamsComboActionPerformed(evt);
@@ -1077,6 +1106,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
 
         avaTimesCombo.setFont(new java.awt.Font("Lucida Grande", 0, 10));
         avaTimesCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Available Times", "Time 01", "Time 02", "Time 03", "Time 04", "Time-integrated Spatial Output" }));
+        avaTimesCombo.setLightWeightPopupEnabled(false);
         avaTimesCombo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 avaTimesComboActionPerformed(evt);
@@ -1087,6 +1117,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
 
         avaVariablesCombo.setFont(new java.awt.Font("Lucida Grande", 0, 10));
         avaVariablesCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Available Variables" }));
+        avaVariablesCombo.setLightWeightPopupEnabled(false);
         avaVariablesCombo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 avaVariablesComboActionPerformed(evt);
@@ -1275,6 +1306,16 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void ridgeLevelComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ridgeLevelComboActionPerformed
+        try {
+            plotPoints(zrSlider.getValue());
+        } catch (RemoteException ex) {
+            ex.printStackTrace();
+        } catch (VisADException ex) {
+            ex.printStackTrace();
+        }
+    }//GEN-LAST:event_ridgeLevelComboActionPerformed
 
     private void pNodesComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pNodesComboActionPerformed
         plotPixel();
@@ -1688,12 +1729,12 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
             
             hydroScalingAPI.mainGUI.ParentGUI tempFrame=new hydroScalingAPI.mainGUI.ParentGUI();
             
-            //new TRIBS_io(tempFrame, 56,79,matDirs,magnitudes,metaModif).setVisible(true);
+            new TRIBS_io(tempFrame, 56,79,matDirs,magnitudes,metaModif).setVisible(true);
             //new TRIBS_io(tempFrame, 111,80,matDirs,magnitudes,metaModif).setVisible(true);
             
             ///home/ricardo/workFiles/tribsWork/sampleTribs/SMALLBASIN/Output/"),"smallbasin"
             ///home/ricardo/workFiles/tribsWork/sampleTribs/Output_Mar23a_07/"),"urp"
-            new TRIBS_io(tempFrame, new java.io.File("/home/ricardo/workFiles/tribsWork/sampleTribs/SMALLBASIN/Output/"),"smallbasin").setVisible(true);
+            //new TRIBS_io(tempFrame, new java.io.File("/home/ricardo/workFiles/tribsWork/sampleTribs/SMALLBASIN/Output/"),"smallbasin").setVisible(true);
         } catch (java.io.IOException IOE){
             System.out.print(IOE);
             System.exit(0);
@@ -1724,6 +1765,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
@@ -1749,6 +1791,8 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel30;
     private javax.swing.JPanel jPanel31;
+    private javax.swing.JPanel jPanel32;
+    private javax.swing.JPanel jPanel33;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
@@ -1785,6 +1829,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
     private javax.swing.JComboBox qNodesCombo;
     private javax.swing.JPanel qoutPanel;
     private javax.swing.JPanel rftPanel;
+    private javax.swing.JComboBox ridgeLevelCombo;
     private javax.swing.JCheckBox satExBox;
     private javax.swing.JComboBox spaceParamsCombo;
     private javax.swing.JCheckBox stageBox;

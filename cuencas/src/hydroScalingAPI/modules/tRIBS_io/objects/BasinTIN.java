@@ -37,6 +37,9 @@ public class BasinTIN {
                          func_xEasting_yNorthing_to_Color=new FunctionType(domainXLYL,voiColor);
     
     private hydroScalingAPI.util.geomorphology.objects.Basin myCuenca;
+    public hydroScalingAPI.util.geomorphology.objects.LinksAnalysis myLinksStructure;
+    public hydroScalingAPI.modules.networkAnalysis.objects.RSNDecomposition myRSNAnalysis;
+    
     private byte[][] matDir;
     private int[][] magnitudes;
     private float[][] DEM;
@@ -78,6 +81,8 @@ public class BasinTIN {
         demField=metaData.getField();
         
         myCuenca=new hydroScalingAPI.util.geomorphology.objects.Basin(x,y,matDir,metaDatos);
+        myLinksStructure=new hydroScalingAPI.util.geomorphology.objects.LinksAnalysis(myCuenca, metaDatos, matDir);
+        myRSNAnalysis=new hydroScalingAPI.modules.networkAnalysis.objects.RSNDecomposition(myLinksStructure);
         
         float[][] lonLatsBasin=myCuenca.getLonLatBasin();
         int[][] xyBasin=myCuenca.getXYBasin();
@@ -457,13 +462,92 @@ public class BasinTIN {
         
     }
     
-    public void filterPoints(boolean ridges, float Zr) throws RemoteException, VisADException{
+    public void filterPoints(int ridges, float Zr) throws RemoteException, VisADException{
         int[][] xyBasin=myCuenca.getXYBasin();
         byte[][] basMask=myCuenca.getBasinMask();
         
         filteredPointsInTriangulation=(java.util.Vector)pointsInTriangulation.clone();
         filteredTypeOfPoint=(java.util.Vector)typeOfPoint.clone();
         filteredElevationOfPoint=(java.util.Vector)elevationOfPoint.clone();
+        
+        java.util.Vector filteredRidges=new java.util.Vector();
+        
+        //First: determine ridges at the desired scale
+        if(ridges > 0){
+            
+            int[][] hillSlopesMask=myCuenca.getEncapsulatedHillslopesMask(matDir,myRSNAnalysis,ridges);
+            
+            int numRidges=0;
+            visad.RealTuple spotValue; double locElev;
+            
+            for (int i = 0; i < hillSlopesMask.length; i++) {
+                for (int j = 0; j < hillSlopesMask[0].length; j++) {
+                    if(hillSlopesMask[i][j] != 0 && magnitudes[i+myCuenca.getMinY()-1][j+myCuenca.getMinX()-1] <= 0){
+                        
+                        double myLon=(j+myCuenca.getMinX()-1+0.5)*metaDatos.getResLon()/3600.0+metaDatos.getMinLon();
+                        double myLat=(i+myCuenca.getMinY()-1+0.5)*metaDatos.getResLat()/3600.0+metaDatos.getMinLat();
+                        
+                        
+                        System.out.println("Analyzing Hillslopes Mask at x: "+(j+myCuenca.getMinX()-1)+" y: "+(i+myCuenca.getMinY()-1)+" "+myLon+" "+myLat+" "+magnitudes[i+myCuenca.getMinY()-1][j+myCuenca.getMinX()-1]);
+                        
+                        boolean gotIn=false;
+                        
+                        for (int k=0; k <= 8; k++){
+                            int ii=i+(k/3)-1;
+                            int jj=j+(k%3)-1;
+                            System.out.print("Asking for Hillslopes Mask at x: "+jj+" y: "+ii);
+                        
+                            //if (magnitudes[jj][ii] > 0 || basMask[jj][ii] == 0){
+                            if (hillSlopesMask[ii][jj] != hillSlopesMask[i][j]){
+                                System.out.println(" - Got in");
+                                
+//                                double addLon=myLon+0.5*(ii-i)*metaDatos.getResLon()/3600.0;
+//                                double addLat=myLat+0.5*(jj-j)*metaDatos.getResLat()/3600.0;
+//                                
+//                                System.out.println(addLon+" - "+addLat);
+//                                
+//                                spotValue=(visad.RealTuple) demField.evaluate(new visad.RealTuple(domain, new double[] {addLon,addLat}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
+//                
+//                                locElev=spotValue.getValues()[0];
+//                                filteredRidges.add(new Gdc_Coord_3d(addLat,addLon,locElev));
+                                
+                                if(gotIn == false) numRidges++;
+                                gotIn=true;
+                            } else {
+                                System.out.println();
+                            }
+                        }
+                        if(gotIn){
+                            spotValue=(visad.RealTuple) demField.evaluate(new visad.RealTuple(domain, new double[] {myLon,myLat}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
+                            locElev=spotValue.getValues()[0];
+                            filteredRidges.add(new Gdc_Coord_3d(myLat,myLon,locElev));
+                        }
+                        
+                    }
+                }
+            }
+            
+            Gdc_Coord_3d[] gdc=new Gdc_Coord_3d[numRidges];
+            Utm_Coord_3d[] utm=new Utm_Coord_3d[numRidges];
+
+            for(int i=0;i<numRidges;i++){
+                gdc[i]=(Gdc_Coord_3d)filteredRidges.get(i);
+                utm[i]=new Utm_Coord_3d();
+            }
+
+            Gdc_To_Utm_Converter.Init(new WE_Ellipsoid());
+            Gdc_To_Utm_Converter.Convert(gdc,utm);
+            for(int i=0;i<numRidges;i++){
+                filteredPointsInTriangulation.add(utm[i]);
+                filteredTypeOfPoint.add(new int[] {0});
+                filteredElevationOfPoint.add(1000);
+            }
+            
+            System.out.println("Number of added ridges "+ridges);
+        }
+        
+        
+        //Second: remove points according to Zr
         
         int numPRemoved=0;
         int pB=0;
@@ -482,8 +566,9 @@ public class BasinTIN {
                 if(!neigh){
                     //if(pointLaplacian(xyBasin[0][i],xyBasin[1][i])>-10.1) {
                     //if(pointLaplacian(xyBasin[0][i],xyBasin[1][i])==0) {
-                    if(pointIncoming(xyBasin[0][i],xyBasin[1][i])>0) {
+                    //if(pointIncoming(xyBasin[0][i],xyBasin[1][i])>0) {
                     //if(Math.random()*100.0 < Zr){
+                    if(true){
                         int pToRemove=(int)(pB-numPRemoved);
                         filteredPointsInTriangulation.remove(pToRemove);
                         filteredTypeOfPoint.remove(pToRemove);
@@ -494,6 +579,8 @@ public class BasinTIN {
                 pB++;
             }
         }
+        
+        //Third: Create arrays for triangulation step
         
         int numPoints=filteredPointsInTriangulation.size();
         float[][] xyLinkValues=new float[3][numPoints];
@@ -514,136 +601,135 @@ public class BasinTIN {
         vals_ff_Li = new FlatField( func_Inex_to_xEasting_yNorthing_Color, xVarIndex);
         vals_ff_Li.setSamples( xyLinkValues );
         
-        if(Zr > 70){
-            float[][] samples=new float[2][];
-            samples[0]=xyLinkValues[0];//.clone();
-            samples[1]=xyLinkValues[1];//.clone();
-            System.out.println("the DelaunayClarkson algorithm.");
-            long start = System.currentTimeMillis();
-            Delaunay.perturb(samples,0.01f,false);
-            delaun = (Delaunay) new DelaunayClarkson(samples);
-            long end = System.currentTimeMillis();
-            float time = (end - start) / 1000f;
-            System.out.println("Triangulation took " + time + " seconds.");
-            //samples[0]=xyLinkValues[0].clone();
-            //samples[1]=xyLinkValues[1].clone();
-            
-            vals_ff_Li.setSamples( xyLinkValues );
-            
-//            System.out.println(delaun.NumEdges);
-//            
-//            for(int j=0;j<delaun.Edges.length;j++){
-//                for(int i=0;i<delaun.Edges[j].length;i++){
-//                    System.out.print(delaun.Edges[j][i]+"\t\t");
-//                }
-//                System.out.println();
+
+        //Fourth: Calculate triangulation and Voronoi Polygons
+        float[][] samples=new float[2][];
+        samples[0]=xyLinkValues[0];//.clone();
+        samples[1]=xyLinkValues[1];//.clone();
+        System.out.println("the DelaunayClarkson algorithm.");
+        long start = System.currentTimeMillis();
+        Delaunay.perturb(samples,0.01f,false);
+        delaun = (Delaunay) new DelaunayClarkson(samples);
+        long end = System.currentTimeMillis();
+        float time = (end - start) / 1000f;
+        System.out.println("Triangulation took " + time + " seconds.");
+        //samples[0]=xyLinkValues[0].clone();
+        //samples[1]=xyLinkValues[1].clone();
+
+        vals_ff_Li.setSamples( xyLinkValues );
+
+//        System.out.println(delaun.NumEdges);
+//
+//        for(int j=0;j<delaun.Edges.length;j++){
+//            for(int i=0;i<delaun.Edges[j].length;i++){
+//                System.out.print(delaun.Edges[j][i]+"\t\t");
 //            }
-            sortTriangles(delaun,samples);
-            
-            
-            Gridded2DSet[] triangles=new Gridded2DSet[delaun.Tri.length];
-            
-            float[][] lines=new float[2][4];
-            
-            for(int j=0;j<delaun.Tri.length;j++){
-                for(int i=0;i<3;i++){
-                    lines[0][i]=samples[0][delaun.Tri[j][i]];
-                    lines[1][i]=samples[1][delaun.Tri[j][i]];
-                }
-                lines[0][3]=samples[0][delaun.Tri[j][0]];
-                lines[1][3]=samples[1][delaun.Tri[j][0]];
-                
-                triangles[j]=new Gridded2DSet(domainXLYL,lines,lines[0].length);
-                
+//            System.out.println();
+//        }
+        sortTriangles(delaun,samples);
+
+
+        Gridded2DSet[] triangles=new Gridded2DSet[delaun.Tri.length];
+
+        float[][] lines=new float[2][4];
+
+        for(int j=0;j<delaun.Tri.length;j++){
+            for(int i=0;i<3;i++){
+                lines[0][i]=samples[0][delaun.Tri[j][i]];
+                lines[1][i]=samples[1][delaun.Tri[j][i]];
             }
-            
-            allTriang=new UnionSet(domainXLYL,triangles);
-            
-            int numValidPoints=0;
-            for(int j=0;j<xyLinkValues[2].length;j++) {
-                if(xyLinkValues[2][j] != 1 ) numValidPoints++;
-            }
-            
-            float[] s0 = samples[0];
-            float[] s1 = samples[1];
-            
-            countNoBorder=numValidPoints-1;
-            
-            nodesPerPolygon=new int[countNoBorder];
-            
-            Gridded2DSet[] polygons=new Gridded2DSet[numValidPoints-1];
-            int kp=0;
-            for(int k=0;k<xyLinkValues[2].length;k++) {
-            //for(int k=0;k<5;k++) {    
-                if(xyLinkValues[2][k] != 1 && xyLinkValues[2][k] != 2){
-                    float[][] lines1=new float[2][delaun.Vertices[k].length+1];
-                    for(int j=0;j<delaun.Vertices[k].length;j++){
-                        
-                        int i=delaun.Vertices[k][j];
-                        float v1X=s0[delaun.Tri[i][1]]-s0[delaun.Tri[i][0]];
-                        float v1Y=s1[delaun.Tri[i][1]]-s1[delaun.Tri[i][0]];
-                        float v2X=s0[delaun.Tri[i][2]]-s0[delaun.Tri[i][0]];
-                        float v2Y=s1[delaun.Tri[i][2]]-s1[delaun.Tri[i][0]];
+            lines[0][3]=samples[0][delaun.Tri[j][0]];
+            lines[1][3]=samples[1][delaun.Tri[j][0]];
 
-                        float kComp=v1X*v2Y-v2X*v1Y;
+            triangles[j]=new Gridded2DSet(domainXLYL,lines,lines[0].length);
 
-                        int pPos=0;
-                        for (int l=1; l<3; l++) if(k == delaun.Tri[i][l]) pPos=l;
-                        //System.out.println("P"+k+" In Triang("+(kComp>0?"+":"-")+"):"+" P"+tri[i][0]+" P"+tri[i][1]+" P"+tri[i][2]+" pPos "+pPos);
-                        int L1pos=(pPos+1+(kComp>0?0:1))%3;
-                        int L2pos=(pPos+1+(kComp>0?1:0))%3;
-                        
-                        double xs1=s0[delaun.Tri[i][pPos]];
-                        double ys1=s1[delaun.Tri[i][pPos]];
-                        
-                        double xs2=s0[delaun.Tri[i][L2pos]];
-                        double ys2=s1[delaun.Tri[i][L2pos]];
-                        
-                        double xa1=(xs1+xs2)/2.0f;
-                        double ya1=(ys1+ys2)/2.0f;
-                        double xb1=0;
-                        double yb1;
-                        if(ys2-ys1 != 0)
-                            yb1=ya1+(xs2-xs1)/(ys2-ys1)*xa1;
-                        else{
-                            xb1=xa1;
-                            yb1=0;
-                        }
-                        
-                        double xs3=s0[delaun.Tri[i][L1pos]];
-                        double ys3=s1[delaun.Tri[i][L1pos]];
-                        
-                        double xa2=(xs1+xs3)/2.0f;
-                        double ya2=(ys1+ys3)/2.0f;
-                        double xb2=0;
-                        double yb2;
-                        if(ys3-ys1 != 0)
-                            yb2=ya2+(xs3-xs1)/(ys3-ys1)*xa2;
-                        else{
-                            xb2=xa1;
-                            yb2=0;
-                        }
-                        
-                        double[] result=intersection(xa1,ya1,xb1,yb1,xa2,ya2,xb2,yb2);
-
-                        double xvoi=result[0];
-                        double yvoi=result[1];
-                        
-                        lines1[0][j]=(float)xvoi;
-                        lines1[1][j]=(float)yvoi;
-
-                    }
-                    lines1[0][delaun.Vertices[k].length]=lines1[0][0];
-                    lines1[1][delaun.Vertices[k].length]=lines1[1][0];
-                    
-                    polygons[kp]=new Gridded2DSet(domainXLYL,lines1,lines1[0].length);
-                    nodesPerPolygon[kp++]=lines1[0].length;
-                }
-            }
-            allPoly=new UnionSet(domainXLYL,polygons);
-            
-            
         }
+
+        allTriang=new UnionSet(domainXLYL,triangles);
+
+        int numValidPoints=0;
+        for(int j=0;j<xyLinkValues[2].length;j++) {
+            if(xyLinkValues[2][j] != 1 ) numValidPoints++;
+        }
+
+        float[] s0 = samples[0];
+        float[] s1 = samples[1];
+
+        countNoBorder=numValidPoints-1;
+
+        nodesPerPolygon=new int[countNoBorder];
+
+        Gridded2DSet[] polygons=new Gridded2DSet[numValidPoints-1];
+        int kp=0;
+        for(int k=0;k<xyLinkValues[2].length;k++) {
+        //for(int k=0;k<5;k++) {    
+            if(xyLinkValues[2][k] != 1 && xyLinkValues[2][k] != 2){
+                float[][] lines1=new float[2][delaun.Vertices[k].length+1];
+                for(int j=0;j<delaun.Vertices[k].length;j++){
+
+                    int i=delaun.Vertices[k][j];
+                    float v1X=s0[delaun.Tri[i][1]]-s0[delaun.Tri[i][0]];
+                    float v1Y=s1[delaun.Tri[i][1]]-s1[delaun.Tri[i][0]];
+                    float v2X=s0[delaun.Tri[i][2]]-s0[delaun.Tri[i][0]];
+                    float v2Y=s1[delaun.Tri[i][2]]-s1[delaun.Tri[i][0]];
+
+                    float kComp=v1X*v2Y-v2X*v1Y;
+
+                    int pPos=0;
+                    for (int l=1; l<3; l++) if(k == delaun.Tri[i][l]) pPos=l;
+                    //System.out.println("P"+k+" In Triang("+(kComp>0?"+":"-")+"):"+" P"+tri[i][0]+" P"+tri[i][1]+" P"+tri[i][2]+" pPos "+pPos);
+                    int L1pos=(pPos+1+(kComp>0?0:1))%3;
+                    int L2pos=(pPos+1+(kComp>0?1:0))%3;
+
+                    double xs1=s0[delaun.Tri[i][pPos]];
+                    double ys1=s1[delaun.Tri[i][pPos]];
+
+                    double xs2=s0[delaun.Tri[i][L2pos]];
+                    double ys2=s1[delaun.Tri[i][L2pos]];
+
+                    double xa1=(xs1+xs2)/2.0f;
+                    double ya1=(ys1+ys2)/2.0f;
+                    double xb1=0;
+                    double yb1;
+                    if(ys2-ys1 != 0)
+                        yb1=ya1+(xs2-xs1)/(ys2-ys1)*xa1;
+                    else{
+                        xb1=xa1;
+                        yb1=0;
+                    }
+
+                    double xs3=s0[delaun.Tri[i][L1pos]];
+                    double ys3=s1[delaun.Tri[i][L1pos]];
+
+                    double xa2=(xs1+xs3)/2.0f;
+                    double ya2=(ys1+ys3)/2.0f;
+                    double xb2=0;
+                    double yb2;
+                    if(ys3-ys1 != 0)
+                        yb2=ya2+(xs3-xs1)/(ys3-ys1)*xa2;
+                    else{
+                        xb2=xa1;
+                        yb2=0;
+                    }
+
+                    double[] result=intersection(xa1,ya1,xb1,yb1,xa2,ya2,xb2,yb2);
+
+                    double xvoi=result[0];
+                    double yvoi=result[1];
+
+                    lines1[0][j]=(float)xvoi;
+                    lines1[1][j]=(float)yvoi;
+
+                }
+                lines1[0][delaun.Vertices[k].length]=lines1[0][0];
+                lines1[1][delaun.Vertices[k].length]=lines1[1][0];
+
+                polygons[kp]=new Gridded2DSet(domainXLYL,lines1,lines1[0].length);
+                nodesPerPolygon[kp++]=lines1[0].length;
+            }
+        }
+        allPoly=new UnionSet(domainXLYL,polygons);
+            
     }
     
     /**
