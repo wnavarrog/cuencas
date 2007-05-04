@@ -488,18 +488,25 @@ public class BasinTIN {
                         double myLat=(i+myCuenca.getMinY()-1+0.5)*metaDatos.getResLat()/3600.0+metaDatos.getMinLat();
                         
                         
-                        System.out.println("Analyzing Hillslopes Mask at x: "+(j+myCuenca.getMinX()-1)+" y: "+(i+myCuenca.getMinY()-1)+" "+myLon+" "+myLat+" "+magnitudes[i+myCuenca.getMinY()-1][j+myCuenca.getMinX()-1]);
+                        //System.out.println("Analyzing Hillslopes Mask at x: "+(j+myCuenca.getMinX()-1)+" y: "+(i+myCuenca.getMinY()-1)+" "+myLon+" "+myLat+" "+magnitudes[i+myCuenca.getMinY()-1][j+myCuenca.getMinX()-1]);
                         
                         boolean gotIn=false;
                         
                         for (int k=0; k <= 8; k++){
                             int ii=i+(k/3)-1;
                             int jj=j+(k%3)-1;
-                            System.out.print("Asking for Hillslopes Mask at x: "+jj+" y: "+ii);
+                            
+                            if(hillSlopesMask[ii][jj] == 0){
+                                if(gotIn) numRidges--;
+                                gotIn=false;
+                                break;
+                            }
+                            
+                            //System.out.print("Asking for Hillslopes Mask at x: "+jj+" y: "+ii);
                         
                             //if (magnitudes[jj][ii] > 0 || basMask[jj][ii] == 0){
                             if (hillSlopesMask[ii][jj] != hillSlopesMask[i][j]){
-                                System.out.println(" - Got in");
+                                //System.out.println(" - Got in");
                                 
 //                                double addLon=myLon+0.5*(ii-i)*metaDatos.getResLon()/3600.0;
 //                                double addLat=myLat+0.5*(jj-j)*metaDatos.getResLat()/3600.0;
@@ -514,18 +521,20 @@ public class BasinTIN {
                                 if(gotIn == false) numRidges++;
                                 gotIn=true;
                             } else {
-                                System.out.println();
+                                //System.out.println();
                             }
                         }
                         if(gotIn){
                             spotValue=(visad.RealTuple) demField.evaluate(new visad.RealTuple(domain, new double[] {myLon,myLat}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
                             locElev=spotValue.getValues()[0];
                             filteredRidges.add(new Gdc_Coord_3d(myLat,myLon,locElev));
+                            filteredElevationOfPoint.add(locElev);
                         }
-                        
                     }
                 }
             }
+            
+            System.out.println(numRidges);
             
             Gdc_Coord_3d[] gdc=new Gdc_Coord_3d[numRidges];
             Utm_Coord_3d[] utm=new Utm_Coord_3d[numRidges];
@@ -540,7 +549,6 @@ public class BasinTIN {
             for(int i=0;i<numRidges;i++){
                 filteredPointsInTriangulation.add(utm[i]);
                 filteredTypeOfPoint.add(new int[] {0});
-                filteredElevationOfPoint.add(1000);
             }
             
             System.out.println("Number of added ridges "+ridges);
@@ -761,6 +769,10 @@ public class BasinTIN {
     
     public UnionSet getPolygonsUnionSet(){
         return allPoly;
+    }
+    
+    public int getBasinOrder(){
+        return myLinksStructure.getBasinOrder();
     }
     
     public void writeTriangulation(java.io.File outputLocation) throws java.io.IOException{

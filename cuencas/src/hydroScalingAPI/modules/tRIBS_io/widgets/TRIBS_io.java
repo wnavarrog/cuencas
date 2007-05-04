@@ -403,6 +403,15 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
 
         display_TIN_I.addReference( data_refPoly_I,polygonsCMap_I );
         
+        String[] levelsString=new String[basTIN_I.getBasinOrder()+1];
+        levelsString[0]="No Ridges";
+        for (int i = 1; i < levelsString.length; i++) {
+            levelsString[i]="Level "+i;
+        }
+        
+        ridgeLevelCombo.setModel(new javax.swing.DefaultComboBoxModel(levelsString));
+        
+        
     }
     
     private void initializeOutputTabs() throws RemoteException, VisADException, java.io.IOException {
