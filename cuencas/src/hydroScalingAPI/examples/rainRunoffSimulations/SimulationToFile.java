@@ -506,10 +506,10 @@ public class SimulationToFile extends java.lang.Object {
         routingParams.put("widthExponent",0.3f);
         routingParams.put("widthStdDev",0.0f);
 
-        routingParams.put("chezyCoeff",14.2f);
-
-        for(float ce=0.5f;ce<=0.6f;ce+=0.05){
-            routingParams.put("chezyExponent",-ce);
+        routingParams.put("chezyExponent",0.0);
+            
+        for(float ce=10f;ce<=500;ce+=40.0){
+            routingParams.put("chezyCoeff",ce);
             new SimulationToFile(82,260,matDirs,magnitudes,metaModif,stormFile,0.0f,0,routingParams);
         }
 
