@@ -506,7 +506,7 @@ public class SimulationToFile extends java.lang.Object {
         routingParams.put("widthExponent",0.3f);
         routingParams.put("widthStdDev",0.0f);
 
-        routingParams.put("chezyExponent",0.0);
+        routingParams.put("chezyExponent",0.0f);
             
         for(float ce=10f;ce<=500;ce+=40.0){
             routingParams.put("chezyCoeff",ce);
