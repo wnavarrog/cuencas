@@ -499,16 +499,16 @@ public class SimulationToFile extends java.lang.Object {
         //hydroScalingAPI.mainGUI.ParentGUI tempFrame=new hydroScalingAPI.mainGUI.ParentGUI();
         
         java.io.File stormFile;
-        stormFile=new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Hydrology/storms/simulated_events/uniform_100_01.metaVHC");
+        stormFile=new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Hydrology/storms/simulated_events/uniform_20_01.metaVHC");
         
         java.util.Hashtable routingParams=new java.util.Hashtable();
-        routingParams.put("widthCoeff",1.0f);
-        routingParams.put("widthExponent",0.3f);
+        routingParams.put("widthCoeff",2.36f);
+        routingParams.put("widthExponent",0.34f);
         routingParams.put("widthStdDev",0.0f);
 
         routingParams.put("chezyExponent",0.0f);
             
-        for(float ce=1f;ce<=9;ce+=0.5){
+        for(float ce=80f;ce<=120;ce+=10.0){
             routingParams.put("chezyCoeff",ce);
             new SimulationToFile(82,260,matDirs,magnitudes,metaModif,stormFile,0.0f,0,routingParams);
         }
