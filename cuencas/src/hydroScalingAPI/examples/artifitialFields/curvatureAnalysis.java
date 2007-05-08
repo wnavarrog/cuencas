@@ -75,7 +75,7 @@ public java.util.Vector AreaBasin = new java.util.Vector();
         System.out.println("**** Starting scale analysis  ****");
         
         getScaleAnalysis();
-        
+        System.exit(0);
         System.out.println("**** Scale analysis finished ****");
         
         getAreaSlope();
@@ -774,8 +774,8 @@ public java.util.Vector AreaBasin = new java.util.Vector();
             args=new String[] { "C:/5_temp/Running_WalnutGulch_040307/walnutGulchUpdated.metaDEM",
                                  "C:/5_temp/Running_WalnutGulch_040307/walnutGulchUpdated.dem"};
             
-            int x = 302;
-            int y = 318;
+            int x = 308;//302;
+            int y = 323;//318;
              
             hydroScalingAPI.io.MetaRaster metaRaster= new hydroScalingAPI.io.MetaRaster(new java.io.File(args[0]));
             metaRaster.setLocationBinaryFile(new java.io.File(args[1]));
