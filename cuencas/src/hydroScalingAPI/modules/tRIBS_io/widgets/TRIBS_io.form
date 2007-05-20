@@ -164,7 +164,8 @@
                                 </Property>
                                 <Property name="paintLabels" type="boolean" value="true"/>
                                 <Property name="paintTicks" type="boolean" value="true"/>
-                                <Property name="value" type="int" value="0"/>
+                                <Property name="value" type="int" value="100"/>
+                                <Property name="enabled" type="boolean" value="false"/>
                               </Properties>
                               <Events>
                                 <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="zrSliderMouseReleased"/>
@@ -175,7 +176,7 @@
                                 </Constraint>
                               </Constraints>
                             </Component>
-                            <Component class="javax.swing.JLabel" name="jLabel1">
+                            <Component class="javax.swing.JLabel" name="zrLabel">
                               <Properties>
                                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                                   <Font name="Lucida Grande" size="10" style="0"/>

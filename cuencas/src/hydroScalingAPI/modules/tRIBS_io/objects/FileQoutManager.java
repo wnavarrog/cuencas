@@ -47,6 +47,17 @@ public class FileQoutManager {
         return toReturn;
     }
     
+    public int[] getLocationIndexes(String baseName){
+        Object[] keys=getKeys();
+        int[] indexes=new int[keys.length];
+        for (int i = 0; i < indexes.length-1; i++) {
+            String key=keys[i].toString();
+            System.out.println(key);
+            indexes[i]=Integer.parseInt(key);
+        }
+        return indexes;
+    }
+    
     /**
      * @param args the command line arguments
      */
