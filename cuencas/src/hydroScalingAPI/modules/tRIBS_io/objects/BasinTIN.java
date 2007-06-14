@@ -721,7 +721,7 @@ public class BasinTIN {
 
             //System.out.println("Walk through algorithm.");
             long startQ = System.currentTimeMillis();
-            for (int i = 0; i < delaun.Tri.length; i+=(int)(Math.random()*10)) {
+            for (int i = 0; i < delaun.Tri.length; i++) {
 
                 int px1=(int)(1e5*samples[0][delaun.Tri[i][0]]);
                 int px2=(int)(1e5*samples[0][delaun.Tri[i][1]]);
@@ -740,9 +740,9 @@ public class BasinTIN {
 
                 java.awt.Rectangle myBounds=myTri.getBounds();
 
-                System.out.println("Now working on Triangle "+i+" with bounds "+myBounds.x+" "+(myBounds.x+myBounds.width) + " "+myBounds.y+" "+(myBounds.y+myBounds.height));
-                System.out.println(" Coordinates X "+px1+" "+px2+" "+px3);
-                System.out.println(" Coordinates Y "+py1+" "+py2+" "+py3);
+//                System.out.println("Now working on Triangle "+i+" with bounds "+myBounds.x+" "+(myBounds.x+myBounds.width) + " "+myBounds.y+" "+(myBounds.y+myBounds.height));
+//                System.out.println(" Coordinates X "+px1+" "+px2+" "+px3);
+//                System.out.println(" Coordinates Y "+py1+" "+py2+" "+py3);
 
                 java.util.Vector potentialCandidates=new java.util.Vector();
                 int maxIndex=-9999;
