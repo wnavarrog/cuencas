@@ -24,17 +24,21 @@ public class FileRftManager {
     private int countTimes=-1;
     
     /** Creates a new instance of FileMrfManager */
-    public FileRftManager(java.io.File pRft) {
+    public FileRftManager(java.io.File pRft,double maxTime) {
         
         pathToRft=pRft;
         try {
             
             java.io.BufferedReader fileRft = new java.io.BufferedReader(new java.io.FileReader(pathToRft));
             String fullLine;
-            do{
+            double theTime=0.0;
+            fullLine=fileRft.readLine(); countTimes++;
+            fullLine=fileRft.readLine(); countTimes++;
+             while (theTime <= maxTime){
                 fullLine=fileRft.readLine();
                 countTimes++;
-            } while (fullLine!=null);
+                theTime=Double.parseDouble(fullLine.split("\t")[0]);
+            }
             fileRft.close();
             
             fileRft = new java.io.BufferedReader(new java.io.FileReader(pathToRft));
@@ -55,7 +59,9 @@ public class FileRftManager {
             for (int i = 0; i < countTimes; i++) {
                 fullLine=fileRft.readLine();
                 elements=fullLine.split("\t");
-                for (int j = 0; j < RftData.length; j++) {
+                int pointPos=elements[0].indexOf(".");
+                RftData[0][i]=Float.parseFloat(elements[0].substring(0,pointPos))+Float.parseFloat(elements[0].substring(pointPos+1))/60.0f;
+                for (int j = 1; j < RftData.length; j++) {
                     RftData[j][i]=Float.parseFloat(elements[j]);
                 }
             }
@@ -83,6 +89,6 @@ public class FileRftManager {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        new FileRftManager(new java.io.File("/home/ricardo/workFiles/tribsWork/sampleTribs/SMALLBASIN/Output/hyd/smallbasin0018_00.rft"));
+        new FileRftManager(new java.io.File("/home/ricardo/workFiles/tribsWork/sampleTribs/SMALLBASIN/Output/hyd/smallbasin0018_00.rft"),8);
     }
 }

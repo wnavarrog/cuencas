@@ -22,17 +22,21 @@ public class FileMrfManager {
     private int countTimes=-1;
     
     /** Creates a new instance of FileMrfManager */
-    public FileMrfManager(java.io.File pMrf) {
+    public FileMrfManager(java.io.File pMrf,double maxTime) {
         
         pathToMRF=pMrf;
         try {
             
             java.io.BufferedReader fileMrf = new java.io.BufferedReader(new java.io.FileReader(pathToMRF));
             String fullLine;
-            do{
+            double theTime=0.0;
+            fullLine=fileMrf.readLine(); countTimes++;
+            fullLine=fileMrf.readLine(); countTimes++;
+            while (theTime <= maxTime){
                 fullLine=fileMrf.readLine();
                 countTimes++;
-            } while (fullLine!=null);
+                theTime=Double.parseDouble(fullLine.split("\t")[0]);
+            }
             fileMrf.close();
             
             fileMrf = new java.io.BufferedReader(new java.io.FileReader(pathToMRF));
@@ -53,7 +57,9 @@ public class FileMrfManager {
             for (int i = 0; i < countTimes; i++) {
                 fullLine=fileMrf.readLine();
                 elements=fullLine.split("\t");
-                for (int j = 0; j < mrfData.length; j++) {
+                int pointPos=elements[0].indexOf(".");
+                mrfData[0][i]=Float.parseFloat(elements[0].substring(0,pointPos))+Float.parseFloat(elements[0].substring(pointPos+1))/60.0f;
+                for (int j = 1; j < mrfData.length; j++) {
                     mrfData[j][i]=Float.parseFloat(elements[j]);
                 }
             }
@@ -81,7 +87,7 @@ public class FileMrfManager {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        new FileMrfManager(new java.io.File("/Users/ricardo/workFiles/tribsWork/sampleTribs/JEMEZ_TRIBS_RUM/Output/hyd/jm0009_00.mrf"));
+        new FileMrfManager(new java.io.File("/Users/ricardo/workFiles/tribsWork/sampleTribs/JEMEZ_TRIBS_RUM/Output/hyd/jm0009_00.mrf"),8);
     }
     
 }

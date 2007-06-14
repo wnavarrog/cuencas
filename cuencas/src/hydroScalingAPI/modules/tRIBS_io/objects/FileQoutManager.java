@@ -31,6 +31,11 @@ public class FileQoutManager {
 
     }
     
+    public double getMaxTime(){
+        double[] time=getTime("Outlet");
+        return time[time.length-1];
+    }
+    
     public double[] getTime(Object theKey){
         FileQout theNode=(FileQout)availableGauges.get(theKey);
         return theNode.getTime();

@@ -95,12 +95,12 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         baseNameTextField.setText(baseName);
         System.out.println(">>Loading TIN");
         basTIN_O=new hydroScalingAPI.modules.tRIBS_io.objects.BasinTIN(findTriEdgNodes(outputsDirectory),baseName);
-        System.out.println(">>Loading MRF");
-        fmrfm=new hydroScalingAPI.modules.tRIBS_io.objects.FileMrfManager(findMRF(outputsDirectory));
-        System.out.println(">>Loading RFT");
-        frftm=new hydroScalingAPI.modules.tRIBS_io.objects.FileRftManager(findRFT(outputsDirectory));
         System.out.println(">>Loading Qouts");
         fqm=new hydroScalingAPI.modules.tRIBS_io.objects.FileQoutManager(findQouts(outputsDirectory));
+        System.out.println(">>Loading MRF");
+        fmrfm=new hydroScalingAPI.modules.tRIBS_io.objects.FileMrfManager(findMRF(outputsDirectory),fqm.getMaxTime());
+        System.out.println(">>Loading RFT");
+        frftm=new hydroScalingAPI.modules.tRIBS_io.objects.FileRftManager(findRFT(outputsDirectory),fqm.getMaxTime());
         System.out.println(">>Loading Pixel Files");
         java.io.File[] listOfPixelFiles=findPixel(outputsDirectory);
         if(listOfPixelFiles.length > 0) fpm=new hydroScalingAPI.modules.tRIBS_io.objects.FilePixelManager(listOfPixelFiles);
@@ -127,7 +127,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         
         //Set up general interface
         setTitle("TRIBS I/O Module");
-        setBounds(0,0, 950, 700);
+        setBounds(0,0, 950, 730);
         java.awt.Rectangle marcoParent=mainFrame.getBounds();
         java.awt.Rectangle thisMarco=this.getBounds();
         setBounds(marcoParent.x+marcoParent.width/2-thisMarco.width/2,marcoParent.y+marcoParent.height/2-thisMarco.height/2,thisMarco.width,thisMarco.height);
@@ -196,6 +196,162 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         display_TIN_Os.addDisplayListener(this);
         
         jPanel17.add("Center",display_TIN_Os.getComponent());
+    }
+    
+    private void initializeInputTabs() throws RemoteException, VisADException, java.io.IOException {
+        
+        ProjectionControl pc = display_TIN_I.getProjectionControl();
+        pc.setAspectCartesian(basTIN_I.getAspect());        
+        
+        data_refPoints_I = new DataReferenceImpl("data_ref_Points");
+        data_refPoints_I.setData(basTIN_I.getPointsFlatField());
+        
+        pointsCMap_I = new ConstantMap[] {new ConstantMap( 5.0f, Display.PointSize)};
+
+        display_TIN_I.addReference( data_refPoints_I,pointsCMap_I );
+        
+        data_refTr_I = new DataReferenceImpl("data_ref_TRIANG");
+        trianglesCMap_I = new ConstantMap[] {new ConstantMap( 0.50f, Display.LineWidth)};
+
+        display_TIN_I.addReference( data_refTr_I,trianglesCMap_I );
+        
+        data_refPoly_I = new DataReferenceImpl("data_ref_poly");
+        polygonsCMap_I = new ConstantMap[] {    new ConstantMap( 1.0f, Display.Red),
+                                                new ConstantMap( 0.0f, Display.Green),
+                                                new ConstantMap( 1.0f, Display.Blue),
+                                                new ConstantMap( 1.50f, Display.LineWidth)};
+
+        display_TIN_I.addReference( data_refPoly_I,polygonsCMap_I );
+        
+        String[] levelsString=new String[basTIN_I.getBasinOrder()+1];
+        levelsString[0]="No Ridges";
+        for (int i = 1; i < levelsString.length; i++) {
+            levelsString[i]="Level "+i;
+        }
+        
+        ridgeLevelCombo.setModel(new javax.swing.DefaultComboBoxModel(levelsString));
+        
+        
+    }
+    
+    private void initializeOutputTabs() throws RemoteException, VisADException, java.io.IOException {
+        
+        ProjectionControl pc = display_TIN_Os.getProjectionControl();
+        pc.setAspectCartesian(basTIN_O.getAspect());
+        
+        data_refPoints_O = new DataReferenceImpl("data_ref_Points");
+        data_refPoints_O.setData(basTIN_O.getPointsFlatField());
+        pointsCMap_O = new ConstantMap[] {new ConstantMap( 5.0f, Display.PointSize)};
+        display_TIN_Os.addReference( data_refPoints_O,pointsCMap_O );
+        
+        data_refTr_O = new DataReferenceImpl("data_ref_TRIANG");
+        data_refTr_O.setData(basTIN_O.getTrianglesUnionSet());
+        trianglesCMap_O = new ConstantMap[] {new ConstantMap( 0.50f, Display.LineWidth)};
+        display_TIN_Os.addReference( data_refTr_O,trianglesCMap_O );
+        
+        data_refPoly_O = new DataReferenceImpl("data_ref_poly");
+        data_refPoly_O.setData(basTIN_O.getPolygonsUnionSet());
+        polygonsCMap_O = new ConstantMap[] {    new ConstantMap( 1.0f, Display.Red),
+                                                new ConstantMap( 0.0f, Display.Green),
+                                                new ConstantMap( 1.0f, Display.Blue),
+                                                new ConstantMap( 1.50f, Display.LineWidth)};
+        display_TIN_Os.addReference( data_refPoly_O,polygonsCMap_O );
+        
+        data_refFill_O = new DataReferenceImpl("data_ref_Fill");
+        data_refFill_O.setData(basTIN_O.getValuesFlatField());
+        display_TIN_Os.addReference( data_refFill_O );
+        
+        if(basTIN_O.getNumVoi() > 10000) display_TIN_Os.disableEvent(visad.DisplayEvent.MOUSE_MOVED);
+        
+        
+        plotMrf(2);
+        plotRft();
+        
+        qNodesCombo.setModel(new javax.swing.DefaultComboBoxModel(fqm.getKeys()));
+        qNodesCombo.setSelectedItem("Outlet");
+        int[] qoutIndex=fqm.getLocationIndexes(baseNameTextField.getText());
+        for (int i=0;i<qoutIndex.length;i++){
+            final int myIndex=qoutIndex[i];
+            Runnable addPoint = new Runnable() {
+                public void run() {
+                    try {
+                        visad.DataReferenceImpl rtref1 = new visad.DataReferenceImpl("RealTuples");
+                        rtref1.setData(basTIN_O.getPositionTuple(myIndex));
+                        visad.ConstantMap[] rtmaps1 = {new visad.ConstantMap(15.0, visad.Display.PointSize ),
+                                                       new visad.ConstantMap(0.4, visad.Display.Red),
+                                                       new visad.ConstantMap(0.4, visad.Display.Green),
+                                                       new visad.ConstantMap(0.4, visad.Display.Blue)};
+                        display_TIN_Os.addReferences(new visad.bom.PickManipulationRendererJ3D(), rtref1, rtmaps1);
+                        visad.CellImpl cells1 = new visad.CellImpl() {
+                            private boolean first = true;
+                            public void doAction() throws visad.VisADException, java.rmi.RemoteException {
+                                if (first) first = false;
+                                else {
+                                    qoutAction(myIndex);
+                                }
+                            }
+                        };
+                        cells1.addReference(rtref1);
+                    } catch (visad.VisADException exc) {
+                        System.err.println("Failed showing gauges");
+                        System.err.println(exc);
+                    } catch (java.io.IOException exc) {
+                        System.err.println("Failed showing gauges");
+                        System.err.println(exc);
+                    }
+                }
+            };
+            new Thread(addPoint).start();
+        }
+        
+        if(fpm != null){
+            pNodesCombo.setModel(new javax.swing.DefaultComboBoxModel(fpm.getKeys()));
+            pNodesVarsCombo.setModel(new javax.swing.DefaultComboBoxModel(ListOfVariables.localOutput));
+            pNodesCombo.setSelectedIndex(0);
+            int[] pixelIndex=fpm.getLocationIndexes(baseNameTextField.getText());
+            for (int i=0;i<pixelIndex.length;i++){
+                final int myIndex=pixelIndex[i];
+                Runnable addPoint = new Runnable() {
+                    public void run() {
+                        try {
+                            visad.DataReferenceImpl rtref1 = new visad.DataReferenceImpl("RealTuples");
+                            rtref1.setData(basTIN_O.getPositionTuple(myIndex));
+                            visad.ConstantMap[] rtmaps1 = {new visad.ConstantMap(15.0, visad.Display.PointSize ),
+                                                           new visad.ConstantMap(0.7, visad.Display.Red),
+                                                           new visad.ConstantMap(0.7, visad.Display.Green),
+                                                           new visad.ConstantMap(0.7, visad.Display.Blue)};
+                            display_TIN_Os.addReferences(new visad.bom.PickManipulationRendererJ3D(), rtref1, rtmaps1);
+                            visad.CellImpl cells1 = new visad.CellImpl() {
+                                private boolean first = true;
+                                public void doAction() throws visad.VisADException, java.rmi.RemoteException {
+                                    if (first) first = false;
+                                    else {
+                                        pixelAction(myIndex);
+                                    }
+                                }
+                            };
+                            cells1.addReference(rtref1);
+                        } catch (visad.VisADException exc) {
+                            System.err.println("Failed showing gauges");
+                            System.err.println(exc);
+                        } catch (java.io.IOException exc) {
+                            System.err.println("Failed showing gauges");
+                            System.err.println(exc);
+                        }
+                    }
+                };
+                new Thread(addPoint).start();
+            }
+        }
+        
+        spaceParamsCombo.setModel(new javax.swing.DefaultComboBoxModel(ListOfVariables.spatialParams));
+        
+        Object[] spatialMoments=new String[] {"Available Times","Initial Condition","Final State"};
+        
+        spatialMoments=hydroScalingAPI.tools.ArrayTools.concatentate(spatialMoments,fdm.getKeys());
+        avaTimesCombo.setModel(new javax.swing.DefaultComboBoxModel(spatialMoments));
+        System.out.println("Step done");
+        
     }
     
     private java.io.File findTriEdgNodes(java.io.File iniDir){
@@ -391,162 +547,6 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         data_refPoly_I.setData(basTIN_I.getPolygonsUnionSet());
     }
     
-    private void initializeInputTabs() throws RemoteException, VisADException, java.io.IOException {
-        
-        ProjectionControl pc = display_TIN_I.getProjectionControl();
-        pc.setAspectCartesian(basTIN_I.getAspect());        
-        
-        data_refPoints_I = new DataReferenceImpl("data_ref_Points");
-        data_refPoints_I.setData(basTIN_I.getPointsFlatField());
-        
-        pointsCMap_I = new ConstantMap[] {new ConstantMap( 5.0f, Display.PointSize)};
-
-        display_TIN_I.addReference( data_refPoints_I,pointsCMap_I );
-        
-        data_refTr_I = new DataReferenceImpl("data_ref_TRIANG");
-        trianglesCMap_I = new ConstantMap[] {new ConstantMap( 0.50f, Display.LineWidth)};
-
-        display_TIN_I.addReference( data_refTr_I,trianglesCMap_I );
-        
-        data_refPoly_I = new DataReferenceImpl("data_ref_poly");
-        polygonsCMap_I = new ConstantMap[] {    new ConstantMap( 1.0f, Display.Red),
-                                                new ConstantMap( 0.0f, Display.Green),
-                                                new ConstantMap( 1.0f, Display.Blue),
-                                                new ConstantMap( 1.50f, Display.LineWidth)};
-
-        display_TIN_I.addReference( data_refPoly_I,polygonsCMap_I );
-        
-        String[] levelsString=new String[basTIN_I.getBasinOrder()+1];
-        levelsString[0]="No Ridges";
-        for (int i = 1; i < levelsString.length; i++) {
-            levelsString[i]="Level "+i;
-        }
-        
-        ridgeLevelCombo.setModel(new javax.swing.DefaultComboBoxModel(levelsString));
-        
-        
-    }
-    
-    private void initializeOutputTabs() throws RemoteException, VisADException, java.io.IOException {
-        
-        ProjectionControl pc = display_TIN_Os.getProjectionControl();
-        pc.setAspectCartesian(basTIN_O.getAspect());
-        
-        data_refPoints_O = new DataReferenceImpl("data_ref_Points");
-        data_refPoints_O.setData(basTIN_O.getPointsFlatField());
-        pointsCMap_O = new ConstantMap[] {new ConstantMap( 5.0f, Display.PointSize)};
-        display_TIN_Os.addReference( data_refPoints_O,pointsCMap_O );
-        
-        data_refTr_O = new DataReferenceImpl("data_ref_TRIANG");
-        data_refTr_O.setData(basTIN_O.getTrianglesUnionSet());
-        trianglesCMap_O = new ConstantMap[] {new ConstantMap( 0.50f, Display.LineWidth)};
-        display_TIN_Os.addReference( data_refTr_O,trianglesCMap_O );
-        
-        data_refPoly_O = new DataReferenceImpl("data_ref_poly");
-        data_refPoly_O.setData(basTIN_O.getPolygonsUnionSet());
-        polygonsCMap_O = new ConstantMap[] {    new ConstantMap( 1.0f, Display.Red),
-                                                new ConstantMap( 0.0f, Display.Green),
-                                                new ConstantMap( 1.0f, Display.Blue),
-                                                new ConstantMap( 1.50f, Display.LineWidth)};
-        display_TIN_Os.addReference( data_refPoly_O,polygonsCMap_O );
-        
-        data_refFill_O = new DataReferenceImpl("data_ref_Fill");
-        data_refFill_O.setData(basTIN_O.getValuesFlatField());
-        display_TIN_Os.addReference( data_refFill_O );
-        
-        if(basTIN_O.getNumVoi() > 10000) display_TIN_Os.disableEvent(visad.DisplayEvent.MOUSE_MOVED);
-        
-        
-        plotMrf(2);
-        plotRft();
-        
-        qNodesCombo.setModel(new javax.swing.DefaultComboBoxModel(fqm.getKeys()));
-        qNodesCombo.setSelectedItem("Outlet");
-        int[] qoutIndex=fqm.getLocationIndexes(baseNameTextField.getText());
-        for (int i=0;i<qoutIndex.length;i++){
-            final int myIndex=qoutIndex[i];
-            Runnable addPoint = new Runnable() {
-                public void run() {
-                    try {
-                        visad.DataReferenceImpl rtref1 = new visad.DataReferenceImpl("RealTuples");
-                        rtref1.setData(basTIN_O.getPositionTuple(myIndex));
-                        visad.ConstantMap[] rtmaps1 = {new visad.ConstantMap(15.0, visad.Display.PointSize ),
-                                                       new visad.ConstantMap(0.4, visad.Display.Red),
-                                                       new visad.ConstantMap(0.4, visad.Display.Green),
-                                                       new visad.ConstantMap(0.4, visad.Display.Blue)};
-                        display_TIN_Os.addReferences(new visad.bom.PickManipulationRendererJ3D(), rtref1, rtmaps1);
-                        visad.CellImpl cells1 = new visad.CellImpl() {
-                            private boolean first = true;
-                            public void doAction() throws visad.VisADException, java.rmi.RemoteException {
-                                if (first) first = false;
-                                else {
-                                    qoutAction(myIndex);
-                                }
-                            }
-                        };
-                        cells1.addReference(rtref1);
-                    } catch (visad.VisADException exc) {
-                        System.err.println("Failed showing gauges");
-                        System.err.println(exc);
-                    } catch (java.io.IOException exc) {
-                        System.err.println("Failed showing gauges");
-                        System.err.println(exc);
-                    }
-                }
-            };
-            new Thread(addPoint).start();
-        }
-        
-        if(fpm != null){
-            pNodesCombo.setModel(new javax.swing.DefaultComboBoxModel(fpm.getKeys()));
-            pNodesVarsCombo.setModel(new javax.swing.DefaultComboBoxModel(ListOfVariables.localOutput));
-            pNodesCombo.setSelectedIndex(0);
-            int[] pixelIndex=fpm.getLocationIndexes(baseNameTextField.getText());
-            for (int i=0;i<pixelIndex.length;i++){
-                final int myIndex=pixelIndex[i];
-                Runnable addPoint = new Runnable() {
-                    public void run() {
-                        try {
-                            visad.DataReferenceImpl rtref1 = new visad.DataReferenceImpl("RealTuples");
-                            rtref1.setData(basTIN_O.getPositionTuple(myIndex));
-                            visad.ConstantMap[] rtmaps1 = {new visad.ConstantMap(15.0, visad.Display.PointSize ),
-                                                           new visad.ConstantMap(0.7, visad.Display.Red),
-                                                           new visad.ConstantMap(0.7, visad.Display.Green),
-                                                           new visad.ConstantMap(0.7, visad.Display.Blue)};
-                            display_TIN_Os.addReferences(new visad.bom.PickManipulationRendererJ3D(), rtref1, rtmaps1);
-                            visad.CellImpl cells1 = new visad.CellImpl() {
-                                private boolean first = true;
-                                public void doAction() throws visad.VisADException, java.rmi.RemoteException {
-                                    if (first) first = false;
-                                    else {
-                                        pixelAction(myIndex);
-                                    }
-                                }
-                            };
-                            cells1.addReference(rtref1);
-                        } catch (visad.VisADException exc) {
-                            System.err.println("Failed showing gauges");
-                            System.err.println(exc);
-                        } catch (java.io.IOException exc) {
-                            System.err.println("Failed showing gauges");
-                            System.err.println(exc);
-                        }
-                    }
-                };
-                new Thread(addPoint).start();
-            }
-        }
-        
-        spaceParamsCombo.setModel(new javax.swing.DefaultComboBoxModel(ListOfVariables.spatialParams));
-        
-        Object[] spatialMoments=new String[] {"Available Times","Initial Condition","Final State"};
-        
-        spatialMoments=hydroScalingAPI.tools.ArrayTools.concatentate(spatialMoments,fdm.getKeys());
-        avaTimesCombo.setModel(new javax.swing.DefaultComboBoxModel(spatialMoments));
-        System.out.println("Step done");
-        
-    }
-    
     private void qoutAction(int index){
         if(index != 0)
             qNodesCombo.setSelectedItem(index+"");
@@ -720,7 +720,6 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         });
 
         panel_IO.setTabLayoutPolicy(javax.swing.JTabbedPane.SCROLL_TAB_LAYOUT);
-        panel_IO.setTabPlacement(javax.swing.JTabbedPane.LEFT);
         jPanel10.setLayout(new java.awt.BorderLayout());
 
         jPanel1.setLayout(new java.awt.BorderLayout());
@@ -1025,7 +1024,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
 
         jPanel24.add(mrfPanel);
 
-        panelOutputs.addTab("Temporal Forcing", jPanel24);
+        panelOutputs.addTab("Basin-Averaged Response", jPanel24);
 
         jPanel16.setLayout(new java.awt.GridLayout(2, 0));
 
@@ -1144,7 +1143,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
 
         jPanel16.add(qoutPanel);
 
-        panelOutputs.addTab("Temporal Response", jPanel16);
+        panelOutputs.addTab("Hydrograph Response", jPanel16);
 
         jPanel26.setLayout(new java.awt.BorderLayout());
 
@@ -1797,13 +1796,13 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
             
             hydroScalingAPI.mainGUI.ParentGUI tempFrame=new hydroScalingAPI.mainGUI.ParentGUI();
             
-            new TRIBS_io(tempFrame, 56,79,matDirs,magnitudes,metaModif).setVisible(true);
+            //new TRIBS_io(tempFrame, 56,79,matDirs,magnitudes,metaModif).setVisible(true);
             //new TRIBS_io(tempFrame, 108,48,matDirs,magnitudes,metaModif).setVisible(true);
             
             ///home/ricardo/workFiles/tribsWork/sampleTribs/SMALLBASIN/Output/"),"smallbasin"
             ///home/ricardo/simulationResults/SMALLBASIN/Output_Base/"),"smallbasin"
-            ///home/ricardo/workFiles/tribsWork/sampleTribs/Output_Mar23a_07/"),"urp"
-            //new TRIBS_io(tempFrame, new java.io.File("/home/ricardo/workFiles/tribsWork/sampleTribs/SMALLBASIN/Output/"),"smallbasin").setVisible(true);
+            ///home/ricardo/simulationResults/Output_Mar23a_07/"),"urp"
+            new TRIBS_io(tempFrame, new java.io.File("/home/ricardo/workFiles/tribsWork/sampleTribs/SMALLBASIN/Output/"),"smallbasin").setVisible(true);
         } catch (java.io.IOException IOE){
             System.out.print(IOE);
             System.exit(0);

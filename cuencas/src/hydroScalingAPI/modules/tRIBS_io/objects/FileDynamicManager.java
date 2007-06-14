@@ -26,7 +26,6 @@ public class FileDynamicManager {
         availableDynamic=new java.util.Hashtable();
         for (int i = 0; i < pInt.length; i++) {
             FileDynamic fd=new FileDynamic(pInt[i],nv);
-            fd.start();
             availableDynamic.put(pInt[i].getName(),fd);
         }
     }
@@ -51,7 +50,7 @@ public class FileDynamicManager {
     
 }
 
-class FileDynamic extends Thread{
+class FileDynamic{
     
     private java.io.File pathToDynamic;
     private int numVoi;
@@ -66,7 +65,7 @@ class FileDynamic extends Thread{
         numVoi=nv;
     }
     
-    public void run(){
+    private void loadFile(){
         try {
             
             java.io.BufferedReader fileDyna = new java.io.BufferedReader(new java.io.FileReader(pathToDynamic));
@@ -104,7 +103,9 @@ class FileDynamic extends Thread{
     }
     
     public float[] getValues(int varIndex){
-        if(!fullyLoaded) return null;
+        if(!fullyLoaded){
+            loadFile();
+        }
         return integData[varIndex];
     }
     

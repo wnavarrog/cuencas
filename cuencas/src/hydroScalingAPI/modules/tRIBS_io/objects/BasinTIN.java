@@ -65,7 +65,7 @@ public class BasinTIN {
     private float[][] pointProps;
     private UnionSet allTriang,allPoly;
     
-    private double minX,minY;
+    public double minX,minY;
     
     private double maxZr=0.0;
     
@@ -654,7 +654,7 @@ public class BasinTIN {
         
         int iii=0;
         pB=0;
-        float[][] samplesO=new float[3][numPointsO];
+        float[][] samplesO=new float[4][numPointsO];
         for(int j=0;j<xyBasin[0].length;j++){
             if(magnitudes[xyBasin[1][j]][xyBasin[0][j]] <= 0){
                 boolean neigh=false;
@@ -672,6 +672,7 @@ public class BasinTIN {
                     samplesO[0][iii]=(float)(utmLocal.x-minX);
                     samplesO[1][iii]=(float)(utmLocal.y-minY);
                     samplesO[2][iii]=pB;
+                    samplesO[3][iii]=1;
                     iii++;
                 }
                 pB++;
@@ -692,108 +693,127 @@ public class BasinTIN {
 //
 //        }
         
-        int numPoints=filteredPointsInTriangulation.size();
-        float[][] samples=new float[2][numPoints];
-        for(int i=0;i<numPoints;i++){
-            Utm_Coord_3d utmLocal=(Utm_Coord_3d)filteredPointsInTriangulation.get(i);
-            samples[0][i]=(float)(utmLocal.x-minX);
-            samples[1][i]=(float)(utmLocal.y-minY);
-        }
         
-        System.out.println("Initial DelaunayWatson algorithm.");
-        delaun = (Delaunay) new DelaunayClarkson(samples);
+        //ITERATIVE COMPONENT
+        int numPoints;
+        float[][] samples;
         
-        System.out.println("Initial Walk through algorithm.");
-        long startQ = System.currentTimeMillis();
-        for (int i = 0; i < delaun.Tri.length; i++) {
+        System.out.println(">>>>>"+pointsPreserved);
+        
+        
+        pointsPreserved=-1;
+        
+        while(maxZr == 0.0 || pointsPreserved != 0){
             
-            int px1=(int)(1e5*samples[0][delaun.Tri[i][0]]);
-            int px2=(int)(1e5*samples[0][delaun.Tri[i][1]]);
-            int px3=(int)(1e5*samples[0][delaun.Tri[i][2]]);
-            
-            int py1=(int)(1e5*samples[1][delaun.Tri[i][0]]);
-            int py2=(int)(1e5*samples[1][delaun.Tri[i][1]]);
-            int py3=(int)(1e5*samples[1][delaun.Tri[i][2]]);
-            
-            
-            java.awt.Polygon myTri=
-                    new java.awt.Polygon(
-                        new int[] {px1,px2,px3}, 
-                        new int[] {py1,py2,py3},
-                        3);
-            
-            java.awt.Rectangle myBounds=myTri.getBounds();
+            pointsPreserved=0;
+            System.out.println(">>>>>"+pointsPreserved);
+        
+            numPoints=filteredPointsInTriangulation.size();
+            samples=new float[2][numPoints];
+            for(int i=0;i<numPoints;i++){
+                Utm_Coord_3d utmLocal=(Utm_Coord_3d)filteredPointsInTriangulation.get(i);
+                samples[0][i]=(float)(utmLocal.x-minX);
+                samples[1][i]=(float)(utmLocal.y-minY);
+            }
 
-            System.out.println("Now working on Triangle "+i+" with bounds "+myBounds.x+" "+(myBounds.x+myBounds.width) + " "+myBounds.y+" "+(myBounds.y+myBounds.height));
-            System.out.println(" Coordinates X "+px1+" "+px2+" "+px3);
-            System.out.println(" Coordinates Y "+py1+" "+py2+" "+py3);
-            
-            java.util.Vector potentialCandidates=new java.util.Vector();
-            int maxIndex=-9999;
-            float maxVal=-1.0f;
-            
-            for(int j=0;j<samplesO[0].length;j++){
-                
-                int pointX=(int)(1e5*samplesO[0][j]);
-                int pointY=(int)(1e5*samplesO[1][j]);
+            System.out.println("Initial DelaunayWatson algorithm.");
+            delaun = (Delaunay) new DelaunayClarkson(samples);
 
-                if(pointX > myBounds.x && pointX < myBounds.x+myBounds.width && pointY > myBounds.y && pointY < myBounds.y+myBounds.height){
-                    if(myTri.contains(pointX,pointY)) {
-                        
-                        visad.Real spotValue1;
-                        spotValue1=(visad.Real) demFieldMeters.evaluate(new visad.RealTuple(domainXLYL, new double[] {pointX/1e5f,pointY/1e5f}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
-                        double e0=spotValue1.getValue();
-                        spotValue1=(visad.Real) demFieldMeters.evaluate(new visad.RealTuple(domainXLYL, new double[] {px1/1e5f,py1/1e5f}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
-                        double e1=spotValue1.getValue();
-                        double d1=Math.sqrt(Math.pow(pointX-px1,2)+Math.pow(pointY-py1,2));
-                        spotValue1=(visad.Real) demFieldMeters.evaluate(new visad.RealTuple(domainXLYL, new double[] {px2/1e5f,py2/1e5f}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
-                        double e2=spotValue1.getValue();
-                        double d2=Math.sqrt(Math.pow(pointX-px2,2)+Math.pow(pointY-py2,2));
-                        spotValue1=(visad.Real) demFieldMeters.evaluate(new visad.RealTuple(domainXLYL, new double[] {px3/1e5f,py3/1e5f}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
-                        double e3=spotValue1.getValue();
-                        double d3=Math.sqrt(Math.pow(pointX-px1,2)+Math.pow(pointY-py1,2));
-                        
-                        float diffElev=(float)((e1*d1+e2*d2+e3*d3)/(d1+d2+d3)-e0);
-                        
-                        if(Math.abs(diffElev) > maxVal) {
-                            maxIndex=potentialCandidates.size();
-                            maxVal=Math.abs(diffElev);
+            //System.out.println("Walk through algorithm.");
+            long startQ = System.currentTimeMillis();
+            for (int i = 0; i < delaun.Tri.length; i+=(int)(Math.random()*10)) {
+
+                int px1=(int)(1e5*samples[0][delaun.Tri[i][0]]);
+                int px2=(int)(1e5*samples[0][delaun.Tri[i][1]]);
+                int px3=(int)(1e5*samples[0][delaun.Tri[i][2]]);
+
+                int py1=(int)(1e5*samples[1][delaun.Tri[i][0]]);
+                int py2=(int)(1e5*samples[1][delaun.Tri[i][1]]);
+                int py3=(int)(1e5*samples[1][delaun.Tri[i][2]]);
+
+
+                java.awt.Polygon myTri=
+                        new java.awt.Polygon(
+                            new int[] {px1,px2,px3}, 
+                            new int[] {py1,py2,py3},
+                            3);
+
+                java.awt.Rectangle myBounds=myTri.getBounds();
+
+                System.out.println("Now working on Triangle "+i+" with bounds "+myBounds.x+" "+(myBounds.x+myBounds.width) + " "+myBounds.y+" "+(myBounds.y+myBounds.height));
+                System.out.println(" Coordinates X "+px1+" "+px2+" "+px3);
+                System.out.println(" Coordinates Y "+py1+" "+py2+" "+py3);
+
+                java.util.Vector potentialCandidates=new java.util.Vector();
+                int maxIndex=-9999;
+                float maxVal=-1.0f;
+
+                for(int j=0;j<samplesO[0].length;j++){
+
+                    int pointX=(int)(1e5*samplesO[0][j]);
+                    int pointY=(int)(1e5*samplesO[1][j]);
+
+                    if(samplesO[3][j] == 1 && pointX > myBounds.x && pointX < myBounds.x+myBounds.width && pointY > myBounds.y && pointY < myBounds.y+myBounds.height){
+                        if(myTri.contains(pointX,pointY)) {
+
+                            visad.Real spotValue1;
+                            spotValue1=(visad.Real) demFieldMeters.evaluate(new visad.RealTuple(domainXLYL, new double[] {pointX/1e5f,pointY/1e5f}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
+                            double e0=spotValue1.getValue();
+                            spotValue1=(visad.Real) demFieldMeters.evaluate(new visad.RealTuple(domainXLYL, new double[] {px1/1e5f,py1/1e5f}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
+                            double e1=spotValue1.getValue();
+                            double d1=Math.sqrt(Math.pow(pointX-px1,2)+Math.pow(pointY-py1,2));
+                            spotValue1=(visad.Real) demFieldMeters.evaluate(new visad.RealTuple(domainXLYL, new double[] {px2/1e5f,py2/1e5f}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
+                            double e2=spotValue1.getValue();
+                            double d2=Math.sqrt(Math.pow(pointX-px2,2)+Math.pow(pointY-py2,2));
+                            spotValue1=(visad.Real) demFieldMeters.evaluate(new visad.RealTuple(domainXLYL, new double[] {px3/1e5f,py3/1e5f}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
+                            double e3=spotValue1.getValue();
+                            double d3=Math.sqrt(Math.pow(pointX-px1,2)+Math.pow(pointY-py1,2));
+
+                            float diffElev=(float)((e1*d1+e2*d2+e3*d3)/(d1+d2+d3)-e0);
+
+                            if(Math.abs(diffElev) > maxVal) {
+                                maxIndex=potentialCandidates.size();
+                                maxVal=Math.abs(diffElev);
+                            }
+
+                            int indexToGet=(int)samplesO[2][j];
+                            potentialCandidates.add(new float[] {pointX/1e5f,pointY/1e5f,indexToGet,diffElev,j});
                         }
+                    }
+
+                }
+
+                if(potentialCandidates.size() > 0){
+//                    System.out.println(maxIndex+" "+maxVal);
+                    maxZr=Math.max(maxVal,maxZr);
+//                    for (int j = 0; j < potentialCandidates.size(); j++) {
+//                        System.out.println(java.util.Arrays.toString((float[])potentialCandidates.get(j))+" Zr "+Zr);
+//                    }
+                    if(Zr != -9999 && maxVal > Zr){
+                        float[] infoPoint=(float[])potentialCandidates.get(maxIndex);
+                        int indexToGet=(int)infoPoint[2];
+                        filteredPointsInTriangulation.add(pointsInTriangulation.get(indexToGet));
+                        filteredTypeOfPoint.add(typeOfPoint.get(indexToGet));
+                        filteredElevationOfPoint.add(elevationOfPoint.get(indexToGet));
                         
-                        int indexToGet=(int)samplesO[2][j];
-                        potentialCandidates.add(new float[] {pointX/1e5f,pointY/1e5f,indexToGet,diffElev});
+                        samplesO[3][(int)infoPoint[4]]=0;
+                        pointsPreserved++;
 
                     }
                 }
-                    
-            }
-            
-            if(potentialCandidates.size() > 0){
-                System.out.println(maxIndex+" "+maxVal);
-                maxZr=Math.max(maxVal,maxZr);
-                for (int j = 0; j < potentialCandidates.size(); j++) {
-                    System.out.println(java.util.Arrays.toString((float[])potentialCandidates.get(j))+" Zr "+Zr);
-                }
-                if(Zr != -9999 && maxVal > Zr){
-                    float[] infoPoint=(float[])potentialCandidates.get(maxIndex);
-                    int indexToGet=(int)infoPoint[2];
-                    filteredPointsInTriangulation.add(pointsInTriangulation.get(indexToGet));
-                    filteredTypeOfPoint.add(typeOfPoint.get(indexToGet));
-                    filteredElevationOfPoint.add(elevationOfPoint.get(indexToGet));
-                }
-            }
-            
-//            filteredPointsInTriangulation.add(pointsInTriangulation.get(indexToGet));
-//            filteredTypeOfPoint.add(typeOfPoint.get(indexToGet));
-//            filteredElevationOfPoint.add(elevationOfPoint.get(indexToGet));
 
-            System.out.println("Done with Triangle "+i);
+    //            filteredPointsInTriangulation.add(pointsInTriangulation.get(indexToGet));
+    //            filteredTypeOfPoint.add(typeOfPoint.get(indexToGet));
+    //            filteredElevationOfPoint.add(elevationOfPoint.get(indexToGet));
+
+//                System.out.println("Done with Triangle "+i);
+            }
+            long endQ = System.currentTimeMillis();
+            float timeQ = (endQ - startQ) / 1000f;
+            System.out.println("Going through took " + timeQ + " seconds.");
+
+            System.out.println("Percentage of points preserved is: "+100*pointsPreserved/(double)numPointsBasin+" %");
         }
-        long endQ = System.currentTimeMillis();
-        float timeQ = (endQ - startQ) / 1000f;
-        System.out.println("Going through took " + timeQ + " seconds.");
-        
-        System.out.println("Percentage of points preserved is: "+100*pointsPreserved/(double)numPointsBasin+" %");
         
         //Third: Create arrays for triangulation step
         

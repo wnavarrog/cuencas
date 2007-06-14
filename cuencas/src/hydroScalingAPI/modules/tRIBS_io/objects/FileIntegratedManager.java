@@ -28,7 +28,6 @@ public class FileIntegratedManager {
         ic.start();
         availableIntegrated.put("Initial Condition",ic);
         FileIntegrated fs=new FileIntegrated(pInt[1],nv);
-        fs.start();
         availableIntegrated.put("Final State",fs);
     }
     
@@ -67,7 +66,7 @@ class FileIntegrated extends Thread{
         numVoi=nv;
     }
     
-    public void run(){
+    private void loadFile(){
         try {
             
             java.io.BufferedReader fileInteg = new java.io.BufferedReader(new java.io.FileReader(pathToIntegrated));
@@ -105,7 +104,9 @@ class FileIntegrated extends Thread{
     }
     
     public float[] getValues(int varIndex){
-        if(!fullyLoaded) return null;
+        if(!fullyLoaded){
+            loadFile();
+        }
         return integData[varIndex];
     }
     
