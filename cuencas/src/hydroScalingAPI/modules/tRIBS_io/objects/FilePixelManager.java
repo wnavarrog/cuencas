@@ -100,8 +100,9 @@ class FilePixel extends Thread{
                 fileQout.close();
                 fileQout = new java.io.BufferedReader(new java.io.FileReader(pathToP));
             }
-            System.out.println(countTimes);
+            countTimes--;
             QhData=new double[49][countTimes];
+            fullLine=fileQout.readLine();
             
             for (int i = 0; i < countTimes; i++) {
                 fullLine=fileQout.readLine();

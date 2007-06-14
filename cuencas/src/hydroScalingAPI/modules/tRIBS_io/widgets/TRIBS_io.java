@@ -7,6 +7,7 @@
 package hydroScalingAPI.modules.tRIBS_io.widgets;
 
 
+import hydroScalingAPI.subGUIs.widgets.HydroClimateViewer2D;
 import java.io.IOException;
 import visad.*;
 import visad.java3d.DisplayImplJ3D;
@@ -136,11 +137,11 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         PpanelRTF = 
                 new hydroScalingAPI.util.plot.XYJPanel( "Runoff Mechanism Response", "Simulation time [h]" , "Runoff [m^3/s]");
         PpanelQOUT = 
-                new hydroScalingAPI.util.plot.XYJPanel( "Hydrographs", "Simulation time [h]" , "Discharge [m^3/s] / Stage [m]");
+                new hydroScalingAPI.util.plot.XYJPanel( "Stream Discharge and Stage", "Simulation time [h]" , "Discharge [m^3/s] / Stage [m]");
         PpanelMRF = 
                 new hydroScalingAPI.util.plot.XYJPanel( "Basin-Averaged Response", "Simulation time [h]" , "Value");
         PpanelPixel = 
-                new hydroScalingAPI.util.plot.XYJPanel( "Local Response", "Simulation time [h]" , "Value");
+                new hydroScalingAPI.util.plot.XYJPanel( "Voronoi Node Temporal Response", "Simulation time [h]" , "Value");
         
         rftPanel.add("Center",PpanelRTF);
         qoutPanel.add("Center",PpanelQOUT);
@@ -176,9 +177,9 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         dispGMC.setScaleEnable(true);
         
         eastMap_O = new ScalarMap( xEasting , Display.XAxis );
-        eastMap_O.setScalarName("East Coordinate");
+        eastMap_O.setScalarName("East Coordinate [meters]");
         northMap_O = new ScalarMap( yNorthing , Display.YAxis );
-        northMap_O.setScalarName("North Coordinate");
+        northMap_O.setScalarName("North Coordinate [meters]");
         pointsMap_O=new ScalarMap( nodeColor , Display.RGB );
         pointsMap_O.setRange(0,4);
         voiColorMap_O=new ScalarMap( voiColor , Display.RGB );
@@ -200,6 +201,9 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
     
     private void initializeInputTabs() throws RemoteException, VisADException, java.io.IOException {
         
+        drI.setBackgroundColor(1,1,1);
+        drI.setForegroundColor(0,0,0);
+        
         ProjectionControl pc = display_TIN_I.getProjectionControl();
         pc.setAspectCartesian(basTIN_I.getAspect());        
         
@@ -211,14 +215,17 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         display_TIN_I.addReference( data_refPoints_I,pointsCMap_I );
         
         data_refTr_I = new DataReferenceImpl("data_ref_TRIANG");
-        trianglesCMap_I = new ConstantMap[] {new ConstantMap( 0.50f, Display.LineWidth)};
+        trianglesCMap_I = new ConstantMap[] {   new ConstantMap( 0.0f, Display.Red),
+                                                new ConstantMap( 1.0f, Display.Green),
+                                                new ConstantMap( 0.2f, Display.Blue),
+                                                new ConstantMap( 0.50f, Display.LineWidth)};
 
         display_TIN_I.addReference( data_refTr_I,trianglesCMap_I );
         
         data_refPoly_I = new DataReferenceImpl("data_ref_poly");
-        polygonsCMap_I = new ConstantMap[] {    new ConstantMap( 1.0f, Display.Red),
+        polygonsCMap_I = new ConstantMap[] {    new ConstantMap( 0.0f, Display.Red),
                                                 new ConstantMap( 0.0f, Display.Green),
-                                                new ConstantMap( 1.0f, Display.Blue),
+                                                new ConstantMap( 0.0f, Display.Blue),
                                                 new ConstantMap( 1.50f, Display.LineWidth)};
 
         display_TIN_I.addReference( data_refPoly_I,polygonsCMap_I );
@@ -236,6 +243,9 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
     
     private void initializeOutputTabs() throws RemoteException, VisADException, java.io.IOException {
         
+        drO.setBackgroundColor(1,1,1);
+        drO.setForegroundColor(0,0,0);
+        
         ProjectionControl pc = display_TIN_Os.getProjectionControl();
         pc.setAspectCartesian(basTIN_O.getAspect());
         
@@ -246,14 +256,17 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         
         data_refTr_O = new DataReferenceImpl("data_ref_TRIANG");
         data_refTr_O.setData(basTIN_O.getTrianglesUnionSet());
-        trianglesCMap_O = new ConstantMap[] {new ConstantMap( 0.50f, Display.LineWidth)};
+        trianglesCMap_O = new ConstantMap[] {   new ConstantMap( 0.0f, Display.Red),
+                                                new ConstantMap( 1.0f, Display.Green),
+                                                new ConstantMap( 0.2f, Display.Blue),
+                                                new ConstantMap( 0.50f, Display.LineWidth)};
         display_TIN_Os.addReference( data_refTr_O,trianglesCMap_O );
         
         data_refPoly_O = new DataReferenceImpl("data_ref_poly");
         data_refPoly_O.setData(basTIN_O.getPolygonsUnionSet());
-        polygonsCMap_O = new ConstantMap[] {    new ConstantMap( 1.0f, Display.Red),
+        polygonsCMap_O = new ConstantMap[] {    new ConstantMap( 0.0f, Display.Red),
                                                 new ConstantMap( 0.0f, Display.Green),
-                                                new ConstantMap( 1.0f, Display.Blue),
+                                                new ConstantMap( 0.0f, Display.Blue),
                                                 new ConstantMap( 1.50f, Display.LineWidth)};
         display_TIN_Os.addReference( data_refPoly_O,polygonsCMap_O );
         
@@ -705,6 +718,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         jPanel62 = new javax.swing.JPanel();
         jLabel323 = new javax.swing.JLabel();
         valueLabel = new javax.swing.JLabel();
+        colorTableButton = new javax.swing.JButton();
         jPanel18 = new javax.swing.JPanel();
         changePath = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
@@ -1284,7 +1298,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
 
         jPanel30.add(pixelPanel);
 
-        panelOutputs.addTab("Local Output", jPanel30);
+        panelOutputs.addTab("Voronoi Node Output", jPanel30);
 
         jPanel11.add(panelOutputs, java.awt.BorderLayout.CENTER);
 
@@ -1294,7 +1308,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
 
         jPanel15.setLayout(new java.awt.GridLayout(3, 1, 0, 3));
 
-        jPanel28.setLayout(new java.awt.GridLayout(1, 3));
+        jPanel28.setLayout(new java.awt.GridLayout(1, 4));
 
         jPanel61.setLayout(new java.awt.BorderLayout());
 
@@ -1331,6 +1345,16 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         jPanel62.add(valueLabel, java.awt.BorderLayout.CENTER);
 
         jPanel28.add(jPanel62);
+
+        colorTableButton.setFont(new java.awt.Font("Lucida Grande", 0, 10));
+        colorTableButton.setText("Color Table");
+        colorTableButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                colorTableButtonActionPerformed(evt);
+            }
+        });
+
+        jPanel28.add(colorTableButton);
 
         jPanel15.add(jPanel28);
 
@@ -1370,6 +1394,10 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void colorTableButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_colorTableButtonActionPerformed
+        new hydroScalingAPI.modules.tRIBS_io.widgets.ColorTableTribs(this,voiColorMap_O).setVisible(true);
+    }//GEN-LAST:event_colorTableButtonActionPerformed
 
     private void ridgeLevelComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ridgeLevelComboActionPerformed
         try {
@@ -1818,6 +1846,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
     private javax.swing.JComboBox avaVariablesCombo;
     private javax.swing.JTextField baseNameTextField;
     private javax.swing.JButton changePath;
+    private javax.swing.JButton colorTableButton;
     private javax.swing.JCheckBox dischBox;
     private javax.swing.JButton exportPoiButton;
     private javax.swing.JButton exportTriButton;
