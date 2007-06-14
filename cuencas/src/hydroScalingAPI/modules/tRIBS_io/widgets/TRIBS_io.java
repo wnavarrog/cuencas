@@ -1108,7 +1108,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
 
         qoutPanel.setLayout(new java.awt.BorderLayout());
 
-        jPanel23.setLayout(new java.awt.GridLayout(6, 0));
+        jPanel23.setLayout(new java.awt.GridLayout(8, 0));
 
         jLabel5.setFont(new java.awt.Font("Lucida Grande", 0, 10));
         jLabel5.setText("Discharge Time Series (*.qout)");
