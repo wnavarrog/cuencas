@@ -62,6 +62,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
     private hydroScalingAPI.modules.tRIBS_io.objects.FileRftManager frftm;
     
     private boolean firstPass=true;
+    private int lastSelectedTab=0;
     
     /**
      * Creates new form TRIBS_io
@@ -104,7 +105,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         frftm=new hydroScalingAPI.modules.tRIBS_io.objects.FileRftManager(findRFT(outputsDirectory),fqm.getMaxTime());
         System.out.println(">>Loading Pixel Files");
         java.io.File[] listOfPixelFiles=findPixel(outputsDirectory);
-        if(listOfPixelFiles.length > 0) fpm=new hydroScalingAPI.modules.tRIBS_io.objects.FilePixelManager(listOfPixelFiles);
+        if(listOfPixelFiles != null && listOfPixelFiles.length > 0) fpm=new hydroScalingAPI.modules.tRIBS_io.objects.FilePixelManager(listOfPixelFiles);
         System.out.println(">>Loading Integrated Files");
         fim=new hydroScalingAPI.modules.tRIBS_io.objects.FileIntegratedManager(findIntegratedOutput(outputsDirectory),basTIN_O.getNumVoi());
         System.out.println(">>Loading Dynamic Files");
@@ -1561,7 +1562,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
     }//GEN-LAST:event_jRadioButton1ActionPerformed
 
     private void panelOutputsStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_panelOutputsStateChanged
-      if ( panelOutputs.getSelectedIndex()==2) {
+      if ( panelOutputs.getSelectedIndex()==2 && lastSelectedTab != 2) {
           jPanel26.add("Center",display_TIN_Os.getComponent());
           jPanel26.add("South",jPanel22);
           if(spaceParamsCombo.getSelectedIndex() == 0) {
@@ -1573,11 +1574,12 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
                     ex.printStackTrace();
                 }
           } else{
-            paintParametersVoronoiPolygons(ListOfVariables.spatialVarSource[spaceParamsCombo.getSelectedIndex()]);
+                paintParametersVoronoiPolygons(ListOfVariables.spatialVarSource[spaceParamsCombo.getSelectedIndex()]);
           }
+          lastSelectedTab=2;
       }
 
-      if ( panelOutputs.getSelectedIndex()==3) {
+      if ( panelOutputs.getSelectedIndex()==3 && lastSelectedTab != 3) {
           jPanel17.add("Center",display_TIN_Os.getComponent());
           jPanel17.add("South",jPanel22);
           if(avaTimesCombo.getSelectedIndex() == 0) {
@@ -1595,6 +1597,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
                   paintParametersVoronoiPolygons(2000+avaVariablesCombo.getSelectedIndex()+3,avaTimesCombo.getSelectedItem());
               }
           }
+          lastSelectedTab=3;
       }
     }//GEN-LAST:event_panelOutputsStateChanged
 
@@ -1810,28 +1813,28 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
      */
     public static void main(String args[]) {
         try{
-            java.io.File theFile=new java.io.File("/hidrosigDataBases/Smallbasin_DB/Rasters/Topography/1_Arcsec/NED_06075640.metaDEM");
+            //java.io.File theFile=new java.io.File("/hidrosigDataBases/Smallbasin_DB/Rasters/Topography/1_Arcsec/NED_06075640.metaDEM");
             //java.io.File theFile=new java.io.File("/hidrosigDataBases/Gila River DB/Rasters/Topography/1_ArcSec/mogollon.metaDEM");
-            hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster (theFile);
-            metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".dir"));
-            
-            String formatoOriginal=metaModif.getFormat();
-            metaModif.setFormat("Byte");
-            byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
-            
-            metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".magn"));
-            metaModif.setFormat("Integer");
-            int [][] magnitudes=new hydroScalingAPI.io.DataRaster(metaModif).getInt();
+//            hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster (theFile);
+//            metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".dir"));
+//            
+//            String formatoOriginal=metaModif.getFormat();
+//            metaModif.setFormat("Byte");
+//            byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
+//            
+//            metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".magn"));
+//            metaModif.setFormat("Integer");
+//            int [][] magnitudes=new hydroScalingAPI.io.DataRaster(metaModif).getInt();
             
             hydroScalingAPI.mainGUI.ParentGUI tempFrame=new hydroScalingAPI.mainGUI.ParentGUI();
             
-            new TRIBS_io(tempFrame, 56,79,matDirs,magnitudes,metaModif).setVisible(true);
+            //new TRIBS_io(tempFrame, 56,79,matDirs,magnitudes,metaModif).setVisible(true);
             //new TRIBS_io(tempFrame, 282,298 ,matDirs,magnitudes,metaModif).setVisible(true);
             
             ///home/ricardo/workFiles/tribsWork/sampleTribs/SMALLBASIN/Output/"),"smallbasin"
             ///home/ricardo/simulationResults/SMALLBASIN/Output_Base/"),"smallbasin"
             ///home/ricardo/simulationResults/Output_Mar23a_07/"),"urp"
-            //new TRIBS_io(tempFrame, new java.io.File("/home/ricardo/workFiles/tribsWork/sampleTribs/SMALLBASIN/Output/"),"smallbasin").setVisible(true);
+            new TRIBS_io(tempFrame, new java.io.File("z:/workFiles/tribsWork/sampleTribs/SMALLBASIN/Output/"),"smallbasin").setVisible(true);
         } catch (java.io.IOException IOE){
             System.out.print(IOE);
             System.exit(0);

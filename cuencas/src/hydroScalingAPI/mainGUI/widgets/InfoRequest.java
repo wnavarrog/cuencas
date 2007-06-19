@@ -41,7 +41,9 @@ public class InfoRequest extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc=" Generated Code ">//GEN-BEGIN:initComponents
     private void initComponents() {
         nameTextField = new javax.swing.JTextField();
+        jPanel1 = new javax.swing.JPanel();
         applyChange = new javax.swing.JButton();
+        cancel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Base Name");
@@ -55,6 +57,8 @@ public class InfoRequest extends javax.swing.JDialog {
 
         getContentPane().add(nameTextField, java.awt.BorderLayout.CENTER);
 
+        jPanel1.setLayout(new java.awt.GridLayout());
+
         applyChange.setFont(new java.awt.Font("Lucida Grande", 0, 10));
         applyChange.setText("Set");
         applyChange.addActionListener(new java.awt.event.ActionListener() {
@@ -63,10 +67,27 @@ public class InfoRequest extends javax.swing.JDialog {
             }
         });
 
-        getContentPane().add(applyChange, java.awt.BorderLayout.EAST);
+        jPanel1.add(applyChange);
+
+        cancel.setFont(new java.awt.Font("Lucida Grande", 0, 10));
+        cancel.setText("Cancel");
+        cancel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cancelActionPerformed(evt);
+            }
+        });
+
+        jPanel1.add(cancel);
+
+        getContentPane().add(jPanel1, java.awt.BorderLayout.EAST);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void cancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelActionPerformed
+        nameTextField.setText("");
+        setVisible(false);
+    }//GEN-LAST:event_cancelActionPerformed
 
     private void nameTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nameTextFieldActionPerformed
         setVisible(false);
@@ -78,6 +99,8 @@ public class InfoRequest extends javax.swing.JDialog {
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton applyChange;
+    private javax.swing.JButton cancel;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JTextField nameTextField;
     // End of variables declaration//GEN-END:variables
     

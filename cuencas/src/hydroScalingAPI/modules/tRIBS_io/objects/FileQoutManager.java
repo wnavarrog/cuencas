@@ -57,7 +57,6 @@ public class FileQoutManager {
         int[] indexes=new int[keys.length];
         for (int i = 0; i < indexes.length-1; i++) {
             String key=keys[i].toString();
-            System.out.println(key);
             indexes[i]=Integer.parseInt(key);
         }
         return indexes;
@@ -69,7 +68,7 @@ public class FileQoutManager {
     public static void main(String[] args) {
         java.io.File[] files = {new java.io.File("/home/ricardo/workFiles/tribsWork/sampleTribs/SMALLBASIN/Output/hyd/smallbasin_Outlet.qout"),
                                 new java.io.File("/home/ricardo/workFiles/tribsWork/sampleTribs/SMALLBASIN/Output/hyd/smallbasin_5549.qout"),
-                                new java.io.File("/home/ricardo/workFiles/tribsWork/sampleTribs/SMALLBASIN/Output/hyd/smallbasin_5637.qout")};
+                                new java.io.File("/home/ricardo/wo2rkFiles/tribsWork/sampleTribs/SMALLBASIN/Output/hyd/smallbasin_5637.qout")};
         new FileQoutManager(files);
     }
     

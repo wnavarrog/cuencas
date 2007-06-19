@@ -1401,10 +1401,12 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         
         hydroScalingAPI.mainGUI.widgets.InfoRequest ir=new hydroScalingAPI.mainGUI.widgets.InfoRequest(this);
         ir.setVisible(true);
+        
+        if(ir.getBaseName().equalsIgnoreCase("")) return;
+        
         System.out.println(fc.getSelectedFile().getPath());
         System.out.println(ir.getBaseName());
         try {
-            
             new hydroScalingAPI.modules.tRIBS_io.widgets.TRIBS_io(this,fc.getSelectedFile(),ir.getBaseName()).setVisible(true);
         } catch (RemoteException ex) {
             ex.printStackTrace();
