@@ -96,7 +96,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         pathTextField.setText(outputsDirectory.getPath());
         baseNameTextField.setText(baseName);
         System.out.println(">>Loading TIN");
-        basTIN_O=new hydroScalingAPI.modules.tRIBS_io.objects.BasinTIN(findTriEdgNodes(outputsDirectory),baseName);
+        basTIN_O=new hydroScalingAPI.modules.tRIBS_io.objects.BasinTIN(parent,findTriEdgNodes(outputsDirectory),baseName);
         System.out.println(">>Loading Qouts");
         fqm=new hydroScalingAPI.modules.tRIBS_io.objects.FileQoutManager(findQouts(outputsDirectory));
         System.out.println(">>Loading MRF");
@@ -535,12 +535,6 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         java.io.File outputsDirectory=findTriEdgNodes(new java.io.File(pathTextField.getText()));
         String baseName=baseNameTextField.getText();
         
-        basTIN_O=new hydroScalingAPI.modules.tRIBS_io.objects.BasinTIN(outputsDirectory,baseName);
-        
-        ProjectionControl pc = display_TIN_Os.getProjectionControl();
-        pc.setAspectCartesian(basTIN_O.getAspect());        
-        initializeOutputTabs();
-            
     }
     
     private void plotPoints(float Zr) throws RemoteException, VisADException{
@@ -595,9 +589,11 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
                 
                 longitudeLabel.setText(""+resultX);
                 latitudeLabel.setText(""+resultY);
-                visad.Real spotValue=(visad.Real) basTIN_O.getValuesFlatField().evaluate(new visad.RealTuple(domainXLYL, new double[] {resultX,resultY}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
+                if(basTIN_O.getValuesFlatField() != null) {
+                    visad.Real spotValue=(visad.Real) basTIN_O.getValuesFlatField().evaluate(new visad.RealTuple(domainXLYL, new double[] {resultX,resultY}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
+                    valueLabel.setText(""+spotValue);
+                }
                 
-                valueLabel.setText(""+spotValue);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -613,9 +609,11 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
                 
                 longitudeLabel.setText(""+resultX);
                 latitudeLabel.setText(""+resultY);
-                visad.Real spotValue=(visad.Real) basTIN_O.getValuesFlatField().evaluate(new visad.RealTuple(domainXLYL, new double[] {resultX,resultY}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
+                if(basTIN_O.getValuesFlatField() != null) {
+                    visad.Real spotValue=(visad.Real) basTIN_O.getValuesFlatField().evaluate(new visad.RealTuple(domainXLYL, new double[] {resultX,resultY}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
+                    valueLabel.setText(""+spotValue);
+                }
                 
-                valueLabel.setText(""+spotValue);
                 
             }
             

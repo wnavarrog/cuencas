@@ -342,7 +342,7 @@ public class BasinTIN {
     }
     
     /** Creates a new instance of BasinTIN */
-    public BasinTIN(java.io.File pathToTriang, String baseName) throws RemoteException, VisADException, java.io.IOException{
+    public BasinTIN(hydroScalingAPI.mainGUI.ParentGUI mainFrame, java.io.File pathToTriang, String baseName) throws RemoteException, VisADException, java.io.IOException{
         
         //Getting data
         
@@ -461,6 +461,8 @@ public class BasinTIN {
 
         lines=new float[2][];
         double[][] newLines=new double[2][];
+        
+        String polygonsIntrouble="";
 
         for(int j=0;j<countNoBorder;j++){
             nodesPerPolygon[j]=voroPolys[j].size();
@@ -476,10 +478,15 @@ public class BasinTIN {
             lines[1][nodesPerPolygon[j]-1]=lines[1][0];
 
             polygons[j]=new Gridded2DSet(domainXLYL,lines,lines[0].length);
+            try {
+                
+                regions[j] = DelaunayCustom.fill(polygons[j]);
+                        
+            } catch (VisADException ex) {
+                polygonsIntrouble+=j+"\n";
+                break;
+            }
             
-            regions[j] = DelaunayCustom.fill(polygons[j]);
-            
-            System.out.println("OK for "+j);
             
             nodesPerPolygon[j]=regions[j].getLength();
             totalPolygonNodes+=nodesPerPolygon[j];
@@ -487,11 +494,15 @@ public class BasinTIN {
             
         }
 
-        allPoly=new UnionSet(domainXLYL,polygons);
-        
-        UnionSet allRegions=new UnionSet(domainXLYL,regions);
+        if(!polygonsIntrouble.equalsIgnoreCase("")){
+                Object[] options = { "OK"};
+                javax.swing.JOptionPane.showOptionDialog(mainFrame, "The following nodes have problems: \n"+polygonsIntrouble+"Please modify your *_voi file to correct self intersecting paths\nDo not attempt to display any spatial field", "Atention", javax.swing.JOptionPane.DEFAULT_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE,null, options, options[0]);
+        }else{
+            allPoly=new UnionSet(domainXLYL,polygons);
+            UnionSet allRegions=new UnionSet(domainXLYL,regions);
+            theColors=new FlatField(func_xEasting_yNorthing_to_Color,allRegions);
+        }
 
-        theColors=new FlatField(func_xEasting_yNorthing_to_Color,allRegions);
         
     }
     
