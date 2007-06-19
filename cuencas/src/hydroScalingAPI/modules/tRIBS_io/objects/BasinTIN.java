@@ -57,7 +57,7 @@ public class BasinTIN {
     private int numPointsBasin=0;
     private int countNoBorder;
     
-    private visad.FlatField demField,theColors,demFieldMeters;
+    private visad.FlatField demField,theColors;
     private int[] nodesPerPolygon;
     private int totalPolygonNodes;
     
@@ -169,7 +169,7 @@ public class BasinTIN {
                         locElev=(3*currentElev+forwardElev)/4.0;
 
                         pointsInTriangulation.add(new Gdc_Coord_3d(nLatP,nLonP,locElev));
-                        typeOfPoint.add(new int[] {0});
+                        typeOfPoint.add(new int[] {5});
                         elevationOfPoint.add(locElev);
                     } 
                     
@@ -209,7 +209,7 @@ public class BasinTIN {
                         locElev=spotValue.getValues()[0];
 
                         pointsInTriangulation.add(new Gdc_Coord_3d(nLatP,nLonP,locElev));
-                        typeOfPoint.add(new int[] {0});
+                        typeOfPoint.add(new int[] {5});
                         elevationOfPoint.add(locElev);
 
                         nLatP=latP+(2*delta_yP+bfs*delta_xP)*adjustFactorLat/4.0;
@@ -220,7 +220,7 @@ public class BasinTIN {
                         locElev=spotValue.getValues()[0];
 
                         pointsInTriangulation.add(new Gdc_Coord_3d(nLatP,nLonP,locElev));
-                        typeOfPoint.add(new int[] {0});
+                        typeOfPoint.add(new int[] {5});
                         elevationOfPoint.add(locElev);
 
                     //A new point three quarters of the way forward
@@ -248,7 +248,7 @@ public class BasinTIN {
                             locElev=spotValue.getValues()[0];
 
                             pointsInTriangulation.add(new Gdc_Coord_3d(nLatP,nLonP,locElev));
-                            typeOfPoint.add(new int[] {0});
+                            typeOfPoint.add(new int[] {5});
                             elevationOfPoint.add(locElev);
                         }
 
@@ -261,7 +261,7 @@ public class BasinTIN {
                             locElev=spotValue.getValues()[0];
 
                             pointsInTriangulation.add(new Gdc_Coord_3d(nLatP,nLonP,locElev));
-                            typeOfPoint.add(new int[] {0});
+                            typeOfPoint.add(new int[] {5});
                             elevationOfPoint.add(locElev);
                         }
                     
@@ -284,7 +284,7 @@ public class BasinTIN {
         }
         int lastElemIndex=typeOfPoint.size()-2;
         typeOfPoint.setElementAt(new int[] {2},lastElemIndex);
-        System.out.println(elevationOfPoint.get(lastElemIndex));
+        System.out.println("Done Creating points grid");
         
         int numPoints=pointsInTriangulation.size();
         Gdc_Coord_3d[] gdc=new Gdc_Coord_3d[numPoints];
@@ -298,6 +298,8 @@ public class BasinTIN {
         Gdc_To_Utm_Converter.Init(new WE_Ellipsoid());
         Gdc_To_Utm_Converter.Convert(gdc,utm);
         
+        System.out.println("Done Tranforming coordinates");
+
         minX=Double.MAX_VALUE;
         minY=Double.MAX_VALUE;
         for (int i = 0; i < numPoints; i++) {
@@ -318,6 +320,8 @@ public class BasinTIN {
             elevPoints[0][i]=((Double)elevationOfPoint.get(i)).floatValue();
         }
         
+        System.out.println("Done Creating Vector pointsInTriangulation");
+
         float[][] pointIndex=new float[1][pointProps[1].length];
         for(int i=0;i<pointProps[0].length;i++){
             pointIndex[0][i]=(float)i;//xyLinkValues[0][i];
@@ -328,15 +332,8 @@ public class BasinTIN {
         vals_ff_Li = new FlatField( func_Inex_to_xEasting_yNorthing_Color, xVarIndex);
         vals_ff_Li.setSamples( pointProps );
         
-        float[][] xyPosits=new float[2][];
-        xyPosits[0]=pointProps[0];
-        xyPosits[1]=pointProps[1];
-        
-        
-        Irregular2DSet xyPosiMet=new Irregular2DSet(domainXLYL,xyPosits);
-        demFieldMeters=new FlatField( func_xEasting_yNorthing_to_Color, xyPosiMet);
-        demFieldMeters.setSamples(elevPoints);
-        
+        System.out.println("Done Creating fields");
+
         
         filteredPointsInTriangulation=(java.util.Vector)pointsInTriangulation.clone();
         filteredTypeOfPoint=(java.util.Vector)typeOfPoint.clone();
@@ -508,12 +505,14 @@ public class BasinTIN {
     }
     
     public void filterPoints(int ridges, float Zr) throws RemoteException, VisADException{
-        int[][] xyBasin=myCuenca.getXYBasin();
-        byte[][] basMask=myCuenca.getBasinMask();
         
-        filteredPointsInTriangulation=(java.util.Vector)pointsInTriangulation.clone();
-        filteredTypeOfPoint=(java.util.Vector)typeOfPoint.clone();
-        filteredElevationOfPoint=(java.util.Vector)elevationOfPoint.clone();
+        if(Zr == -9999) maxZr=0.0;
+        
+        int[][] xyBasin=myCuenca.getXYBasin();
+        
+        filteredPointsInTriangulation=new java.util.Vector();//(java.util.Vector)pointsInTriangulation.clone();
+        filteredTypeOfPoint=new java.util.Vector();//(java.util.Vector)typeOfPoint.clone();
+        filteredElevationOfPoint=new java.util.Vector();//(java.util.Vector)elevationOfPoint.clone();
         
         java.util.Vector filteredRidges=new java.util.Vector();
         
@@ -527,15 +526,21 @@ public class BasinTIN {
             int numRidges=0;
             visad.RealTuple spotValue; double locElev;
             
+            int cuencaMinX=myCuenca.getMinX();
+            int cuencaMinY=myCuenca.getMinY();
+            double cuencaResLon=metaDatos.getResLon();
+            double cuencaResLat=metaDatos.getResLat();
+            double cuencaMinLon=metaDatos.getMinLon();
+            double cuencaMinLat=metaDatos.getMinLat();
+            
+            
             for (int i = 0; i < hillSlopesMask.length; i++) {
                 for (int j = 0; j < hillSlopesMask[0].length; j++) {
-                    if(hillSlopesMask[i][j] != 0 && magnitudes[i+myCuenca.getMinY()-1][j+myCuenca.getMinX()-1] <= 0){
+                    if(hillSlopesMask[i][j] != 0 && magnitudes[i+cuencaMinY-1][j+cuencaMinX-1] <= 0){
                         
-                        double myLon=(j+myCuenca.getMinX()-1+0.5)*metaDatos.getResLon()/3600.0+metaDatos.getMinLon();
-                        double myLat=(i+myCuenca.getMinY()-1+0.5)*metaDatos.getResLat()/3600.0+metaDatos.getMinLat();
+                        double myLon=(j+cuencaMinX-1+0.5)*cuencaResLon/3600.0+cuencaMinLon;
+                        double myLat=(i+cuencaMinY-1+0.5)*cuencaResLat/3600.0+cuencaMinLat;
                         
-                        
-                        //System.out.println("Analyzing Hillslopes Mask at x: "+(j+myCuenca.getMinX()-1)+" y: "+(i+myCuenca.getMinY()-1)+" "+myLon+" "+myLat+" "+magnitudes[i+myCuenca.getMinY()-1][j+myCuenca.getMinX()-1]);
                         
                         boolean gotIn=false;
                         float normalizer=0f;
@@ -546,49 +551,18 @@ public class BasinTIN {
                             int ii=i+(k/3)-1;
                             int jj=j+(k%3)-1;
                             
-                            if(hillSlopesMask[ii][jj] == 0){
-                                if(gotIn) numRidges--;
-                                gotIn=false;
-                                break;
-                            }
-                            
-                            //System.out.print("Asking for Hillslopes Mask at x: "+jj+" y: "+ii);
-                        
-                            //if (magnitudes[jj][ii] > 0 || basMask[jj][ii] == 0){
-                            
                             if ((k==1 || k==3 || k==5 || k==7) && hillSlopesMask[ii][jj] != hillSlopesMask[i][j]){
                                 
                                 normalizer++;
                                 pushX+=jj-j;
                                 pushY+=ii-i;
                                 
-                                //System.out.println(" - Got in");
-                                
-//                                double addLon=myLon+0.5*(ii-i)*metaDatos.getResLon()/3600.0;
-//                                double addLat=myLat+0.5*(jj-j)*metaDatos.getResLat()/3600.0;
-//                                
-//                                System.out.println(addLon+" - "+addLat);
-//                                
-//                                spotValue=(visad.RealTuple) demField.evaluate(new visad.RealTuple(domain, new double[] {addLon,addLat}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
-//                
-//                                locElev=spotValue.getValues()[0];
-//                                filteredRidges.add(new Gdc_Coord_3d(addLat,addLon,locElev));
                                 
                                 if(gotIn == false) numRidges++;
                                 gotIn=true;
-                            } else {
-                                //System.out.println();
                             }
                         }
                         if(gotIn){
-                            
-                            pushX/=5*normalizer;
-                            pushY/=5*normalizer;
-                            
-                            if(pushX >= pushY)
-                                myLon+=pushX*metaDatos.getResLon()/3600.0;
-                            else
-                                myLat+=pushY*metaDatos.getResLat()/3600.0;
                             
                             double[] lonLatPair=new double[] {myLon,myLat};
                             
@@ -602,7 +576,7 @@ public class BasinTIN {
                 }
             }
             
-            System.out.println(numRidges);
+            System.out.println(">>> Number of points in ridges: "+numRidges);
             
             Gdc_Coord_3d[] gdc=new Gdc_Coord_3d[numRidges];
             Utm_Coord_3d[] utm=new Utm_Coord_3d[numRidges];
@@ -625,196 +599,197 @@ public class BasinTIN {
         
         //a) Create base triangulation
         
+        System.out.println(">>> Including nodes for initial triangulation");
+        
+        int numPointsT=pointsInTriangulation.size();
         int numPointsO=0;
-        int numPRemoved=0;
-        int pB=0;
-        for(int j=0;j<xyBasin[0].length;j++){
-            if(magnitudes[xyBasin[1][j]][xyBasin[0][j]] <= 0){
-                boolean neigh=false;
-                for (int k=0; k <= 8; k++){
-                    int jj=xyBasin[1][j]+(k/3)-1;
-                    int ii=xyBasin[0][j]+(k%3)-1;
-                    //if (magnitudes[jj][ii] > 0 || basMask[jj][ii] == 0){
-                    if (basMask[jj][ii] == 0){
-                        neigh=true;
-                    }
-                }
-                //if(!neigh && Math.random()*100.0 < Zr){
-                if(!neigh){
-                    numPointsO++;
-                    int pToRemove=(int)(pB-numPRemoved);
-                    filteredPointsInTriangulation.remove(pToRemove);
-                    filteredTypeOfPoint.remove(pToRemove);
-                    filteredElevationOfPoint.remove(pToRemove);
-                    numPRemoved++;
-                }
-                pB++;
-            }
+        
+        for (int i = 0; i < numPointsT; i++) {
+            if(((int[])typeOfPoint.get(i))[0] != 0){
+                filteredPointsInTriangulation.add(pointsInTriangulation.get(i));
+                filteredTypeOfPoint.add(typeOfPoint.get(i));
+                filteredElevationOfPoint.add(elevationOfPoint.get(i));
+            } else numPointsO++;
         }
+            
+        System.out.println(">>> Done adding border and network points");
         
         int iii=0;
-        pB=0;
-        float[][] samplesO=new float[4][numPointsO];
-        for(int j=0;j<xyBasin[0].length;j++){
-            if(magnitudes[xyBasin[1][j]][xyBasin[0][j]] <= 0){
-                boolean neigh=false;
-                for (int k=0; k <= 8; k++){
-                    int jj=xyBasin[1][j]+(k/3)-1;
-                    int ii=xyBasin[0][j]+(k%3)-1;
-                    //if (magnitudes[jj][ii] > 0 || basMask[jj][ii] == 0){
-                    if (basMask[jj][ii] == 0){
-                        neigh=true;
-                    }
-                }
-                //if(!neigh && Math.random()*100.0 < Zr){
-                if(!neigh){
-                    Utm_Coord_3d utmLocal=(Utm_Coord_3d)pointsInTriangulation.get(pB);
-                    samplesO[0][iii]=(float)(utmLocal.x-minX);
-                    samplesO[1][iii]=(float)(utmLocal.y-minY);
-                    samplesO[2][iii]=pB;
-                    samplesO[3][iii]=1;
-                    iii++;
-                }
-                pB++;
+        float[][] samplesO=new float[5][numPointsO];
+        for(int j=0;j<numPointsO;j++){
+            if(((int[])typeOfPoint.get(j))[0] == 0){
+                Utm_Coord_3d utmLocal=(Utm_Coord_3d)pointsInTriangulation.get(j);
+                samplesO[0][iii]=(float)(utmLocal.x-minX);
+                samplesO[1][iii]=(float)(utmLocal.y-minY);
+                samplesO[2][iii]=j;
+                samplesO[3][iii]=1;
+                samplesO[4][iii]=((Double)elevationOfPoint.get(j)).floatValue();
+                iii++;
             }
         }
         
-//        for(int j=0;j<samplesO[0].length;j++){
-//                
-//            int pointX=(int)(1e5*samplesO[0][j]);
-//            int pointY=(int)(1e5*samplesO[1][j]);
-//
-//            int indexToGet=(int)samplesO[2][j];
-//            filteredPointsInTriangulation.add(pointsInTriangulation.get(indexToGet));
-//            filteredTypeOfPoint.add(typeOfPoint.get(indexToGet));
-//            filteredElevationOfPoint.add(elevationOfPoint.get(indexToGet));
-//            System.out.println(">>>> Yes");
-//            
-//
-//        }
+        System.out.println(">>> Created array of interior points with "+numPointsO+" elements");
+
         
         
         //ITERATIVE COMPONENT
         int numPoints;
         float[][] samples;
+        float[] samplesElevs;
         
-        System.out.println(">>>>>"+pointsPreserved);
+        if(maxZr != 0.0){
+
+            pointsPreserved=-1;
         
-        
-        pointsPreserved=-1;
-        
-        while(maxZr == 0.0 || pointsPreserved != 0){
-            
-            pointsPreserved=0;
-            System.out.println(">>>>>"+pointsPreserved);
-        
-            numPoints=filteredPointsInTriangulation.size();
-            samples=new float[2][numPoints];
-            for(int i=0;i<numPoints;i++){
-                Utm_Coord_3d utmLocal=(Utm_Coord_3d)filteredPointsInTriangulation.get(i);
-                samples[0][i]=(float)(utmLocal.x-minX);
-                samples[1][i]=(float)(utmLocal.y-minY);
-            }
+            int passNumber=0;
 
-            System.out.println("Initial DelaunayWatson algorithm.");
-            delaun = (Delaunay) new DelaunayClarkson(samples);
+            System.out.println(">>> Initializing Zr Iterations");
 
-            //System.out.println("Walk through algorithm.");
-            long startQ = System.currentTimeMillis();
-            for (int i = 0; i < delaun.Tri.length; i++) {
+            while(pointsPreserved != 0){
 
-                int px1=(int)(1e5*samples[0][delaun.Tri[i][0]]);
-                int px2=(int)(1e5*samples[0][delaun.Tri[i][1]]);
-                int px3=(int)(1e5*samples[0][delaun.Tri[i][2]]);
+                pointsPreserved=0;
 
-                int py1=(int)(1e5*samples[1][delaun.Tri[i][0]]);
-                int py2=(int)(1e5*samples[1][delaun.Tri[i][1]]);
-                int py3=(int)(1e5*samples[1][delaun.Tri[i][2]]);
+                numPoints=filteredPointsInTriangulation.size();
+                samples=new float[2][numPoints];
+                samplesElevs=new float[numPoints];
+                for(int i=0;i<numPoints;i++){
+                    Utm_Coord_3d utmLocal=(Utm_Coord_3d)filteredPointsInTriangulation.get(i);
+                    samples[0][i]=(float)(utmLocal.x-minX);
+                    samples[1][i]=(float)(utmLocal.y-minY);
+                    samplesElevs[i]=((Double)filteredElevationOfPoint.get(i)).floatValue();
+                }
+
+                long startQ = System.currentTimeMillis();
+
+                System.out.println("DelaunayClarkson algorithm.");
+                delaun = (Delaunay) new DelaunayClarkson(samples);
+
+                double passThreshold=0.03125*Math.exp(0.6931*passNumber);
+
+                System.out.println("Walk through algorithm.");
+                for (int i = 0; i < delaun.Tri.length; i++) {
+
+                    int px1=(int)(1e5*samples[0][delaun.Tri[i][0]]);
+                    int px2=(int)(1e5*samples[0][delaun.Tri[i][1]]);
+                    int px3=(int)(1e5*samples[0][delaun.Tri[i][2]]);
+
+                    int py1=(int)(1e5*samples[1][delaun.Tri[i][0]]);
+                    int py2=(int)(1e5*samples[1][delaun.Tri[i][1]]);
+                    int py3=(int)(1e5*samples[1][delaun.Tri[i][2]]);
+
+                    java.awt.Polygon myTri=
+                            new java.awt.Polygon(
+                                new int[] {px1,px2,px3}, 
+                                new int[] {py1,py2,py3},
+                                3);
+
+                    java.awt.Rectangle myBounds=myTri.getBounds();
+
+    //                System.out.println("Now working on Triangle "+i+" with bounds "+myBounds.x+" "+(myBounds.x+myBounds.width) + " "+myBounds.y+" "+(myBounds.y+myBounds.height));
+    //                System.out.println(" CoordinatesX "+px1+" "+px2+" "+px3);
+    //                System.out.println(" CoordinatesY "+py1+" "+py2+" "+py3);
 
 
-                java.awt.Polygon myTri=
-                        new java.awt.Polygon(
-                            new int[] {px1,px2,px3}, 
-                            new int[] {py1,py2,py3},
-                            3);
+                    int pointX_C=(int)((px1+px2+px3)/3.0);
+                    int pointY_C=(int)((py1+py2+py3)/3.0);
 
-                java.awt.Rectangle myBounds=myTri.getBounds();
+                    double d1_C=Math.sqrt(Math.pow(pointX_C-px1,2)+Math.pow(pointY_C-py1,2));
+                    double d2_C=Math.sqrt(Math.pow(pointX_C-px2,2)+Math.pow(pointY_C-py2,2));
+                    double d3_C=Math.sqrt(Math.pow(pointX_C-px3,2)+Math.pow(pointY_C-py3,2));
 
-//                System.out.println("Now working on Triangle "+i+" with bounds "+myBounds.x+" "+(myBounds.x+myBounds.width) + " "+myBounds.y+" "+(myBounds.y+myBounds.height));
-//                System.out.println(" Coordinates X "+px1+" "+px2+" "+px3);
-//                System.out.println(" Coordinates Y "+py1+" "+py2+" "+py3);
+                    if(d1_C < 3e6 && d2_C < 3e6 && d3_C < 3e6) {
+                        continue;
+                    }
 
-                java.util.Vector potentialCandidates=new java.util.Vector();
-                int maxIndex=-9999;
-                float maxVal=-1.0f;
+                    if(passNumber > 0){
+                        if(Math.random() > passThreshold){
+                            continue;
+                        }
+                    }
 
-                for(int j=0;j<samplesO[0].length;j++){
 
-                    int pointX=(int)(1e5*samplesO[0][j]);
-                    int pointY=(int)(1e5*samplesO[1][j]);
+                    java.util.Vector potentialCandidates=new java.util.Vector();
+                    int maxIndex=-9999;
+                    float maxVal=-1.0f;
 
-                    if(samplesO[3][j] == 1 && pointX > myBounds.x && pointX < myBounds.x+myBounds.width && pointY > myBounds.y && pointY < myBounds.y+myBounds.height){
-                        if(myTri.contains(pointX,pointY)) {
+                    int numPointsAnalyzed=0;
 
-                            visad.Real spotValue1;
-                            spotValue1=(visad.Real) demFieldMeters.evaluate(new visad.RealTuple(domainXLYL, new double[] {pointX/1e5f,pointY/1e5f}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
-                            double e0=spotValue1.getValue();
-                            spotValue1=(visad.Real) demFieldMeters.evaluate(new visad.RealTuple(domainXLYL, new double[] {px1/1e5f,py1/1e5f}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
-                            double e1=spotValue1.getValue();
+                    for(int j=0;j<samplesO[0].length;j+=3){
+
+                        int pointX=(int)(1e5*samplesO[0][j]);
+                        int pointY=(int)(1e5*samplesO[1][j]);
+
+                        if(samplesO[3][j] == 1){
                             double d1=Math.sqrt(Math.pow(pointX-px1,2)+Math.pow(pointY-py1,2));
-                            spotValue1=(visad.Real) demFieldMeters.evaluate(new visad.RealTuple(domainXLYL, new double[] {px2/1e5f,py2/1e5f}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
-                            double e2=spotValue1.getValue();
                             double d2=Math.sqrt(Math.pow(pointX-px2,2)+Math.pow(pointY-py2,2));
-                            spotValue1=(visad.Real) demFieldMeters.evaluate(new visad.RealTuple(domainXLYL, new double[] {px3/1e5f,py3/1e5f}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
-                            double e3=spotValue1.getValue();
-                            double d3=Math.sqrt(Math.pow(pointX-px1,2)+Math.pow(pointY-py1,2));
+                            double d3=Math.sqrt(Math.pow(pointX-px3,2)+Math.pow(pointY-py3,2));
 
-                            float diffElev=(float)((e1*d1+e2*d2+e3*d3)/(d1+d2+d3)-e0);
+                            if(d1 < 1e5 || d2 < 1e5 || d3 < 1e5) samplesO[3][j] = 0;
+                        }
 
-                            if(Math.abs(diffElev) > maxVal) {
-                                maxIndex=potentialCandidates.size();
-                                maxVal=Math.abs(diffElev);
+
+                        if(samplesO[3][j] == 1 && pointX > myBounds.x && pointX < myBounds.x+myBounds.width && pointY > myBounds.y && pointY < myBounds.y+myBounds.height){
+                            if(myTri.contains(pointX,pointY)) {
+
+                                double e0=samplesO[4][j];
+                                double e1=samplesElevs[delaun.Tri[i][0]];
+                                double d1=Math.sqrt(Math.pow(pointX-px1,2)+Math.pow(pointY-py1,2));
+                                double e2=samplesElevs[delaun.Tri[i][1]];
+                                double d2=Math.sqrt(Math.pow(pointX-px2,2)+Math.pow(pointY-py2,2));
+                                double e3=samplesElevs[delaun.Tri[i][2]];
+                                double d3=Math.sqrt(Math.pow(pointX-px3,2)+Math.pow(pointY-py3,2));
+
+                                float diffElev=(float)((e1*d1+e2*d2+e3*d3)/(d1+d2+d3)-e0);
+
+                                if(Math.abs(diffElev) > maxVal) {
+                                    maxIndex=potentialCandidates.size();
+                                    maxVal=Math.abs(diffElev);
+                                }
+
+                                int indexToGet=(int)samplesO[2][j];
+                                potentialCandidates.add(new float[] {pointX/1e5f,pointY/1e5f,indexToGet,diffElev,j});
                             }
+                            numPointsAnalyzed++;
+                        }
 
-                            int indexToGet=(int)samplesO[2][j];
-                            potentialCandidates.add(new float[] {pointX/1e5f,pointY/1e5f,indexToGet,diffElev,j});
+                    }
+
+    //                System.out.println("Number of Potential Candidates: "+potentialCandidates.size()+" Number of points considered: "+numPointsAnalyzed);
+
+                    if(potentialCandidates.size() > 0){
+
+                        maxZr=Math.max(maxVal,maxZr);
+
+    //                    System.out.println(maxIndex+" "+maxVal);
+    //                    for (int j = 0; j < potentialCandidates.size(); j++) {
+    //                        System.out.println(java.util.Arrays.toString((float[])potentialCandidates.get(j)));
+    //                    }
+                        if(Zr != -9999 && maxVal > Zr){
+                            float[] infoPoint=(float[])potentialCandidates.get(maxIndex);
+                            int indexToGet=(int)infoPoint[2];
+                            filteredPointsInTriangulation.add(pointsInTriangulation.get(indexToGet));
+                            filteredTypeOfPoint.add(typeOfPoint.get(indexToGet));
+                            filteredElevationOfPoint.add(elevationOfPoint.get(indexToGet));
+
+                            samplesO[3][(int)infoPoint[4]]=0;
+                            pointsPreserved++;
+
                         }
                     }
 
                 }
+                long endQ = System.currentTimeMillis();
+                float timeQ = (endQ - startQ) / 1000f;
+                System.out.println("Going through took " + timeQ + " seconds.");
 
-                if(potentialCandidates.size() > 0){
-//                    System.out.println(maxIndex+" "+maxVal);
-                    maxZr=Math.max(maxVal,maxZr);
-//                    for (int j = 0; j < potentialCandidates.size(); j++) {
-//                        System.out.println(java.util.Arrays.toString((float[])potentialCandidates.get(j))+" Zr "+Zr);
-//                    }
-                    if(Zr != -9999 && maxVal > Zr){
-                        float[] infoPoint=(float[])potentialCandidates.get(maxIndex);
-                        int indexToGet=(int)infoPoint[2];
-                        filteredPointsInTriangulation.add(pointsInTriangulation.get(indexToGet));
-                        filteredTypeOfPoint.add(typeOfPoint.get(indexToGet));
-                        filteredElevationOfPoint.add(elevationOfPoint.get(indexToGet));
-                        
-                        samplesO[3][(int)infoPoint[4]]=0;
-                        pointsPreserved++;
+                System.out.println("Pass: "+passNumber);
+                System.out.println("Number of points included is: "+pointsPreserved);
+                System.out.println("Random Threshold: "+passThreshold);
 
-                    }
-                }
-
-    //            filteredPointsInTriangulation.add(pointsInTriangulation.get(indexToGet));
-    //            filteredTypeOfPoint.add(typeOfPoint.get(indexToGet));
-    //            filteredElevationOfPoint.add(elevationOfPoint.get(indexToGet));
-
-//                System.out.println("Done with Triangle "+i);
+                passNumber++;
             }
-            long endQ = System.currentTimeMillis();
-            float timeQ = (endQ - startQ) / 1000f;
-            System.out.println("Going through took " + timeQ + " seconds.");
+        } else maxZr = 40;
 
-            System.out.println("Percentage of points preserved is: "+100*pointsPreserved/(double)numPointsBasin+" %");
-        }
-        
         //Third: Create arrays for triangulation step
         
         numPoints=filteredPointsInTriangulation.size();
@@ -1195,11 +1170,15 @@ public class BasinTIN {
             samples[1][i]=(float)utmLocal.y;
             samples[2][i]=((Double)filteredElevationOfPoint.get(i)).floatValue();
             samples[3][i]=(float)((int[])filteredTypeOfPoint.get(i))[0];
+            if(samples[3][i]==5) samples[3][i]=0;
         }
         
         System.out.println("Points File");
+        
+        String sufix="";
+        if(outputLocation.getPath().indexOf(".points") == -1) sufix=".points";
 
-        java.io.File nodesFileLocation=new java.io.File(outputLocation.getPath()+".points");
+        java.io.File nodesFileLocation=new java.io.File(outputLocation.getPath()+sufix);
         java.io.BufferedWriter writerNodes = new java.io.BufferedWriter(new java.io.FileWriter(nodesFileLocation));
         writerNodes.write(samples[0].length+"\n");
         

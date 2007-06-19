@@ -644,8 +644,8 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         jLabel9 = new javax.swing.JLabel();
         ridgeLevelCombo = new javax.swing.JComboBox();
         jPanel33 = new javax.swing.JPanel();
-        zrSlider = new javax.swing.JSlider();
         zrLabel = new javax.swing.JLabel();
+        zrSlider = new javax.swing.JSlider();
         jPanel3 = new javax.swing.JPanel();
         pointsCheckBox_I = new javax.swing.JCheckBox();
         trianglesCheckBox_I = new javax.swing.JCheckBox();
@@ -765,6 +765,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         jPanel32.setLayout(new java.awt.GridLayout(2, 0));
 
         jLabel9.setFont(new java.awt.Font("Lucida Grande", 0, 12));
+        jLabel9.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel9.setText("Ridges Level");
         jPanel32.add(jLabel9);
 
@@ -782,8 +783,13 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
 
         jPanel33.setLayout(new java.awt.BorderLayout());
 
+        zrLabel.setFont(new java.awt.Font("Lucida Grande", 0, 10));
+        zrLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        zrLabel.setText("Zr");
+        zrLabel.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jPanel33.add(zrLabel, java.awt.BorderLayout.NORTH);
+
         zrSlider.setFont(new java.awt.Font("Lucida Grande", 0, 10));
-        zrSlider.setPaintLabels(true);
         zrSlider.setPaintTicks(true);
         zrSlider.setValue(100);
         zrSlider.setEnabled(false);
@@ -794,12 +800,6 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         });
 
         jPanel33.add(zrSlider, java.awt.BorderLayout.CENTER);
-
-        zrLabel.setFont(new java.awt.Font("Lucida Grande", 0, 10));
-        zrLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        zrLabel.setText("Zr");
-        zrLabel.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jPanel33.add(zrLabel, java.awt.BorderLayout.NORTH);
 
         jPanel2.add(jPanel33, java.awt.BorderLayout.CENTER);
 
@@ -1401,6 +1401,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
 
     private void ridgeLevelComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ridgeLevelComboActionPerformed
         try {
+            firstPass=true;
             plotPoints(zrSlider.getValue());
         } catch (RemoteException ex) {
             ex.printStackTrace();
@@ -1810,7 +1811,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
     public static void main(String args[]) {
         try{
             java.io.File theFile=new java.io.File("/hidrosigDataBases/Smallbasin_DB/Rasters/Topography/1_Arcsec/NED_06075640.metaDEM");
-            //java.io.File theFile=new java.io.File("/hidrosigDataBases/Test_DB/Rasters/Topography/58447060.metaDEM");
+            //java.io.File theFile=new java.io.File("/hidrosigDataBases/Gila River DB/Rasters/Topography/1_ArcSec/mogollon.metaDEM");
             hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster (theFile);
             metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".dir"));
             
@@ -1824,13 +1825,13 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
             
             hydroScalingAPI.mainGUI.ParentGUI tempFrame=new hydroScalingAPI.mainGUI.ParentGUI();
             
-            //new TRIBS_io(tempFrame, 56,79,matDirs,magnitudes,metaModif).setVisible(true);
-            //new TRIBS_io(tempFrame, 108,48,matDirs,magnitudes,metaModif).setVisible(true);
+            new TRIBS_io(tempFrame, 56,79,matDirs,magnitudes,metaModif).setVisible(true);
+            //new TRIBS_io(tempFrame, 282,298 ,matDirs,magnitudes,metaModif).setVisible(true);
             
             ///home/ricardo/workFiles/tribsWork/sampleTribs/SMALLBASIN/Output/"),"smallbasin"
             ///home/ricardo/simulationResults/SMALLBASIN/Output_Base/"),"smallbasin"
             ///home/ricardo/simulationResults/Output_Mar23a_07/"),"urp"
-            new TRIBS_io(tempFrame, new java.io.File("/home/ricardo/workFiles/tribsWork/sampleTribs/SMALLBASIN/Output/"),"smallbasin").setVisible(true);
+            //new TRIBS_io(tempFrame, new java.io.File("/home/ricardo/workFiles/tribsWork/sampleTribs/SMALLBASIN/Output/"),"smallbasin").setVisible(true);
         } catch (java.io.IOException IOE){
             System.out.print(IOE);
             System.exit(0);
