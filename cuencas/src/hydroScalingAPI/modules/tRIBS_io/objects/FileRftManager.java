@@ -34,11 +34,11 @@ public class FileRftManager {
             double theTime=0.0;
             fullLine=fileRft.readLine(); countTimes++;
             fullLine=fileRft.readLine(); countTimes++;
-             while (theTime <= maxTime){
+            do{
                 fullLine=fileRft.readLine();
                 countTimes++;
                 theTime=Double.parseDouble(fullLine.split("\t")[0]);
-            }
+            } while (theTime < maxTime);
             fileRft.close();
             
             fileRft = new java.io.BufferedReader(new java.io.FileReader(pathToRft));

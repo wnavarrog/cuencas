@@ -32,11 +32,11 @@ public class FileMrfManager {
             double theTime=0.0;
             fullLine=fileMrf.readLine(); countTimes++;
             fullLine=fileMrf.readLine(); countTimes++;
-            while (theTime <= maxTime){
+            do{
                 fullLine=fileMrf.readLine();
                 countTimes++;
                 theTime=Double.parseDouble(fullLine.split("\t")[0]);
-            }
+            }while (theTime < maxTime);
             fileMrf.close();
             
             fileMrf = new java.io.BufferedReader(new java.io.FileReader(pathToMRF));
