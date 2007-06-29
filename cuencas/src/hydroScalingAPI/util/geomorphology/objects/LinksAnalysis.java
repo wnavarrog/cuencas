@@ -676,7 +676,8 @@ public class LinksAnalysis extends java.lang.Object {
     public static void main(String args[]) {
         
         //main0(args);  An anlysis of topography
-        main1(args);
+        //main1(args);
+        main2(args);
         
     }
         
@@ -802,6 +803,49 @@ public class LinksAnalysis extends java.lang.Object {
                     System.out.print(wfs[i][j]+",");
                 }
                 System.out.println();
+            }
+            
+        } catch (java.io.IOException IOE){
+            System.out.print(IOE);
+            System.exit(0);
+        }
+        
+        System.exit(0);
+        
+    }
+    
+    /**
+     * Tests for the class
+     * @param args the command line arguments
+     */
+    public static void main2(String args[]) {
+        
+        java.text.NumberFormat number2 = java.text.NumberFormat.getNumberInstance();
+        java.text.DecimalFormat dpoint2 = (java.text.DecimalFormat)number2;
+        dpoint2.applyPattern("0.00000000"); 
+        
+        try{
+            
+            java.io.File theFile=new java.io.File("/hidrosigDataBases/Upper Rio Puerco DB/Rasters/Topography/1_ArcSec/NED_54212683.metaDEM");
+            hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
+            metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Upper Rio Puerco DB/Rasters/Topography/1_ArcSec/NED_54212683.dir"));
+        
+            String formatoOriginal=metaModif.getFormat();
+            metaModif.setFormat("Byte");
+            byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
+            
+            hydroScalingAPI.util.geomorphology.objects.Basin laCuenca=new hydroScalingAPI.util.geomorphology.objects.Basin(381,221,matDirs,metaModif);
+            
+            LinksAnalysis myResults=new LinksAnalysis(laCuenca, metaModif, matDirs);
+            
+            hydroScalingAPI.modules.rainfallRunoffModel.objects.LinksInfo thisNetworkGeom=new hydroScalingAPI.modules.rainfallRunoffModel.objects.LinksInfo(myResults);
+            
+            double[][] wfs=myResults.getWidthFunctions(new int[]{myResults.getOutletID()},1);
+            System.out.println("Distance to Outlet, Number of Links");
+            for (int i = 0; i < wfs.length; i++) {
+                for (int j = 0; j < wfs[i].length; j++) {
+                    System.out.println((j*0.3)+","+wfs[i][j]);
+                }
             }
             
         } catch (java.io.IOException IOE){
