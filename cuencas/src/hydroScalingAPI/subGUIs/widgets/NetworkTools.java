@@ -137,7 +137,41 @@ public class NetworkTools extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void BasinMaskActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BasinMaskActionPerformed
-        // TODO add your handling code here:
+        try{
+            javax.swing.JFileChooser fc=new javax.swing.JFileChooser(mainFrame.getInfoManager().dataBaseRastersHydPath);
+            fc.setFileSelectionMode(fc.DIRECTORIES_ONLY);
+            fc.setDialogTitle("Directory Selection");
+            fc.showOpenDialog(this);
+
+            if (fc.getSelectedFile() == null) return;
+        
+            hydroScalingAPI.util.geomorphology.objects.Basin myCuenca=new hydroScalingAPI.util.geomorphology.objects.Basin(xOut,yOut,matDir,metaDatos);
+            hydroScalingAPI.io.MetaRaster maskMR=new hydroScalingAPI.io.MetaRaster(metaDatos);
+            java.io.File saveFile1,saveFile2;
+            saveFile1=new java.io.File(fc.getSelectedFile().getPath()+"/"+metaDatos.getLocationMeta().getName().substring(0,metaDatos.getLocationMeta().getName().lastIndexOf("."))+"_BasinMask.metaVHC");
+            saveFile2=new java.io.File(fc.getSelectedFile().getPath()+"/"+metaDatos.getLocationMeta().getName().substring(0,metaDatos.getLocationMeta().getName().lastIndexOf("."))+"_BasinMask.vhc");
+            
+            maskMR.setLocationMeta(saveFile1);
+            maskMR.setLocationBinaryFile(saveFile2);
+            maskMR.setFormat("Byte");
+            maskMR.writeMetaRaster(maskMR.getLocationMeta());
+
+            byte[][] BasMask=myCuenca.getBasinMask();
+            
+            java.io.DataOutputStream writer;
+            writer = new java.io.DataOutputStream(new java.io.BufferedOutputStream(new java.io.FileOutputStream(saveFile2)));
+
+            for(int i=0;i<BasMask.length;i++) for(int j=0;j<BasMask[0].length;j++){
+                writer.writeByte(BasMask[i][j]);
+            }
+
+            writer.close();
+            
+            closeDialog(null);
+        } catch (java.io.IOException IOE){
+            System.err.println("Failed creating mask file for this basin. "+xOut+" "+yOut);
+            System.err.println(IOE);
+        }
     }//GEN-LAST:event_BasinMaskActionPerformed
 
     private void TribsInputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TribsInputActionPerformed

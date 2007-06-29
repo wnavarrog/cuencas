@@ -725,7 +725,7 @@ public class BasinTIN {
 
                     int numPointsAnalyzed=0;
 
-                    for(int j=0;j<samplesO[0].length;j+=3){
+                    for(int j=0;j<samplesO[0].length;j++){
 
                         int pointX=(int)(1e5*samplesO[0][j]);
                         int pointY=(int)(1e5*samplesO[1][j]);

@@ -305,23 +305,20 @@ public class LinksAnalysis extends java.lang.Object {
     public float[][] getDistancesToOutlet(int outlet){
         try{
             float[][] dToOutlet=new float[2][];
-            dToOutlet[0]=getVarValues(7)[0];
-            dToOutlet[1]=getVarValues(8)[0];
-            
-            for(int i=0;i<dToOutlet[0].length;i++){
-                dToOutlet[0][i]-=dToOutlet[0][outlet];
-                dToOutlet[1][i]-=dToOutlet[1][outlet];
-            }
+            dToOutlet[0]=getVarValues(8)[0];
+            dToOutlet[1]=getVarValues(7)[0];
             
             java.util.Vector distToInclue=new java.util.Vector();
             distToInclue.add(new float[] {dToOutlet[0][outlet],dToOutlet[1][outlet]});
             addIncoming(dToOutlet,distToInclue,outlet);
             
+            
             float[][] shortGroupDists=new float[2][distToInclue.size()];
+            
             for(int i=0;i<shortGroupDists[0].length;i++){
                 float[] myDists=(float[])distToInclue.get(i);
-                shortGroupDists[0][i]=myDists[0];
-                shortGroupDists[1][i]=myDists[1];
+                shortGroupDists[0][i]=myDists[0]-dToOutlet[0][outlet];
+                shortGroupDists[1][i]=myDists[1]-dToOutlet[1][outlet];
             }
             
             return shortGroupDists;
@@ -336,7 +333,7 @@ public class LinksAnalysis extends java.lang.Object {
     
     private void addIncoming(float[][] dToOutlet,java.util.Vector distToInclue,int outlet){
         for(int i=0;i<connectionsArray[outlet].length;i++){
-            distToInclue.add(new float[] {dToOutlet[0][outlet],dToOutlet[1][outlet]});
+            distToInclue.add(new float[] {dToOutlet[0][connectionsArray[outlet][i]],dToOutlet[1][connectionsArray[outlet][i]]});
             addIncoming(dToOutlet,distToInclue,connectionsArray[outlet][i]);
         }
     }
@@ -366,15 +363,14 @@ public class LinksAnalysis extends java.lang.Object {
 
                     float[][] gWFunc=new float[1][wFunc[metric].length];
 
-                    for (int i=0;i<wFunc[0].length;i++)
+                    for (int i=0;i<wFunc[0].length;i++){
                         gWFunc[0][i]=wFunc[metric][i];
+                    }
                     
-                    hydroScalingAPI.util.statistics.Stats distStats=new hydroScalingAPI.util.statistics.Stats(gWFunc);
+//                    hydroScalingAPI.util.statistics.Stats distStats=new hydroScalingAPI.util.statistics.Stats(gWFunc);
                     
-                    if(metric == 0){
-                        binsize=0.2f;  //This can be improved by using the mean link lenght
-                    } else {
-                        binsize=distStats.meanValue;
+                    if(metric != 0){
+                        binsize=0.3f;
                     }
 
                     visad.RealType numLinks= visad.RealType.getRealType("numLinks");
@@ -385,12 +381,11 @@ public class LinksAnalysis extends java.lang.Object {
 
                     int numBins=(int) (gWFunc[0][gWFunc[0].length-1]/binsize)+1;
                     visad.Linear1DSet binsSet = new visad.Linear1DSet(numLinks,binsize, gWFunc[0][gWFunc[0].length-1]+binsize,numBins);
+//                    if(metric == 1){
+//                        numBins =(int) ((distStats.maxValue-distStats.minValue)/binsize);
+//                        binsSet = new visad.Linear1DSet(numLinks,distStats.minValue, distStats.maxValue,numBins);
+//                    }
                     
-                    if(metric == 1){
-                        numBins =(int) ((distStats.maxValue-distStats.minValue)/0.2f);
-                        binsSet = new visad.Linear1DSet(numLinks,distStats.minValue, distStats.maxValue,numBins);
-                    }
-
                     visad.FlatField hist = visad.math.Histogram.makeHistogram(vals_ff_W, binsSet);
 
                     float[][] laLinea=binsSet.getSamples();
@@ -673,12 +668,23 @@ public class LinksAnalysis extends java.lang.Object {
         }
         return ressimID;
     }
-        
+    
     /**
      * Tests for the class
      * @param args the command line arguments
      */
     public static void main(String args[]) {
+        
+        //main0(args);  An anlysis of topography
+        main1(args);
+        
+    }
+        
+    /**
+     * Tests for the class
+     * @param args the command line arguments
+     */
+    public static void main0(String args[]) {
         
         java.text.NumberFormat number2 = java.text.NumberFormat.getNumberInstance();
         java.text.DecimalFormat dpoint2 = (java.text.DecimalFormat)number2;
@@ -737,6 +743,66 @@ public class LinksAnalysis extends java.lang.Object {
                 }
                 System.out.println();
             }*/
+            
+        } catch (java.io.IOException IOE){
+            System.out.print(IOE);
+            System.exit(0);
+        }
+        
+        System.exit(0);
+        
+    }
+    
+    /**
+     * Tests for the class
+     * @param args the command line arguments
+     */
+    public static void main1(String args[]) {
+        
+        java.text.NumberFormat number2 = java.text.NumberFormat.getNumberInstance();
+        java.text.DecimalFormat dpoint2 = (java.text.DecimalFormat)number2;
+        dpoint2.applyPattern("0.00000000"); 
+        
+        try{
+            
+            java.io.File theFile=new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS/Whitewaters.metaDEM");
+            hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
+            metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS/Whitewaters.dir"));
+        
+            String formatoOriginal=metaModif.getFormat();
+            metaModif.setFormat("Byte");
+            byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
+            
+            hydroScalingAPI.util.geomorphology.objects.Basin laCuenca=new hydroScalingAPI.util.geomorphology.objects.Basin(1064, 494,matDirs,metaModif);
+            
+            LinksAnalysis myResults=new LinksAnalysis(laCuenca, metaModif, matDirs);
+            
+            hydroScalingAPI.modules.rainfallRunoffModel.objects.LinksInfo thisNetworkGeom=new hydroScalingAPI.modules.rainfallRunoffModel.objects.LinksInfo(myResults);
+            
+            float[][] orders=myResults.getVarValues(4);
+            int first5=0,first4=0;
+            for (int i = 0; i < orders[0].length; i++) {
+                System.out.print(orders[0][i]+",");
+                if(first5==0 && orders[0][i] > 5) first5=i;
+                if(first4==0 && orders[0][i] > 4) first4=i;
+                
+            }
+            System.out.println();
+            
+            float[][] dists=myResults.getDistancesToOutlet();
+            for (int i = 0; i < dists[0].length; i++) {
+                System.out.print(dists[0][i]+",");
+            }
+            System.out.println();
+            
+            double[][] wfs=myResults.getWidthFunctions(new int[]{myResults.getOutletID(),first5,first4},1);
+            //double[][] wfs=myResults.getWidthFunctions(new int[]{first4},1);
+            for (int i = 0; i < wfs.length; i++) {
+                for (int j = 0; j < wfs[i].length; j++) {
+                    System.out.print(wfs[i][j]+",");
+                }
+                System.out.println();
+            }
             
         } catch (java.io.IOException IOE){
             System.out.print(IOE);
