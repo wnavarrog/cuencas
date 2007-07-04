@@ -318,7 +318,8 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
             
             //subMain0(args);   //To Run as a external program from shell
             //subMain1(args);   //The test case for TestDem
-            subMain2(args);     //Case for Walnut Gulch
+            //subMain2(args);   //Case for Walnut Gulch
+            subMain3(args);     //Case Upper Rio Puerco
             
         } catch (java.io.IOException IOE){
             System.out.print(IOE);
@@ -433,6 +434,26 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
         new SimulationToAsciiFile(82,260,matDirs,magnitudes,metaModif, 50, 6,3.0f,2,new java.io.File("/tmp/")).executeSimulation();
         new SimulationToAsciiFile(82,260,matDirs,magnitudes,metaModif, 10,30,3.0f,2,new java.io.File("/tmp/")).executeSimulation();
         new SimulationToAsciiFile(82,260,matDirs,magnitudes,metaModif,  5,60,3.0f,2,new java.io.File("/tmp/")).executeSimulation();
+        
+    }
+    
+    public static void subMain3(String args[]) throws java.io.IOException, VisADException {
+        
+        java.io.File theFile=new java.io.File("/hidrosigDataBases/Upper Rio Puerco DB/Rasters/Topography/1_ArcSec/NED_54212683.metaDEM");
+        hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
+        metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Upper Rio Puerco DB/Rasters/Topography/1_ArcSec/NED_54212683.dir"));
+        
+        String formatoOriginal=metaModif.getFormat();
+        metaModif.setFormat("Byte");
+        byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
+        
+        metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".magn"));
+        metaModif.setFormat("Integer");
+        int [][] magnitudes=new hydroScalingAPI.io.DataRaster(metaModif).getInt();
+        
+        hydroScalingAPI.mainGUI.ParentGUI tempFrame=new hydroScalingAPI.mainGUI.ParentGUI();
+        
+        new SimulationToAsciiFile(381, 221,matDirs,magnitudes,metaModif,new java.io.File("/hidrosigDataBases/Upper Rio Puerco DB/Rasters/Hydrology/Rainfall/nexrad_prec.metaVHC"),0.0f,2,new java.io.File("/tmp/")).executeSimulation();
         
     }
     

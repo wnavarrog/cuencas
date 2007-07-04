@@ -790,7 +790,7 @@ public class Rainfall_Runoff_Model extends javax.swing.JDialog implements Displa
         javax.swing.JFileChooser fc=new javax.swing.JFileChooser(mainFrame.getInfoManager().dataBaseRastersHydPath);
         fc.setFileSelectionMode(fc.FILES_ONLY);
         fc.setDialogTitle("Select Rainfall Field");
-        javax.swing.filechooser.FileFilter mdtFilter = new visad.util.ExtensionFileFilter("metaVHC","Variable Hidrol�gica");
+        javax.swing.filechooser.FileFilter mdtFilter = new visad.util.ExtensionFileFilter("metaVHC","Hydrologic Variable");
         fc.addChoosableFileFilter(mdtFilter);
         fc.showOpenDialog(this);
 
