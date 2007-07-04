@@ -147,14 +147,14 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
         java.io.BufferedOutputStream bufferout = new java.io.BufferedOutputStream(salida);
         java.io.OutputStreamWriter newfile = new java.io.OutputStreamWriter(bufferout);
         
-        double[][] wfs=linksStructure.getWidthFunctions(linksStructure.completeStreamLinksArray,0);
-        for (int i=0;i<linksStructure.completeStreamLinksArray.length;i++){
-            if(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > 1){
-                newfile.write("Link #"+linksStructure.completeStreamLinksArray[i]+",");
-                for (int j=0;j<wfs[i].length;j++) newfile.write(wfs[i][j]+",");
-                newfile.write("\n");
-            }
-        }
+//        double[][] wfs=linksStructure.getWidthFunctions(linksStructure.completeStreamLinksArray,0);
+//        for (int i=0;i<linksStructure.completeStreamLinksArray.length;i++){
+//            if(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > 1){
+//                newfile.write("Link #"+linksStructure.completeStreamLinksArray[i]+",");
+//                for (int j=0;j<wfs[i].length;j++) newfile.write(wfs[i][j]+",");
+//                newfile.write("\n");
+//            }
+//        }
         
         newfile.close();
         bufferout.close();
@@ -217,7 +217,7 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
                 newfile.write("Link-"+linksStructure.completeStreamLinksArray[i]+",");
         }
         
-        hydroScalingAPI.modules.rainfallRunoffModel.objects.NetworkEquations_Simple thisBasinEqSys=new hydroScalingAPI.modules.rainfallRunoffModel.objects.NetworkEquations_Simple(linksStructure,thisHillsInfo,thisNetworkGeom,routingType);
+        hydroScalingAPI.modules.rainfallRunoffModel.objects.NetworkEquations_ChannelLosses thisBasinEqSys=new hydroScalingAPI.modules.rainfallRunoffModel.objects.NetworkEquations_ChannelLosses(linksStructure,thisHillsInfo,thisNetworkGeom,routingType);
         double[] initialCondition=new double[linksStructure.contactsArray.length*2];
         
         float[][] areasHillArray=thisHillsInfo.getAreasArray();
