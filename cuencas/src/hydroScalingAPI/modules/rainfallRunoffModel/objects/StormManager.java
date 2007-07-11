@@ -190,7 +190,7 @@ public class StormManager {
                 dataSnapShot=new hydroScalingAPI.io.DataRaster(metaStorm).getDouble();
                 
                 hydroScalingAPI.util.statistics.Stats rainStats=new hydroScalingAPI.util.statistics.Stats(dataSnapShot,-999);
-                System.out.println("    --> Stats of the File Max: "+rainStats.maxValue+" Min: "+rainStats.minValue+" Mean: "+rainStats.meanValue);
+                System.out.println("    --> Stats of the File:  Max = "+rainStats.maxValue+" Min = "+rainStats.minValue+" Mean = "+rainStats.meanValue);
                 
                 
                 //recorto la seccion que esta en la cuenca (TIENE QUE CONTENERLA)
@@ -233,6 +233,7 @@ public class StormManager {
                             firstWaterDrop=arCron[i].getDate();
                             veryFirstDrop=false;
                         }
+                        
                         precOnBasin[j].addDateAndValue(arCron[i].getDate(),new Float(currentHillBasedPrec[j]/upAreaValues[0][j])); //
                         totalHillBasedPrec[j]+=currentHillBasedPrec[j]/upAreaValues[0][j];
                         lastWaterDrop=arCron[i].getDate();

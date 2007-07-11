@@ -158,8 +158,8 @@ public class SimulationToFile extends java.lang.Object {
                         Resulatdos
              
              */
-        //String Directory="/tmp/";
-        String Directory="/ResultsSimulations/simulationsWalnutGulch/";
+        String Directory="/temp200/";
+        //String Directory="/ResultsSimulations/simulationsWalnutGulch/";
         String demName=md.getLocationBinaryFile().getName().substring(0,md.getLocationBinaryFile().getName().lastIndexOf("."));
         String routingString="";
         switch (routingType) {
@@ -272,7 +272,7 @@ public class SimulationToFile extends java.lang.Object {
         
         System.out.println("Termina calculo de WFs");
         
-        hydroScalingAPI.modules.rainfallRunoffModel.objects.NetworkEquations_Simple thisBasinEqSys=new hydroScalingAPI.modules.rainfallRunoffModel.objects.NetworkEquations_Simple(linksStructure,thisHillsInfo,thisNetworkGeom,routingType);
+        hydroScalingAPI.modules.rainfallRunoffModel.objects.NetworkEquations_ChannelLosses thisBasinEqSys=new hydroScalingAPI.modules.rainfallRunoffModel.objects.NetworkEquations_ChannelLosses(linksStructure,thisHillsInfo,thisNetworkGeom,routingType);
         double[] initialCondition=new double[linksStructure.contactsArray.length*2];
         
         float[][] areasHillArray=thisHillsInfo.getAreasArray();
@@ -317,7 +317,7 @@ public class SimulationToFile extends java.lang.Object {
         
         for (int k=0;k<numPeriods;k++) {
             System.out.println("Period "+(k+1)+" of "+numPeriods);
-            rainRunoffRaining.jumpsRunToFile(storm.stormInitialTimeInMinutes()+k*storm.stormRecordResolutionInMinutes(),storm.stormInitialTimeInMinutes()+(k+1)*storm.stormRecordResolutionInMinutes(),1,initialCondition,newfile);
+            rainRunoffRaining.jumpsRunToFile(storm.stormInitialTimeInMinutes()+k*storm.stormRecordResolutionInMinutes(),storm.stormInitialTimeInMinutes()+(k+1)*storm.stormRecordResolutionInMinutes(),10,initialCondition,newfile);
             initialCondition=rainRunoffRaining.finalCond;
             rainRunoffRaining.setBasicTimeStep(10/60.);
         }
@@ -325,7 +325,7 @@ public class SimulationToFile extends java.lang.Object {
         System.out.println("Intermedia Time:"+interTime.toString());
         System.out.println("Running Time:"+(.001*(interTime.getTime()-startTime.getTime()))+" seconds");
         
-        rainRunoffRaining.jumpsRunToFile(storm.stormInitialTimeInMinutes()+numPeriods*storm.stormRecordResolutionInMinutes(),(storm.stormInitialTimeInMinutes()+(numPeriods+1)*storm.stormRecordResolutionInMinutes())+5000,5,initialCondition,newfile);
+        rainRunoffRaining.jumpsRunToFile(storm.stormInitialTimeInMinutes()+numPeriods*storm.stormRecordResolutionInMinutes(),(storm.stormInitialTimeInMinutes()+(numPeriods+1)*storm.stormRecordResolutionInMinutes())+100,10,initialCondition,newfile);
         
         System.out.println("Termina simulacion RKF");
         java.util.Date endTime=new java.util.Date();
@@ -379,7 +379,7 @@ public class SimulationToFile extends java.lang.Object {
             
             //Uniform Rain
             //subMain1(args);  //The test case for Whitewater
-            subMain3(args);  //The test case for Walnut Gulch 30m
+            //subMain3(args);  //The test case for Walnut Gulch 30m
             //subMain4(args);   //The test case for TestDem
             //subMain5(args);   //The Man-Vis Tree
             //subMain6(args);   //The Peano Tree
@@ -390,6 +390,7 @@ public class SimulationToFile extends java.lang.Object {
             //Rainfields from data
             //subMain2(args);   //using constant infiltration in space
             //subMain7(args);   //using a map to set infiltration values
+            subMain10(args);     //Simulations for Upper Rio Puerco Using Nexrad
             
         } catch (java.io.IOException IOE){
             System.out.print(IOE);
@@ -710,6 +711,37 @@ public class SimulationToFile extends java.lang.Object {
         stormFile=new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Hydrology/storms/simulated_events/uniform_050_01.metaVHC");
         new SimulationToFile(259,744,matDirs,magnitudes,metaModif,stormFile,0.0f,0,routingParams);
 
+    }
+    
+    public static void subMain10(String args[]) throws java.io.IOException, VisADException {
+        
+        java.io.File theFile=new java.io.File("/hidrosigDataBases/Upper Rio Puerco DB/Rasters/Topography/1_ArcSec/NED_54212683.metaDEM");
+        hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
+        metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Upper Rio Puerco DB/Rasters/Topography/1_ArcSec/NED_54212683.dir"));
+        
+        String formatoOriginal=metaModif.getFormat();
+        metaModif.setFormat("Byte");
+        byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
+        
+        metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".magn"));
+        metaModif.setFormat("Integer");
+        int [][] magnitudes=new hydroScalingAPI.io.DataRaster(metaModif).getInt();
+        
+        //hydroScalingAPI.mainGUI.ParentGUI tempFrame=new hydroScalingAPI.mainGUI.ParentGUI();
+        
+        java.io.File stormFile;
+        java.util.Hashtable routingParams=new java.util.Hashtable();
+        routingParams.put("widthCoeff",1.0f);
+        routingParams.put("widthExponent",0.4f);
+        routingParams.put("widthStdDev",0.0f);
+        
+        routingParams.put("chezyCoeff",14.2f);
+        routingParams.put("chezyExponent",-1/3.0f);
+        
+        
+        stormFile=new java.io.File("/hidrosigDataBases/Upper Rio Puerco DB/Rasters/Hydrology/Rainfall/nexrad_prec.metaVHC");
+        new SimulationToFile(381, 221,matDirs,magnitudes,metaModif,stormFile,0.0f,2,routingParams);
+        //new SimulationToFile(1139,1948,matDirs,magnitudes,metaModif,stormFile,0.0f,2,routingParams);
     }
     
 }

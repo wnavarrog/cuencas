@@ -443,6 +443,7 @@ public class NetworkExtractionModule implements Runnable {
             Sink_t = new java.util.Vector();
             MT.corrigeWorkRectangle(OpProc.myFSc);
             corrigeSink_t();
+            
             //Scan the matrix for crossings (This should not occur and it needs to be address in the algorithm itself)
             int countSituation=0;
             
@@ -536,7 +537,12 @@ public class NetworkExtractionModule implements Runnable {
             }
             
             GetRasterNetwork.cleanShorts(this);
+            
             GetRasterNetwork.fixIntersections(this);
+            
+            GetGeomorphologyRAM.getAreas(this);
+            GetGeomorphologyRAM.getMaxPend(this);
+            
             writePREL(metaDEM.getLocationBinaryFile());
             
             if(!areaPend_cargar && !areaPend_nuevo && !areaPend_LA )
