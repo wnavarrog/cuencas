@@ -10,7 +10,8 @@
 package hydroScalingAPI.examples.artifitialFields;
 
 import ij.util.Java2;
-
+import visad.*;
+import java.rmi.RemoteException;
 
 /**
  *
@@ -735,6 +736,16 @@ public java.util.Vector AreaBasin = new java.util.Vector();
         }
     
     
+    }
+    
+    public void getRidges() throws RemoteException, VisADException, java.io.IOException{
+    
+        hydroScalingAPI.util.geomorphology.objects.LinksAnalysis myLinksStructure=new hydroScalingAPI.util.geomorphology.objects.LinksAnalysis(basinOrig,metaOrig, DIR);
+        
+        hydroScalingAPI.modules.networkAnalysis.objects.RSNDecomposition myRSNAnalysis=new hydroScalingAPI.modules.networkAnalysis.objects.RSNDecomposition(myLinksStructure);
+
+        int[][] hillSlopesMask=basinOrig.getEncapsulatedHillslopesMask(DIR,myRSNAnalysis,1); // ridges corresponds to the basin order. In this case it is 1
+        
     }
     
     
