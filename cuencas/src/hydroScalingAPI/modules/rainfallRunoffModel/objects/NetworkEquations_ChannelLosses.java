@@ -148,7 +148,7 @@ public class NetworkEquations_ChannelLosses implements hydroScalingAPI.util.ordD
             
             if (input[i] < 0) input[i]=0;
             
-            double hillPrecIntensity=basinHillSlopesInfo.precipitation(i,time);
+            double hillPrecIntensity=basinHillSlopesInfo.precipitation(i,time);// for URP event apply this rule*0.143;
             
             maxInt=Math.max(maxInt,hillPrecIntensity);
             
@@ -210,7 +210,7 @@ public class NetworkEquations_ChannelLosses implements hydroScalingAPI.util.ordD
                 System.out.println("  --> !!  When Discharge is "+typDisch+" m^3/s, A typical Velocity-Depth-Width triplet is "+typVel+" m/s - "+typDepth+" cm - "+typWidth+" cm >> for Link "+i+" with upstream area : "+linksHydraulicInfo.upStreamArea(i)+" km^2");
             }*/
             
-            double ks=200/3.6e6;
+            double ks=0/3.6e6;
             double chanLoss=lengthArray[0][i]*widthArray[0][i]*ks;
             
             //the links

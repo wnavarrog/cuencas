@@ -86,7 +86,7 @@ public class BasinTIN {
         
         myCuenca=new hydroScalingAPI.util.geomorphology.objects.Basin(x,y,matDir,metaDatos);
         myLinksStructure=new hydroScalingAPI.util.geomorphology.objects.LinksAnalysis(myCuenca, metaDatos, matDir);
-        myRSNAnalysis=new hydroScalingAPI.modules.networkAnalysis.objects.RSNDecomposition(myLinksStructure);
+        //myRSNAnalysis=new hydroScalingAPI.modules.networkAnalysis.objects.RSNDecomposition(myLinksStructure);
         
         float[][] lonLatsBasin=myCuenca.getLonLatBasin();
         int[][] xyBasin=myCuenca.getXYBasin();

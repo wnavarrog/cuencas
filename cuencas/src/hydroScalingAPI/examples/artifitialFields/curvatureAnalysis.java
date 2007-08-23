@@ -72,11 +72,11 @@ public java.util.Vector AreaBasin = new java.util.Vector();
         path = fileMeta.getPath().substring(0,fileMeta.getPath().lastIndexOf("."));
 
         getInitialParameters();
-        
+
         System.out.println("**** Starting scale analysis  ****");
         
-        getScaleAnalysis();
-        System.exit(0);
+        //getScaleAnalysis();
+        //System.exit(0);
         System.out.println("**** Scale analysis finished ****");
         
         getAreaSlope();
@@ -782,11 +782,15 @@ public java.util.Vector AreaBasin = new java.util.Vector();
 //            int y = 311;
             
             
-            args=new String[] { "C:/5_temp/Running_WalnutGulch_040307/walnutGulchUpdated.metaDEM",
-                                 "C:/5_temp/Running_WalnutGulch_040307/walnutGulchUpdated.dem"};
+//            args=new String[] { "C:/5_temp/Running_WalnutGulch_040307/walnutGulchUpdated.metaDEM",
+//                                 "C:/5_temp/Running_WalnutGulch_040307/walnutGulchUpdated.dem"};
+            args=new String[] { "//Mantilla/hidrosigdatabases/Gila River DB/Rasters/Topography/1_ArcSec/mogollon.metaDEM",
+                                 "//Mantilla/hidrosigdatabases/Gila River DB/Rasters/Topography/1_ArcSec/mogollon.dem"};
             
-            int x = 308;//302;
-            int y = 323;//318;
+            
+            
+            int x = 689;//308;//302;
+            int y = 483;//323;//318;
              
             hydroScalingAPI.io.MetaRaster metaRaster= new hydroScalingAPI.io.MetaRaster(new java.io.File(args[0]));
             metaRaster.setLocationBinaryFile(new java.io.File(args[1]));

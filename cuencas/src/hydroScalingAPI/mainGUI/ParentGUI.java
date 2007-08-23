@@ -1407,7 +1407,7 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
         System.out.println(fc.getSelectedFile().getPath());
         System.out.println(ir.getBaseName());
         try {
-            new hydroScalingAPI.modules.tRIBS_io.widgets.TRIBS_io(this,fc.getSelectedFile(),ir.getBaseName()).setVisible(true);
+            new hydroScalingAPI.modules.tRIBS_io.widgets.TRIBS_io(this,fc.getSelectedFile(),ir.getBaseName(),0).setVisible(true);
         } catch (RemoteException ex) {
             ex.printStackTrace();
         } catch (IOException ex) {

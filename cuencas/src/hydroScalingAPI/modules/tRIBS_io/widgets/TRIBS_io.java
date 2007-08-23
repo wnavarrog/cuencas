@@ -63,6 +63,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
     
     private boolean firstPass=true;
     private int lastSelectedTab=0;
+    private int standAlone=0;
     
     /**
      * Creates new form TRIBS_io
@@ -90,8 +91,11 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
      * @throws visad.VisADException Captures errors while creating VisAD objects
      * @throws java.io.IOException Captures errors while reading information
      */
-    public TRIBS_io(hydroScalingAPI.mainGUI.ParentGUI parent, java.io.File outputsDirectory, String baseName) throws RemoteException, VisADException, java.io.IOException{
+    public TRIBS_io(hydroScalingAPI.mainGUI.ParentGUI parent, java.io.File outputsDirectory, String baseName,int flag) throws RemoteException, VisADException, java.io.IOException{
         this(parent);
+        
+        standAlone=flag;
+        
         panel_IO.setSelectedIndex(1);
         pathTextField.setText(outputsDirectory.getPath());
         baseNameTextField.setText(baseName);
@@ -1803,6 +1807,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
     private void closeDialog(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_closeDialog
         setVisible(false);
         dispose();
+        if(standAlone > 0) System.exit(0);
     }//GEN-LAST:event_closeDialog
     
     /**
@@ -1832,7 +1837,16 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
             ///home/ricardo/workFiles/tribsWork/sampleTribs/SMALLBASIN/Output/"),"smallbasin"
             ///home/ricardo/simulationResults/SMALLBASIN/Output_Base/"),"smallbasin"
             ///home/ricardo/simulationResults/Output_Mar23a_07/"),"urp"
-            new TRIBS_io(tempFrame, new java.io.File("C:/Documents and Settings/ricardo/Desktop/test/"),"x_s").setVisible(true);
+            
+            java.io.File theDirectory=new java.io.File("C:/Documents and Settings/ricardo/Desktop/test/");
+            String baseName="x_s";
+            
+            if(args.length > 0){
+                theDirectory=new java.io.File(args[0]);
+                baseName=args[1];
+            }
+            
+            new TRIBS_io(tempFrame, theDirectory,baseName,args.length).setVisible(true);
 
         } catch (java.io.IOException IOE){
             System.out.print(IOE);
@@ -1841,6 +1855,8 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
             System.out.print(v);
             System.exit(0);
         }
+        
+        System.exit(0);
     }
     
     

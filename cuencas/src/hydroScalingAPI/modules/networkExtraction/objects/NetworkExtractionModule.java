@@ -345,7 +345,9 @@ public class NetworkExtractionModule implements Runnable {
         
 //        taskDIR=false; taskRED=true; taskGEO=true; taskVECT=true;
         taskDIR=true; taskRED=true; taskGEO=true; taskVECT=true;
-
+        
+        pixPodado = 0.05f/(float)dy/(float)dxm;
+        
         corrigeDEM();
         OpProc.dispose();
     }
