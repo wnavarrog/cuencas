@@ -1855,8 +1855,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
             System.out.print(v);
             System.exit(0);
         }
-        
-        System.exit(0);
+    
     }
     
     
