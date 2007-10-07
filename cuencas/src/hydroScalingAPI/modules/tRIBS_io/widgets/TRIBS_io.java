@@ -295,15 +295,14 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
                                                 new ConstantMap( 1.0f, Display.Green),
                                                 new ConstantMap( 0.2f, Display.Blue),
                                                 new ConstantMap( 0.50f, Display.LineWidth)};
-        display_TIN_O.addReference( data_refTr_O,trianglesCMap_O );
-        
+
         data_refPoly_O = new DataReferenceImpl("data_ref_poly");
         data_refPoly_O.setData(basTIN_O.getPolygonsUnionSet());
         polygonsCMap_O = new ConstantMap[] {    new ConstantMap( 0.0f, Display.Red),
                                                 new ConstantMap( 0.0f, Display.Green),
                                                 new ConstantMap( 0.0f, Display.Blue),
                                                 new ConstantMap( 1.50f, Display.LineWidth)};
-        
+        display_TIN_O.addReference( data_refPoly_O,polygonsCMap_O );
         
         data_refFill_O = new DataReferenceImpl("data_ref_Fill");
         data_refFill_O.setData(basTIN_O.getValuesFlatField());
@@ -324,7 +323,8 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
             trianglesCheckBox_O.setSelected(false);
         } else {
             display_TIN_O.addReference( data_refPoints_O,pointsCMap_O );
-            display_TIN_O.addReference( data_refPoly_O,polygonsCMap_O );
+            display_TIN_O.addReference( data_refTr_O,trianglesCMap_O );
+            
         }
         
         visad.TextType t = visad.TextType.getTextType("text");
@@ -387,7 +387,6 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         qNodesCombo.setSelectedItem("Outlet");
         int[] qoutIndex=fqm.getLocationIndexes(baseNameTextField.getText());
         for (int i=0;i<qoutIndex.length;i++){
-            System.out.println(qoutIndex[i]);
             final int myIndex=qoutIndex[i];
             Runnable addPoint = new Runnable() {
                 public void run() {
@@ -2015,8 +2014,8 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
             ///home/ricardo/simulationResults/SMALLBASIN/Output_Base/"),"smallbasin"
             ///home/ricardo/simulationResults/Output_Mar23a_07/"),"urp"
             
-            java.io.File theDirectory=new java.io.File("/home/ricardo/workFiles/tribsWork/sampleTribs/SMALLBASIN/Output/");
-            String baseName="smallbasin";
+            java.io.File theDirectory=new java.io.File("/home/ricardo/workFiles/tribsWork/sampleTribs/MOGOLLON/Output/");
+            String baseName="mogollon";
             
             if(args.length > 0){
                 theDirectory=new java.io.File(args[0]);
