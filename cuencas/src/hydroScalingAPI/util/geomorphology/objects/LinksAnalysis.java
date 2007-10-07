@@ -564,7 +564,7 @@ public class LinksAnalysis extends java.lang.Object {
                     fileQuantity.seek(8*tailsArray[i]);
                     quantityArray[0][i]=(float) (altUp-fileQuantity.readDouble());
                     
-                    quantityArray[0][i]/=linkLengths[0][i];
+                    quantityArray[0][i]/=linkLengths[0][i]*1000;
                 }
                 
                 break;

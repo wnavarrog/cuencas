@@ -532,7 +532,7 @@ public class RsnStructure {
         float[] ordCount=new float[myRsnStruc.getNetworkOrder()];
         
         for (int i=0;i<compLinks.length;i++){
-            if(upOrder[0][compLinks[i]]>2)System.out.println(i+" "+upAreas[0][compLinks[i]]+" "+upLength[0][compLinks[i]]+" "+upOrder[0][compLinks[i]]+" "+longLength[0][compLinks[i]]);
+            if(upOrder[0][compLinks[i]]>0)System.out.println(i+" "+upAreas[0][compLinks[i]]+" "+upLength[0][compLinks[i]]+" "+upOrder[0][compLinks[i]]+" "+longLength[0][compLinks[i]]);
             averDd[(int)upOrder[0][compLinks[i]]-1]+=upLength[0][compLinks[i]]/upAreas[0][compLinks[i]];
             ordCount[(int)upOrder[0][compLinks[i]]-1]++;
         }

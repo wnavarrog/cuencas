@@ -441,7 +441,7 @@ public class RKF extends java.lang.Object {
         
         java.util.Calendar thisDate=java.util.Calendar.getInstance();
         thisDate.setTimeInMillis((long)(currentTime*60.*1000.0));
-        System.out.println(thisDate.getTime()+" ("+java.util.Calendar.getInstance().getTime()+")");
+        System.out.println(thisDate.getTime()+" ("+java.util.Calendar.getInstance().getTime()+")"+" Outlet Discharge: "+IC[ouletID]);
         //for (int j=0;j<IC.length/2;j++) System.out.print(IC[j]+" ");
         //System.out.println();
        
@@ -504,7 +504,7 @@ public class RKF extends java.lang.Object {
             
             thisDate=java.util.Calendar.getInstance();
             thisDate.setTimeInMillis((long)(currentTime*60.*1000.0));
-            System.out.println(thisDate.getTime()+" ("+java.util.Calendar.getInstance().getTime()+")");
+            System.out.println(thisDate.getTime()+" ("+java.util.Calendar.getInstance().getTime()+")"+" Outlet Discharge: "+IC[ouletID]);
             
             //for (int j=0;j<IC.length/2;j++) System.out.print(IC[j]+" ");
             //System.out.println();
@@ -525,9 +525,9 @@ public class RKF extends java.lang.Object {
                     outputStream.write(IC[linksStructure.completeStreamLinksArray[i]]+",");
             }
 
-            /*thisDate=java.util.Calendar.getInstance();
+            thisDate=java.util.Calendar.getInstance();
             thisDate.setTimeInMillis((long)(currentTime*60.*1000.0));
-            System.out.println(thisDate.getTime()+" ("+java.util.Calendar.getInstance().getTime()+")");*/
+            System.out.println(thisDate.getTime()+" ("+java.util.Calendar.getInstance().getTime()+")"+" Outlet Discharge: "+IC[ouletID]);
             //for (int j=0;j<IC.length/2;j++) System.out.print(IC[j]+" ");
             //System.out.println();
 
@@ -640,7 +640,7 @@ public class RKF extends java.lang.Object {
 
         }
         
-        if (currentTime != finalTime && IC[ouletID] > 1e-3){
+        if (currentTime != finalTime && IC[ouletID] > 1e-7){
             givenStep=step(currentTime, IC , finalTime-currentTime-1/60.,true);
             basicTimeStep=givenStep[0][0];
             currentTime+=basicTimeStep;

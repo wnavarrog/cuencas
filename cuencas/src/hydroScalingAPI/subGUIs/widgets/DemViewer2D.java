@@ -102,7 +102,8 @@ public class DemViewer2D extends hydroScalingAPI.subGUIs.widgets.RasterViewer im
         
         visad.TextControl tcontrol = (visad.TextControl) tmap.getControl();
         tcontrol.setCenter(true);
-        tcontrol.setSize(0.1);
+        tcontrol.setSize(0.6);
+        tcontrol.setAutoSize(true);
         tcontrol.setFont(font);
         
         display.enableEvent(visad.DisplayEvent.MOUSE_MOVED);

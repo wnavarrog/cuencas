@@ -86,8 +86,12 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
         hydroScalingAPI.modules.rainfallRunoffModel.objects.LinksInfo thisNetworkGeom=new hydroScalingAPI.modules.rainfallRunoffModel.objects.LinksInfo(linksStructure);
         //thisNetworkGeom.setWidthsHG(5.6f, 0.46f);
         //thisNetworkGeom.setChezysHG(14.2f, -1/3.0f);
-        thisNetworkGeom.setWidthsHG(1.0f, 0.3f,0.0f);
-        thisNetworkGeom.setCheziHG(14.2f, -1/6.0f);
+        thisNetworkGeom.setWidthsHG(8.66f, 0.6f,0.0f);
+        
+        float chezLawExpon=-1/3f;
+        float chezLawCoeff=200f/(float)Math.pow(0.000357911,chezLawExpon);
+        thisNetworkGeom.setCheziHG(chezLawCoeff, chezLawExpon);
+        
         hydroScalingAPI.modules.rainfallRunoffModel.objects.HillSlopesInfo thisHillsInfo=new hydroScalingAPI.modules.rainfallRunoffModel.objects.HillSlopesInfo(linksStructure);
         
         System.out.println("Loading Storm ...");
@@ -162,7 +166,7 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
         
         
         if(stormFile == null)
-            theFile=new java.io.File(outputDirectory.getAbsolutePath()+"/"+demName+"-INT_"+rainIntensity+"-DUR_"+rainDuration+"-IR_"+infiltRate+"-Routing_"+routingString+".csv");
+            theFile=new java.io.File(outputDirectory.getAbsolutePath()+"/"+demName+"-INT_"+rainIntensity+"-DUR_"+rainDuration+"-IR_"+infiltRate+"-Routing_"+routingString+chezLawExpon+".csv");
         else
             theFile=new java.io.File(outputDirectory.getAbsolutePath()+"/"+demName+"-"+stormFile.getName()+"-IR_"+infiltRate+"-Routing_"+routingString+".csv");
         
@@ -177,7 +181,7 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
         newfile.write("Link #,");
         
         for (int i=0;i<linksStructure.completeStreamLinksArray.length;i++){
-            if(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > 1)
+            if(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > 0)
                 newfile.write("Link-"+linksStructure.completeStreamLinksArray[i]+",");
         }
         
@@ -185,7 +189,7 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
         newfile.write("Horton Order,");
         
         for (int i=0;i<linksStructure.completeStreamLinksArray.length;i++){
-            if(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > 1)
+            if(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > 0)
                 newfile.write(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i])+",");
         }
         
@@ -193,7 +197,7 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
         newfile.write("Upstream Area [km^2],");
         
         for (int i=0;i<linksStructure.completeStreamLinksArray.length;i++){
-            if(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > 1)
+            if(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > 0)
                 newfile.write(thisNetworkGeom.upStreamArea(linksStructure.completeStreamLinksArray[i])+",");
         }
         
@@ -201,7 +205,7 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
         newfile.write("Link Outlet ID,");
         
         for (int i=0;i<linksStructure.completeStreamLinksArray.length;i++){
-            if(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > 1)
+            if(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > 0)
                 newfile.write(linksStructure.contactsArray[linksStructure.completeStreamLinksArray[i]]+",");
         }
         
@@ -213,7 +217,7 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
         newfile.write("Time,");
         
         for (int i=0;i<linksStructure.completeStreamLinksArray.length;i++){
-            if(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > 1)
+            if(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > 0)
                 newfile.write("Link-"+linksStructure.completeStreamLinksArray[i]+",");
         }
         
@@ -256,8 +260,8 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
         if(stormFile == null){
             for (int k=0;k<numPeriods;k++) {
                 System.out.println("Period"+(k)+" out of "+numPeriods);
-                //rainRunoffRaining.jumpsRunToAsciiFile(storm.stormInitialTimeInMinutes()+k*rainDuration,storm.stormInitialTimeInMinutes()+(k+1)*rainDuration,rainDuration,initialCondition,newfile,linksStructure,thisNetworkGeom);
-                rainRunoffRaining.jumpsRunToAsciiFile(storm.stormInitialTimeInMinutes()+k*rainDuration,storm.stormInitialTimeInMinutes()+(k+1)*rainDuration,10,initialCondition,newfile,linksStructure,thisNetworkGeom);
+                rainRunoffRaining.jumpsRunToAsciiFile(storm.stormInitialTimeInMinutes()+k*rainDuration,storm.stormInitialTimeInMinutes()+(k+1)*rainDuration,rainDuration,initialCondition,newfile,linksStructure,thisNetworkGeom);
+                //rainRunoffRaining.jumpsRunToAsciiFile(storm.stormInitialTimeInMinutes()+k*rainDuration,storm.stormInitialTimeInMinutes()+(k+1)*rainDuration,10,initialCondition,newfile,linksStructure,thisNetworkGeom);
                 initialCondition=rainRunoffRaining.finalCond;
                 rainRunoffRaining.setBasicTimeStep(10/60.);
             }
@@ -266,7 +270,7 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
             System.out.println("Intermedia Time:"+interTime.toString());
             System.out.println("Running Time:"+(.001*(interTime.getTime()-startTime.getTime()))+" seconds");
             
-            rainRunoffRaining.jumpsRunToAsciiFile(storm.stormInitialTimeInMinutes()+numPeriods*rainDuration,(storm.stormInitialTimeInMinutes()+(numPeriods+1)*rainDuration)+5000,10,initialCondition,newfile,linksStructure,thisNetworkGeom);
+            rainRunoffRaining.jumpsRunToAsciiFile(storm.stormInitialTimeInMinutes()+numPeriods*rainDuration,(storm.stormInitialTimeInMinutes()+(numPeriods+1)*rainDuration)+800,2,initialCondition,newfile,linksStructure,thisNetworkGeom);
             
         } else {
             for (int k=0;k<numPeriods;k++) {
@@ -280,7 +284,7 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
             System.out.println("Intermedia Time:"+interTime.toString());
             System.out.println("Running Time:"+(.001*(interTime.getTime()-startTime.getTime()))+" seconds");
             
-            rainRunoffRaining.jumpsRunToAsciiFile(storm.stormInitialTimeInMinutes()+numPeriods*storm.stormRecordResolutionInMinutes(),(storm.stormInitialTimeInMinutes()+(numPeriods+1)*storm.stormRecordResolutionInMinutes())+500,5,initialCondition,newfile,linksStructure,thisNetworkGeom);
+            rainRunoffRaining.jumpsRunToAsciiFile(storm.stormInitialTimeInMinutes()+numPeriods*storm.stormRecordResolutionInMinutes(),(storm.stormInitialTimeInMinutes()+(numPeriods+1)*storm.stormRecordResolutionInMinutes())+350,5,initialCondition,newfile,linksStructure,thisNetworkGeom);
         }
         
         System.out.println("Termina simulacion RKF");
@@ -318,8 +322,8 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
             
             //subMain0(args);   //To Run as a external program from shell
             //subMain1(args);   //The test case for TestDem
-            //subMain2(args);   //Case for Walnut Gulch
-            subMain3(args);     //Case Upper Rio Puerco
+            subMain2(args);   //Case for Walnut Gulch
+            //subMain3(args);     //Case Upper Rio Puerco
             
         } catch (java.io.IOException IOE){
             System.out.print(IOE);
@@ -410,15 +414,15 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
         new SimulationToAsciiFile(777, 324,matDirs,magnitudes,metaModif,stormFile,0.0f,0,new java.io.File("/tmp/"));
         
         stormFile=new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Hydrology/storms/precipitation_events/event_10/precipitation_interpolated_ev10.metaVHC");
-        new SimulationToAsciiFile(777, 324,matDirs,magnitudes,metaModif,stormFile,0.0f,0,new java.io.File("/tmp/"));
+        new SimulationToAsciiFile(777, 324,matDirs,magnitudes,metaModif,stormFile,0.0f,2,new java.io.File("/tmp/"));
         
     }
     
     public static void subMain2(String args[]) throws java.io.IOException, VisADException {
         
-        java.io.File theFile=new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Topography/1_ArcSec_USGS/ORIGINAL/walnutGulchUpdated.metaDEM");
+        java.io.File theFile=new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Topography/1_ArcSec_USGS/walnutGulchUpdated.metaDEM");
         hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
-        metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Topography/1_ArcSec_USGS/ORIGINAL/walnutGulchUpdated.dir"));
+        metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Topography/1_ArcSec_USGS/walnutGulchUpdated.dir"));
         
         String formatoOriginal=metaModif.getFormat();
         metaModif.setFormat("Byte");
@@ -430,11 +434,11 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
         
         hydroScalingAPI.mainGUI.ParentGUI tempFrame=new hydroScalingAPI.mainGUI.ParentGUI();
         
-        new SimulationToAsciiFile(82,260,matDirs,magnitudes,metaModif,150, 2,3.0f,2,new java.io.File("/tmp/")).executeSimulation();
-        new SimulationToAsciiFile(82,260,matDirs,magnitudes,metaModif, 50, 6,3.0f,2,new java.io.File("/tmp/")).executeSimulation();
-        new SimulationToAsciiFile(82,260,matDirs,magnitudes,metaModif, 10,30,3.0f,2,new java.io.File("/tmp/")).executeSimulation();
-        new SimulationToAsciiFile(82,260,matDirs,magnitudes,metaModif,  5,60,3.0f,2,new java.io.File("/tmp/")).executeSimulation();
-        
+        //new SimulationToAsciiFile(194,281,matDirs,magnitudes,metaModif,150, 2,3.0f,2,new java.io.File("/home/ricardo/simulationResults/walnutGulch/")).executeSimulation();
+        //new SimulationToAsciiFile(194,281,matDirs,magnitudes,metaModif, 50, 6,3.0f,2,new java.io.File("/home/ricardo/simulationResults/walnutGulch/")).executeSimulation();
+        //new SimulationToAsciiFile(194,281,matDirs,magnitudes,metaModif, 10,30,3.0f,2,new java.io.File("/home/ricardo/simulationResults/walnutGulch/")).executeSimulation();
+        //new SimulationToAsciiFile(194,281,matDirs,magnitudes,metaModif,  5,60,3.0f,2,new java.io.File("/home/ricardo/simulationResults/walnutGulch/")).executeSimulation();
+        new SimulationToAsciiFile(88,245,matDirs,magnitudes,metaModif,  50,5,0.0f,2,new java.io.File("/home/ricardo/simulationResults/walnutGulch/")).executeSimulation();
     }
     
     public static void subMain3(String args[]) throws java.io.IOException, VisADException {
@@ -453,7 +457,7 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
         
         hydroScalingAPI.mainGUI.ParentGUI tempFrame=new hydroScalingAPI.mainGUI.ParentGUI();
         
-        new SimulationToAsciiFile(381, 221,matDirs,magnitudes,metaModif,new java.io.File("/hidrosigDataBases/Upper Rio Puerco DB/Rasters/Hydrology/Rainfall/nexrad_prec.metaVHC"),0.0f,2,new java.io.File("/tmp/")).executeSimulation();
+        new SimulationToAsciiFile(381, 221,matDirs,magnitudes,metaModif,new java.io.File("/hidrosigDataBases/Upper Rio Puerco DB/Rasters/Hydrology/Rainfall/nexrad_prec.metaVHC"),0.0f,0,new java.io.File("/tmp/")).executeSimulation();
         
     }
     

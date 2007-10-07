@@ -28,7 +28,7 @@ package hydroScalingAPI.mainGUI.widgets;
 
 /**
  * Creates a {@link java.awt.Dialog} that displays the CUENCAS License agreement
- * @author ricardo
+ * @author Ricardo Mantilla
  */
 public class License extends java.awt.Dialog {
     

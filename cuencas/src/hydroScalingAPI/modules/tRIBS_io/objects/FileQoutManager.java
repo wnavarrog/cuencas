@@ -20,10 +20,11 @@ import java.io.IOException;
 public class FileQoutManager {
     
     private java.util.Hashtable availableGauges;
-    
+    private int outletNode;
     /** Creates a new instance of FileQoutManager */
-    public FileQoutManager(java.io.File[] avGauges) {
+    public FileQoutManager(java.io.File[] avGauges,int oN) {
         
+        outletNode=oN;
         availableGauges=new java.util.Hashtable();
         for (int i = 0; i < avGauges.length; i++) {
             availableGauges.put(avGauges[i].getName().substring(avGauges[i].getName().lastIndexOf("_")+1,avGauges[i].getName().lastIndexOf(".")),new FileQout(avGauges[i]));
@@ -59,6 +60,7 @@ public class FileQoutManager {
             String key=keys[i].toString();
             indexes[i]=Integer.parseInt(key);
         }
+        indexes[indexes.length-1]=outletNode;
         return indexes;
     }
     
@@ -67,9 +69,10 @@ public class FileQoutManager {
      */
     public static void main(String[] args) {
         java.io.File[] files = {new java.io.File("/home/ricardo/workFiles/tribsWork/sampleTribs/SMALLBASIN/Output/hyd/smallbasin_Outlet.qout"),
-                                new java.io.File("/home/ricardo/workFiles/tribsWork/sampleTribs/SMALLBASIN/Output/hyd/smallbasin_5549.qout"),
-                                new java.io.File("/home/ricardo/wo2rkFiles/tribsWork/sampleTribs/SMALLBASIN/Output/hyd/smallbasin_5637.qout")};
-        new FileQoutManager(files);
+                                new java.io.File("/home/ricardo/workFiles/tribsWork/sampleTribs/SMALLBASIN/Output/hyd/smallbasin_5614.qout"),
+                                new java.io.File("/home/ricardo/workFiles/tribsWork/sampleTribs/SMALLBASIN/Output/hyd/smallbasin_5549.qout")};
+        FileQoutManager test = new FileQoutManager(files,1745);
+        System.out.println(""+test.getLocationIndexes("base")[0]);
     }
     
 }

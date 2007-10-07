@@ -174,7 +174,7 @@ public class NetworkEquations_ChannelLosses implements hydroScalingAPI.util.ordD
                             break;    
 
                 case 1:     K_Q=3/2.*Math.pow(input[i],1/3.)
-                                *Math.pow(10.0,2/3.)
+                                *Math.pow(200.0,2/3.)
                                 *Math.pow(widthArray[0][i],-1/3.)
                                 *Math.pow(lengthArray[0][i],-1)
                                 *Math.pow(slopeArray[0][i],1/3.);
@@ -211,6 +211,7 @@ public class NetworkEquations_ChannelLosses implements hydroScalingAPI.util.ordD
             }*/
             
             double ks=0/3.6e6;
+
             double chanLoss=lengthArray[0][i]*widthArray[0][i]*ks;
             
             //the links

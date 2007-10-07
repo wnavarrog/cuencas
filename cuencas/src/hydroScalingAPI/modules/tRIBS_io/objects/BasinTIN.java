@@ -56,6 +56,7 @@ public class BasinTIN {
     private Delaunay delaun;
     private int numPointsBasin=0;
     private int countNoBorder;
+    private int outletNodeID;
     
     private visad.FlatField demField,theColors;
     private int[] nodesPerPolygon;
@@ -138,7 +139,7 @@ public class BasinTIN {
 
                 pointsInTriangulation.add(new Gdc_Coord_3d(latP,lonP,locElev));
                 typeOfPoint.add(new int[] {3});
-                elevationOfPoint.add(locElev);
+                elevationOfPoint.add(locElev-0.05);
                 
                 int delta_yP=((matDir[(int)yP][xP]-1)/3)-1;
                 int delta_xP=((matDir[yP][xP]-1)%3)-1;
@@ -164,9 +165,7 @@ public class BasinTIN {
                         nLatP=latP-delta_yP*adjustFactorLat*1.0/4.0;
                         nLonP=lonP-delta_xP*adjustFactorLon*1.0/4.0;
 
-                        spotValue=(visad.RealTuple) demField.evaluate(new visad.RealTuple(domain, new double[] {lonP,latP}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
-
-                        locElev=(3*currentElev+forwardElev)/4.0;
+                        locElev=currentElev;
 
                         pointsInTriangulation.add(new Gdc_Coord_3d(nLatP,nLonP,locElev));
                         typeOfPoint.add(new int[] {5});
@@ -178,35 +177,27 @@ public class BasinTIN {
                     nLatP=latP+delta_yP*adjustFactorLat*1.0/4.0;
                     nLonP=lonP+delta_xP*adjustFactorLon*1.0/4.0;
 
-                    spotValue=(visad.RealTuple) demField.evaluate(new visad.RealTuple(domain, new double[] {lonP,latP}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
-                
                     locElev=(3*currentElev+forwardElev)/4.0;
 
                     pointsInTriangulation.add(new Gdc_Coord_3d(nLatP,nLonP,locElev));
                     typeOfPoint.add(new int[] {3});
-                    elevationOfPoint.add(locElev);
+                    elevationOfPoint.add(locElev-0.05);
 
                     //A new point half way forward
                     
                     nLatP=latP+delta_yP*adjustFactorLat*2.0/4.0;
                     nLonP=lonP+delta_xP*adjustFactorLon*2.0/4.0;
                     
-                    spotValue=(visad.RealTuple) demField.evaluate(new visad.RealTuple(domain, new double[] {lonP,latP}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
-                
                     locElev=(2*currentElev+2*forwardElev)/4.0;
 
                     pointsInTriangulation.add(new Gdc_Coord_3d(nLatP,nLonP,locElev));
                     typeOfPoint.add(new int[] {3});
-                    elevationOfPoint.add(locElev);
+                    elevationOfPoint.add(locElev-0.05);
 
                         //New points creating a buffer for the river
 
                         nLatP=latP+(2*delta_yP-bfs*delta_xP)*adjustFactorLat/4.0;
                         nLonP=lonP+(2*delta_xP+bfs*delta_yP)*adjustFactorLon/4.0;
-
-                        spotValue=(visad.RealTuple) demField.evaluate(new visad.RealTuple(domain, new double[] {lonP,latP}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
-                
-                        locElev=spotValue.getValues()[0];
 
                         pointsInTriangulation.add(new Gdc_Coord_3d(nLatP,nLonP,locElev));
                         typeOfPoint.add(new int[] {5});
@@ -214,10 +205,6 @@ public class BasinTIN {
 
                         nLatP=latP+(2*delta_yP+bfs*delta_xP)*adjustFactorLat/4.0;
                         nLonP=lonP+(2*delta_xP-bfs*delta_yP)*adjustFactorLon/4.0;
-
-                        spotValue=(visad.RealTuple) demField.evaluate(new visad.RealTuple(domain, new double[] {lonP,latP}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
-                
-                        locElev=spotValue.getValues()[0];
 
                         pointsInTriangulation.add(new Gdc_Coord_3d(nLatP,nLonP,locElev));
                         typeOfPoint.add(new int[] {5});
@@ -234,7 +221,7 @@ public class BasinTIN {
 
                     pointsInTriangulation.add(new Gdc_Coord_3d(nLatP,nLonP,locElev));
                     typeOfPoint.add(new int[] {3});
-                    elevationOfPoint.add(locElev);
+                    elevationOfPoint.add(locElev-0.05);
                     
                         //Two new points acting as buffer for the initial network point
                         //An if statement is needed to avoid hillslope points where there is river network
@@ -243,26 +230,18 @@ public class BasinTIN {
                             nLatP=latP-delta_xP*adjustFactorLat*bfs/4.0;
                             nLonP=lonP+delta_yP*adjustFactorLon*bfs/4.0;
 
-                            spotValue=(visad.RealTuple) demField.evaluate(new visad.RealTuple(domain, new double[] {lonP,latP}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
-
-                            locElev=spotValue.getValues()[0];
-
                             pointsInTriangulation.add(new Gdc_Coord_3d(nLatP,nLonP,locElev));
                             typeOfPoint.add(new int[] {5});
-                            elevationOfPoint.add(locElev);
+                            elevationOfPoint.add(currentElev);
                         }
 
                         if(magnitudes[xyBasin[1][i]+delta_xP][xyBasin[0][i]-delta_yP] <= 0 || matDir[xyBasin[1][i]+delta_xP][xyBasin[0][i]-delta_yP] != 10-directionsKey[1+delta_xP][1-delta_yP]){
                             nLatP=latP+delta_xP*adjustFactorLat*bfs/4.0;
                             nLonP=lonP-delta_yP*adjustFactorLon*bfs/4.0;
 
-                            spotValue=(visad.RealTuple) demField.evaluate(new visad.RealTuple(domain, new double[] {lonP,latP}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
-
-                            locElev=spotValue.getValues()[0];
-
                             pointsInTriangulation.add(new Gdc_Coord_3d(nLatP,nLonP,locElev));
                             typeOfPoint.add(new int[] {5});
-                            elevationOfPoint.add(locElev);
+                            elevationOfPoint.add(currentElev);
                         }
                     
                 }
@@ -378,6 +357,7 @@ public class BasinTIN {
             pointProps[1][i]=(float)(Double.parseDouble(lineData[1])-minY);
             pointProps[2][i]=(float)(Double.parseDouble(lineData[3]));
             if(pointProps[2][i] != 1 && pointProps[2][i] != 2) countNoBorder++;
+            if(pointProps[2][i] == 2) outletNodeID=i;
             Utm_Coord_3d thisUtm=new Utm_Coord_3d(); thisUtm.x=pointProps[0][i]; thisUtm.y=pointProps[1][i];
             pointsInTriangulation.add(thisUtm);
             typeOfPoint.add(pointProps[2][i]);
@@ -496,7 +476,7 @@ public class BasinTIN {
 
         if(!polygonsIntrouble.equalsIgnoreCase("")){
                 Object[] options = { "OK"};
-                javax.swing.JOptionPane.showOptionDialog(mainFrame, "The following nodes have problems: \n"+polygonsIntrouble+"Please modify your *_voi file to correct self intersecting paths\nDo not attempt to display any spatial field", "Atention", javax.swing.JOptionPane.DEFAULT_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE,null, options, options[0]);
+                javax.swing.JOptionPane.showOptionDialog(mainFrame, "The following nodes have problems: \n"+polygonsIntrouble+"Please modify your *_voi file to correct self intersecting paths\nDo not attempt to display any spatial field", "Attention", javax.swing.JOptionPane.DEFAULT_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE,null, options, options[0]);
         }else{
             allPoly=new UnionSet(domainXLYL,polygons);
             UnionSet allRegions=new UnionSet(domainXLYL,regions);
@@ -504,6 +484,10 @@ public class BasinTIN {
         }
 
         
+    }
+    
+    public int getOutletNode(){
+        return outletNodeID;
     }
     
     public double[] getAspect(){
@@ -967,6 +951,17 @@ public class BasinTIN {
         visad.Real[] rtd1 = {new visad.Real(xEasting, xx),
                              new visad.Real(yNorthing,  yy)};
         return new visad.RealTuple(rtd1);
+    }
+    
+    public visad.Tuple getTextTuple(int index)  throws visad.VisADException, java.rmi.RemoteException{
+        visad.TextType t = visad.TextType.getTextType("text");
+        Utm_Coord_3d thePointInfo = (Utm_Coord_3d)pointsInTriangulation.get(index);
+        double xx=thePointInfo.x;
+        double yy=thePointInfo.y;
+        visad.Data[] rtd1 = {new visad.Real(xEasting, xx),
+                             new visad.Real(yNorthing,  yy),
+                             new visad.Text(t, ""+index)};
+        return new visad.Tuple(rtd1);
     }
     
     public double getMaxZr(){
