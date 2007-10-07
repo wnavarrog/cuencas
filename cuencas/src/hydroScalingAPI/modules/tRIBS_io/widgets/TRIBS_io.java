@@ -727,8 +727,8 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
                 float resultX= eastMap_O.inverseScaleValues(new float[] {(float)ray.position[0]})[0];
                 float resultY= northMap_O.inverseScaleValues(new float[] {(float)ray.position[1]})[0];
                 
-                longitudeLabel.setText(""+resultX);
-                latitudeLabel.setText(""+resultY);
+                longitudeLabel.setText(""+resultX+" (UTM: "+(resultX+basTIN_O.minX)+")");
+                latitudeLabel.setText(""+resultY+" (UTM: "+(resultY+basTIN_O.minY)+")");
                 if(basTIN_O.getValuesFlatField() != null) {
                     visad.Real spotValue=(visad.Real) basTIN_O.getValuesFlatField().evaluate(new visad.RealTuple(domainXLYL, new double[] {resultX,resultY}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
                     valueLabel.setText(""+spotValue);
@@ -747,8 +747,8 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
                 float resultX= eastMap_O.inverseScaleValues(new float[] {(float)ray.position[0]})[0];
                 float resultY= northMap_O.inverseScaleValues(new float[] {(float)ray.position[1]})[0];
                 
-                longitudeLabel.setText(""+resultX);
-                latitudeLabel.setText(""+resultY);
+                longitudeLabel.setText(""+resultX+" (UTM: "+(resultX+basTIN_O.minX)+")");
+                latitudeLabel.setText(""+resultY+" (UTM: "+(resultY+basTIN_O.minY)+")");
                 if(basTIN_O.getValuesFlatField() != null) {
                     visad.Real spotValue=(visad.Real) basTIN_O.getValuesFlatField().evaluate(new visad.RealTuple(domainXLYL, new double[] {resultX,resultY}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
                     valueLabel.setText(""+spotValue);
