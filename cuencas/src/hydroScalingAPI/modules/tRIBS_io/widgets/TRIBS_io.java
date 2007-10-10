@@ -319,6 +319,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         
         if(basTIN_O.getNumVoi() > 10000) {
             display_TIN_O.disableEvent(visad.DisplayEvent.MOUSE_MOVED);
+            display_NET.disableEvent(visad.DisplayEvent.MOUSE_MOVED);
             pointsCheckBox_O.setSelected(false);
             trianglesCheckBox_O.setSelected(false);
         } else {
@@ -691,7 +692,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
     }
     
     private void qoutAction(int index){
-        if(index != 0)
+        if(index != basTIN_O.getOutletNode())
             qNodesCombo.setSelectedItem(index+"");
         else
             qNodesCombo.setSelectedItem("Outlet");

@@ -1119,6 +1119,11 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
             minXVarValueCurrent=minXVarValue;
             maxXVarValueCurrent=maxXVarValue;
             
+            System.out.println("Mean: "+varStats.meanValue);
+            System.out.println("Standard Deviation: "+varStats.standardDeviation);
+            System.out.println("Min: "+varStats.minValue);
+            System.out.println("MAx: "+varStats.maxValue);
+            
             minXVarValueSlider.setValue(0);
             maxXVarValueSlider.setValue(100);
             
