@@ -177,6 +177,7 @@ public class ExtractionOptions extends javax.swing.JDialog {
             
         }
         jCheckBoxTodoRed.setSelected(Proc.todoRed);
+        jCheckBoxCleanShorts.setSelected(Proc.cleanShorts);
         jCheckBoxMontgomery.setSelected(Proc.montgomery);
         jButton4.setEnabled(jCheckBox4.isSelected() || jCheckBox6.isSelected() || jCheckBox7.isSelected());
         jRadioButton14.setSelected(Proc.archPro);
@@ -395,6 +396,8 @@ public class ExtractionOptions extends javax.swing.JDialog {
         jPanelIniCanales = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jCheckBoxTodoRed = new javax.swing.JCheckBox();
+        jPanel10 = new javax.swing.JPanel();
+        jCheckBoxCleanShorts = new javax.swing.JCheckBox();
         jPanel3 = new javax.swing.JPanel();
         jCheckBox2 = new javax.swing.JCheckBox();
         jTextField1 = new javax.swing.JTextField();
@@ -795,7 +798,7 @@ public class ExtractionOptions extends javax.swing.JDialog {
         jPanelRedRas.setLayout(new java.awt.GridBagLayout());
 
         jPanelRedRas.setPreferredSize(new java.awt.Dimension(507, 78));
-        jPanelIniCanales.setLayout(new java.awt.GridLayout(6, 0));
+        jPanelIniCanales.setLayout(new java.awt.GridLayout(7, 0));
 
         jPanelIniCanales.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
         jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
@@ -806,6 +809,15 @@ public class ExtractionOptions extends javax.swing.JDialog {
         jPanel2.add(jCheckBoxTodoRed);
 
         jPanelIniCanales.add(jPanel2);
+
+        jPanel10.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jCheckBoxCleanShorts.setFont(new java.awt.Font("Dialog", 0, 12));
+        jCheckBoxCleanShorts.setSelected(true);
+        jCheckBoxCleanShorts.setText("Prune Short Tributaries (1 pixel long)");
+        jPanel10.add(jCheckBoxCleanShorts);
+
+        jPanelIniCanales.add(jPanel10);
 
         jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
@@ -1353,6 +1365,7 @@ public class ExtractionOptions extends javax.swing.JDialog {
               Proc.pixAP=Proc.pixAP/(float)(dx*dy);
       }catch(NumberFormatException e){ jTextField1.setText(" "); jTextField1.grabFocus() ; ok=false;}
       Proc.todoRed = jCheckBoxTodoRed.isSelected();
+      Proc.cleanShorts = jCheckBoxCleanShorts.isSelected();
       Proc.montgomery = jCheckBoxMontgomery.isSelected();
       Proc.archPro=jRadioButton14.isSelected();
       Proc.lAzules = jCheckBoxLAzules.isSelected();
@@ -1546,6 +1559,7 @@ public class ExtractionOptions extends javax.swing.JDialog {
     private javax.swing.JCheckBox jCheckBoxAP_LA;
     private javax.swing.JCheckBox jCheckBoxAreaPend_c;
     private javax.swing.JCheckBox jCheckBoxAreaPend_n;
+    private javax.swing.JCheckBox jCheckBoxCleanShorts;
     private javax.swing.JCheckBox jCheckBoxDIR;
     private javax.swing.JCheckBox jCheckBoxGEO;
     private javax.swing.JCheckBox jCheckBoxLAzules;
@@ -1575,6 +1589,7 @@ public class ExtractionOptions extends javax.swing.JDialog {
     private javax.swing.JLabel jLabelBarra1;
     private javax.swing.JPanel jPaneLAzules;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel16;
     private javax.swing.JPanel jPanel17;

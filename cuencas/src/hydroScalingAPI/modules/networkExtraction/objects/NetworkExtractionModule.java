@@ -219,6 +219,10 @@ public class NetworkExtractionModule implements Runnable {
      */
     public int nCeldasConv=2;
     /**
+     * A flag that indicates the cleanShortsRoutine will be called
+     */
+    public boolean cleanShorts = true;
+    /**
      * A flag that indicates if a ROM-based or RAM-based algorithm must be used to
      * calculate the geomorphology
      */
@@ -538,7 +542,7 @@ public class NetworkExtractionModule implements Runnable {
                 }
             }
             
-            GetRasterNetwork.cleanShorts(this);
+            if(cleanShorts) GetRasterNetwork.cleanShorts(this);
             
             GetRasterNetwork.fixIntersections(this);
             
