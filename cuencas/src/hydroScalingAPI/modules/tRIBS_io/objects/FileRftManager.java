@@ -36,6 +36,7 @@ public class FileRftManager {
             fullLine=fileRft.readLine(); countTimes++;
             do{
                 fullLine=fileRft.readLine();
+                if(fullLine == null) break;
                 countTimes++;
                 theTime=Double.parseDouble(fullLine.split("\t")[0]);
             } while (theTime < maxTime);

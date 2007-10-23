@@ -20,7 +20,6 @@ public class FileIntegratedManager {
     
     private java.util.Hashtable availableIntegrated;
     
-    
     /** Creates a new instance of FileIntegratedManager */
     public FileIntegratedManager(java.io.File[] pInt,int nv) {
         availableIntegrated=new java.util.Hashtable();
@@ -32,6 +31,7 @@ public class FileIntegratedManager {
     }
     
     public float[] getValues(Object theKey,int varIndex){
+        System.out.println(" ----- Catch here"+theKey);
         FileIntegrated theNode=(FileIntegrated)availableIntegrated.get(theKey);
         return theNode.getValues(varIndex);
     }

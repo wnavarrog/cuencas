@@ -61,6 +61,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
     
     private hydroScalingAPI.modules.tRIBS_io.objects.BasinNet basNet;
     
+    private hydroScalingAPI.modules.tRIBS_io.objects.FileOnlyNetworkManager fonm;
     private hydroScalingAPI.modules.tRIBS_io.objects.FileDynamicManager fdm;
     private hydroScalingAPI.modules.tRIBS_io.objects.FileIntegratedManager fim;
     private hydroScalingAPI.modules.tRIBS_io.objects.FileMrfManager fmrfm;
@@ -123,6 +124,8 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         fim=new hydroScalingAPI.modules.tRIBS_io.objects.FileIntegratedManager(findIntegratedOutput(outputsDirectory),basTIN_O.getNumVoi());
         System.out.println(">>Loading Dynamic Files");
         fdm=new hydroScalingAPI.modules.tRIBS_io.objects.FileDynamicManager(findDynamicOutput(outputsDirectory),basTIN_O.getNumVoi());
+        System.out.println(">>Loading Only Network Files");
+        fonm=new hydroScalingAPI.modules.tRIBS_io.objects.FileOnlyNetworkManager(findTriEdgNodes(outputsDirectory),basTIN_O.getNumVoi(),baseName);
         System.out.println(">>Initializing Interface");
         initializeOutputTabs();
     }
@@ -137,6 +140,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
     public TRIBS_io(hydroScalingAPI.mainGUI.ParentGUI parent) throws RemoteException, VisADException, java.io.IOException{
         super(parent, false);
         initComponents();
+        panelOutputs.remove(jPanel34);
         
         mainFrame=parent;
         
@@ -619,7 +623,11 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
     }
     private void paintParametersVoronoiPolygons(int locAndCol){
         if(locAndCol >= 2000){
-            paintParametersVoronoiPolygons(locAndCol,baseNameTextField.getText()+".0000_00d");
+            if(locAndCol >= 3000){
+                paintParametersVoronoiPolygons(locAndCol,"Only Network");
+            } else {
+                paintParametersVoronoiPolygons(locAndCol,baseNameTextField.getText()+".0000_00d");
+            }
         } else {
             paintParametersVoronoiPolygons(locAndCol,"Initial Condition");
         }
@@ -631,7 +639,11 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         float[][] values=new float[1][];
         
         if(locAndCol >= 2000){
-            values[0] = fdm.getValues((String)fileKey,locAndCol-2000);
+            if(locAndCol >= 3000){
+                values[0] = fonm.getValues((String)fileKey,locAndCol-3000);
+            } else {
+                values[0] = fdm.getValues((String)fileKey,locAndCol-2000);
+            }
         } else {
             values[0] = fim.getValues((String)fileKey,locAndCol-1000);
         }
@@ -2014,9 +2026,15 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
             ///home/ricardo/workFiles/tribsWork/sampleTribs/SMALLBASIN/Output/"),"smallbasin"
             ///home/ricardo/simulationResults/SMALLBASIN/Output_Base/"),"smallbasin"
             ///home/ricardo/simulationResults/Output_Mar23a_07/"),"urp"
+            ///home/ricardo/SourceCodes/benchmarkExamples/Scripts/Comparison/tRIBS_Output/Output_conv_loam_G5/Output/ conv_tt_loam
+            ///home/ricardo/SourceCodes/benchmarkExamples/Scripts/Comparison/tRIBS_Output/Output_elem_loam_G5/Output/ elem_tt_loam
+            ///home/ricardo/SourceCodes/benchmarkExamples/Scripts/Comparison/tRIBS_Output/Output_peach_Fall1996_G5/Output/ peach_f96_tt_dist
+            ///home/ricardo/SourceCodes/benchmarkExamples/Scripts/Comparison/tRIBS_Output/Output_peach_Fall1998_G5/Output/ peach_f98_tt_dist
+            ///home/ricardo/SourceCodes/benchmarkExamples/Scripts/Comparison/tRIBS_Output/Output_Summer1991_G5/Output/ peach_s91_tt_loam
             
-            java.io.File theDirectory=new java.io.File("/home/ricardo/workFiles/tribsWork/sampleTribs/MOGOLLON/Output/");
-            String baseName="mogollon";
+            
+            java.io.File theDirectory=new java.io.File("/home/ricardo/SourceCodes/benchmarkExamples/PEACH/Output/Fall1996/");
+            String baseName="peach_f96_tt_dist";
             
             if(args.length > 0){
                 theDirectory=new java.io.File(args[0]);
@@ -2151,7 +2169,11 @@ class ListOfVariables{
                                             1008,
                                             1009,
                                             2025,
-                                            2026};
+                                            2026,
+                                            3000,
+                                            3001,
+                                            3002,
+                                            3003};
 
     public static String[] spatialParams={  "Available Variables",
                                             "Node Identification, ID [id]",
@@ -2165,7 +2187,11 @@ class ListOfVariables{
                                             "Width of Voronoi Flow Window, FWidth [m]",
                                             "Site Aspect as Angle from North, Aspect [radian]",
                                             "Soil Type []",
-                                            "Land Use Type []"};
+                                            "Land Use Type []",
+                                            "Channel Width [m]",
+                                            "Edge Length [m]",
+                                            "Channel Slope []",
+                                            "Channel Upstream Area [m^2]"};
     
     public static String[] integratedOutput={   "Average Soil Moisture, top 10 cm, AvSM [m3/m3]",
                                                 "Average Root Zone Moisture, top 1 m, AvRtM [m3/m3]",
@@ -2252,4 +2278,4 @@ class ListOfVariables{
                                           "Discharge, Qstrm [m3/s]",
                                           "Channel Stage, Hlev"};
 }
-
+ 
