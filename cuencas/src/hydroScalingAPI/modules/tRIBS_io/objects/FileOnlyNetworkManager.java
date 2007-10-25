@@ -35,9 +35,11 @@ public class FileOnlyNetworkManager {
             String[] lineData=fullLine.split("\t");
             int index=Integer.parseInt(lineData[0]);
             if(index < nv){
-                netProperties[0][index]=Float.parseFloat(lineData[3]);
-                netProperties[1][index]=Float.parseFloat(lineData[4]);
-                netProperties[2][index]=Float.parseFloat(lineData[5]);
+                if(lineData.length == 6){
+                    netProperties[0][index]=Float.parseFloat(lineData[3]);
+                    netProperties[1][index]=Float.parseFloat(lineData[4]);
+                    netProperties[2][index]=Float.parseFloat(lineData[5]);
+                }
             }
             fullLine=bufferNodes.readLine();
         }

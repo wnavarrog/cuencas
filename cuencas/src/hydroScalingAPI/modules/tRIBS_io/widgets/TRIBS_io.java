@@ -2033,7 +2033,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
             ///home/ricardo/SourceCodes/benchmarkExamples/Scripts/Comparison/tRIBS_Output/Output_Summer1991_G5/Output/ peach_s91_tt_loam
             
             
-            java.io.File theDirectory=new java.io.File("/home/ricardo/temp/benchmarkExamples/standard/ELEM/Output/");
+            java.io.File theDirectory=new java.io.File("/home/ricardo/temp/benchmarkExamples/parallel/ELEM/Output/");
             String baseName="conv_tt_loam";
             
             if(args.length > 0){
