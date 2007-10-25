@@ -559,10 +559,10 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
     
     private void plotRft(){
         PpanelRTF.removeAll();
-        if(infExBox.isSelected()) PpanelRTF.addDatos(frftm.getTime(),frftm.getSeries(1),-9999,java.awt.Color.BLUE,1);
-        if(satExBox.isSelected()) PpanelRTF.addDatos(frftm.getTime(),frftm.getSeries(2),-9999,java.awt.Color.RED,1);
-        if(perFlBox.isSelected()) PpanelRTF.addDatos(frftm.getTime(),frftm.getSeries(3),-9999,java.awt.Color.GREEN,1); 
-        if(groFlBox.isSelected()) PpanelRTF.addDatos(frftm.getTime(),frftm.getSeries(4),-9999,java.awt.Color.YELLOW,1); 
+        if(infExBox.isSelected()) PpanelRTF.addDatos(frftm.getTime(),frftm.getSeries(1),-9999,java.awt.Color.BLUE,0);
+        if(satExBox.isSelected()) PpanelRTF.addDatos(frftm.getTime(),frftm.getSeries(2),-9999,java.awt.Color.RED,0);
+        if(perFlBox.isSelected()) PpanelRTF.addDatos(frftm.getTime(),frftm.getSeries(3),-9999,java.awt.Color.GREEN,0); 
+        if(groFlBox.isSelected()) PpanelRTF.addDatos(frftm.getTime(),frftm.getSeries(4),-9999,java.awt.Color.YELLOW,0); 
     }
     
     private java.io.File[] findQouts(java.io.File iniDir){
@@ -582,8 +582,8 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
     private void plotQouts(){
         Object theKey=qNodesCombo.getSelectedItem();
         PpanelQOUT.removeAll();
-        if(dischBox.isSelected()) PpanelQOUT.addDatos(fqm.getTime(theKey),fqm.getSeries(theKey,1),-9999,java.awt.Color.BLUE,1);
-        if(stageBox.isSelected()) PpanelQOUT.addDatos(fqm.getTime(theKey),fqm.getSeries(theKey,2),-9999,java.awt.Color.RED,1);
+        if(dischBox.isSelected()) PpanelQOUT.addDatos(fqm.getTime(theKey),fqm.getSeries(theKey,1),-9999,java.awt.Color.BLUE,0);
+        if(stageBox.isSelected()) PpanelQOUT.addDatos(fqm.getTime(theKey),fqm.getSeries(theKey,2),-9999,java.awt.Color.RED,0);
     }
     
     private java.io.File[] findPixel(java.io.File iniDir){
@@ -604,7 +604,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         Object theKey=pNodesCombo.getSelectedItem();
         int theIndex=pNodesVarsCombo.getSelectedIndex();
         PpanelPixel.removeAll();
-        PpanelPixel.addDatos(fpm.getTime(theKey),fpm.getSeries(theKey,theIndex+2),-9999,java.awt.Color.BLUE,1);
+        PpanelPixel.addDatos(fpm.getTime(theKey),fpm.getSeries(theKey,theIndex+2),-9999,java.awt.Color.BLUE,0);
         
     }
     
