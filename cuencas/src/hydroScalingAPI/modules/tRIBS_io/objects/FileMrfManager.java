@@ -32,7 +32,6 @@ public class FileMrfManager {
             double theTime=0.0;
             fullLine=fileMrf.readLine(); countTimes++;
             fullLine=fileMrf.readLine(); countTimes++;
-            System.out.println(maxTime);
             do{
                 fullLine=fileMrf.readLine();
                 if(fullLine == null) break;

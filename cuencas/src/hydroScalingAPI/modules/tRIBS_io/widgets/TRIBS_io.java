@@ -495,7 +495,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
     }
     
     private java.io.File findTriEdgNodes(java.io.File iniDir){
-        java.io.File[] fileNodesCand=iniDir.listFiles(new hydroScalingAPI.util.fileUtilities.DotFilter("nodes"));
+        java.io.File[] fileNodesCand=iniDir.listFiles(new hydroScalingAPI.util.fileUtilities.NameDotFilter(baseNameTextField.getText(),"nodes"));
         if(fileNodesCand.length > 0){
             return fileNodesCand[0].getParentFile();
         }else{
@@ -509,7 +509,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
     }
     
     private java.io.File findMRF(java.io.File iniDir){
-        java.io.File[] fileNodesCand=iniDir.listFiles(new hydroScalingAPI.util.fileUtilities.DotFilter("mrf"));
+        java.io.File[] fileNodesCand=iniDir.listFiles(new hydroScalingAPI.util.fileUtilities.NameDotFilter(baseNameTextField.getText(),"mrf"));
         if(fileNodesCand.length > 0){
             return fileNodesCand[0];
         }else{
@@ -530,7 +530,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
     }
     
     private java.io.File findRFT(java.io.File iniDir){
-        java.io.File[] fileNodesCand=iniDir.listFiles(new hydroScalingAPI.util.fileUtilities.DotFilter("rft"));
+        java.io.File[] fileNodesCand=iniDir.listFiles(new hydroScalingAPI.util.fileUtilities.NameDotFilter(baseNameTextField.getText(),"rft"));
         if(fileNodesCand.length > 0){
             return fileNodesCand[0];
         }else{
@@ -544,7 +544,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
     }
     
     private java.io.File findCNTRL(java.io.File iniDir){
-        java.io.File[] fileNodesCand=iniDir.listFiles(new hydroScalingAPI.util.fileUtilities.DotFilter("cntrl"));
+        java.io.File[] fileNodesCand=iniDir.listFiles(new hydroScalingAPI.util.fileUtilities.NameDotFilter(baseNameTextField.getText(),"cntrl"));
         if(fileNodesCand.length > 0){
             return fileNodesCand[0];
         }else{
@@ -566,7 +566,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
     }
     
     private java.io.File[] findQouts(java.io.File iniDir){
-        java.io.File[] fileNodesCand=iniDir.listFiles(new hydroScalingAPI.util.fileUtilities.DotFilter("qout"));
+        java.io.File[] fileNodesCand=iniDir.listFiles(new hydroScalingAPI.util.fileUtilities.NameDotFilter(baseNameTextField.getText(),"qout"));
         if(fileNodesCand.length > 0){
             return fileNodesCand;
         }else{
@@ -587,7 +587,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
     }
     
     private java.io.File[] findPixel(java.io.File iniDir){
-        java.io.File[] fileNodesCand=iniDir.listFiles(new hydroScalingAPI.util.fileUtilities.DotFilter("pixel"));
+        java.io.File[] fileNodesCand=iniDir.listFiles(new hydroScalingAPI.util.fileUtilities.NameDotFilter(baseNameTextField.getText(),"pixel"));
         if(fileNodesCand.length > 0){
             return fileNodesCand;
         }else{
@@ -2033,8 +2033,8 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
             ///home/ricardo/SourceCodes/benchmarkExamples/Scripts/Comparison/tRIBS_Output/Output_Summer1991_G5/Output/ peach_s91_tt_loam
             
             
-            java.io.File theDirectory=new java.io.File("/home/ricardo/SourceCodes/benchmarkExamples/PEACH/Output/Fall1996/");
-            String baseName="peach_f96_tt_dist";
+            java.io.File theDirectory=new java.io.File("/home/ricardo/temp/benchmarkExamples/standard/ELEM/Output/");
+            String baseName="conv_tt_loam";
             
             if(args.length > 0){
                 theDirectory=new java.io.File(args[0]);
