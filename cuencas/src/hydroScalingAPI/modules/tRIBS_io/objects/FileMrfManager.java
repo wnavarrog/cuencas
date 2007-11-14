@@ -12,6 +12,9 @@ package hydroScalingAPI.modules.tRIBS_io.objects;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import java.security.*;
+import java.math.*;
+
 /**
  * @author ricardo
  */
@@ -82,6 +85,26 @@ public class FileMrfManager {
     
     public double[] getSeries(int index){
         return mrfData[index];
+    }
+    
+    public String SimulationMD5(){
+        String s="TheEntireMRF:";
+        for (int i = 0; i<mrfData.length; i++) {
+            for (int j = 0; j < mrfData[i].length; j+=10) {
+                s+=""+mrfData[i][j];
+            }
+        
+        }
+        
+        MessageDigest m;
+        try {
+            m = MessageDigest.getInstance("MD5");
+            m.update(s.getBytes(),0,s.length());
+            return new BigInteger(1,m.digest()).toString(16);
+        } catch (NoSuchAlgorithmException ex) {
+            ex.printStackTrace();
+            return null;
+        }
     }
     
     /**

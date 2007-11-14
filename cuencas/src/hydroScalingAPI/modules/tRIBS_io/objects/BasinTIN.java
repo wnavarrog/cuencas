@@ -16,6 +16,9 @@ import geotransform.coords.*;
 import geotransform.ellipsoids.*;
 import geotransform.transforms.*;
 
+import java.security.*;
+import java.math.*;
+
 
 /**
  *
@@ -87,7 +90,7 @@ public class BasinTIN {
         
         myCuenca=new hydroScalingAPI.util.geomorphology.objects.Basin(x,y,matDir,metaDatos);
         myLinksStructure=new hydroScalingAPI.util.geomorphology.objects.LinksAnalysis(myCuenca, metaDatos, matDir);
-        //myRSNAnalysis=new hydroScalingAPI.modules.networkAnalysis.objects.RSNDecomposition(myLinksStructure);
+        myRSNAnalysis=new hydroScalingAPI.modules.networkAnalysis.objects.RSNDecomposition(myLinksStructure);
         
         float[][] lonLatsBasin=myCuenca.getLonLatBasin();
         int[][] xyBasin=myCuenca.getXYBasin();
@@ -1289,12 +1292,28 @@ public class BasinTIN {
         
     }
     
-    
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        // TODO code application logic here
+    public String GridMD5(){
+        
+        String s="TheEntireGrid:";
+        try {
+            float[][] values=vals_ff_Li.getFloats();
+            for (int i = 0; i < values.length; i++) {
+                for (int j = 0; j < values[i].length; j+=10) {
+                    s+=""+values[i][j];
+                }
+            }
+        } catch (VisADException ex) {
+            ex.printStackTrace();
+        }
+        MessageDigest m;
+        try {
+            m = MessageDigest.getInstance("MD5");
+            m.update(s.getBytes(),0,s.length());
+            return new BigInteger(1,m.digest()).toString(16);
+        } catch (NoSuchAlgorithmException ex) {
+            ex.printStackTrace();
+            return null;
+        }
     }
     
 }

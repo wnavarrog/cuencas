@@ -14,7 +14,7 @@ import java.io.IOException;
 
 /**
  *
- * @author ricardo
+ * @author Ricardo Mantilla
  */
 public class FileIntegratedManager {
     
@@ -24,14 +24,12 @@ public class FileIntegratedManager {
     public FileIntegratedManager(java.io.File[] pInt,int nv) {
         availableIntegrated=new java.util.Hashtable();
         FileIntegrated ic=new FileIntegrated(pInt[0],nv);
-        ic.start();
         availableIntegrated.put("Initial Condition",ic);
         FileIntegrated fs=new FileIntegrated(pInt[1],nv);
         availableIntegrated.put("Final State",fs);
     }
     
     public float[] getValues(Object theKey,int varIndex){
-        System.out.println(" ----- Catch here"+theKey);
         FileIntegrated theNode=(FileIntegrated)availableIntegrated.get(theKey);
         return theNode.getValues(varIndex);
     }
@@ -40,6 +38,14 @@ public class FileIntegratedManager {
         Object[] toReturn=availableIntegrated.keySet().toArray();
         java.util.Arrays.sort(toReturn);
         return toReturn;
+    }
+    
+    public void clearData(){
+        Object[] toReturn=availableIntegrated.keySet().toArray();
+        for (Object theKey : toReturn) {
+            FileIntegrated theNode=(FileIntegrated)availableIntegrated.get(theKey);
+            theNode.clearData();
+        }
     }
     
     /**
@@ -51,7 +57,7 @@ public class FileIntegratedManager {
     
 }
 
-class FileIntegrated extends Thread{
+class FileIntegrated{
     
     private java.io.File pathToIntegrated;
     private int numVoi;
@@ -110,7 +116,11 @@ class FileIntegrated extends Thread{
         return integData[varIndex];
     }
     
-    
+    public void clearData(){
+        integData=null;
+        fullyLoaded=false;
+        System.out.println(">>>> "+pathToIntegrated+" has been unloaded");
+    }
 }
 
 

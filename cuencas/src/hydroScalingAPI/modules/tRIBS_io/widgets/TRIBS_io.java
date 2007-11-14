@@ -9,6 +9,7 @@ package hydroScalingAPI.modules.tRIBS_io.widgets;
 
 import hydroScalingAPI.modules.tRIBS_io.objects.BasinNet;
 import hydroScalingAPI.subGUIs.widgets.HydroClimateViewer2D;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import visad.*;
 import visad.java3d.DisplayImplJ3D;
@@ -17,6 +18,8 @@ import java.rmi.RemoteException;
 import geotransform.coords.*;
 import geotransform.ellipsoids.*;
 import geotransform.transforms.*;
+
+import java.sql.*;
     
 /**
  * This module is a graphical interface for creating input and analyzing output
@@ -73,6 +76,8 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
     private int lastSelectedTab=0;
     private int standAlone=0;
     
+    private Connection conn;
+    
     /**
      * Creates new form TRIBS_io
      * @param parent The main GIS GUI
@@ -95,6 +100,8 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
      * Creates new form TRIBS_io
      * @param parent The main GIS GUI
      * @param outputsDirectory Path to tRIBS output directory
+     * @param baseName The base string after which tRIBS output files are named
+     * @param flag 0: Called From within Cuencas 2: Only Visualize 3: Only Data Export
      * @throws java.rmi.RemoteException Captures errors while assigning values to VisAD data objects
      * @throws visad.VisADException Captures errors while creating VisAD objects
      * @throws java.io.IOException Captures errors while reading information
@@ -104,8 +111,37 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         
         standAlone=flag;
         
+        //Loading the Postgresql driver
+        
+        try {
+            Class.forName("org.postgresql.Driver");
+        } catch (ClassNotFoundException ex) {
+            ex.printStackTrace();
+        }
+        
+        //Determine if a connection can be established from this machine
+        
+        String url = "jdbc:postgresql://edacdata1.unm.edu/test";
+        java.util.Properties props = new java.util.Properties();
+        props.setProperty("user","ricardo");
+        props.setProperty("password","Ric@rd09");
+        props.setProperty("loginTimeout","2");
+        
+        try {
+            
+            Connection connT = DriverManager.getConnection(url, props);
+            connT.close();
+            
+        } catch (SQLException ex) {
+            System.out.println("Connection to EDAC servers failed");
+            if(flag == 3) {
+                System.out.println("This System is not authorized to upload data direclty into the EDAC servers");
+                System.exit(0);
+            }
+        }
+        
         panel_IO.setSelectedIndex(1);
-        pathTextField.setText(outputsDirectory.getPath());
+        pathTextField.setText(outputsDirectory.getAbsolutePath());
         baseNameTextField.setText(baseName);
         System.out.println(">>Loading TIN");
         basTIN_O=new hydroScalingAPI.modules.tRIBS_io.objects.BasinTIN(parent,findTriEdgNodes(outputsDirectory),baseName);
@@ -126,8 +162,31 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         fdm=new hydroScalingAPI.modules.tRIBS_io.objects.FileDynamicManager(findDynamicOutput(outputsDirectory),basTIN_O.getNumVoi());
         System.out.println(">>Loading Only Network Files");
         fonm=new hydroScalingAPI.modules.tRIBS_io.objects.FileOnlyNetworkManager(findTriEdgNodes(outputsDirectory),basTIN_O.getNumVoi(),baseName);
-        System.out.println(">>Initializing Interface");
-        initializeOutputTabs();
+        
+
+        System.out.println(">>Testing Connection to EDAC - Database");
+
+        try {
+            
+            conn = DriverManager.getConnection(url, props);
+            
+            initializeDataExportTab();
+            
+        } catch (SQLException ex) {
+            System.out.println("Connection to EDAC servers failed");
+            panelOutputs.remove(jPanel35);
+        }
+        
+        if(flag != 3){
+            System.out.println(">>Initializing Interface");
+            initializeOutputTabs();
+        } else {
+            panelOutputs.remove(jPanel24);
+            panelOutputs.remove(jPanel16);
+            panelOutputs.remove(jPanel26);
+            panelOutputs.remove(jPanel17);
+            panelOutputs.remove(jPanel30);
+        }
     }
     
     /**
@@ -277,6 +336,70 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         
         ridgeLevelCombo.setModel(new javax.swing.DefaultComboBoxModel(levelsString));
         
+        
+    }
+    
+    private void initializeDataExportTab(){
+        
+        System.out.println(">> Calculating MD5 keys");
+        
+        md5_grid_textField.setText(basTIN_O.GridMD5());
+        md5_simu_textField.setText(fmrfm.SimulationMD5());
+
+        System.out.println(">> Obtaining Projection's list");
+        
+        try {
+            
+            Statement st = conn.createStatement();
+            
+            ResultSet rs = st.executeQuery("SELECT srid,srtext FROM spatial_ref_sys WHERE srtext LIKE '%UTM zone%'");
+            java.util.Vector avaProjs=new java.util.Vector<String>(3000);
+            avaProjs.add("Projections ...");
+            String proStr;
+            String[] pieces;
+            while (rs.next()) {
+                proStr=rs.getString(2);
+                pieces=proStr.split("\"");
+                avaProjs.add("["+rs.getString(1)+"]"+" "+pieces[1]);
+            }
+            rs.close();
+            
+            projsComboBox.setModel(new javax.swing.DefaultComboBoxModel(avaProjs));
+            
+            
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        
+        Object months[] = 
+           {"Month",
+            "01",	"02",	"03",	"04",	"05",	"06",	"07",	"08",	"09",	"10",	"11",	"12"};
+        monthComboBox.setModel(new javax.swing.DefaultComboBoxModel(months));
+        
+        Object days[] = 
+           {"Day",
+            "01",	"02",	"03",	"04",	"05",	"06",	"07",	"08",	"09",	"10",	"11",	"12",	"13",	"14",	"15",	"16",	"17",	"18",	"19",	"20",	"21",	"22",	"23",	"24",	"25",	"26",	"27",	"28",	"29",	"30",	"31"};
+        dayComboBox.setModel(new javax.swing.DefaultComboBoxModel(days));
+        
+        Object years[] = 
+           {"Year",
+            "1950",	"1951",	"1952",	"1953",	"1954",	"1955",	"1956",	"1957",	"1958",	"1959",	"1960",	"1961",	"1962",	"1963",	"1964",	"1965",	"1966",	"1967",	"1968",	"1969",	"1970",	"1971",	"1972",	"1973",	"1974",	"1975",	"1976",	"1977",	"1978",	"1979",	"1980",	"1981",	"1982",	"1983",	"1984",	"1985",	"1986",	"1987",	"1988",	"1989",	"1990",	"1991",	"1992",	"1993",	"1994",	"1995",	"1996",	"1997",	"1998",	"1999",	"2000",	"2001",	"2002",	"2003",	"2004",	"2005",	"2006",	"2007",	"2008",	"2009",	"2010",	"2011",	"2012",	"2013",	"2014",	"2015",	"2016",	"2017",	"2018",	"2019",	"2020",	"2021",	"2022",	"2023",	"2024",	"2025",	"2026",	"2027",	"2028",	"2029",	"2030",	"2031",	"2032",	"2033",	"2034",	"2035",	"2036",	"2037",	"2038",	"2039",	"2040",	"2041",	"2042",	"2043",	"2044",	"2045",	"2046",	"2047",	"2048",	"2049",	"2050"};
+        yearComboBox.setModel(new javax.swing.DefaultComboBoxModel(years));
+        
+        Object hour[] = 
+           {"Hour",
+            "00",   "01",	"02",	"03",	"04",	"05",	"06",	"07",	"08",	"09",	"10",	"11",	"12",	"13",	"14",	"15",	"16",	"17",	"18",	"19",	"20",	"21",	"22",	"23"};
+        hourComboBox.setModel(new javax.swing.DefaultComboBoxModel(hour));
+        
+        Object minute[] = 
+           {"Minute",
+            "00",   "01",	"02",	"03",	"04",	"05",	"06",	"07",	"08",	"09",	"10",	"11",	"12",	"13",	"14",	"15",	"16",	"17",	"18",	"19",	"20",	"21",	"22",	"23",	"24",	"25",	"26",	"27",	"28",	"29",	"30",	"31",	"32",	"33",	"34",	"35",	"36",	"37",	"38",	"39",	"40",	"41",	"42",	"43",	"44",	"45",	"46",	"47",	"48",	"49",	"50",	"51",	"52",	"53",	"54",	"55",	"56",	"57",	"58",	"59",	"60"};
+        minComboBox.setModel(new javax.swing.DefaultComboBoxModel(minute));
+        
+        Object timeZones[] = 
+           {"TimeZone",
+            "UTC-1200",	"UTC-1100",	"UTC-1000",	"UTC-0900",	"UTC-0800",	"UTC-0700",	"UTC-0600",	"UTC-0500",	"UTC-0400",	"UTC-0300",	"UTC-0200",	"UTC-0100",	"UTC-0000",	"UTC+0100",	"UTC+0200",	"UTC+0300",	"UTC+0400",	"UTC+0500",	"UTC+0600",	"UTC+0700",	"UTC+0800",	"UTC+0900",	"UTC+1000",	"UTC+1100",	"UTC+1200"};
+        timeZoneComboBox.setModel(new javax.swing.DefaultComboBoxModel(timeZones));
         
     }
     
@@ -860,6 +983,54 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         jLabel8 = new javax.swing.JLabel();
         pNodesCombo = new javax.swing.JComboBox();
         pNodesVarsCombo = new javax.swing.JComboBox();
+        jPanel35 = new javax.swing.JPanel();
+        jPanel36 = new javax.swing.JPanel();
+        jPanel39 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        md5_grid_textField = new javax.swing.JTextField();
+        jPanel54 = new javax.swing.JPanel();
+        jLabel10 = new javax.swing.JLabel();
+        projsComboBox = new javax.swing.JComboBox();
+        jPanel47 = new javax.swing.JPanel();
+        jLabel25 = new javax.swing.JLabel();
+        md5_simu_textField = new javax.swing.JTextField();
+        jPanel55 = new javax.swing.JPanel();
+        jLabel33 = new javax.swing.JLabel();
+        jPanel38 = new javax.swing.JPanel();
+        monthComboBox = new javax.swing.JComboBox();
+        dayComboBox = new javax.swing.JComboBox();
+        yearComboBox = new javax.swing.JComboBox();
+        hourComboBox = new javax.swing.JComboBox();
+        minComboBox = new javax.swing.JComboBox();
+        timeZoneComboBox = new javax.swing.JComboBox();
+        jPanel56 = new javax.swing.JPanel();
+        jLabel34 = new javax.swing.JLabel();
+        jPanel40 = new javax.swing.JPanel();
+        inFileTextField = new javax.swing.JTextField();
+        findFileButton = new javax.swing.JButton();
+        jPanel48 = new javax.swing.JPanel();
+        jLabel26 = new javax.swing.JLabel();
+        polyProgressBar = new javax.swing.JProgressBar();
+        jPanel49 = new javax.swing.JPanel();
+        jLabel27 = new javax.swing.JLabel();
+        reachProgressBar = new javax.swing.JProgressBar();
+        jPanel53 = new javax.swing.JPanel();
+        jLabel32 = new javax.swing.JLabel();
+        aggProgressBar = new javax.swing.JProgressBar();
+        jPanel57 = new javax.swing.JPanel();
+        jLabel35 = new javax.swing.JLabel();
+        aggTimeProgressBar = new javax.swing.JProgressBar();
+        jPanel51 = new javax.swing.JPanel();
+        jLabel29 = new javax.swing.JLabel();
+        hydProgressBar = new javax.swing.JProgressBar();
+        jPanel52 = new javax.swing.JPanel();
+        jLabel30 = new javax.swing.JLabel();
+        pixelProgressBar = new javax.swing.JProgressBar();
+        jPanel50 = new javax.swing.JPanel();
+        jLabel28 = new javax.swing.JLabel();
+        dynamicOutputProgressBar = new javax.swing.JProgressBar();
+        jPanel37 = new javax.swing.JPanel();
+        sendButton = new javax.swing.JButton();
         jPanel34 = new javax.swing.JPanel();
         jPanel15 = new javax.swing.JPanel();
         jPanel28 = new javax.swing.JPanel();
@@ -1476,6 +1647,185 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
 
         panelOutputs.addTab("Voronoi Node Output", jPanel30);
 
+        jPanel35.setLayout(new java.awt.BorderLayout());
+
+        jPanel36.setLayout(new java.awt.GridLayout(12, 1));
+
+        jPanel39.setLayout(new java.awt.GridLayout(1, 0));
+
+        jLabel1.setText("GRID HASH CODE : ");
+        jPanel39.add(jLabel1);
+
+        md5_grid_textField.setEditable(false);
+        jPanel39.add(md5_grid_textField);
+
+        jPanel36.add(jPanel39);
+
+        jPanel54.setLayout(new java.awt.GridLayout(1, 0));
+
+        jLabel10.setText("GRID PROJECTION : ");
+        jPanel54.add(jLabel10);
+
+        projsComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Projection ...", "Item 2", "Item 3", "Item 4" }));
+        jPanel54.add(projsComboBox);
+
+        jPanel36.add(jPanel54);
+
+        jPanel47.setLayout(new java.awt.GridLayout(1, 0));
+
+        jLabel25.setText("SIMULATION HASH CODE : ");
+        jPanel47.add(jLabel25);
+
+        md5_simu_textField.setEditable(false);
+        jPanel47.add(md5_simu_textField);
+
+        jPanel36.add(jPanel47);
+
+        jPanel55.setLayout(new java.awt.GridLayout(1, 0));
+
+        jLabel33.setText("SIMULATION INITIAL TIME : ");
+        jPanel55.add(jLabel33);
+
+        jPanel38.setLayout(new java.awt.GridLayout(1, 6));
+
+        monthComboBox.setFont(new java.awt.Font("Lucida Grande", 0, 10));
+        monthComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Month", "Item 2", "Item 3", "Item 4" }));
+        jPanel38.add(monthComboBox);
+
+        dayComboBox.setFont(new java.awt.Font("Lucida Grande", 0, 10));
+        dayComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Day", "Item 2", "Item 3", "Item 4" }));
+        jPanel38.add(dayComboBox);
+
+        yearComboBox.setFont(new java.awt.Font("Lucida Grande", 0, 10));
+        yearComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Year", "Item 2", "Item 3", "Item 4" }));
+        jPanel38.add(yearComboBox);
+
+        hourComboBox.setFont(new java.awt.Font("Lucida Grande", 0, 10));
+        hourComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Hour", "Item 2", "Item 3", "Item 4" }));
+        jPanel38.add(hourComboBox);
+
+        minComboBox.setFont(new java.awt.Font("Lucida Grande", 0, 10));
+        minComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Minute", "Item 2", "Item 3", "Item 4" }));
+        jPanel38.add(minComboBox);
+
+        timeZoneComboBox.setFont(new java.awt.Font("Lucida Grande", 0, 10));
+        timeZoneComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "UTC", "Item 2", "Item 3", "Item 4" }));
+        jPanel38.add(timeZoneComboBox);
+
+        jPanel55.add(jPanel38);
+
+        jPanel36.add(jPanel55);
+
+        jPanel56.setLayout(new java.awt.GridLayout(1, 0));
+
+        jLabel34.setText("*.in FILE LOCATION : ");
+        jPanel56.add(jLabel34);
+
+        jPanel40.setLayout(new java.awt.BorderLayout());
+
+        inFileTextField.setText("/path/to/simulation.in");
+        jPanel40.add(inFileTextField, java.awt.BorderLayout.CENTER);
+
+        findFileButton.setText("Find");
+        findFileButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                findFileButtonActionPerformed(evt);
+            }
+        });
+
+        jPanel40.add(findFileButton, java.awt.BorderLayout.EAST);
+
+        jPanel56.add(jPanel40);
+
+        jPanel36.add(jPanel56);
+
+        jPanel48.setLayout(new java.awt.GridLayout(1, 0));
+
+        jLabel26.setText("Polygons Upload : ");
+        jPanel48.add(jLabel26);
+
+        polyProgressBar.setStringPainted(true);
+        jPanel48.add(polyProgressBar);
+
+        jPanel36.add(jPanel48);
+
+        jPanel49.setLayout(new java.awt.GridLayout(1, 0));
+
+        jLabel27.setText("Reaches Upload : ");
+        jPanel49.add(jLabel27);
+
+        reachProgressBar.setStringPainted(true);
+        jPanel49.add(reachProgressBar);
+
+        jPanel36.add(jPanel49);
+
+        jPanel53.setLayout(new java.awt.GridLayout(1, 0));
+
+        jLabel32.setText("Aggreagated (space and time) Response Upload : ");
+        jPanel53.add(jLabel32);
+
+        aggProgressBar.setStringPainted(true);
+        jPanel53.add(aggProgressBar);
+
+        jPanel36.add(jPanel53);
+
+        jPanel57.setLayout(new java.awt.GridLayout(1, 0));
+
+        jLabel35.setText("Aggreagated (time) Response Upload : ");
+        jPanel57.add(jLabel35);
+
+        aggTimeProgressBar.setStringPainted(true);
+        jPanel57.add(aggTimeProgressBar);
+
+        jPanel36.add(jPanel57);
+
+        jPanel51.setLayout(new java.awt.GridLayout(1, 0));
+
+        jLabel29.setText("Hydrographs Upload : ");
+        jPanel51.add(jLabel29);
+
+        hydProgressBar.setStringPainted(true);
+        jPanel51.add(hydProgressBar);
+
+        jPanel36.add(jPanel51);
+
+        jPanel52.setLayout(new java.awt.GridLayout(1, 0));
+
+        jLabel30.setText("Node Output Upload : ");
+        jPanel52.add(jLabel30);
+
+        pixelProgressBar.setStringPainted(true);
+        jPanel52.add(pixelProgressBar);
+
+        jPanel36.add(jPanel52);
+
+        jPanel50.setLayout(new java.awt.GridLayout(1, 0));
+
+        jLabel28.setText("Spatial Output Upload : ");
+        jPanel50.add(jLabel28);
+
+        dynamicOutputProgressBar.setStringPainted(true);
+        jPanel50.add(dynamicOutputProgressBar);
+
+        jPanel36.add(jPanel50);
+
+        jPanel35.add(jPanel36, java.awt.BorderLayout.CENTER);
+
+        jPanel37.setLayout(new java.awt.GridLayout(1, 0));
+
+        sendButton.setText("BEGIN TRANSACTION >>>");
+        sendButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                sendButtonActionPerformed(evt);
+            }
+        });
+
+        jPanel37.add(sendButton);
+
+        jPanel35.add(jPanel37, java.awt.BorderLayout.SOUTH);
+
+        panelOutputs.addTab("Data Upload", jPanel35);
+
         jPanel34.setLayout(new java.awt.BorderLayout());
 
         panelOutputs.addTab("Network Structure", jPanel34);
@@ -1564,6 +1914,520 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void findFileButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_findFileButtonActionPerformed
+        javax.swing.JFileChooser fc=new javax.swing.JFileChooser(pathTextField.getText());
+        fc.setFileSelectionMode(fc.FILES_ONLY);
+        fc.setDialogTitle("tRIBS *.in File Selection");
+        javax.swing.filechooser.FileFilter mdtFilter = new visad.util.ExtensionFileFilter("in","tRIBS Set Up File");
+        fc.addChoosableFileFilter(mdtFilter);
+        int result = fc.showDialog(this,"Select");
+        if (result == javax.swing.JFileChooser.CANCEL_OPTION) return;
+        if (!fc.getSelectedFile().isFile()) return;
+        
+        inFileTextField.setText(fc.getSelectedFile().getAbsolutePath());
+        
+    }//GEN-LAST:event_findFileButtonActionPerformed
+
+    private void sendButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sendButtonActionPerformed
+        
+        sendButton.setEnabled(false);
+
+        //Determine if projection and ini-date were given
+        
+//        projsComboBox.setSelectedIndex(594);
+//        monthComboBox.setSelectedIndex(11);
+//        dayComboBox.setSelectedIndex(1);
+//        yearComboBox.setSelectedIndex(48);
+//        hourComboBox.setSelectedIndex(1);
+//        minComboBox.setSelectedIndex(1);
+//        timeZoneComboBox.setSelectedIndex(5);
+//        inFileTextField.setText("/Users/ricardo/workFiles/tribsWork/sampleTribs/SEVILLETA/smallbasin.in");
+        
+        
+        if(projsComboBox.getSelectedIndex() == 0 ||
+           monthComboBox.getSelectedIndex() == 0 ||
+           dayComboBox.getSelectedIndex() == 0 ||
+           yearComboBox.getSelectedIndex() == 0 ||
+           hourComboBox.getSelectedIndex() == 0 ||
+           minComboBox.getSelectedIndex() == 0 ||
+           timeZoneComboBox.getSelectedIndex() == 0){
+            
+            Object[] options = {"OK"};
+            if(javax.swing.JOptionPane.showOptionDialog(mainFrame, "Please select a projection and initial simulation time before initiating transaction", "Atention", javax.swing.JOptionPane.DEFAULT_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE,null, options, options[0]) == 1) return;
+            return;
+            
+        }
+        
+        java.io.File theInFile=new java.io.File(inFileTextField.getText());
+        String fullLine="",fullFile="";
+        
+        if(!theInFile.exists()){
+            Object[] options = { "OK"};
+            if(javax.swing.JOptionPane.showOptionDialog(mainFrame, "Please select a valid *.in file", "Atention", javax.swing.JOptionPane.DEFAULT_OPTION, javax.swing.JOptionPane.QUESTION_MESSAGE,null, options, options[0]) == 1) return;
+            return;
+        } else {
+            try {
+                java.io.BufferedReader fileMeta = new java.io.BufferedReader(new java.io.FileReader(theInFile));
+                fullLine=fileMeta.readLine();
+                while (fullLine != null) {
+                    fullFile+=fullLine+"\n";
+                    fullLine=fileMeta.readLine();
+                }
+
+                fileMeta.close();
+            } catch (FileNotFoundException ex) {
+                ex.printStackTrace();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+        
+        
+        final String TheInFileText=fullFile;
+        Runnable pushData = new Runnable() {
+                public void run() {
+                    int gridID=0;
+                    int simuID=0;
+
+                    try {
+
+                        //Determine if grid exists in database
+
+                        Statement st = conn.createStatement();
+
+                        ResultSet rs = st.executeQuery("SELECT COUNT(grid_hash) FROM nmt_model_grid WHERE grid_hash = '"+md5_grid_textField.getText()+"'");
+                        rs.next();
+                        if(rs.getString(1).equalsIgnoreCase("0")){
+                            //Upload if necessary
+
+                            rs = st.executeQuery("SELECT NEXTVAL('nmt_model_grid_id_seq')");
+                            rs.next();
+                            gridID=Integer.valueOf(rs.getString(1));
+
+                            String epsgCode=(String)projsComboBox.getSelectedItem();
+                            System.out.println(epsgCode);
+                            epsgCode=epsgCode.substring(1,epsgCode.lastIndexOf("]"));
+
+                            //First register the grid
+
+                            st.execute("INSERT INTO nmt_model_grid (id, grid_hash, proj_epsg) VALUES ("+gridID+",'"+md5_grid_textField.getText()+"',"+epsgCode+")");
+
+                            //Get info about the polygons and static values
+
+                            UnionSet pol=basTIN_O.getPolygonsUnionSet();
+                            SampledSet[] pols=pol.getSets();
+                            
+                            float[][] calcNodeLocation=basTIN_O.getPointsFlatField().getFloats(true);
+
+                            String[] fileKey={"Initial Condition",baseNameTextField.getText()+".0000_00d","Only Network"};
+
+                            float[] val_node_id = fdm.getValues(fileKey[1],0);
+                            float[] val_z = fdm.getValues(fileKey[1],1);
+                            float[] val_s = fdm.getValues(fileKey[1],2);
+                            float[] val_v_ar = fim.getValues(fileKey[0],3);
+                            float[] val_c_ar = fim.getValues(fileKey[0],4);
+                            float[] val_curv = fim.getValues(fileKey[0],5);
+                            float[] val_edg_l = fim.getValues(fileKey[0],6);
+                            float[] val_tan_slp = fim.getValues(fileKey[0],7);
+                            float[] val_f_width = fim.getValues(fileKey[0],8);
+                            float[] val_aspect = fim.getValues(fileKey[0],9);
+                            float[] val_soil_type = fdm.getValues(fileKey[1],25);
+                            float[] val_land_use = fdm.getValues(fileKey[1],26);
+                            float[] val_chan_w = fonm.getValues(fileKey[2],0);
+                            float[] val_chan_l = fonm.getValues(fileKey[2],1);
+                            float[] val_chan_s = fonm.getValues(fileKey[2],2);
+                            float[] val_chan_ua = fonm.getValues(fileKey[2],3);
+
+                            for (int j = 0; j < pols.length; j+=100) {
+                                int k;
+                                for (k = j; k < j+100 && k < pols.length; k++) {
+
+                                    float[][] polsVals=((Gridded2DSet)pols[k]).getSamples();
+
+                                    String pointString="'POINT("+(calcNodeLocation[0][(int)val_node_id[k]]+basTIN_O.minX)+","+(calcNodeLocation[1][(int)val_node_id[k]]+basTIN_O.minY)+")'";
+
+                                    String polygonString="'POLYGON((";
+
+                                    for (int i = 0; i < polsVals[0].length-1; i++) {
+                                        polygonString+=""+(polsVals[0][i]+basTIN_O.minX)+" "+(polsVals[1][i]+basTIN_O.minY)+",";
+                                    }
+                                    polygonString+=""+(polsVals[0][0]+basTIN_O.minX)+" "+(polsVals[1][0]+basTIN_O.minY)+"))'";
+
+                                    if(Float.isNaN(val_chan_w[k])) val_chan_w[k]=-9999;
+                                    if(Float.isNaN(val_chan_l[k])) val_chan_l[k]=-9999;
+                                    if(Float.isNaN(val_chan_s[k])) val_chan_s[k]=-9999;
+                                    if(Float.isNaN(val_chan_ua[k])) val_chan_ua[k]=-9999;
+
+                                    st.addBatch("INSERT INTO nmt_model_polygon ( id,grid_id,geom_txt_poly,geom_txt_pt,z,s,v_ar,c_ar,curv,edg_l,tan_slp,f_width,aspect,soil_type,land_use,chan_w,chan_l,chan_s,chan_ua)" +
+                                                " VALUES("+(gridID*10000000+(int)val_node_id[k])+","+gridID+","+polygonString+","+pointString+","+val_z[k]+","+val_s[k]+","+val_v_ar[k]+","+val_c_ar[k]+","+val_curv[k]+","+val_edg_l[k]+","+val_tan_slp[k]+","+val_f_width[k]+","+val_aspect[k]+","+val_soil_type[k]+","+val_land_use[k]+","+val_chan_w[k]+","+val_chan_l[k]+","+val_chan_s[k]+","+val_chan_ua[k]+")");
+
+                                }
+
+                                int[] s=st.executeBatch();
+
+                                polyProgressBar.setValue((int)(100*k/(float)pols.length));
+                                
+                                st.clearBatch();
+                            }
+
+                            fim.clearData();
+                            
+                            //Create a view for the data view_grid_00000
+                            
+                            java.text.NumberFormat labelFormat = java.text.NumberFormat.getNumberInstance();
+                            labelFormat.setGroupingUsed(false);
+                            labelFormat.setMinimumIntegerDigits(5);
+                            
+                            st.execute("create view view_grid"+labelFormat.format(gridID)+" as select *, geometryfromtext(geom_txt_poly,"+epsgCode+") as the_geom from nmt_model_polygon where grid_id = "+gridID);
+                            st.execute("insert into geometry_columns (f_table_catalog,f_table_schema,f_table_name,f_geometry_column,coord_dimension,srid,type) values ('','public','view_grid"+labelFormat.format(gridID)+"','the_geom',2,"+epsgCode+",'POLYGON')");
+                            //Get Reaches
+
+                            UnionSet rivNet=basNet.getReachesUnionSet();
+                            SampledSet[] reaches=rivNet.getSets();
+
+
+                            for (int j = 0; j < reaches.length; j+=100) {
+                                int k;
+                                for (k = j; k < j+100 && k < reaches.length; k++) {
+
+                                    float[][] polsVals=((Gridded2DSet)reaches[k]).getSamples();
+
+                                    String lineString="'LINESTRING(";
+
+                                    for (int i = 0; i < polsVals[0].length-1; i++) {
+                                        lineString+=""+(polsVals[0][i]+basTIN_O.minX)+" "+(polsVals[1][i]+basTIN_O.minY)+",";
+                                    }
+                                    lineString+=""+(polsVals[0][polsVals[0].length-1]+basTIN_O.minX)+" "+(polsVals[1][polsVals[0].length-1]+basTIN_O.minY)+")'";
+
+                                    st.addBatch("INSERT INTO nmt_model_reach ( id,grid_id,geom_txt_line)" +
+                                                " VALUES("+(gridID*10000000+(int)val_node_id[k])+","+gridID+","+lineString+")");
+
+                                }
+
+                                int[] s=st.executeBatch();
+                                
+                                reachProgressBar.setValue((int)(100*k/(float)reaches.length));
+
+                                st.clearBatch();
+
+                            }
+                            
+                            st.execute("create view view_reach"+labelFormat.format(gridID)+" as select *, geometryfromtext(geom_txt_line,"+epsgCode+") as the_geom from nmt_model_reach where grid_id = "+gridID);
+                            st.execute("insert into geometry_columns (f_table_catalog,f_table_schema,f_table_name,f_geometry_column,coord_dimension,srid,type) values ('','public','view_reach"+labelFormat.format(gridID)+"','the_geom',2,"+epsgCode+",'LINESTRING')");
+
+
+                        } else{
+                            rs = st.executeQuery("SELECT id FROM nmt_model_grid WHERE grid_hash = '"+md5_grid_textField.getText()+"'");
+                            rs.next();
+                            gridID=Integer.valueOf(rs.getString(1));
+                            polyProgressBar.setValue(100);
+                            reachProgressBar.setValue(100);
+                        }
+                        rs.close();
+                        
+                        //Determine if the simulation exists in database
+                    
+                        st = conn.createStatement();
+
+                        rs = st.executeQuery("SELECT COUNT(sim_hash) FROM nmt_model_simulation WHERE sim_hash = '"+md5_simu_textField.getText()+"'");
+                        rs.next();
+                        if(rs.getString(1).equalsIgnoreCase("0")){
+                            //Upload if necessary
+
+                            rs = st.executeQuery("SELECT NEXTVAL('nmt_model_simulation_id_seq')");
+                            rs.next();
+                            simuID=Integer.valueOf(rs.getString(1));
+                            
+                            String time0=yearComboBox.getSelectedItem()+"-"+monthComboBox.getSelectedItem()+"-"+dayComboBox.getSelectedItem()+" "+hourComboBox.getSelectedItem()+":"+minComboBox.getSelectedItem()+":00"+((String)timeZoneComboBox.getSelectedItem()).substring(3);
+
+                            //First register the simulation
+
+                            st.execute("INSERT INTO nmt_model_simulation (id,sim_hash,grid_id,start_time,create_time,init_file) VALUES ("+simuID+",'"+md5_simu_textField.getText()+"',"+gridID+",'"+time0+"','now','"+TheInFileText+"')");
+
+                            //Get info about aggregated response in space and time (mrf+rft)
+                            
+                            double[] times=fmrfm.getTime();
+                            double[] agg_MeanAP=fmrfm.getSeries(2);
+                            double[] agg_MaxAP=fmrfm.getSeries(3);
+                            double[] agg_MinAP=fmrfm.getSeries(4);
+                            double[] agg_FS=fmrfm.getSeries(5);
+                            double[] agg_MeanSSM=fmrfm.getSeries(6);
+                            double[] agg_MeanSRZM=fmrfm.getSeries(7);
+                            double[] agg_MeanSUZM=fmrfm.getSeries(8);
+                            double[] agg_MeanDGW=fmrfm.getSeries(9);
+                            double[] agg_MeanEVAP=fmrfm.getSeries(10);
+                            double[] agg_AFSS=fmrfm.getSeries(11);
+                            double[] agg_AFP=fmrfm.getSeries(12);
+                            double[] agg_Runoff_IE=frftm.getSeries(1);
+                            double[] agg_Runoff_SE=fmrfm.getSeries(2);
+                            double[] agg_Runoff_PF=fmrfm.getSeries(3);
+                            double[] agg_Runoff_GE=fmrfm.getSeries(4);
+                            
+                            for (int j = 0; j < times.length; j+=100) {
+                                int k;
+                                for (k = j; k < j+100 && k < times.length; k++) {
+                                    
+                                    st.addBatch("INSERT INTO nmt_model_aggregatedspacetime (id,                                       grid_id,   simulation_id,time_offset,agg_meanap,    agg_maxap,   agg_minap,   agg_fs,   agg_meanssm,   agg_meansrzm,   agg_meansuzm,   agg_meandgw,   agg_meanevap,   agg_afss,   agg_afp,   agg_runoff_ie,   agg_runoff_se,   agg_runoff_pf,   agg_runoff_ge)" +
+                                               " VALUES (                                  NEXTVAL('nmt_model_aggregatedspacetime_id_seq'),"+gridID+","+simuID+","+   times[k]+","+agg_MeanAP[k]+","+agg_MaxAP[k]+","+agg_MinAP[k]+","+agg_FS[k]+","+agg_MeanSSM[k]+","+agg_MeanSRZM[k]+","+agg_MeanSUZM[k]+","+agg_MeanDGW[k]+","+agg_MeanEVAP[k]+","+agg_AFSS[k]+","+agg_AFP[k]+","+agg_Runoff_IE[k]+","+agg_Runoff_SE[k]+","+agg_Runoff_PF[k]+","+agg_Runoff_GE[k]+")");
+                                    
+                                }
+                                
+                                int[] s=st.executeBatch();
+                                
+                                aggProgressBar.setValue((int)(100*k/(float)times.length));
+
+                                st.clearBatch();
+                            }
+                            
+                            //Get info about aggregated response in time (Integrated Files)
+                            
+                            float[] val_node_id = fim.getValues("Final State",0);
+                            float[] avsm = fim.getValues("Final State",9);
+                            float[] avrtm = fim.getValues("Final State",10);
+                            float[] hoccr = fim.getValues("Final State",11);
+                            float[] hrt = fim.getValues("Final State",12);
+                            float[] sboccr = fim.getValues("Final State",13);
+                            float[] sbrt = fim.getValues("Final State",14);
+                            float[] poccr = fim.getValues("Final State",15);
+                            float[] prt = fim.getValues("Final State",16);
+                            float[] satoccr = fim.getValues("Final State",17);
+                            float[] satrt = fim.getValues("Final State",18);
+                            float[] soisatoccr = fim.getValues("Final State",19);
+                            float[] rchdsch = fim.getValues("Final State",20);
+                            float[] aveet = fim.getValues("Final State",21);
+                            float[] evpfrct = fim.getValues("Final State",22);
+
+                            
+                            for (int j = 0; j < val_node_id.length; j+=100) {
+                                int k;
+                                for (k = j; k < j+100 && k < val_node_id.length; k++) {
+                                    
+                                    st.addBatch("INSERT INTO nmt_model_aggregatedtime (id,                                          simulation_id,polygon_id,                               avsm,       avrtm,       hoccr,       hrt,       sboccr,       sbrt,       poccr,       prt,       satoccr,       satrt,       soisatoccr,       rchdsch,       aveet,       evpfrct)" +
+                                               " VALUES (                              NEXTVAL('nmt_model_aggregatedtime_id_seq'),"+simuID+","+(gridID*10000000+(int)val_node_id[k])+","+   avsm[k]+","+avrtm[k]+","+hoccr[k]+","+hrt[k]+","+sboccr[k]+","+sbrt[k]+","+poccr[k]+","+prt[k]+","+satoccr[k]+","+satrt[k]+","+soisatoccr[k]+","+rchdsch[k]+","+aveet[k]+","+evpfrct[k]+")");
+                                    
+                                }
+                                
+                                int[] s=st.executeBatch();
+                                
+                                aggTimeProgressBar.setValue((int)(100*k/(float)val_node_id.length));
+
+                                st.clearBatch();
+                            }
+                            
+                            fim.clearData();
+                            
+                            //Create a view for the data view_grid_00000_sim00000_aggregatedtime and register geometry
+                            
+                            java.text.NumberFormat labelFormat = java.text.NumberFormat.getNumberInstance();
+                            labelFormat.setGroupingUsed(false);
+                            labelFormat.setMinimumIntegerDigits(5);
+                            
+                            st.execute("create view view_grid"+labelFormat.format(gridID)+"_sim"+labelFormat.format(simuID)+"_aggregatedtime as select a.*, b.id as agg_id, b.avsm, b.avrtm, b.hoccr, b.hrt, b.sboccr, b.sbrt, b.poccr, b.prt, b.satoccr,b.satrt,b.soisatoccr, b.rchdsch,b.aveet,b.evpfrct from view_grid"+labelFormat.format(gridID)+" a, nmt_model_aggregatedtime b where a.id = b.polygon_id and b.simulation_id = "+simuID);
+                            
+                            rs = st.executeQuery("SELECT proj_epsg FROM nmt_model_grid  WHERE id = "+gridID);
+                            rs.next();
+                            String epsgCode=rs.getString(1);
+                            
+                            st.execute("insert into geometry_columns (f_table_catalog,f_table_schema,f_table_name,f_geometry_column,coord_dimension,srid,type) values ('','public','view_grid"+labelFormat.format(gridID)+"_sim"+labelFormat.format(simuID)+"_aggregatedtime','the_geom',2,"+epsgCode+",'POLYGON')");
+
+                            //Get info about hydrographs
+                            
+                            Object[] qKeys=fqm.getKeys();
+                            int[] qIndex=fqm.getLocationIndexes(baseNameTextField.getText());
+                            
+                            for (int l = 0; l < qKeys.length; l++) {
+                                
+                                double[] timesQ=fqm.getTime(qKeys[l]);
+                                double[] dishaQ=fqm.getSeries(qKeys[l],1);
+                                double[] depthQ=fqm.getSeries(qKeys[l],2);
+                                
+                                
+
+                                for (int j = 0; j < timesQ.length; j+=100) {
+                                    int k;
+                                    for (k = j; k < j+100 && k < timesQ.length; k++) {
+
+                                        st.addBatch("INSERT INTO nmt_model_outputhydrograph (id,                                          simulation_id,polygon_id,time_offset,hydrograph_q, hydrograph_depth)" +
+                                                   " VALUES (                                  NEXTVAL('nmt_model_outputhydrograph_id_seq'),"+simuID+","+(gridID*10000000+qIndex[l])+","+timesQ[k]+","+dishaQ[k]+","+depthQ[k]+")");
+
+                                    }
+
+                                    int[] s=st.executeBatch();
+
+                                    
+                                    hydProgressBar.setValue((int)(100*(l+k/(float)timesQ.length)/(float)qKeys.length));
+
+                                    st.clearBatch();
+                                }
+                            }
+                            
+                            //Get info about nodes
+                            
+                            Object[] pKeys=fpm.getKeys();
+                            int[] pIndex=fpm.getLocationIndexes(baseNameTextField.getText());
+                            
+                            for (int l = 0; l < pKeys.length; l++) {
+                                
+                                double[] timesP=fpm.getTime(pKeys[l]);
+                                double[] nwt=fpm.getSeries(pKeys[l],2);
+                                double[] nf=fpm.getSeries(pKeys[l],3);
+                                double[] nt=fpm.getSeries(pKeys[l],4);
+                                double[] mu=fpm.getSeries(pKeys[l],5);
+                                double[] mi=fpm.getSeries(pKeys[l],6);
+                                double[] qpout=fpm.getSeries(pKeys[l],7);
+                                double[] qpin=fpm.getSeries(pKeys[l],8);
+                                double[] trnsm=fpm.getSeries(pKeys[l],9);
+                                double[] gwflx=fpm.getSeries(pKeys[l],10);
+                                double[] srf=fpm.getSeries(pKeys[l],11);
+                                double[] rainfall=fpm.getSeries(pKeys[l],12);
+                                double[] soil_moist=fpm.getSeries(pKeys[l],13);
+                                double[] root_moist=fpm.getSeries(pKeys[l],14);
+                                double[] air_t=fpm.getSeries(pKeys[l],15);
+                                double[] dew_t=fpm.getSeries(pKeys[l],16);
+                                double[] surf_t=fpm.getSeries(pKeys[l],17);
+                                double[] soil_t=fpm.getSeries(pKeys[l],18);
+                                double[] press=fpm.getSeries(pKeys[l],19);
+                                double[] rel_hum=fpm.getSeries(pKeys[l],20);
+                                double[] sky_cov=fpm.getSeries(pKeys[l],21);
+                                double[] wind=fpm.getSeries(pKeys[l],22);
+                                double[] net_rad=fpm.getSeries(pKeys[l],23);
+                                double[] shrt_rad_in=fpm.getSeries(pKeys[l],24);
+                                double[] shrt_rad_in_dir=fpm.getSeries(pKeys[l],25);
+                                double[] shrt_rad_in_dif=fpm.getSeries(pKeys[l],26);
+                                double[] shrt_absv_veg=fpm.getSeries(pKeys[l],27);
+                                double[] shrt_absv_soi=fpm.getSeries(pKeys[l],28);
+                                double[] lng_rad_in=fpm.getSeries(pKeys[l],29);
+                                double[] lng_rad_out=fpm.getSeries(pKeys[l],30);
+                                double[] pot_evp=fpm.getSeries(pKeys[l],31);
+                                double[] act_evp=fpm.getSeries(pKeys[l],32);
+                                double[] evp_ttrs=fpm.getSeries(pKeys[l],33);
+                                double[] evp_wet_can=fpm.getSeries(pKeys[l],34);
+                                double[] evp_dry_can=fpm.getSeries(pKeys[l],35);
+                                double[] evp_soil=fpm.getSeries(pKeys[l],36);
+                                double[] gflux=fpm.getSeries(pKeys[l],37);
+                                double[] hflux=fpm.getSeries(pKeys[l],38);
+                                double[] lflux=fpm.getSeries(pKeys[l],39);
+                                double[] net_precip=fpm.getSeries(pKeys[l],40);
+                                double[] can_storg=fpm.getSeries(pKeys[l],41);
+                                double[] cum_intercept=fpm.getSeries(pKeys[l],42);
+                                double[] intercept=fpm.getSeries(pKeys[l],43);
+                                double[] recharge=fpm.getSeries(pKeys[l],44);
+                                double[] runon=fpm.getSeries(pKeys[l],45);
+                                double[] surf_hour=fpm.getSeries(pKeys[l],46);
+                                double[] qstrm=fpm.getSeries(pKeys[l],47);
+                                double[] hlev=fpm.getSeries(pKeys[l],48);
+
+                                for (int j = 0; j < timesP.length; j+=100) {
+                                    int k;
+                                    for (k = j; k < j+100 && k < timesP.length; k++) {
+
+                                        st.addBatch("INSERT INTO nmt_model_outputnode (id,simulation_id,polygon_id,time_offset,nwt,nf,nt,mu,mi,qpout,qpin,trnsm,gwflx,srf,rainfall,soil_moist,root_moist,air_t,dew_t,surf_t,soil_t,press,rel_hum,sky_cov,wind,net_rad,shrt_rad_in,shrt_rad_in_dir,shrt_rad_in_dif,shrt_absv_veg,shrt_absv_soi,lng_rad_in,lng_rad_out,pot_evp,act_evp,evp_ttrs,evp_wet_can,evp_dry_can,evp_soil,gflux,hflux,lflux,net_precip,can_storg,cum_intercept,intercept,recharge,runon,surf_hour,qstrm,hlev)" +
+                                                   " VALUES (                                  NEXTVAL('nmt_model_outputnode_id_seq'),"+simuID+","+(gridID*10000000+pIndex[l])+","+timesP[k]+","+nwt[k]+","+nf[k]+","+nt[k]+","+mu[k]+","+mi[k]+","+qpout[k]+","+qpin[k]+","+trnsm[k]+","+gwflx[k]+","+srf[k]+","+rainfall[k]+","+soil_moist[k]+","+root_moist[k]+","+air_t[k]+","+dew_t[k]+","+surf_t[k]+","+soil_t[k]+","+press[k]+","+rel_hum[k]+","+sky_cov[k]+","+wind[k]+","+net_rad[k]+","+shrt_rad_in[k]+","+shrt_rad_in_dir[k]+","+shrt_rad_in_dif[k]+","+shrt_absv_veg[k]+","+shrt_absv_soi[k]+","+lng_rad_in[k]+","+lng_rad_out[k]+","+pot_evp[k]+","+act_evp[k]+","+evp_ttrs[k]+","+evp_wet_can[k]+","+evp_dry_can[k]+","+evp_soil[k]+","+gflux[k]+","+hflux[k]+","+lflux[k]+","+net_precip[k]+","+can_storg[k]+","+cum_intercept[k]+","+intercept[k]+","+recharge[k]+","+runon[k]+","+surf_hour[k]+","+qstrm[k]+","+hlev[k]+")");
+
+                                    }
+
+                                    int[] s=st.executeBatch();
+
+                                    
+                                    pixelProgressBar.setValue((int)(100*(l+k/(float)timesP.length)/(float)pKeys.length));
+
+                                    st.clearBatch();
+                                }
+                                
+                                
+                            }
+                            
+                            //Get info about dynamic files
+                            
+                            Object[] dKeys=fdm.getKeys();
+
+                            for (int l = 0; l < dKeys.length; l++) {
+                                
+                                String time_offset=dKeys[l].toString();
+                                time_offset=time_offset.substring(time_offset.lastIndexOf(".")+1,time_offset.lastIndexOf("d"));
+                                float val_time_offset=Float.parseFloat((time_offset.split("_"))[0])+Float.parseFloat((time_offset.split("_"))[1])/60.0f;
+                                
+                                val_node_id = fdm.getValues(dKeys[l],0);
+                                
+                                float[] nwt = fdm.getValues(dKeys[l],4);
+                                float[] mu = fdm.getValues(dKeys[l],5);
+                                float[] mi = fdm.getValues(dKeys[l],6);
+                                float[] nf = fdm.getValues(dKeys[l],7);
+                                float[] nt = fdm.getValues(dKeys[l],8);
+                                float[] qpout = fdm.getValues(dKeys[l],9);
+                                float[] qpin = fdm.getValues(dKeys[l],10);
+                                float[] srf = fdm.getValues(dKeys[l],11);
+                                float[] rain = fdm.getValues(dKeys[l],12);
+                                float[] soil_moist = fdm.getValues(dKeys[l],13);
+                                float[] root_moist = fdm.getValues(dKeys[l],14);
+                                float[] can_storg = fdm.getValues(dKeys[l],15);
+                                float[] act_evp = fdm.getValues(dKeys[l],16);
+                                float[] evp_soil = fdm.getValues(dKeys[l],17);
+                                float[] et = fdm.getValues(dKeys[l],18);
+                                float[] gflux = fdm.getValues(dKeys[l],19);
+                                float[] hflux =  fdm.getValues(dKeys[l],20);
+                                float[] lflux =  fdm.getValues(dKeys[l],21);
+                                float[] qstrm =  fdm.getValues(dKeys[l],22);
+                                float[] hlev =  fdm.getValues(dKeys[l],23);
+                                float[] flw_vlc =  fdm.getValues(dKeys[l],24);
+        
+        
+                                for (int j = 0; j < val_node_id.length; j+=200) {
+                                    int k;
+                                    for (k = j; k < j+200 && k < val_node_id.length; k++) {
+
+                                        st.addBatch("INSERT INTO nmt_model_outputpoly (id,simulation_id,polygon_id,time_offset,nwt,mu,mi,nf,nt,qpout,qpin,srf,rain,soil_moist,root_moist,can_storg,act_evp,evp_soil,et,gflux,hflux,lflux,qstrm,hlev,flw_vlc)" +
+                                                   " VALUES (                                  NEXTVAL('nmt_model_outputpoly_id_seq'),"+simuID+","+(gridID*10000000+(int)val_node_id[k])+","+val_time_offset+","+nwt[k]+","+mu[k]+","+mi[k]+","+nf[k]+","+nt[k]+","+qpout[k]+","+qpin[k]+","+srf[k]+","+rain[k]+","+soil_moist[k]+","+root_moist[k]+","+can_storg[k]+","+act_evp[k]+","+evp_soil[k]+","+et[k]+","+gflux[k]+","+hflux[k]+","+lflux[k]+","+qstrm[k]+","+hlev[k]+","+flw_vlc[k]+")");
+
+                                    }
+
+                                    int[] s=st.executeBatch();
+
+                                    
+                                    dynamicOutputProgressBar.setValue((int)(100*(l+k/(float)val_node_id.length)/(float)dKeys.length));
+
+                                    st.clearBatch();
+                                }
+                                
+                                fdm.clearData(dKeys[l]);
+                                
+                            }
+                            
+                            //Create a view for the data view_grid_00000_sim00000_timeseries and register geometry
+                            
+                            st.execute("create view view_grid"+labelFormat.format(gridID)+"_sim"+labelFormat.format(simuID)+"_timeseries as select a.*, b.id as ts_id, b.simulation_id, (c.start_time + (b.time_offset::char(12) || ' hours')::interval) AT TIME ZONE 'UTC' as timestep, b.nwt, b.mu, b.mi, b.nf, b.nt, b.qpout, b.qpin, b.srf, b.rain, b.soil_moist, b.root_moist, b.can_storg, b.act_evp, b.evp_soil, b.et, b.gflux, b.hflux, b.lflux, b.qstrm, b.hlev, b.flw_vlc from view_grid"+labelFormat.format(gridID)+" a, nmt_model_outputpoly b, nmt_model_simulation c where a.id = b.polygon_id and b.simulation_id = "+simuID+" and c.id = b.simulation_id");
+                            
+                            st.execute("insert into geometry_columns (f_table_catalog,f_table_schema,f_table_name,f_geometry_column,coord_dimension,srid,type) values ('','public','view_grid"+labelFormat.format(gridID)+"_sim"+labelFormat.format(simuID)+"_timeseries','the_geom',2,"+epsgCode+",'POLYGON')");
+
+                            
+
+                        } else{
+                            rs = st.executeQuery("SELECT id FROM nmt_model_grid WHERE grid_hash = '"+md5_grid_textField.getText()+"'");
+                            rs.next();
+                            simuID=Integer.valueOf(rs.getString(1));
+                            aggProgressBar.setValue(100);
+                            aggTimeProgressBar.setValue(100);
+                            dynamicOutputProgressBar.setValue(100);
+                            hydProgressBar.setValue(100);
+                            pixelProgressBar.setValue(100);
+                                    
+                        }
+                        rs.close();
+                        
+                        sendButton.setEnabled(true);
+                        
+                    } catch (SQLException exSQL) {
+                        exSQL.printStackTrace();
+                    }  catch (VisADException exVis) {
+                        exVis.printStackTrace();
+                    }                        
+                        
+                }
+            };
+        new Thread(pushData).start();
+        
+    }//GEN-LAST:event_sendButtonActionPerformed
 
     private void netCheckBox_OActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_netCheckBox_OActionPerformed
         if(netCheckBox_O.isSelected()){
@@ -1790,6 +2654,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
           }
           lastSelectedTab=3;
       }
+      
     }//GEN-LAST:event_panelOutputsStateChanged
 
     private void valuesCheckBox_OActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_valuesCheckBox_OActionPerformed
@@ -2004,6 +2869,19 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
      * @param args the command line arguments
      */
     public static void main(String args[]) {
+        
+//        args=new String[3];
+//        args[0]="-ou";
+//        args[1]="/Users/ricardo/workFiles/tribsWork/sampleTribs/SEVILLETA/simRound1/Output0/";
+//        args[2]="smallbasin";
+
+//        args=new String[2];
+//        args[0]="/Users/ricardo/workFiles/tribsWork/sampleTribs/SEVILLETA/Output4/";
+//        args[1]="smallbasin";
+        
+        System.out.println(java.util.Arrays.toString(args));
+        
+        
         try{
 //            java.io.File theFile=new java.io.File("/hidrosigDataBases/Smallbasin_DB/Rasters/Topography/1_Arcsec/NED_06075640.metaDEM");
 //            //java.io.File theFile=new java.io.File("/hidrosigDataBases/Gila River DB/Rasters/Topography/1_ArcSec/mogollon.metaDEM");
@@ -2019,7 +2897,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
 //            int [][] magnitudes=new hydroScalingAPI.io.DataRaster(metaModif).getInt();
 //            
             hydroScalingAPI.mainGUI.ParentGUI tempFrame=new hydroScalingAPI.mainGUI.ParentGUI();
-//            
+
 //            new TRIBS_io(tempFrame, 56,79,matDirs,magnitudes,metaModif).setVisible(true);
 //            //new TRIBS_io(tempFrame, 282,298 ,matDirs,magnitudes,metaModif).setVisible(true);
             
@@ -2033,12 +2911,17 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
             ///home/ricardo/SourceCodes/benchmarkExamples/Scripts/Comparison/tRIBS_Output/Output_Summer1991_G5/Output/ peach_s91_tt_loam
             
             
-            java.io.File theDirectory=new java.io.File("/home/ricardo/temp/benchmarkExamples/parallel/ELEM/Output/");
-            String baseName="conv_tt_loam";
+            java.io.File theDirectory=new java.io.File("/Users/ricardo/workFiles/tribsWork/sampleTribs/SEVILLETA/Output0/");
+            String baseName="smallbasin";
             
             if(args.length > 0){
-                theDirectory=new java.io.File(args[0]);
-                baseName=args[1];
+                if(args[0].equalsIgnoreCase("-ou")){
+                    theDirectory=new java.io.File(args[1]);
+                    baseName=args[2];
+                } else {
+                    theDirectory=new java.io.File(args[0]);
+                    baseName=args[1];
+                }
             }
             
             new TRIBS_io(tempFrame, theDirectory,baseName,args.length).setVisible(true);
@@ -2055,20 +2938,40 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JProgressBar aggProgressBar;
+    private javax.swing.JProgressBar aggTimeProgressBar;
     private javax.swing.JComboBox avaTimesCombo;
     private javax.swing.JComboBox avaVariablesCombo;
     private javax.swing.JTextField baseNameTextField;
     private javax.swing.JButton changePath;
     private javax.swing.JButton colorTableButton;
+    private javax.swing.JComboBox dayComboBox;
     private javax.swing.JCheckBox dischBox;
+    private javax.swing.JProgressBar dynamicOutputProgressBar;
     private javax.swing.JButton exportPoiButton;
     private javax.swing.JButton exportTriButton;
+    private javax.swing.JButton findFileButton;
     private javax.swing.JCheckBox groFlBox;
+    private javax.swing.JComboBox hourComboBox;
+    private javax.swing.JProgressBar hydProgressBar;
+    private javax.swing.JTextField inFileTextField;
     private javax.swing.JCheckBox infExBox;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel25;
+    private javax.swing.JLabel jLabel26;
+    private javax.swing.JLabel jLabel27;
+    private javax.swing.JLabel jLabel28;
+    private javax.swing.JLabel jLabel29;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel30;
     private javax.swing.JLabel jLabel31;
+    private javax.swing.JLabel jLabel32;
     private javax.swing.JLabel jLabel323;
+    private javax.swing.JLabel jLabel33;
+    private javax.swing.JLabel jLabel34;
+    private javax.swing.JLabel jLabel35;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
@@ -2103,8 +3006,25 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
     private javax.swing.JPanel jPanel32;
     private javax.swing.JPanel jPanel33;
     private javax.swing.JPanel jPanel34;
+    private javax.swing.JPanel jPanel35;
+    private javax.swing.JPanel jPanel36;
+    private javax.swing.JPanel jPanel37;
+    private javax.swing.JPanel jPanel38;
+    private javax.swing.JPanel jPanel39;
     private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel40;
+    private javax.swing.JPanel jPanel47;
+    private javax.swing.JPanel jPanel48;
+    private javax.swing.JPanel jPanel49;
     private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel50;
+    private javax.swing.JPanel jPanel51;
+    private javax.swing.JPanel jPanel52;
+    private javax.swing.JPanel jPanel53;
+    private javax.swing.JPanel jPanel54;
+    private javax.swing.JPanel jPanel55;
+    private javax.swing.JPanel jPanel56;
+    private javax.swing.JPanel jPanel57;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel61;
     private javax.swing.JPanel jPanel62;
@@ -2124,6 +3044,10 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
     private javax.swing.JRadioButton jRadioButton9;
     private javax.swing.JLabel latitudeLabel;
     private javax.swing.JLabel longitudeLabel;
+    private javax.swing.JTextField md5_grid_textField;
+    private javax.swing.JTextField md5_simu_textField;
+    private javax.swing.JComboBox minComboBox;
+    private javax.swing.JComboBox monthComboBox;
     private javax.swing.ButtonGroup mrfButtonGroup;
     private javax.swing.JPanel mrfPanel;
     private javax.swing.JCheckBox netCheckBox_O;
@@ -2135,21 +3059,28 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
     private javax.swing.JTextField pathTextField;
     private javax.swing.JCheckBox perFlBox;
     private javax.swing.JPanel pixelPanel;
+    private javax.swing.JProgressBar pixelProgressBar;
     private javax.swing.JCheckBox pointsCheckBox_I;
     private javax.swing.JCheckBox pointsCheckBox_O;
+    private javax.swing.JProgressBar polyProgressBar;
+    private javax.swing.JComboBox projsComboBox;
     private javax.swing.JComboBox qNodesCombo;
     private javax.swing.JPanel qoutPanel;
+    private javax.swing.JProgressBar reachProgressBar;
     private javax.swing.JPanel rftPanel;
     private javax.swing.JComboBox ridgeLevelCombo;
     private javax.swing.JCheckBox satExBox;
+    private javax.swing.JButton sendButton;
     private javax.swing.JComboBox spaceParamsCombo;
     private javax.swing.JCheckBox stageBox;
+    private javax.swing.JComboBox timeZoneComboBox;
     private javax.swing.JCheckBox trianglesCheckBox_I;
     private javax.swing.JCheckBox trianglesCheckBox_O;
     private javax.swing.JLabel valueLabel;
     private javax.swing.JCheckBox valuesCheckBox_O;
     private javax.swing.JCheckBox voronoiCheckBox_I;
     private javax.swing.JCheckBox voronoiCheckBox_O;
+    private javax.swing.JComboBox yearComboBox;
     private javax.swing.JLabel zrLabel;
     private javax.swing.JSlider zrSlider;
     // End of variables declaration//GEN-END:variables

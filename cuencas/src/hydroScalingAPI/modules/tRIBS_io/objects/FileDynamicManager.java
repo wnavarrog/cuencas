@@ -14,7 +14,7 @@ import java.io.IOException;
 
 /**
  *
- * @author ricardo
+ * @author Ricardo Mantilla
  */
 public class FileDynamicManager {
     
@@ -39,6 +39,11 @@ public class FileDynamicManager {
         Object[] toReturn=availableDynamic.keySet().toArray();
         java.util.Arrays.sort(toReturn);
         return toReturn;
+    }
+    
+    public void clearData(Object theKey){
+        FileDynamic theNode=(FileDynamic)availableDynamic.get(theKey);
+        theNode.clearData();
     }
     
     /**
@@ -107,6 +112,12 @@ class FileDynamic{
             loadFile();
         }
         return integData[varIndex];
+    }
+    
+    public void clearData(){
+        integData=null;
+        fullyLoaded=false;
+        System.out.println(">>>> "+pathToDynamic+" has been unloaded");
     }
     
     
