@@ -72,19 +72,19 @@ public class LocationsOpenDialog extends javax.swing.JDialog {
         double coordString;
         
         coordString=dialogManager.getNorthernmostLat().doubleValue();
-        coordString=(Math.ceil(coordString*1000))/1000.;
+        coordString=(Math.ceil((coordString+0.1)*1000))/1000.;
         northM.setText(new Float(coordString).toString());
         
         coordString=dialogManager.getWesternmostLat().doubleValue();
-        coordString=(Math.floor(coordString*1000))/1000.;
+        coordString=(Math.floor((coordString-0.1)*1000))/1000.;
         westM.setText(new Float(coordString).toString());
         
         coordString=dialogManager.getSouthernmostLat().doubleValue();
-        coordString=(Math.floor(coordString*1000))/1000.;
+        coordString=(Math.floor((coordString-0.1)*1000))/1000.;
         southM.setText(new Float(coordString).toString());
         
         coordString=dialogManager.getEasternmostLat().doubleValue();
-        coordString=(Math.ceil(coordString*1000))/1000.;
+        coordString=(Math.ceil((coordString+0.1)*1000))/1000.;
         eastM.setText(new Float(coordString).toString());
     }
     
