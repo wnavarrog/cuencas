@@ -75,12 +75,20 @@ public class HillslopeRainAndNetworkToFile {
         int numPeriods = (int) ((storm.stormFinalTimeInMinutes()-storm.stormInitialTimeInMinutes())/storm.stormRecordResolutionInMinutes());
         newfile.writeInt(numPeriods);
         
+        java.util.Date startTime1=new java.util.Date();
         for (int k=0;k<numPeriods;k++) {
+            System.out.println("Initiating time step "+k);
             double currTime=storm.stormInitialTimeInMinutes()+k*storm.stormRecordResolutionInMinutes();
+            java.util.Date startTime=new java.util.Date();
             for (int i=0;i<linksStructure.contactsArray.length;i++){
                 newfile.writeDouble(thisHillsInfo.precipitation(i,currTime));
             }
+            java.util.Date endTime=new java.util.Date();
+            System.out.println("Time Getting "+linksStructure.contactsArray.length+" records :"+((endTime.getTime()-startTime.getTime()))+" milliseconds");
+            System.out.println("Finishig up time step "+k);
         }
+        java.util.Date endTime1=new java.util.Date();
+        System.out.println("Time Getting "+(linksStructure.contactsArray.length*numPeriods)+" records :"+((endTime1.getTime()-startTime1.getTime()))+" milliseconds");
         
         System.out.println("Done Writing Precipitations");
 
@@ -93,9 +101,9 @@ public class HillslopeRainAndNetworkToFile {
     public static void main(String args[]) {
         
         try{
-            java.io.File theFile=new java.io.File("//mantilla/hidrosigDataBases/Gila_River_DB/Rasters/Topography/1_ArcSec/mogollon.metaDEM");
+            java.io.File theFile=new java.io.File("/hidrosigDataBases/Gila_River_DB/Rasters/Topography/1_ArcSec/mogollon.metaDEM");
             hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
-            metaModif.setLocationBinaryFile(new java.io.File("//mantilla/hidrosigDataBases/Gila_River_DB/Rasters/Topography/1_ArcSec/mogollon.dir"));
+            metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Gila_River_DB/Rasters/Topography/1_ArcSec/mogollon.dir"));
 
             String formatoOriginal=metaModif.getFormat();
             metaModif.setFormat("Byte");
@@ -117,7 +125,7 @@ public class HillslopeRainAndNetworkToFile {
             routingParams.put("lambda2",-0.1f);
 
             java.io.File stormFile;
-            stormFile=new java.io.File("//mantilla/hidrosigDataBases/Gila_River_DB/Rasters/Hydrology/NexradPrecipitation/wholeSummer2003/nexrad_prec.metaVHC");
+            stormFile=new java.io.File("/hidrosigDataBases/Gila_River_DB/Rasters/Hydrology/NexradPrecipitation/wholeSummer2005/nexrad_prec.metaVHC");
 
         
             new HillslopeRainAndNetworkToFile(282, 298,matDirs,magnitudes,metaModif,stormFile);

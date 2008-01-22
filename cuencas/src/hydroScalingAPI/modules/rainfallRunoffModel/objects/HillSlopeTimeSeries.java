@@ -35,20 +35,28 @@ public class HillSlopeTimeSeries {
     
     private int regInterval;
     
-    private java.util.Vector recordValue;
-    private java.util.Vector recordTime;
+//    private java.util.Vector recordValue;
+//    private java.util.Vector recordTime;
+    
+    private java.util.Hashtable recordTimeValue;
     
     private float maxPrec=0.0f;
     private float totalPrec=0.0f;
     private int numRecordsWithRain=0;
+    
+    private boolean first=true;
+    private long iniTimeMill;
 
     /**
      * Creates new HillSlopeTimeSeries
      * @param regIn Register interval in milliseconds
      */
     public HillSlopeTimeSeries(int regIn) {
-        recordValue=new java.util.Vector();
-        recordTime=new java.util.Vector();
+//        recordValue=new java.util.Vector();
+//        recordTime=new java.util.Vector();
+        
+        recordTimeValue=new java.util.Hashtable<java.util.Calendar, Float>();
+        
         regInterval=regIn;
     }
     
@@ -58,8 +66,15 @@ public class HillSlopeTimeSeries {
      * @param newRecordValue The value of the record taken
      */
     public void addDateAndValue(java.util.Calendar newRecordTime, Float newRecordValue){
-        recordTime.add(newRecordTime);
-        recordValue.add(newRecordValue);
+//        recordTime.add(newRecordTime);
+//        recordValue.add(newRecordValue);
+        
+        if(first){
+            iniTimeMill=newRecordTime.getTimeInMillis();
+            first=false;
+        }
+        
+        recordTimeValue.put(newRecordTime,newRecordValue);
         
         numRecordsWithRain++;
         maxPrec=Math.max(maxPrec,newRecordValue.floatValue());
@@ -73,23 +88,34 @@ public class HillSlopeTimeSeries {
      */
     public float getRecord(java.util.Calendar atThisTime){
         
-        java.util.Calendar serchForTime = java.util.Calendar.getInstance(); 
-        serchForTime.setTimeInMillis(atThisTime.getTimeInMillis());
-        
-        if (recordTime.size() == 0) return 0.0f;
-        if (serchForTime.before(recordTime.firstElement())) return 0.0f;
-        
-        long iniTimeMill=((java.util.Calendar)recordTime.firstElement()).getTimeInMillis();
-        
+        java.util.Calendar serchForTime = java.util.Calendar.getInstance();
         serchForTime.setTimeInMillis(iniTimeMill+regInterval*((atThisTime.getTimeInMillis()-iniTimeMill)/regInterval)); //To round the time to the previous exact record time
-
-        if (serchForTime.after(recordTime.lastElement())) return 0.0f;
-
-        int k=recordTime.indexOf(serchForTime);
         
-        if (k == -1) return 0.0f;
+        Float valueToReturn=((Float)recordTimeValue.get(serchForTime));
         
-        return ((Float) recordValue.get(k)).floatValue();
+        if (valueToReturn == null){
+            return 0.0f;
+        } else return valueToReturn;
+        
+
+//        java.util.Calendar serchForTime = java.util.Calendar.getInstance(); 
+//        serchForTime.setTimeInMillis(atThisTime.getTimeInMillis());
+//        
+//        if (recordTime.size() == 0) return 0.0f;
+//        if (serchForTime.before(recordTime.firstElement())) return 0.0f;
+//        
+//        long iniTimeMill=((java.util.Calendar)recordTime.firstElement()).getTimeInMillis();
+//        
+//        serchForTime.setTimeInMillis(iniTimeMill+regInterval*((atThisTime.getTimeInMillis()-iniTimeMill)/regInterval)); //To round the time to the previous exact record time
+//
+//        if (serchForTime.after(recordTime.lastElement())) return 0.0f;
+//
+//        int k=recordTime.indexOf(serchForTime);
+//        
+//        if (k == -1) return 0.0f;
+//        
+//        return ((Float) recordValue.get(k)).floatValue();
+        
     }
     
     /**
@@ -97,7 +123,7 @@ public class HillSlopeTimeSeries {
      * @return The record lenght
      */
     public float getSize(){
-        return recordValue.size();
+        return recordTimeValue.size();
     }
     
     /**
@@ -116,5 +142,5 @@ public class HillSlopeTimeSeries {
         if(numRecordsWithRain == 0) return 0.0f;
         return totalPrec/(float)numRecordsWithRain;
     }
-
+    
 }

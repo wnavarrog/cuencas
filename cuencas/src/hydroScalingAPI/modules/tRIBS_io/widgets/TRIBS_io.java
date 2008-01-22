@@ -11,6 +11,7 @@ import hydroScalingAPI.modules.tRIBS_io.objects.BasinNet;
 import hydroScalingAPI.subGUIs.widgets.HydroClimateViewer2D;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Iterator;
 import visad.*;
 import visad.java3d.DisplayImplJ3D;
 import java.rmi.RemoteException;
@@ -34,28 +35,37 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
                         nodeColor=RealType.getRealType("nodeColor"),
                         voiColor=RealType.getRealType("voiColor");
     
-    private RealTupleType   espacioXLYL=new RealTupleType(new RealType[] {xEasting,yNorthing,nodeColor}),
+    private RealTupleType   domain=new visad.RealTupleType(visad.RealType.Longitude,visad.RealType.Latitude),
+                            espacioXLYL=new RealTupleType(new RealType[] {xEasting,yNorthing,nodeColor}),
                             domainXLYL=new RealTupleType(new RealType[] {xEasting,yNorthing});
     
     private hydroScalingAPI.mainGUI.ParentGUI mainFrame;
     
-    private DisplayImplJ3D display_TIN_I,display_TIN_O,display_NET;
+    private DisplayImplJ3D display_TIN_I,display_TIN_O,display_NET,display_LULC,display_SOIL,display_GW;
+
     
     private visad.util.HersheyFont font = new visad.util.HersheyFont("futural");
     
     private ScalarMap eastMap_I,northMap_I,pointsMap_I,voiColorMap_I,
                       eastMap_O,northMap_O,pointsMap_O,voiColorMap_O,
-                      eastMap_NET,northMap_NET;
+                      eastMap_NET,northMap_NET,
+                      eastMap_LULC,northMap_LULC,voiColorMap_LULC,
+                      eastMap_SOIL,northMap_SOIL,voiColorMap_SOIL,
+                      eastMap_GW,northMap_GW,voiColorMap_GW;
     
     private hydroScalingAPI.util.plot.XYJPanel PpanelRTF;
     private hydroScalingAPI.util.plot.XYJPanel PpanelQOUT;
     private hydroScalingAPI.util.plot.XYJPanel PpanelMRF;
     private hydroScalingAPI.util.plot.XYJPanel PpanelPixel;
     
-    private visad.java3d.DisplayRendererJ3D drI,drO,drNET;
+    private visad.java3d.DisplayRendererJ3D drI,drO,drNET,drLULC,drSOIL,drGW;
     
     private DataReferenceImpl data_refPoints_I,data_refTr_I,data_refPoly_I,data_refFill_I,
-                              data_refPoints_O,data_refTr_O,data_refPoly_O,data_refFill_O,data_refNet_O;
+                              data_refPoints_O,data_refTr_O,data_refPoly_O,data_refFill_O,data_refNet_O,
+                              data_refFill_LULC,data_refFill_SOIL,data_refFill_GW,
+                              data_refPolygon_LULC,data_refPolygon_SOIL,data_refPolygon_GW;
+    
+    private visad.FlatField field_LULC,field_SOIL,field_GW;
     
     private ConstantMap[] pointsCMap_I,trianglesCMap_I,polygonsCMap_I,
                           pointsCMap_O,trianglesCMap_O,polygonsCMap_O,networkCMap_O;
@@ -72,7 +82,6 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
     private hydroScalingAPI.modules.tRIBS_io.objects.FileQoutManager fqm;
     private hydroScalingAPI.modules.tRIBS_io.objects.FileRftManager frftm;
     
-    private boolean firstPass=true;
     private int lastSelectedTab=0;
     private int standAlone=0;
     
@@ -84,15 +93,19 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
      * @param x The column number of the basin outlet location
      * @param y The row number of the basin outlet location
      * @param direcc The direction matrix associated to the DEM where the basin is embeded
-     * @param magnit The magnitudes matrix associated to the DEM where the basin is embeded
+     * @param order The horton order matrix associated to the DEM where the basin is embeded
      * @param md The MetaRaster associated to the DEM where the basin is embeded
+     * @param writePath Path to tRIBS implementation directory
+     * @param baseName The base string after which tRIBS files are named
      * @throws java.rmi.RemoteException Captures errors while assigning values to VisAD data objects
      * @throws visad.VisADException Captures errors while creating VisAD objects
      * @throws java.io.IOException Captures errors while reading information
      */
-    public TRIBS_io(hydroScalingAPI.mainGUI.ParentGUI parent, int x, int y, byte[][] direcc, int[][] magnit, hydroScalingAPI.io.MetaRaster md) throws RemoteException, VisADException, java.io.IOException{
+    public TRIBS_io(hydroScalingAPI.mainGUI.ParentGUI parent, int x, int y, byte[][] direcc, byte[][] order, hydroScalingAPI.io.MetaRaster md,java.io.File writePath, String baseName) throws RemoteException, VisADException, java.io.IOException{
         this(parent);
-        basTIN_I=new hydroScalingAPI.modules.tRIBS_io.objects.BasinTIN(x,y,direcc,magnit,md);
+        pathTextField.setText(writePath.getPath());
+        baseNameTextField.setText(baseName);
+        basTIN_I=new hydroScalingAPI.modules.tRIBS_io.objects.BasinTIN(x,y,direcc,order,md);
         initializeInputTabs();
     }
     
@@ -246,6 +259,76 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         
         jPanel12.add("Center",display_TIN_I.getComponent());
         
+        
+        //Graphical structure for input land cover
+        drLULC=new  visad.java3d.TwoDDisplayRendererJ3D();
+        display_LULC = new DisplayImplJ3D("display_LULC",drLULC);
+        
+        dispGMC = (GraphicsModeControl) display_LULC.getGraphicsModeControl();
+        dispGMC.setScaleEnable(true);
+        
+        eastMap_LULC = new ScalarMap( xEasting , Display.XAxis );
+        eastMap_LULC.setScalarName("East Coordinate");
+        northMap_LULC = new ScalarMap( yNorthing , Display.YAxis );
+        northMap_LULC.setScalarName("North Coordinate");
+        voiColorMap_LULC=new ScalarMap( voiColor , Display.RGB );
+        voiColorMap_LULC.setRange(0,10);
+
+        display_LULC.addMap(eastMap_LULC);
+        display_LULC.addMap(northMap_LULC);
+        display_LULC.addMap(voiColorMap_LULC);
+        
+        hydroScalingAPI.tools.VisadTools.addWheelFunctionality(display_LULC);
+        
+        jPanel6.add("Center",display_LULC.getComponent());
+        
+        
+        //Graphical structure for input soils
+        drSOIL=new  visad.java3d.TwoDDisplayRendererJ3D();
+        display_SOIL = new DisplayImplJ3D("display_SOIL",drSOIL);
+        
+        dispGMC = (GraphicsModeControl) display_SOIL.getGraphicsModeControl();
+        dispGMC.setScaleEnable(true);
+        
+        eastMap_SOIL = new ScalarMap( xEasting , Display.XAxis );
+        eastMap_SOIL.setScalarName("East Coordinate");
+        northMap_SOIL = new ScalarMap( yNorthing , Display.YAxis );
+        northMap_SOIL.setScalarName("North Coordinate");
+        voiColorMap_SOIL=new ScalarMap( voiColor , Display.RGB );
+        voiColorMap_SOIL.setRange(0,10);
+
+        display_SOIL.addMap(eastMap_SOIL);
+        display_SOIL.addMap(northMap_SOIL);
+        display_SOIL.addMap(voiColorMap_SOIL);
+        
+        hydroScalingAPI.tools.VisadTools.addWheelFunctionality(display_SOIL);
+        
+        jPanel7.add("Center",display_SOIL.getComponent());
+
+        
+        //Graphical structure for input groundwater
+        drGW=new  visad.java3d.TwoDDisplayRendererJ3D();
+        display_GW = new DisplayImplJ3D("display_GW",drGW);
+        
+        dispGMC = (GraphicsModeControl) display_GW.getGraphicsModeControl();
+        dispGMC.setScaleEnable(true);
+        
+        eastMap_GW = new ScalarMap( xEasting , Display.XAxis );
+        eastMap_GW.setScalarName("East Coordinate");
+        northMap_GW = new ScalarMap( yNorthing , Display.YAxis );
+        northMap_GW.setScalarName("North Coordinate");
+        voiColorMap_GW=new ScalarMap( voiColor , Display.RGB );
+        voiColorMap_GW.setRange(0,10);
+
+        display_GW.addMap(eastMap_GW);
+        display_GW.addMap(northMap_GW);
+        display_GW.addMap(voiColorMap_GW);
+        
+        hydroScalingAPI.tools.VisadTools.addWheelFunctionality(display_GW);
+        
+        jPanel13.add("Center",display_GW.getComponent());
+
+        
         //Graphical structure for output triangulated points
         drO=new  visad.java3d.TwoDDisplayRendererJ3D();
         display_TIN_O = new DisplayImplJ3D("display_TIN_O",drO);
@@ -328,14 +411,45 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
 
         display_TIN_I.addReference( data_refPoly_I,polygonsCMap_I );
         
-        String[] levelsString=new String[basTIN_I.getBasinOrder()+1];
-        levelsString[0]="No Ridges";
-        for (int i = 1; i < levelsString.length; i++) {
-            levelsString[i]="Level "+i;
+        numPointsLabel.setText("Number of Points : "+basTIN_I.getNumPoints());
+        
+        String[] levelsString=new String[basTIN_I.getBasinOrder()];
+        for (int i = 0; i < levelsString.length; i++) {
+            levelsString[i]="Level "+(i+1);
         }
         
         ridgeLevelCombo.setModel(new javax.swing.DefaultComboBoxModel(levelsString));
+        ridgeLevelCombo.setSelectedIndex(2);
         
+        String[] levelsStringN=new String[basTIN_I.getBasinOrder()+1];
+        levelsStringN[0]="All Network";
+        for (int i = 1; i < levelsStringN.length; i++) {
+            levelsStringN[i]="Level "+i;
+        }
+        
+        networkLevelCombo.setModel(new javax.swing.DefaultComboBoxModel(levelsStringN));
+        
+        drLULC.setBackgroundColor(1,1,1);
+        drLULC.setForegroundColor(0,0,0);
+        pc = display_LULC.getProjectionControl();
+        pc.setAspectCartesian(basTIN_I.getAspect());
+        data_refFill_LULC = new DataReferenceImpl("data_refFill_LCLU");
+        display_LULC.addReference( data_refFill_LULC );
+        
+        drSOIL.setBackgroundColor(1,1,1);
+        drSOIL.setForegroundColor(0,0,0);
+        pc = display_SOIL.getProjectionControl();
+        pc.setAspectCartesian(basTIN_I.getAspect());
+        data_refFill_SOIL = new DataReferenceImpl("data_refFill_SOIL");
+        display_SOIL.addReference( data_refFill_SOIL );
+
+        drGW.setBackgroundColor(1,1,1);
+        drGW.setForegroundColor(0,0,0);
+        pc = display_GW.getProjectionControl();
+        pc.setAspectCartesian(basTIN_I.getAspect());
+        data_refFill_GW = new DataReferenceImpl("data_refFill_GW");
+        display_GW.addReference( data_refFill_GW );
+
         
     }
     
@@ -808,22 +922,18 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         
     }
     
-    private void plotPoints(float Zr) throws RemoteException, VisADException{
+    private void plotPoints() throws RemoteException, VisADException,java.io.IOException{
         
-        if(firstPass){
-            basTIN_I.filterPoints(ridgeLevelCombo.getSelectedIndex(),-9999);
-            zrSlider.setMaximum((int)(basTIN_I.getMaxZr()*100));
-            zrSlider.setValue((int)(basTIN_I.getMaxZr()*100));
-            zrLabel.setText("Zr = "+basTIN_I.getMaxZr());
-            zrSlider.setEnabled(true);
-            firstPass=false;
-        } else
-            basTIN_I.filterPoints(ridgeLevelCombo.getSelectedIndex(),Zr);
+        System.out.println(networkLevelCombo.getSelectedIndex()+" "+pathDensityLevelCombo.getSelectedIndex()+" "+bufferTypeCombo.getSelectedIndex());
         
+        basTIN_I.initializeNetworkPoints(networkLevelCombo.getSelectedIndex()-1,pathDensityLevelCombo.getSelectedIndex(),bufferTypeCombo.getSelectedIndex());
+        basTIN_I.filterPoints(ridgeLevelCombo.getSelectedIndex(),zrSlider.getValue(),networkLevelCombo.getSelectedIndex()-1);
         
         data_refPoints_I.setData(basTIN_I.getPointsFlatField());
         data_refTr_I.setData(basTIN_I.getTrianglesUnionSet());
         data_refPoly_I.setData(basTIN_I.getPolygonsUnionSet());
+        
+        numPointsLabel.setText("Number of Points : "+basTIN_I.getNumPoints());
     }
     
     private void qoutAction(int index){
@@ -912,26 +1022,60 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
-        exportTriButton = new javax.swing.JButton();
+        computeLattice = new javax.swing.JButton();
         exportPoiButton = new javax.swing.JButton();
-        jPanel32 = new javax.swing.JPanel();
-        jLabel9 = new javax.swing.JLabel();
-        ridgeLevelCombo = new javax.swing.JComboBox();
+        resetLattice = new javax.swing.JButton();
+        exportTriButton = new javax.swing.JButton();
         jPanel33 = new javax.swing.JPanel();
         zrLabel = new javax.swing.JLabel();
         zrSlider = new javax.swing.JSlider();
+        jPanel42 = new javax.swing.JPanel();
+        jPanel43 = new javax.swing.JPanel();
+        jLabel16 = new javax.swing.JLabel();
+        networkLevelCombo = new javax.swing.JComboBox();
+        jPanel44 = new javax.swing.JPanel();
+        jLabel17 = new javax.swing.JLabel();
+        pathDensityLevelCombo = new javax.swing.JComboBox();
+        jPanel45 = new javax.swing.JPanel();
+        jLabel18 = new javax.swing.JLabel();
+        bufferTypeCombo = new javax.swing.JComboBox();
+        jPanel32 = new javax.swing.JPanel();
+        jLabel9 = new javax.swing.JLabel();
+        ridgeLevelCombo = new javax.swing.JComboBox();
         jPanel3 = new javax.swing.JPanel();
         pointsCheckBox_I = new javax.swing.JCheckBox();
         trianglesCheckBox_I = new javax.swing.JCheckBox();
         voronoiCheckBox_I = new javax.swing.JCheckBox();
+        numPointsLabel = new javax.swing.JLabel();
         jPanel12 = new javax.swing.JPanel();
-        jPanel4 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
-        jPanel7 = new javax.swing.JPanel();
         jPanel8 = new javax.swing.JPanel();
-        jPanel13 = new javax.swing.JPanel();
+        jLabel13 = new javax.swing.JLabel();
+        selectLandCover = new javax.swing.JButton();
+        jPanel46 = new javax.swing.JPanel();
+        jLabel19 = new javax.swing.JLabel();
+        exportLandCover = new javax.swing.JButton();
+        jPanel7 = new javax.swing.JPanel();
         jPanel14 = new javax.swing.JPanel();
+        jLabel14 = new javax.swing.JLabel();
+        selectSoils = new javax.swing.JButton();
+        jPanel58 = new javax.swing.JPanel();
+        jLabel20 = new javax.swing.JLabel();
+        exportSoils = new javax.swing.JButton();
+        jPanel13 = new javax.swing.JPanel();
+        jPanel41 = new javax.swing.JPanel();
+        jLabel15 = new javax.swing.JLabel();
+        selectGW = new javax.swing.JButton();
+        jPanel59 = new javax.swing.JPanel();
+        jLabel21 = new javax.swing.JLabel();
+        exportGW = new javax.swing.JButton();
         jPanel9 = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        inFileTextArea = new javax.swing.JTextArea();
+        jPanel4 = new javax.swing.JPanel();
+        jLabel11 = new javax.swing.JLabel();
+        writeInFile = new javax.swing.JButton();
+        jLabel12 = new javax.swing.JLabel();
         jPanel11 = new javax.swing.JPanel();
         panelOutputs = new javax.swing.JTabbedPane();
         jPanel24 = new javax.swing.JPanel();
@@ -1066,15 +1210,18 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
 
         jPanel5.setLayout(new java.awt.GridLayout(2, 1));
 
-        exportTriButton.setText("Export Trinangulation");
-        exportTriButton.addActionListener(new java.awt.event.ActionListener() {
+        jPanel5.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        computeLattice.setFont(new java.awt.Font("Lucida Grande", 0, 10));
+        computeLattice.setText("Compute Lattice");
+        computeLattice.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                exportTriButtonActionPerformed(evt);
+                computeLatticeActionPerformed(evt);
             }
         });
 
-        jPanel5.add(exportTriButton);
+        jPanel5.add(computeLattice);
 
+        exportPoiButton.setFont(new java.awt.Font("Lucida Grande", 0, 10));
         exportPoiButton.setText("Export Points");
         exportPoiButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1084,52 +1231,109 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
 
         jPanel5.add(exportPoiButton);
 
+        resetLattice.setFont(new java.awt.Font("Lucida Grande", 0, 10));
+        resetLattice.setText("Reset Lattice Settings");
+        jPanel5.add(resetLattice);
+
+        exportTriButton.setFont(new java.awt.Font("Lucida Grande", 0, 10));
+        exportTriButton.setText("Export Trinangulation");
+        exportTriButton.setEnabled(false);
+        exportTriButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                exportTriButtonActionPerformed(evt);
+            }
+        });
+
+        jPanel5.add(exportTriButton);
+
         jPanel2.add(jPanel5, java.awt.BorderLayout.EAST);
+
+        jPanel33.setLayout(new java.awt.BorderLayout());
+
+        jPanel33.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        zrLabel.setFont(new java.awt.Font("Lucida Grande", 1, 10));
+        zrLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        zrLabel.setText("Zr [m]");
+        zrLabel.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jPanel33.add(zrLabel, java.awt.BorderLayout.NORTH);
+
+        zrSlider.setFont(new java.awt.Font("Lucida Grande", 0, 10));
+        zrSlider.setMajorTickSpacing(5);
+        zrSlider.setMaximum(20);
+        zrSlider.setMinorTickSpacing(1);
+        zrSlider.setPaintLabels(true);
+        zrSlider.setPaintTicks(true);
+        zrSlider.setSnapToTicks(true);
+        zrSlider.setValue(0);
+        jPanel33.add(zrSlider, java.awt.BorderLayout.CENTER);
+
+        jPanel2.add(jPanel33, java.awt.BorderLayout.CENTER);
+
+        jPanel42.setLayout(new java.awt.GridLayout(1, 0));
+
+        jPanel43.setLayout(new java.awt.GridLayout(2, 0));
+
+        jPanel43.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jLabel16.setFont(new java.awt.Font("Lucida Grande", 1, 10));
+        jLabel16.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel16.setText("Network Level");
+        jPanel43.add(jLabel16);
+
+        networkLevelCombo.setFont(new java.awt.Font("Lucida Grande", 0, 10));
+        networkLevelCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "All Network", "Level 1", "Level 2", "Level 3", "Level 4", "Level 5", "Level 6" }));
+        jPanel43.add(networkLevelCombo);
+
+        jPanel42.add(jPanel43);
+
+        jPanel44.setLayout(new java.awt.GridLayout(2, 0));
+
+        jPanel44.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jLabel17.setFont(new java.awt.Font("Lucida Grande", 1, 10));
+        jLabel17.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel17.setText("Path Density");
+        jPanel44.add(jLabel17);
+
+        pathDensityLevelCombo.setFont(new java.awt.Font("Lucida Grande", 0, 10));
+        pathDensityLevelCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Basic", "Dense", "Very Dense" }));
+        pathDensityLevelCombo.setSelectedIndex(1);
+        jPanel44.add(pathDensityLevelCombo);
+
+        jPanel42.add(jPanel44);
+
+        jPanel45.setLayout(new java.awt.GridLayout(2, 0));
+
+        jPanel45.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jLabel18.setFont(new java.awt.Font("Lucida Grande", 1, 10));
+        jLabel18.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel18.setText("River Buffer");
+        jPanel45.add(jLabel18);
+
+        bufferTypeCombo.setFont(new java.awt.Font("Lucida Grande", 0, 10));
+        bufferTypeCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "No Buffer", "Simple", "Floodplain" }));
+        bufferTypeCombo.setSelectedIndex(1);
+        jPanel45.add(bufferTypeCombo);
+
+        jPanel42.add(jPanel45);
 
         jPanel32.setLayout(new java.awt.GridLayout(2, 0));
 
-        jLabel9.setFont(new java.awt.Font("Lucida Grande", 0, 12));
+        jPanel32.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        jLabel9.setFont(new java.awt.Font("Lucida Grande", 1, 10));
         jLabel9.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel9.setText("Ridges Level");
         jPanel32.add(jLabel9);
 
         ridgeLevelCombo.setFont(new java.awt.Font("Lucida Grande", 0, 10));
         ridgeLevelCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "No Ridges", "Level 1", "Level 2", "Level 3", "Level 4", "Level 5", "Level 6" }));
-        ridgeLevelCombo.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                ridgeLevelComboActionPerformed(evt);
-            }
-        });
-
         jPanel32.add(ridgeLevelCombo);
 
-        jPanel2.add(jPanel32, java.awt.BorderLayout.WEST);
+        jPanel42.add(jPanel32);
 
-        jPanel33.setLayout(new java.awt.BorderLayout());
-
-        zrLabel.setFont(new java.awt.Font("Lucida Grande", 0, 10));
-        zrLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        zrLabel.setText("Zr");
-        zrLabel.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jPanel33.add(zrLabel, java.awt.BorderLayout.NORTH);
-
-        zrSlider.setFont(new java.awt.Font("Lucida Grande", 0, 10));
-        zrSlider.setPaintTicks(true);
-        zrSlider.setValue(100);
-        zrSlider.setEnabled(false);
-        zrSlider.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                zrSliderMouseReleased(evt);
-            }
-        });
-
-        jPanel33.add(zrSlider, java.awt.BorderLayout.CENTER);
-
-        jPanel2.add(jPanel33, java.awt.BorderLayout.CENTER);
+        jPanel2.add(jPanel42, java.awt.BorderLayout.WEST);
 
         jPanel1.add(jPanel2, java.awt.BorderLayout.SOUTH);
 
-        jPanel3.setLayout(new java.awt.GridLayout(1, 3));
+        jPanel3.setLayout(new java.awt.GridLayout(1, 4));
 
         pointsCheckBox_I.setFont(new java.awt.Font("Lucida Grande", 0, 10));
         pointsCheckBox_I.setSelected(true);
@@ -1170,6 +1374,10 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
 
         jPanel3.add(voronoiCheckBox_I);
 
+        numPointsLabel.setFont(new java.awt.Font("Lucida Grande", 0, 10));
+        numPointsLabel.setText("Number of Points : ");
+        jPanel3.add(numPointsLabel);
+
         jPanel1.add(jPanel3, java.awt.BorderLayout.NORTH);
 
         jPanel12.setLayout(new java.awt.BorderLayout());
@@ -1178,17 +1386,149 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
 
         panelInputs.addTab("TIN", jPanel1);
 
-        panelInputs.addTab("3D TIN", jPanel4);
+        jPanel6.setLayout(new java.awt.BorderLayout());
+
+        jPanel8.setLayout(new java.awt.BorderLayout());
+
+        jLabel13.setText("<<<");
+        jPanel8.add(jLabel13, java.awt.BorderLayout.CENTER);
+
+        selectLandCover.setText("Select Land Cover Map ...");
+        selectLandCover.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                selectLandCoverActionPerformed(evt);
+            }
+        });
+
+        jPanel8.add(selectLandCover, java.awt.BorderLayout.WEST);
+
+        jPanel6.add(jPanel8, java.awt.BorderLayout.NORTH);
+
+        jPanel46.setLayout(new java.awt.BorderLayout());
+
+        jLabel19.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+        jLabel19.setText(">>>");
+        jPanel46.add(jLabel19, java.awt.BorderLayout.CENTER);
+
+        exportLandCover.setText("Export Land Cover Map ...");
+        exportLandCover.setEnabled(false);
+        exportLandCover.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                exportLandCoverActionPerformed(evt);
+            }
+        });
+
+        jPanel46.add(exportLandCover, java.awt.BorderLayout.EAST);
+
+        jPanel6.add(jPanel46, java.awt.BorderLayout.SOUTH);
 
         panelInputs.addTab("Land Cover", jPanel6);
 
+        jPanel7.setLayout(new java.awt.BorderLayout());
+
+        jPanel14.setLayout(new java.awt.BorderLayout());
+
+        jLabel14.setText("<<<");
+        jPanel14.add(jLabel14, java.awt.BorderLayout.CENTER);
+
+        selectSoils.setText("Select Soils Map ...");
+        selectSoils.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                selectSoilsActionPerformed(evt);
+            }
+        });
+
+        jPanel14.add(selectSoils, java.awt.BorderLayout.WEST);
+
+        jPanel7.add(jPanel14, java.awt.BorderLayout.NORTH);
+
+        jPanel58.setLayout(new java.awt.BorderLayout());
+
+        jLabel20.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+        jLabel20.setText(">>>");
+        jPanel58.add(jLabel20, java.awt.BorderLayout.CENTER);
+
+        exportSoils.setText("Export Soils Map ...");
+        exportSoils.setEnabled(false);
+        exportSoils.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                exportSoilsActionPerformed(evt);
+            }
+        });
+
+        jPanel58.add(exportSoils, java.awt.BorderLayout.EAST);
+
+        jPanel7.add(jPanel58, java.awt.BorderLayout.SOUTH);
+
         panelInputs.addTab("Soil Type", jPanel7);
 
-        panelInputs.addTab("Rainfall", jPanel8);
+        jPanel13.setLayout(new java.awt.BorderLayout());
+
+        jPanel41.setLayout(new java.awt.BorderLayout());
+
+        jLabel15.setText("<<<");
+        jPanel41.add(jLabel15, java.awt.BorderLayout.CENTER);
+
+        selectGW.setText("Select Ground Water Map ...");
+        selectGW.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                selectGWActionPerformed(evt);
+            }
+        });
+
+        jPanel41.add(selectGW, java.awt.BorderLayout.WEST);
+
+        jPanel13.add(jPanel41, java.awt.BorderLayout.NORTH);
+
+        jPanel59.setLayout(new java.awt.BorderLayout());
+
+        jLabel21.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+        jLabel21.setText(">>>");
+        jPanel59.add(jLabel21, java.awt.BorderLayout.CENTER);
+
+        exportGW.setText("Export Ground Water Map ...");
+        exportGW.setEnabled(false);
+        exportGW.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                exportGWActionPerformed(evt);
+            }
+        });
+
+        jPanel59.add(exportGW, java.awt.BorderLayout.EAST);
+
+        jPanel13.add(jPanel59, java.awt.BorderLayout.SOUTH);
 
         panelInputs.addTab("Ground Water", jPanel13);
 
-        panelInputs.addTab("Weather", jPanel14);
+        jPanel9.setLayout(new java.awt.BorderLayout());
+
+        inFileTextArea.setColumns(20);
+        inFileTextArea.setFont(new java.awt.Font("Courier New", 1, 13));
+        inFileTextArea.setRows(5);
+        inFileTextArea.setText("##############################################################################\n##\n##\n##                    tRIBS Distributed Hydrologic Model\n##              TIN-based Real-time Integrated Basin Simulator\n##                       Ralph M. Parsons Laboratory\n##                  Massachusetts Institute of Technology\n##  \n##\n##\t              Input File for tRIBS simulations\n##\n##############################################################################\n\n\n##=========================================================================\n##\n##\n##\t\t\tSection 1: Model Run Parameters\n##\n##\n##=========================================================================\n\n## Time Variables  \n## --------------           \n\nSTARTDATE:      Starting time \t\t\t \t (#MM/DD/YYYY/HH#)\nXX/XX/XXXX/XX\n\nRUNTIME:     \tRun duration\t\t\t\t (#hours#)\nXXX.X\n\nTIMESTEP:    \tUnsaturated zone computational time step (#mins#)\n3.75\n\nGWSTEP:      \tSaturated zone computational time step \t (#mins#)\n7.5\n\nMETSTEP:     \tMeteorological data time step \t\t (#mins#)\n60.0\n\nRAININTRVL:  \tTime interval in rainfall input \t (#hours#)\n1\n\nOPINTRVL:    \tOutput interval \t\t\t (#hours#)\n1\n\nSPOPINTRVL:   \tSpatial output interval \t\t (#hours#)\n10\n\nINTSTORMMAX: \tInterstorm interval \t\t\t (#hours#)\n8760\n\n\n## Routing Variables\n## -----------------\n\nBASEFLOW:    \tBaseflow discharge \t\t\t (#m3/s#)  \n0.01\n\nVELOCITYCOEF: \tDischarge-velocity coefficient \t\t (#m/s#)\n0.5\n\nVELOCITYRATIO: \tStream to hillslope velocity coefficient (#D/L#)\n5\n\nKINEMVELCOEF:   Coefficient in power law for non-linear routing\n0.1\n\nFLOWEXP: \tNonlinear discharge coefficient\t\t (#D/L#)\n0.0000001\n\nCHANNELROUGHNESS: Uniform channel roughness value        (#D/L#)\n0.15\n\nCHANNELWIDTH:     Uniform channel width                  (# m #)\n10\n\nCHANNELWIDTHCOEFF:\tCoefficient in width-area relationship \n1.0\n\nCHANNELWIDTHEXPNT:\tExponent in width-area relationship \n0.3\n\nCHANNELWIDTHFILE:\tFilename that contains channel widths\n\n##=========================================================================\n##\n##\n##\t\t\tSection 2: Model Run Options\n##\n##\n##  OPTMESHINPUT:\t1  tMesh data\t\t5  Arc/Info *.net\n##\t\t\t2  Point file\t\t6  Arc/Info *.lin,*.pnt\n##\t\t\t3  ArcGrid (random)\t7  Scratch\n##\t\t\t4  ArcGrid (hex)\t8  Point file using Tipper\n##\n##  RAINSOURCE:\t\t1  Stage III radar\n##\t\t\t2  WSI radar\n##                      3  Rain gauges\n##\n##  OPTEVAPOTRANS:\t0  Inactive evapotranspiration\n##\t\t\t1  Penman-Monteith method\n##                      2  Deardorff method\n##  \t\t\t3  Priestley-Taylor method\n##                      4  Pan evaporation measurements\n##\n##  OPTINTERCEPT:\t0  Inactive interception \n## \t\t\t1  Canopy storage method\n##\t\t\t2  Canopy water balance method\n##  \n##  GFLUXOPTION:\t0  No ground heat flux computation\n##\t\t\t1  Temperature gradient method\n##\t\t\t2  Force restore method\n##\n##  OPTRUNON:\t\t0  No runon is simulated\n##\t\t\t1  Simplified runon scheme is used\n##\n##  METDATAOPTION:\t0  Inactive meteorological data\n##\t\t\t1  Weather station point data\n##\t\t\t2  Gridded meteorological data\n##\n##  CONVERTDATA:\t0  Inactive met data preprocessing\n##\t\t\t1  Active met data preprocessing\n##\n##  OPTGWFILE:          0  Grid of water table depth is assumed as input\n##\t                1  File with water table depths for Voronoi cells\n##\n##  OPTBEDROCK:         0  A uniform value used (DEPTHTOBEDROCK)\n##\t                1  Input grid file of bedrock depth is expected \n##\n##  WIDTHINTERPOLATION: 0  Interpolate between measured and observed\n##\t                1  Interpolate only between measured\n##\n##=========================================================================\n\nOPTMESHINPUT:   Mesh input data option\n2\n\nINPUTTIME:      Time slice which is searched by tListInputData\n0\n\nRAINSOURCE:     Rainfall data source option\n2\n\nOPTEVAPOTRANS: \tOption for evapoTranspiration scheme\n1\n\nOPTINTERCEPT: \tOption for interception scheme\n2\n\nGFLUXOPTION: \tOption for ground heat flux\n2\n\nOPTRUNON:\tOption of runon mechanism\n0  \n\nMETDATAOPTION:  Option for meteorological data\n1\n\nCONVERTDATA:   \tOption to convert met data format\n0\n\nOPTGWFILE:\tOption for groundwater initialization\n0\n\nOPTBEDROCK:     Option to read bedrock depth\n0\n\nWIDTHINTERPOLATION:  Option for interpolating width values\n0\n\n##=========================================================================\n##\n##\n##\t\t\tSection 3: Model Input Files and Pathnames\n##\n##\n##=========================================================================\n\n## Mesh Generation\n## -----------------\n\nINPUTDATAFILE:    tMesh input file base name *.nodes, *.edges, *.tri: Opt 1\nOutput/voronoi/basename\n\nPOINTFILENAME:    tMesh input file base name *.points: Opt 2\nInput/basename.points\n\nARCINFOFILENAME:  tMesh input file base name *.net, *.lin, *.pnt: Opt 5, 6\n\n\n## Soil Variables\n## -----------------\n\nDEPTHTOBEDROCK:   Uniform depth to bedrock \t\t (#m#)\n10\n\n## Resampling Grids\n## -----------------\n\nBEDROCKFILE:      Bedrock depth file \nInput/\n\nSOILTABLENAME:    Soil parameter reference table (*.sdtt)\nInput/basename.sdt\n\nSOILMAPNAME:      Soil texture ASCII grid (*.soi)\nInput/basename.soi\n\nLANDTABLENAME:    Land use parameter reference table (*.ldtt)\nInput/basename.ldt\n\nLANDMAPNAME:  \t  Land use ASCII grid (*.lan)\nInput/basename.lan\n\nVEGTABLENAME:     File containing vegetation parameter info\n\n\nVEGINITFILENAME:  File containing vegetation parameter info\n\n\nGWATERFILE:       Ground water ASCII grid (*.iwt) \nInput/basename.iwt\n\nRAINFILE:         Base name of the radar ASCII grid\nRain/p\n\nRAINEXTENSION:    Extension for the radar ASCII grid \ntxt\n\n## Meteorological Data\n## ------------------\n\nHYDROMETSTATIONS:  Hydrometeorological station file (*.sdf)\nWeather/weatherGauge.sdf\n\nHYDROMETGRID:  \t   Hydrometeorological ASCII grid (*.gdf)\nWeather/\n\nHYDROMETCONVERT:   Hydrometeorological data input file (*.mdi)\nWeather/\n\nHYDROMETBASENAME:  Hydrometeorological data file (*.mdf)\nWeather/weatherField\n\nGAUGESTATIONS: \t   Rain Gauge station file (*.sdf)\nRain/rainGauge.sdf\n\nTLINKE:\t\t   Linke turbidity factor (par-r of shortwave radiation model)\n2.5\n\n## Output Data\n## -----------\n\nOUTFILENAME:\t   Base name of the tMesh and dynamic variable output\nOutput/voronoi/basename\n\nOUTHYDROFILENAME:  Base name for hydrograph output\nOutput/hyd/basename\n\nOUTHYDROEXTENSION: Extension for hydrograph output\nmrf\n\nRIBSHYDOUTPUT:     RIBS comp-ty: Opt 0: basin lumped quant, Opt 1: prev+curr \n0\n\nNODEOUTPUTLIST\nInput/Nodes/pNodes.dat\n\nHYDRONODELIST\nInput/Nodes/hNodes.dat\n\nOUTLETNODELIST\nInput/Nodes/oNodes.dat\n\n##=========================================================================\n##\n##\n##\t\t\tSection 4: Model Climate Forcing Modes \n##\n##\n##  STOCHASTICMODE:\t0  No Stochastic Mode\t 4  Mean+Sine Forcing\n##                      1  Mean Forcing     \t 5  Random+Sine Forcing\n##                      2  Random Forcing        6  Random Seasonal Forcing\n##                      3  Sinusoidal Forcing\n##                      \n##=========================================================================\n\n## Stochastic Climate Forcing\n## --------------------------\n\nSTOCHASTICMODE:\t   Stochastic Climate Mode Option\n0\n\nPMEAN:\t\t   Mean rainfall intensity (mm/hr)\t\n0.0\n\nSTDUR:\t\t   Mean storm duration (hours)\n0.0\n\nISTDUR:\t\t   Mean time interval between storms (hours) \n0.0\n\nSEED:\t\t   Random seed\n11\n\nPERIOD:\t\t   Period of variation (hours) \n0\n\nMAXPMEAN:\t   Maximum value of mean rainfall intensity (mm/hr) \n0\n\nMAXSTDURMN:        Maximum value of mean storm duration (hours) \n0\n\nMAXISTDURMN: \t   Maximum value of mean interstorm period (hours) \n0\n\nWEATHERTABLENAME:  File with input parameters for weather generator\nInput/pramsWG.T\n\n##=========================================================================\n##\n##\n##\t\t\tSection 5: Model Rainfall Modes\n##\n##\n##  FORECASTMODE:\t0  No Forecasting\t\t\n##\t\t\t1  Single or Updating QPF Forecast\n##\t\t\t2  Persistence Forecast\n## \t                3  Climatological Forecast\n##\n##\n##  RAINDISTRIBUTION:\t0  Spatially-distributed Radar\n##\t\t\t1  Mean Areal Precipitation Radar\n##\n##=========================================================================\n\n## Rainfall Forecasting\n## --------------------\n\nFORECASTMODE:\t  Rainfall Forecasting Mode Option\n0\n\nFORECASTTIME:\t  Single Forecast Time (hours from start)\n0\n\nFORECASTLEADTIME:  Forecast Lead Time (hour interval) \n0\n\nFORECASTLENGTH:\t   Forecast Window Length (hours)\n0\n\nFORECASTFILE:\t   Base name of the radar QPF grids\nRain/\n\nCLIMATOLOGY:\t   Rainfall climatology (mm/hr)\n0\n\nRAINDISTRIBUTION:  Distributed or MAP radar rainfall\t\n0\n\n##=========================================================================\n##\n##\n##\t\t\tSection 6: Parallel Computing \n##\n##\n##  PARALLELMODE:\t0  Run in serial mode\n##\t\t\t1  Run in parallel mode\n##\n##\n##  GRAPHFILEOPTION:\t0  Default partitioning of the graph\n##\t\t\t1  Reach-based\n##\t\t\t2  Inlet/outlet-based\n##\n##  GRAPHFILE:\t\tReach connectivity file (parallel only)\n##\n##=========================================================================\n\n## Parallel Processing\n##--------------------\n\nPARALLELMODE:\n0\n\nGRAPHFILEOPTION:\n0\n\nGRAPHFILE:        Reach connectivity file (parallel ONLY)\nInput/\n\n## Viewers\n## -----------\n\nTRIBS_DISP_HYDRO:  Hydrograph run-time viewer (disabled)\n\n##======================================================================\n##\n##\n## \t\t  Section 5: Restart Mode Options\n##\n##\n## RESTARTMODE:   0  No reading or writing of restart (for fast development)\n##                1  Write files only (for initial runs)\n##                2  Read file only (to start at some time)\n##                3  Read a restart file and continue to write \n##                     restart files\n##\n##======================================================================\n\nRESTARTMODE:\t    Restart Mode Option\n0\n\nRESTARTINTRVL:      Time set for restart output (hours)\n0\n\nRESTARTDIR:         Path of directory for restart output\n\nRESTARTFILE:        Actual file to restart from\n\n\n##=========================================================================\n##\n##\n##\t\t\tEnd of Template.in\n##\n##\n##=========================================================================\n");
+        jScrollPane1.setViewportView(inFileTextArea);
+
+        jPanel9.add(jScrollPane1, java.awt.BorderLayout.CENTER);
+
+        jPanel4.setLayout(new java.awt.BorderLayout());
+
+        jLabel11.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+        jLabel11.setText(">>>");
+        jPanel4.add(jLabel11, java.awt.BorderLayout.CENTER);
+
+        writeInFile.setText("Write *.in Template");
+        writeInFile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                writeInFileActionPerformed(evt);
+            }
+        });
+
+        jPanel4.add(writeInFile, java.awt.BorderLayout.EAST);
+
+        jPanel9.add(jPanel4, java.awt.BorderLayout.SOUTH);
+
+        jLabel12.setText("Modify the *.in template file to adjust to your specific simulation needs");
+        jPanel9.add(jLabel12, java.awt.BorderLayout.NORTH);
 
         panelInputs.addTab("Input File", jPanel9);
 
@@ -1915,6 +2255,533 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void writeInFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_writeInFileActionPerformed
+        try {
+            String fileAscSalida=pathTextField.getText()+"/"+baseNameTextField.getText()+".in";
+            
+            java.io.FileOutputStream        outputDir;
+            java.io.OutputStreamWriter      newfile;
+            java.io.BufferedOutputStream    bufferout;
+            String                          retorno="\n";
+            
+            outputDir = new java.io.FileOutputStream(fileAscSalida);
+            bufferout=new java.io.BufferedOutputStream(outputDir);
+            newfile=new java.io.OutputStreamWriter(bufferout);
+            
+            String[] inFileText=inFileTextArea.getText().split("\n");
+            for (int i = 0; i < inFileText.length; i++) {
+                if(inFileText[i].contains("basename")){
+                   String[] pathToWrite=inFileText[i].split("basename");
+                   newfile.write(pathToWrite[0]);
+                   newfile.write(baseNameTextField.getText());
+                   if(pathToWrite.length > 1) newfile.write(pathToWrite[1]);
+                   newfile.write(retorno);
+                } else{
+                    newfile.write(inFileText[i]+retorno);
+                }
+            }
+            newfile.write(retorno);
+            
+            newfile.close();
+            bufferout.close();
+            outputDir.close();
+            
+        } catch (NumberFormatException ex) {
+            ex.printStackTrace();
+        } catch (FileNotFoundException ex) {
+            ex.printStackTrace();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }//GEN-LAST:event_writeInFileActionPerformed
+
+    private void selectGWActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectGWActionPerformed
+        javax.swing.JFileChooser fcI=new javax.swing.JFileChooser(mainFrame.getInfoManager().dataBaseRastersHydPath);
+        fcI.setFileSelectionMode(fcI.FILES_ONLY);
+        fcI.setDialogTitle("Hydroclimatic File Selection");
+        javax.swing.filechooser.FileFilter vhcFilter = new visad.util.ExtensionFileFilter("metaVHC","Hydroclimatic File");
+        fcI.addChoosableFileFilter(vhcFilter);
+        int result=fcI.showOpenDialog(this);
+        java.io.File fileInput = fcI.getSelectedFile();
+        if (result == javax.swing.JFileChooser.CANCEL_OPTION) return;
+        if (!fcI.getSelectedFile().isFile()) return;
+        
+        try{
+            java.io.File theMetaFile=new java.io.File(fileInput.getPath().substring(0,fileInput.getPath().lastIndexOf("."))+".metaVHC");
+            hydroScalingAPI.subGUIs.widgets.HydroOpenDialog openVhc=new hydroScalingAPI.subGUIs.widgets.HydroOpenDialog(mainFrame,new hydroScalingAPI.io.MetaRaster(theMetaFile),"Export");
+            openVhc.setVisible(true);
+            if (!openVhc.mapsSelected()){
+                return;
+            }
+            
+            hydroScalingAPI.io.MetaRaster theActualMeta=openVhc.getSelectedMetaRasters()[0];
+            visad.FlatField theActualField=theActualMeta.getField();
+            
+            double[] er=eastMap_I.getRange();
+            double[] nr=northMap_I.getRange();
+            
+            int ncMap=(int)Math.round((er[1]-er[0])/100)+6;
+            int nrMap=(int)Math.round((nr[1]-nr[0])/100)+6;
+            
+            visad.FunctionType  func_xEasting_yNorthing_to_Color=new FunctionType(domainXLYL,voiColor);
+            visad.Linear2DSet   domainExtent = new visad.Linear2DSet(domainXLYL,er[0]-300,er[0]+ncMap*100+300,ncMap,
+                                                                                nr[0]-300,nr[0]+nrMap*100+300,nrMap);
+            field_GW = new visad.FlatField( func_xEasting_yNorthing_to_Color, domainExtent);
+            
+            float[][] locationsEN=domainExtent.getSamples();
+            
+            int numPoints=locationsEN[0].length;
+            Gdc_Coord_3d[] gdc=new Gdc_Coord_3d[numPoints];
+            Utm_Coord_3d[] utm=new Utm_Coord_3d[numPoints];
+
+            for(int i=0;i<numPoints;i++){
+                gdc[i]=new Gdc_Coord_3d();
+                utm[i]=new Utm_Coord_3d();
+                    utm[i].x=locationsEN[0][i]+basTIN_I.minX;
+                    utm[i].y=locationsEN[1][i]+basTIN_I.minY;
+                    utm[i].zone=basTIN_I.TIN_Zone;
+                    utm[i].hemisphere_north=basTIN_I.TIN_Hemisphere;
+            }
+
+            Utm_To_Gdc_Converter.Init(new WE_Ellipsoid());
+            Utm_To_Gdc_Converter.Convert(utm,gdc);
+            
+            float[][] valueVar=new float[1][ncMap*nrMap];
+            visad.RealTuple spotValue;
+            
+            
+            for (int i = 0; i < valueVar[0].length; i++) {
+                
+                spotValue=(visad.RealTuple) theActualField.evaluate(new visad.RealTuple(domain, new double[] {gdc[i].longitude,gdc[i].latitude}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
+
+                valueVar[0][i]=(float)spotValue.getValues()[0];
+                
+            }
+            
+            field_GW.setSamples( valueVar, false );
+            
+            voiColorMap_GW.setRange(0,500);
+            
+            data_refFill_GW.setData(field_GW);
+            
+            exportSoils.setEnabled(true);
+            
+            data_refPolygon_GW = new DataReferenceImpl("data_refPolygon_GW"); 
+            data_refPolygon_GW.setData(basTIN_I.getPolygon());
+            
+            display_GW.addReference(data_refPolygon_GW);
+            
+        } catch (RemoteException ex) {
+            ex.printStackTrace();
+        } catch (VisADException ex) {
+            ex.printStackTrace();
+        } catch(java.io.IOException ex){
+            ex.printStackTrace();
+        }
+    }//GEN-LAST:event_selectGWActionPerformed
+
+    private void selectSoilsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectSoilsActionPerformed
+        javax.swing.JFileChooser fcI=new javax.swing.JFileChooser(mainFrame.getInfoManager().dataBaseRastersHydPath);
+        fcI.setFileSelectionMode(fcI.FILES_ONLY);
+        fcI.setDialogTitle("Hydroclimatic File Selection");
+        javax.swing.filechooser.FileFilter vhcFilter = new visad.util.ExtensionFileFilter("metaVHC","Hydroclimatic File");
+        fcI.addChoosableFileFilter(vhcFilter);
+        int result=fcI.showOpenDialog(this);
+        java.io.File fileInput = fcI.getSelectedFile();
+        if (result == javax.swing.JFileChooser.CANCEL_OPTION) return;
+        if (!fcI.getSelectedFile().isFile()) return;
+        
+        try{
+            java.io.File theMetaFile=new java.io.File(fileInput.getPath().substring(0,fileInput.getPath().lastIndexOf("."))+".metaVHC");
+            hydroScalingAPI.subGUIs.widgets.HydroOpenDialog openVhc=new hydroScalingAPI.subGUIs.widgets.HydroOpenDialog(mainFrame,new hydroScalingAPI.io.MetaRaster(theMetaFile),"Export");
+            openVhc.setVisible(true);
+            if (!openVhc.mapsSelected()){
+                return;
+            }
+            
+            hydroScalingAPI.io.MetaRaster theActualMeta=openVhc.getSelectedMetaRasters()[0];
+            visad.FlatField theActualField=theActualMeta.getField();
+            
+            double[] er=eastMap_I.getRange();
+            double[] nr=northMap_I.getRange();
+            
+            int ncMap=(int)Math.round((er[1]-er[0])/100)+6;
+            int nrMap=(int)Math.round((nr[1]-nr[0])/100)+6;
+            
+            visad.FunctionType  func_xEasting_yNorthing_to_Color=new FunctionType(domainXLYL,voiColor);
+            visad.Linear2DSet   domainExtent = new visad.Linear2DSet(domainXLYL,er[0]-300,er[0]+ncMap*100+300,ncMap,
+                                                                                nr[0]-300,nr[0]+nrMap*100+300,nrMap);
+            field_SOIL = new visad.FlatField( func_xEasting_yNorthing_to_Color, domainExtent);
+            
+            float[][] locationsEN=domainExtent.getSamples();
+            
+            int numPoints=locationsEN[0].length;
+            Gdc_Coord_3d[] gdc=new Gdc_Coord_3d[numPoints];
+            Utm_Coord_3d[] utm=new Utm_Coord_3d[numPoints];
+
+            for(int i=0;i<numPoints;i++){
+                gdc[i]=new Gdc_Coord_3d();
+                utm[i]=new Utm_Coord_3d();
+                    utm[i].x=locationsEN[0][i]+basTIN_I.minX;
+                    utm[i].y=locationsEN[1][i]+basTIN_I.minY;
+                    utm[i].zone=basTIN_I.TIN_Zone;
+                    utm[i].hemisphere_north=basTIN_I.TIN_Hemisphere;
+            }
+
+            Utm_To_Gdc_Converter.Init(new WE_Ellipsoid());
+            Utm_To_Gdc_Converter.Convert(utm,gdc);
+            
+            float[][] valueVar=new float[1][ncMap*nrMap];
+            visad.RealTuple spotValue;
+            
+            
+            for (int i = 0; i < valueVar[0].length; i++) {
+                
+                spotValue=(visad.RealTuple) theActualField.evaluate(new visad.RealTuple(domain, new double[] {gdc[i].longitude,gdc[i].latitude}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
+
+                valueVar[0][i]=(float)spotValue.getValues()[0];
+                
+            }
+            
+            field_SOIL.setSamples( valueVar, false );
+            
+            voiColorMap_SOIL.setRange(0,500);
+            
+            data_refFill_SOIL.setData(field_SOIL);
+            
+            exportSoils.setEnabled(true);
+            
+            data_refPolygon_SOIL = new DataReferenceImpl("data_refPolygon_SOIL"); 
+            data_refPolygon_SOIL.setData(basTIN_I.getPolygon());
+            
+            display_SOIL.addReference(data_refPolygon_SOIL);
+            
+        } catch (RemoteException ex) {
+            ex.printStackTrace();
+        } catch (VisADException ex) {
+            ex.printStackTrace();
+        } catch(java.io.IOException ex){
+            ex.printStackTrace();
+        }
+    }//GEN-LAST:event_selectSoilsActionPerformed
+
+    private void exportGWActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportGWActionPerformed
+        try {
+            String fileAscSalida=pathTextField.getText()+"/Input/"+baseNameTextField.getText()+".iwt";
+            
+            java.io.FileOutputStream        outputDir;
+            java.io.OutputStreamWriter      newfile;
+            java.io.BufferedOutputStream    bufferout;
+            String                          retorno="\n";
+            
+            outputDir = new java.io.FileOutputStream(fileAscSalida);
+            bufferout=new java.io.BufferedOutputStream(outputDir);
+            newfile=new java.io.OutputStreamWriter(bufferout);
+            
+            
+            double[] er=eastMap_I.getRange();
+            double[] nr=northMap_I.getRange();
+            
+            int ncMap=(int)Math.round((er[1]-er[0])/100)+6;
+            int nrMap=(int)Math.round((nr[1]-nr[0])/100)+6;
+            
+            newfile.write("ncols         "+ncMap+retorno);
+            newfile.write("nrows         "+nrMap+retorno);
+            newfile.write("xllcorner     "+(er[0]+basTIN_I.minX-300)+retorno);
+            newfile.write("yllcorner     "+(nr[0]+basTIN_I.minY-300)+retorno);
+            newfile.write("cellsize      "+100+retorno);
+            newfile.write("NODATA_value  "+"-9999"+retorno);
+            
+            double[][] values_GW=field_GW.getValues();
+            
+            int k=0;
+            for (int j=0;j<values_GW[0].length;j++) {
+                newfile.write(values_GW[0][nrMap*ncMap-(k+1)*ncMap+(j%ncMap)]+" ");
+                if((j+1)%ncMap == 0) {
+                    k++;
+                    newfile.write(retorno);
+                }
+            }
+            
+            newfile.write(retorno);
+            
+            newfile.close();
+            bufferout.close();
+            outputDir.close();
+            
+        } catch (NumberFormatException ex) {
+            ex.printStackTrace();
+        } catch (FileNotFoundException ex) {
+            ex.printStackTrace();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } catch (VisADException ex) {
+            ex.printStackTrace();
+        }
+    }//GEN-LAST:event_exportGWActionPerformed
+
+    private void exportSoilsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportSoilsActionPerformed
+        try {
+            String fileAscSalida=pathTextField.getText()+"/Input/"+baseNameTextField.getText()+".soi";
+            
+            java.io.FileOutputStream        outputDir;
+            java.io.OutputStreamWriter      newfile;
+            java.io.BufferedOutputStream    bufferout;
+            String                          retorno="\n";
+            
+            outputDir = new java.io.FileOutputStream(fileAscSalida);
+            bufferout=new java.io.BufferedOutputStream(outputDir);
+            newfile=new java.io.OutputStreamWriter(bufferout);
+            
+            
+            double[] er=eastMap_I.getRange();
+            double[] nr=northMap_I.getRange();
+            
+            int ncMap=(int)Math.round((er[1]-er[0])/100)+6;
+            int nrMap=(int)Math.round((nr[1]-nr[0])/100)+6;
+            
+            newfile.write("ncols         "+ncMap+retorno);
+            newfile.write("nrows         "+nrMap+retorno);
+            newfile.write("xllcorner     "+(er[0]+basTIN_I.minX-300)+retorno);
+            newfile.write("yllcorner     "+(nr[0]+basTIN_I.minY-300)+retorno);
+            newfile.write("cellsize      "+100+retorno);
+            newfile.write("NODATA_value  "+"-9999"+retorno);
+            
+            double[][] values_SOIL=field_SOIL.getValues();
+            java.util.Vector uniqueValues=new java.util.Vector<Integer>();
+            
+            int k=0;
+            for (int j=0;j<values_SOIL[0].length;j++) {
+                Integer valueInteger=new Integer((int)values_SOIL[0][nrMap*ncMap-(k+1)*ncMap+(j%ncMap)]);
+                if(!uniqueValues.contains(valueInteger)) uniqueValues.add(valueInteger);
+                
+                newfile.write(values_SOIL[0][nrMap*ncMap-(k+1)*ncMap+(j%ncMap)]+" ");
+                if((j+1)%ncMap == 0) {
+                    k++;
+                    newfile.write(retorno);
+                }
+            }
+            
+            newfile.write(retorno);
+            
+            newfile.close();
+            bufferout.close();
+            outputDir.close();
+            
+            fileAscSalida=pathTextField.getText()+"/Input/"+baseNameTextField.getText()+".sdt";
+            outputDir = new java.io.FileOutputStream(fileAscSalida);
+            bufferout=new java.io.BufferedOutputStream(outputDir);
+            newfile=new java.io.OutputStreamWriter(bufferout);
+            
+            newfile.write(uniqueValues.size()+" 12"+retorno);
+            for (Iterator it = uniqueValues.iterator(); it.hasNext();) {
+                Integer elem = (Integer) it.next();
+                newfile.write(elem.intValue()+" Edit with appropriate parameter values"+retorno);
+            }
+            
+            newfile.close();
+            bufferout.close();
+            outputDir.close();
+            
+        } catch (NumberFormatException ex) {
+            ex.printStackTrace();
+        } catch (FileNotFoundException ex) {
+            ex.printStackTrace();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } catch (VisADException ex) {
+            ex.printStackTrace();
+        }
+    }//GEN-LAST:event_exportSoilsActionPerformed
+
+    private void exportLandCoverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportLandCoverActionPerformed
+        try {
+            String fileAscSalida=pathTextField.getText()+"/Input/"+baseNameTextField.getText()+".lan";
+            
+            java.io.FileOutputStream        outputDir;
+            java.io.OutputStreamWriter      newfile;
+            java.io.BufferedOutputStream    bufferout;
+            String                          retorno="\n";
+            
+            outputDir = new java.io.FileOutputStream(fileAscSalida);
+            bufferout=new java.io.BufferedOutputStream(outputDir);
+            newfile=new java.io.OutputStreamWriter(bufferout);
+            
+            
+            double[] er=eastMap_I.getRange();
+            double[] nr=northMap_I.getRange();
+            
+            int ncMap=(int)Math.round((er[1]-er[0])/100)+6;
+            int nrMap=(int)Math.round((nr[1]-nr[0])/100)+6;
+            
+            newfile.write("ncols         "+ncMap+retorno);
+            newfile.write("nrows         "+nrMap+retorno);
+            newfile.write("xllcorner     "+(er[0]+basTIN_I.minX-300)+retorno);
+            newfile.write("yllcorner     "+(nr[0]+basTIN_I.minY-300)+retorno);
+            newfile.write("cellsize      "+100+retorno);
+            newfile.write("NODATA_value  "+"-9999"+retorno);
+            
+            double[][] values_LULC=field_LULC.getValues();
+            java.util.Vector uniqueValues=new java.util.Vector<Integer>();
+            
+            int k=0;
+            for (int j=0;j<values_LULC[0].length;j++) {
+                Integer valueInteger=new Integer((int)values_LULC[0][nrMap*ncMap-(k+1)*ncMap+(j%ncMap)]);
+                if(!uniqueValues.contains(valueInteger)) uniqueValues.add(valueInteger);
+                
+                newfile.write(values_LULC[0][nrMap*ncMap-(k+1)*ncMap+(j%ncMap)]+" ");
+                if((j+1)%ncMap == 0) {
+                    k++;
+                    newfile.write(retorno);
+                }
+            }
+            
+            newfile.write(retorno);
+            
+            newfile.close();
+            bufferout.close();
+            outputDir.close();
+            
+            fileAscSalida=pathTextField.getText()+"/Input/"+baseNameTextField.getText()+".ldt";
+            outputDir = new java.io.FileOutputStream(fileAscSalida);
+            bufferout=new java.io.BufferedOutputStream(outputDir);
+            newfile=new java.io.OutputStreamWriter(bufferout);
+            
+            newfile.write(uniqueValues.size()+" 12"+retorno);
+            for (Iterator it = uniqueValues.iterator(); it.hasNext();) {
+                Integer elem = (Integer) it.next();
+                newfile.write(elem.intValue()+" Edit with appropriate parameter values"+retorno);
+            }
+            
+            newfile.close();
+            bufferout.close();
+            outputDir.close();
+            
+        } catch (NumberFormatException ex) {
+            ex.printStackTrace();
+        } catch (FileNotFoundException ex) {
+            ex.printStackTrace();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } catch (VisADException ex) {
+            ex.printStackTrace();
+        }
+    }//GEN-LAST:event_exportLandCoverActionPerformed
+
+    private void selectLandCoverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectLandCoverActionPerformed
+        javax.swing.JFileChooser fcI=new javax.swing.JFileChooser(mainFrame.getInfoManager().dataBaseRastersHydPath);
+        fcI.setFileSelectionMode(fcI.FILES_ONLY);
+        fcI.setDialogTitle("Hydroclimatic File Selection");
+        javax.swing.filechooser.FileFilter vhcFilter = new visad.util.ExtensionFileFilter("metaVHC","Hydroclimatic File");
+        fcI.addChoosableFileFilter(vhcFilter);
+        int result=fcI.showOpenDialog(this);
+        java.io.File fileInput = fcI.getSelectedFile();
+        if (result == javax.swing.JFileChooser.CANCEL_OPTION) return;
+        if (!fcI.getSelectedFile().isFile()) return;
+        
+        try{
+            java.io.File theMetaFile=new java.io.File(fileInput.getPath().substring(0,fileInput.getPath().lastIndexOf("."))+".metaVHC");
+            hydroScalingAPI.subGUIs.widgets.HydroOpenDialog openVhc=new hydroScalingAPI.subGUIs.widgets.HydroOpenDialog(mainFrame,new hydroScalingAPI.io.MetaRaster(theMetaFile),"Export");
+            openVhc.setVisible(true);
+            if (!openVhc.mapsSelected()){
+                return;
+            }
+            
+            hydroScalingAPI.io.MetaRaster theActualMeta=openVhc.getSelectedMetaRasters()[0];
+            visad.FlatField theActualField=theActualMeta.getField();
+            
+            double[] er=eastMap_I.getRange();
+            double[] nr=northMap_I.getRange();
+            
+            int ncMap=(int)Math.round((er[1]-er[0])/100)+6;
+            int nrMap=(int)Math.round((nr[1]-nr[0])/100)+6;
+            
+            visad.FunctionType  func_xEasting_yNorthing_to_Color=new FunctionType(domainXLYL,voiColor);
+            visad.Linear2DSet   domainExtent = new visad.Linear2DSet(domainXLYL,er[0]-300,er[0]+ncMap*100+300,ncMap,
+                                                                                nr[0]-300,nr[0]+nrMap*100+300,nrMap);
+            field_LULC = new visad.FlatField( func_xEasting_yNorthing_to_Color, domainExtent);
+            
+            float[][] locationsEN=domainExtent.getSamples();
+            
+            int numPoints=locationsEN[0].length;
+            Gdc_Coord_3d[] gdc=new Gdc_Coord_3d[numPoints];
+            Utm_Coord_3d[] utm=new Utm_Coord_3d[numPoints];
+
+            for(int i=0;i<numPoints;i++){
+                gdc[i]=new Gdc_Coord_3d();
+                utm[i]=new Utm_Coord_3d();
+                    utm[i].x=locationsEN[0][i]+basTIN_I.minX;
+                    utm[i].y=locationsEN[1][i]+basTIN_I.minY;
+                    utm[i].zone=basTIN_I.TIN_Zone;
+                    utm[i].hemisphere_north=basTIN_I.TIN_Hemisphere;
+            }
+
+            Utm_To_Gdc_Converter.Init(new WE_Ellipsoid());
+            Utm_To_Gdc_Converter.Convert(utm,gdc);
+            
+            float[][] valueVar=new float[1][ncMap*nrMap];
+            visad.RealTuple spotValue;
+            
+            
+            for (int i = 0; i < valueVar[0].length; i++) {
+                
+                spotValue=(visad.RealTuple) theActualField.evaluate(new visad.RealTuple(domain, new double[] {gdc[i].longitude,gdc[i].latitude}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
+
+                valueVar[0][i]=(float)spotValue.getValues()[0];
+                
+            }
+            
+            field_LULC.setSamples( valueVar, false );
+            
+            voiColorMap_LULC.setRange(0,100);
+            
+            data_refFill_LULC.setData(field_LULC);
+            
+            exportLandCover.setEnabled(true);
+            
+            data_refPolygon_LULC = new DataReferenceImpl("data_refPolygon_LULC"); 
+            data_refPolygon_LULC.setData(basTIN_I.getPolygon());
+            
+            display_LULC.addReference(data_refPolygon_LULC);
+            
+        } catch (RemoteException ex) {
+            ex.printStackTrace();
+        } catch (VisADException ex) {
+            ex.printStackTrace();
+        } catch(java.io.IOException ex){
+            ex.printStackTrace();
+        }
+        
+        
+    }//GEN-LAST:event_selectLandCoverActionPerformed
+
+    private void computeLatticeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_computeLatticeActionPerformed
+        
+        try {
+
+            javax.swing.JDialog me=new javax.swing.JDialog(this,"Wait ...",false);
+
+            me.setBounds(0,0, 200, 10);
+            java.awt.Rectangle marcoParent=this.getBounds();
+            java.awt.Rectangle thisMarco=me.getBounds();
+            me.setBounds(marcoParent.x+marcoParent.width/2-thisMarco.width/2,marcoParent.y+marcoParent.height/2-thisMarco.height/2,thisMarco.width,thisMarco.height);
+
+
+            me.setVisible(true);
+        
+            plotPoints();
+            
+            me.dispose();
+            
+        } catch (RemoteException ex) {
+            ex.printStackTrace();
+        } catch (VisADException ex) {
+            ex.printStackTrace();
+        } catch (java.io.IOException ex){
+            ex.printStackTrace();
+        }
+    }//GEN-LAST:event_computeLatticeActionPerformed
+
     private void findFileButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_findFileButtonActionPerformed
         javax.swing.JFileChooser fc=new javax.swing.JFileChooser(pathTextField.getText());
         fc.setFileSelectionMode(fc.FILES_ONLY);
@@ -1991,6 +2858,9 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
                     int simuID=0;
 
                     try {
+                        
+                        java.util.Date startTime=new java.util.Date();
+                        System.out.println("> Database transaction starts at :"+startTime.toString());
 
                         //Determine if grid exists in database
 
@@ -2054,13 +2924,13 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
                                     }
                                     polygonString+=""+(polsVals[0][0]+basTIN_O.minX)+" "+(polsVals[1][0]+basTIN_O.minY)+"))'";
 
-                                    if(Float.isNaN(val_chan_w[k])) val_chan_w[k]=-9999;
-                                    if(Float.isNaN(val_chan_l[k])) val_chan_l[k]=-9999;
-                                    if(Float.isNaN(val_chan_s[k])) val_chan_s[k]=-9999;
-                                    if(Float.isNaN(val_chan_ua[k])) val_chan_ua[k]=-9999;
+                                    if(Float.isNaN(val_chan_w[k])) val_chan_w[k]=-9;
+                                    if(Float.isNaN(val_chan_l[k])) val_chan_l[k]=-9;
+                                    if(Float.isNaN(val_chan_s[k])) val_chan_s[k]=-9;
+                                    if(Float.isNaN(val_chan_ua[k])) val_chan_ua[k]=-9;
 
-                                    st.addBatch("INSERT INTO nmt_model_polygon ( id,grid_id,geom_txt_poly,geom_txt_pt,z,s,v_ar,c_ar,curv,edg_l,tan_slp,f_width,aspect,soil_type,land_use,chan_w,chan_l,chan_s,chan_ua)" +
-                                                " VALUES("+(gridID*10000000+(int)val_node_id[k])+","+gridID+","+polygonString+","+pointString+","+val_z[k]+","+val_s[k]+","+val_v_ar[k]+","+val_c_ar[k]+","+val_curv[k]+","+val_edg_l[k]+","+val_tan_slp[k]+","+val_f_width[k]+","+val_aspect[k]+","+val_soil_type[k]+","+val_land_use[k]+","+val_chan_w[k]+","+val_chan_l[k]+","+val_chan_s[k]+","+val_chan_ua[k]+")");
+                                    st.addBatch("INSERT INTO nmt_model_polygon ( id,grid_id,geom_txt_poly,epsgcode,geom_txt_pt,z,s,v_ar,c_ar,curv,edg_l,tan_slp,f_width,aspect,soil_type,land_use,chan_w,chan_l,chan_s,chan_ua)" +
+                                                " VALUES("+(gridID*10000000+(int)val_node_id[k])+","+gridID+","+polygonString+","+epsgCode+","+pointString+","+val_z[k]+","+val_s[k]+","+val_v_ar[k]+","+val_c_ar[k]+","+val_curv[k]+","+val_edg_l[k]+","+val_tan_slp[k]+","+val_f_width[k]+","+val_aspect[k]+","+val_soil_type[k]+","+val_land_use[k]+","+val_chan_w[k]+","+val_chan_l[k]+","+val_chan_s[k]+","+val_chan_ua[k]+")");
 
                                 }
 
@@ -2081,6 +2951,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
                             
                             st.execute("create view view_grid"+labelFormat.format(gridID)+" as select *, geometryfromtext(geom_txt_poly,"+epsgCode+") as the_geom from nmt_model_polygon where grid_id = "+gridID);
                             st.execute("insert into geometry_columns (f_table_catalog,f_table_schema,f_table_name,f_geometry_column,coord_dimension,srid,type) values ('','public','view_grid"+labelFormat.format(gridID)+"','the_geom',2,"+epsgCode+",'POLYGON')");
+                            
                             //Get Reaches
 
                             UnionSet rivNet=basNet.getReachesUnionSet();
@@ -2223,12 +3094,11 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
                             labelFormat.setGroupingUsed(false);
                             labelFormat.setMinimumIntegerDigits(5);
                             
-                            st.execute("create view view_grid"+labelFormat.format(gridID)+"_sim"+labelFormat.format(simuID)+"_aggregatedtime as select a.*, b.id as agg_id, b.avsm, b.avrtm, b.hoccr, b.hrt, b.sboccr, b.sbrt, b.poccr, b.prt, b.satoccr,b.satrt,b.soisatoccr, b.rchdsch,b.aveet,b.evpfrct from view_grid"+labelFormat.format(gridID)+" a, nmt_model_aggregatedtime b where a.id = b.polygon_id and b.simulation_id = "+simuID);
-                            
                             rs = st.executeQuery("SELECT proj_epsg FROM nmt_model_grid  WHERE id = "+gridID);
                             rs.next();
                             String epsgCode=rs.getString(1);
-                            
+
+                            st.execute("create view view_grid"+labelFormat.format(gridID)+"_sim"+labelFormat.format(simuID)+"_aggregatedtime as select a.*, b.id as agg_id, b.avsm, b.avrtm, b.hoccr, b.hrt, b.sboccr, b.sbrt, b.poccr, b.prt, b.satoccr,b.satrt,b.soisatoccr, b.rchdsch,b.aveet,b.evpfrct from view_grid"+labelFormat.format(gridID)+" a, nmt_model_aggregatedtime b where a.id = b.polygon_id and b.simulation_id = "+simuID);
                             st.execute("insert into geometry_columns (f_table_catalog,f_table_schema,f_table_name,f_geometry_column,coord_dimension,srid,type) values ('','public','view_grid"+labelFormat.format(gridID)+"_sim"+labelFormat.format(simuID)+"_aggregatedtime','the_geom',2,"+epsgCode+",'POLYGON')");
 
                             //Get info about hydrographs
@@ -2247,14 +3117,13 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
                                 for (int j = 0; j < timesQ.length; j+=100) {
                                     int k;
                                     for (k = j; k < j+100 && k < timesQ.length; k++) {
-
-                                        st.addBatch("INSERT INTO nmt_model_outputhydrograph (id,                                          simulation_id,polygon_id,time_offset,hydrograph_q, hydrograph_depth)" +
-                                                   " VALUES (                                  NEXTVAL('nmt_model_outputhydrograph_id_seq'),"+simuID+","+(gridID*10000000+qIndex[l])+","+timesQ[k]+","+dishaQ[k]+","+depthQ[k]+")");
+                                        
+                                        st.addBatch("INSERT INTO nmt_model_outputhydrograph (id,simulation_id,polygon_id,time_offset,hydrograph_q, hydrograph_depth)" +
+                                                   " VALUES (NEXTVAL('nmt_model_outputhydrograph_id_seq'),"+simuID+","+(gridID*10000000+qIndex[l])+","+timesQ[k]+","+(float)dishaQ[k]+","+(float)depthQ[k]+")");
 
                                     }
 
-                                    int[] s=st.executeBatch();
-
+                                    //int[] s=st.executeBatch();
                                     
                                     hydProgressBar.setValue((int)(100*(l+k/(float)timesQ.length)/(float)qKeys.length));
 
@@ -2397,10 +3266,11 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
                             //Create a view for the data view_grid_00000_sim00000_timeseries and register geometry
                             
                             st.execute("create view view_grid"+labelFormat.format(gridID)+"_sim"+labelFormat.format(simuID)+"_timeseries as select a.*, b.id as ts_id, b.simulation_id, (c.start_time + (b.time_offset::char(12) || ' hours')::interval) AT TIME ZONE 'UTC' as timestep, b.nwt, b.mu, b.mi, b.nf, b.nt, b.qpout, b.qpin, b.srf, b.rain, b.soil_moist, b.root_moist, b.can_storg, b.act_evp, b.evp_soil, b.et, b.gflux, b.hflux, b.lflux, b.qstrm, b.hlev, b.flw_vlc from view_grid"+labelFormat.format(gridID)+" a, nmt_model_outputpoly b, nmt_model_simulation c where a.id = b.polygon_id and b.simulation_id = "+simuID+" and c.id = b.simulation_id");
-                            
                             st.execute("insert into geometry_columns (f_table_catalog,f_table_schema,f_table_name,f_geometry_column,coord_dimension,srid,type) values ('','public','view_grid"+labelFormat.format(gridID)+"_sim"+labelFormat.format(simuID)+"_timeseries','the_geom',2,"+epsgCode+",'POLYGON')");
 
-                            
+                            java.util.Date endTime=new java.util.Date();
+                            System.out.println("> Database Transaction ends at :"+endTime.toString());
+                            System.out.println("> Transaction Time:"+(.001*(endTime.getTime()-startTime.getTime()))+" seconds");
 
                         } else{
                             rs = st.executeQuery("SELECT id FROM nmt_model_grid WHERE grid_hash = '"+md5_grid_textField.getText()+"'");
@@ -2452,17 +3322,6 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
     private void colorTableButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_colorTableButtonActionPerformed
         new hydroScalingAPI.modules.tRIBS_io.widgets.ColorTableTribs(this,voiColorMap_O).setVisible(true);
     }//GEN-LAST:event_colorTableButtonActionPerformed
-
-    private void ridgeLevelComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ridgeLevelComboActionPerformed
-        try {
-            firstPass=true;
-            plotPoints(zrSlider.getValue());
-        } catch (RemoteException ex) {
-            ex.printStackTrace();
-        } catch (VisADException ex) {
-            ex.printStackTrace();
-        }
-    }//GEN-LAST:event_ridgeLevelComboActionPerformed
 
     private void pNodesComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pNodesComboActionPerformed
         plotPixel();
@@ -2751,13 +3610,13 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
 
     private void exportPoiButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportPoiButtonActionPerformed
         try{
-            javax.swing.JFileChooser fc=new javax.swing.JFileChooser();
+            javax.swing.JFileChooser fc=new javax.swing.JFileChooser(pathTextField.getText()+"/Input/");
             fc.setFileSelectionMode(fc.FILES_ONLY);
             fc.setDialogTitle("Directory Selection");
             javax.swing.filechooser.FileFilter mdtFilter = new visad.util.ExtensionFileFilter("points","Points File");
             fc.addChoosableFileFilter(mdtFilter);
             fc.showSaveDialog(this);
-
+            
             if (fc.getSelectedFile() == null) return;
             
             basTIN_I.writePoints(fc.getSelectedFile());
@@ -2827,19 +3686,6 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         }
     }//GEN-LAST:event_pointsCheckBox_IActionPerformed
 
-    private void zrSliderMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_zrSliderMouseReleased
-        if(zrSlider.isEnabled()){
-            try {
-                zrLabel.setText("Zr = "+zrSlider.getValue()/100.0f);
-                plotPoints(zrSlider.getValue()/100.0f);
-            } catch (RemoteException ex) {
-                ex.printStackTrace();
-            } catch (VisADException ex) {
-                ex.printStackTrace();
-            }
-        }
-    }//GEN-LAST:event_zrSliderMouseReleased
-
     private void exportTriButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportTriButtonActionPerformed
         try{
             javax.swing.JFileChooser fc=new javax.swing.JFileChooser();
@@ -2869,10 +3715,14 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
      * @param args the command line arguments
      */
     public static void main(String args[]) {
+
+          //Uncomment when testing the input interface
+        main0(args);
+        if(true) return;
         
 //        args=new String[3];
 //        args[0]="-ou";
-//        args[1]="/Users/ricardo/workFiles/tribsWork/sampleTribs/SEVILLETA/simRound1/Output0/";
+//        args[1]="/Users/ricardo/workFiles/tribsWork/sampleTribs/SEVILLETA/simRound2/Output0/";
 //        args[2]="smallbasin";
 
 //        args=new String[2];
@@ -2883,24 +3733,9 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         
         
         try{
-//            java.io.File theFile=new java.io.File("/hidrosigDataBases/Smallbasin_DB/Rasters/Topography/1_Arcsec/NED_06075640.metaDEM");
-//            //java.io.File theFile=new java.io.File("/hidrosigDataBases/Gila River DB/Rasters/Topography/1_ArcSec/mogollon.metaDEM");
-//            hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster (theFile);
-//            metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".dir"));
-//            
-//            String formatoOriginal=metaModif.getFormat();
-//            metaModif.setFormat("Byte");
-//            byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
-//            
-//            metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".magn"));
-//            metaModif.setFormat("Integer");
-//            int [][] magnitudes=new hydroScalingAPI.io.DataRaster(metaModif).getInt();
-//            
+
             hydroScalingAPI.mainGUI.ParentGUI tempFrame=new hydroScalingAPI.mainGUI.ParentGUI();
 
-//            new TRIBS_io(tempFrame, 56,79,matDirs,magnitudes,metaModif).setVisible(true);
-//            //new TRIBS_io(tempFrame, 282,298 ,matDirs,magnitudes,metaModif).setVisible(true);
-            
             ///home/ricardo/workFiles/tribsWork/sampleTribs/SMALLBASIN/Output/"),"smallbasin"
             ///home/ricardo/simulationResults/SMALLBASIN/Output_Base/"),"smallbasin"
             ///home/ricardo/simulationResults/Output_Mar23a_07/"),"urp"
@@ -2935,7 +3770,48 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         }
     
     }
+
     
+    public static void main0(String args[]) {
+        
+        
+        try{
+            
+            java.io.File writePath=new java.io.File("/home/ricardo/temp/TESTBASIN/");
+            String baseName = "testbasin";
+            
+            //java.io.File theFile=new java.io.File("/hidrosigDataBases/Smallbasin_DB/Rasters/Topography/1_Arcsec/NED_06075640.metaDEM");
+            java.io.File theFile=new java.io.File("/hidrosigDataBases/Gila_River_DB/Rasters/Topography/1_ArcSec/mogollon.metaDEM");
+            hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster (theFile);
+            metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".dir"));
+            
+            String formatoOriginal=metaModif.getFormat();
+            metaModif.setFormat("Byte");
+            byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
+            
+            metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".horton"));
+            metaModif.setFormat("Byte");
+            byte [][] magnitudes=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
+            
+            hydroScalingAPI.mainGUI.ParentGUI tempFrame=new hydroScalingAPI.mainGUI.ParentGUI();
+
+            //Locations for Smallbasin case
+            //new TRIBS_io(tempFrame, 56,79,matDirs,magnitudes,metaModif).setVisible(true);
+            
+            //Locations for Mogollon Case
+            //new TRIBS_io(tempFrame, 282,298 ,matDirs,magnitudes,metaModif,writePath,baseName).setVisible(true);
+            new TRIBS_io(tempFrame, 689,483 ,matDirs,magnitudes,metaModif,writePath,baseName).setVisible(true);
+            
+            
+        } catch (java.io.IOException IOE){
+            System.out.print(IOE);
+            System.exit(0);
+        } catch (VisADException v){
+            System.out.print(v);
+            System.exit(0);
+        }
+    
+    }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JProgressBar aggProgressBar;
@@ -2943,22 +3819,39 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
     private javax.swing.JComboBox avaTimesCombo;
     private javax.swing.JComboBox avaVariablesCombo;
     private javax.swing.JTextField baseNameTextField;
+    private javax.swing.JComboBox bufferTypeCombo;
     private javax.swing.JButton changePath;
     private javax.swing.JButton colorTableButton;
+    private javax.swing.JButton computeLattice;
     private javax.swing.JComboBox dayComboBox;
     private javax.swing.JCheckBox dischBox;
     private javax.swing.JProgressBar dynamicOutputProgressBar;
+    private javax.swing.JButton exportGW;
+    private javax.swing.JButton exportLandCover;
     private javax.swing.JButton exportPoiButton;
+    private javax.swing.JButton exportSoils;
     private javax.swing.JButton exportTriButton;
     private javax.swing.JButton findFileButton;
     private javax.swing.JCheckBox groFlBox;
     private javax.swing.JComboBox hourComboBox;
     private javax.swing.JProgressBar hydProgressBar;
+    private javax.swing.JTextArea inFileTextArea;
     private javax.swing.JTextField inFileTextField;
     private javax.swing.JCheckBox infExBox;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel14;
+    private javax.swing.JLabel jLabel15;
+    private javax.swing.JLabel jLabel16;
+    private javax.swing.JLabel jLabel17;
+    private javax.swing.JLabel jLabel18;
+    private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel20;
+    private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel25;
     private javax.swing.JLabel jLabel26;
     private javax.swing.JLabel jLabel27;
@@ -3013,6 +3906,12 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
     private javax.swing.JPanel jPanel39;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel40;
+    private javax.swing.JPanel jPanel41;
+    private javax.swing.JPanel jPanel42;
+    private javax.swing.JPanel jPanel43;
+    private javax.swing.JPanel jPanel44;
+    private javax.swing.JPanel jPanel45;
+    private javax.swing.JPanel jPanel46;
     private javax.swing.JPanel jPanel47;
     private javax.swing.JPanel jPanel48;
     private javax.swing.JPanel jPanel49;
@@ -3025,6 +3924,8 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
     private javax.swing.JPanel jPanel55;
     private javax.swing.JPanel jPanel56;
     private javax.swing.JPanel jPanel57;
+    private javax.swing.JPanel jPanel58;
+    private javax.swing.JPanel jPanel59;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel61;
     private javax.swing.JPanel jPanel62;
@@ -3042,6 +3943,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
     private javax.swing.JRadioButton jRadioButton7;
     private javax.swing.JRadioButton jRadioButton8;
     private javax.swing.JRadioButton jRadioButton9;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel latitudeLabel;
     private javax.swing.JLabel longitudeLabel;
     private javax.swing.JTextField md5_grid_textField;
@@ -3051,11 +3953,14 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
     private javax.swing.ButtonGroup mrfButtonGroup;
     private javax.swing.JPanel mrfPanel;
     private javax.swing.JCheckBox netCheckBox_O;
+    private javax.swing.JComboBox networkLevelCombo;
+    private javax.swing.JLabel numPointsLabel;
     private javax.swing.JComboBox pNodesCombo;
     private javax.swing.JComboBox pNodesVarsCombo;
     private javax.swing.JTabbedPane panelInputs;
     private javax.swing.JTabbedPane panelOutputs;
     private javax.swing.JTabbedPane panel_IO;
+    private javax.swing.JComboBox pathDensityLevelCombo;
     private javax.swing.JTextField pathTextField;
     private javax.swing.JCheckBox perFlBox;
     private javax.swing.JPanel pixelPanel;
@@ -3067,9 +3972,13 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
     private javax.swing.JComboBox qNodesCombo;
     private javax.swing.JPanel qoutPanel;
     private javax.swing.JProgressBar reachProgressBar;
+    private javax.swing.JButton resetLattice;
     private javax.swing.JPanel rftPanel;
     private javax.swing.JComboBox ridgeLevelCombo;
     private javax.swing.JCheckBox satExBox;
+    private javax.swing.JButton selectGW;
+    private javax.swing.JButton selectLandCover;
+    private javax.swing.JButton selectSoils;
     private javax.swing.JButton sendButton;
     private javax.swing.JComboBox spaceParamsCombo;
     private javax.swing.JCheckBox stageBox;
@@ -3080,6 +3989,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
     private javax.swing.JCheckBox valuesCheckBox_O;
     private javax.swing.JCheckBox voronoiCheckBox_I;
     private javax.swing.JCheckBox voronoiCheckBox_O;
+    private javax.swing.JButton writeInFile;
     private javax.swing.JComboBox yearComboBox;
     private javax.swing.JLabel zrLabel;
     private javax.swing.JSlider zrSlider;

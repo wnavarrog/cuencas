@@ -177,18 +177,35 @@ public class NetworkTools extends javax.swing.JDialog {
     private void TribsInputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TribsInputActionPerformed
         try{
             java.io.File theFile=metaDatos.getLocationBinaryFile();
-            metaDatos.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".magn"));
-            metaDatos.setFormat("Integer");
-            int [][] magnitudes=new hydroScalingAPI.io.DataRaster(metaDatos).getInt();
+            metaDatos.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".horton"));
+            metaDatos.setFormat("Byte");
+            byte [][] order=new hydroScalingAPI.io.DataRaster(metaDatos).getByte();
             
-            new hydroScalingAPI.modules.tRIBS_io.widgets.TRIBS_io(mainFrame,xOut,yOut,matDir,magnitudes,metaDatos).setVisible(true);
+            javax.swing.JFileChooser fc=new javax.swing.JFileChooser("/");
+            fc.setFileSelectionMode(fc.DIRECTORIES_ONLY);
+            fc.setDialogTitle("tRIBS Implementation Base Directory");
+
+            int result = fc.showDialog(this,"Select");
+            if (result == javax.swing.JFileChooser.CANCEL_OPTION) return;
+            
+            new java.io.File(fc.getSelectedFile().getPath()+"/Input").mkdirs();
+
+            hydroScalingAPI.mainGUI.widgets.InfoRequest ir=new hydroScalingAPI.mainGUI.widgets.InfoRequest(mainFrame);
+            ir.setVisible(true);
+
+            if(ir.getBaseName().equalsIgnoreCase("")) return;
+
+            System.out.println(fc.getSelectedFile().getPath());
+            System.out.println(ir.getBaseName());
+            
+            new hydroScalingAPI.modules.tRIBS_io.widgets.TRIBS_io(mainFrame,xOut,yOut,matDir,order,metaDatos,fc.getSelectedFile(),ir.getBaseName()).setVisible(true);
             closeDialog(null);
         } catch (java.io.IOException IOE){
             System.err.println("Failed loading Rainfall_Runoff_Model. "+xOut+" "+yOut);
-            System.err.println(IOE);
+            IOE.printStackTrace();
         } catch (visad.VisADException v){
             System.err.println("Failed loading Rainfall_Runoff_Model. "+xOut+" "+yOut);
-            System.err.println(v);
+            v.printStackTrace();
         }
         
         

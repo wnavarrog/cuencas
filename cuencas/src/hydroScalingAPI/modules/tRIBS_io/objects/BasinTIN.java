@@ -44,8 +44,9 @@ public class BasinTIN {
     public hydroScalingAPI.modules.networkAnalysis.objects.RSNDecomposition myRSNAnalysis;
     
     private byte[][] matDir;
-    private int[][] magnitudes;
+    private byte[][] hortonOrder;
     private float[][] DEM;
+    private int x,y;
     
     private hydroScalingAPI.io.MetaRaster metaDatos;
     
@@ -62,6 +63,7 @@ public class BasinTIN {
     private int outletNodeID;
     
     private visad.FlatField demField,theColors;
+    private visad.Gridded2DSet polygonCountour;
     private int[] nodesPerPolygon;
     private int totalPolygonNodes;
     
@@ -69,16 +71,23 @@ public class BasinTIN {
     private float[][] pointProps;
     private UnionSet allTriang,allPoly;
     
+    private double latP,lonP,locElev,nLatP,nLonP,adjustFactorLat,adjustFactorLon;
+    private visad.RealTuple spotValue;
     public double minX,minY;
+    public byte TIN_Zone;
+    public boolean TIN_Hemisphere;
     
     private double maxZr=0.0;
+    private float baseLatticePercent;
     
     /** Creates a new instance of BasinTIN */
-    public BasinTIN( int x, int y, byte[][] direcc, int[][] magnit, hydroScalingAPI.io.MetaRaster md) throws RemoteException, VisADException, java.io.IOException{
+    public BasinTIN( int xO, int yO, byte[][] direcc, byte[][] order, hydroScalingAPI.io.MetaRaster md) throws RemoteException, VisADException, java.io.IOException{
         
         matDir=direcc;
         metaDatos=md;
-        magnitudes=magnit;
+        hortonOrder=order;
+        x=xO;
+        y=yO;
         
         //Getting data
         
@@ -92,234 +101,22 @@ public class BasinTIN {
         myLinksStructure=new hydroScalingAPI.util.geomorphology.objects.LinksAnalysis(myCuenca, metaDatos, matDir);
         myRSNAnalysis=new hydroScalingAPI.modules.networkAnalysis.objects.RSNDecomposition(myLinksStructure);
         
-        float[][] lonLatsBasin=myCuenca.getLonLatBasin();
         int[][] xyBasin=myCuenca.getXYBasin();
-        
-        float[][] lonLatsDivide=myCuenca.getLonLatBasinDivide();
-        int[][] xyDivide=myCuenca.getXYBasinDivide();
-        
-        pointsInTriangulation=new java.util.Vector();
-        typeOfPoint=new java.util.Vector();
-        elevationOfPoint=new java.util.Vector();
-        
-        double latP,lonP,locElev,nLatP,nLonP,adjustFactorLat,adjustFactorLon;
-        visad.RealTuple spotValue;
-        
-        adjustFactorLat=metaDatos.getResLat()/3600.0;
-        adjustFactorLon=metaDatos.getResLon()/3600.0;
-        
-        //adding points inside the basin
+        int numPointsImportant=0;
         for (int i = 0;i<xyBasin[0].length;i++){
-            if(magnitudes[xyBasin[1][i]][xyBasin[0][i]] <= 0){
-                latP=lonLatsBasin[1][i]+adjustFactorLat/2.0;
-                lonP=lonLatsBasin[0][i]+adjustFactorLon/2.0;
-                
-                spotValue=(visad.RealTuple) demField.evaluate(new visad.RealTuple(domain, new double[] {lonP,latP}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
-                
-                locElev=spotValue.getValues()[0];
-
-                pointsInTriangulation.add(new Gdc_Coord_3d(latP,lonP,locElev));
-                typeOfPoint.add(new int[] {0});
-                elevationOfPoint.add(locElev);
-                numPointsBasin++;
+            if(pointLaplacian(xyBasin[0][i],xyBasin[1][i]) != 0){
+                numPointsImportant++;
             }
         }
         
-        float bfs=0.8f;
+        baseLatticePercent=numPointsImportant/(float)xyBasin[0].length;
         
-        //adding points along the river network
-        for (int i = 0;i<xyBasin[0].length;i++){
-            if(magnitudes[xyBasin[1][i]][xyBasin[0][i]] > 0){
-                int yP=xyBasin[1][i];
-                int xP=xyBasin[0][i];
-                
-                latP=lonLatsBasin[1][i]+adjustFactorLat/2.0;
-                lonP=lonLatsBasin[0][i]+adjustFactorLon/2.0;
-                
-                spotValue=(visad.RealTuple) demField.evaluate(new visad.RealTuple(domain, new double[] {lonP,latP}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
-                
-                locElev=spotValue.getValues()[0];
-
-                pointsInTriangulation.add(new Gdc_Coord_3d(latP,lonP,locElev));
-                typeOfPoint.add(new int[] {3});
-                elevationOfPoint.add(locElev-0.05);
-                
-                int delta_yP=((matDir[(int)yP][xP]-1)/3)-1;
-                int delta_xP=((matDir[yP][xP]-1)%3)-1;
-                
-                nLatP=latP+delta_yP*adjustFactorLat;
-                nLonP=lonP+delta_xP*adjustFactorLon;
-                
-                spotValue=(visad.RealTuple) demField.evaluate(new visad.RealTuple(domain, new double[] {nLonP,nLatP}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
-                
-                double currentElev=locElev;
-                double forwardElev=spotValue.getValues()[0];
-                
-                if (i>0){
-                    
-                    //if this is a channel head add a point a quarter of the way backwards (avoids problems with triangulation of almost colinear points)
-                    int llegan = 0;
-                    for (int k=0; k <= 8; k++){
-                        if (matDir[yP+(k/3)-1][xP+(k%3)-1]==9-k && magnitudes[yP+(k/3)-1][xP+(k%3)-1] > 0)
-                            llegan++;
-                    }
-                    
-                    if(llegan == 0) {
-                        nLatP=latP-delta_yP*adjustFactorLat*1.0/4.0;
-                        nLonP=lonP-delta_xP*adjustFactorLon*1.0/4.0;
-
-                        locElev=currentElev;
-
-                        pointsInTriangulation.add(new Gdc_Coord_3d(nLatP,nLonP,locElev));
-                        typeOfPoint.add(new int[] {5});
-                        elevationOfPoint.add(locElev);
-                    } 
-                    
-                    //A new point a quarter of the way forward
-
-                    nLatP=latP+delta_yP*adjustFactorLat*1.0/4.0;
-                    nLonP=lonP+delta_xP*adjustFactorLon*1.0/4.0;
-
-                    locElev=(3*currentElev+forwardElev)/4.0;
-
-                    pointsInTriangulation.add(new Gdc_Coord_3d(nLatP,nLonP,locElev));
-                    typeOfPoint.add(new int[] {3});
-                    elevationOfPoint.add(locElev-0.05);
-
-                    //A new point half way forward
-                    
-                    nLatP=latP+delta_yP*adjustFactorLat*2.0/4.0;
-                    nLonP=lonP+delta_xP*adjustFactorLon*2.0/4.0;
-                    
-                    locElev=(2*currentElev+2*forwardElev)/4.0;
-
-                    pointsInTriangulation.add(new Gdc_Coord_3d(nLatP,nLonP,locElev));
-                    typeOfPoint.add(new int[] {3});
-                    elevationOfPoint.add(locElev-0.05);
-
-                        //New points creating a buffer for the river
-
-                        nLatP=latP+(2*delta_yP-bfs*delta_xP)*adjustFactorLat/4.0;
-                        nLonP=lonP+(2*delta_xP+bfs*delta_yP)*adjustFactorLon/4.0;
-
-                        pointsInTriangulation.add(new Gdc_Coord_3d(nLatP,nLonP,locElev));
-                        typeOfPoint.add(new int[] {5});
-                        elevationOfPoint.add(locElev);
-
-                        nLatP=latP+(2*delta_yP+bfs*delta_xP)*adjustFactorLat/4.0;
-                        nLonP=lonP+(2*delta_xP-bfs*delta_yP)*adjustFactorLon/4.0;
-
-                        pointsInTriangulation.add(new Gdc_Coord_3d(nLatP,nLonP,locElev));
-                        typeOfPoint.add(new int[] {5});
-                        elevationOfPoint.add(locElev);
-
-                    //A new point three quarters of the way forward
-
-                    nLatP=latP+delta_yP*adjustFactorLat*3.0/4.0;
-                    nLonP=lonP+delta_xP*adjustFactorLon*3.0/4.0;
-
-                    spotValue=(visad.RealTuple) demField.evaluate(new visad.RealTuple(domain, new double[] {lonP,latP}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
-                
-                    locElev=(currentElev+3*forwardElev)/4.0;
-
-                    pointsInTriangulation.add(new Gdc_Coord_3d(nLatP,nLonP,locElev));
-                    typeOfPoint.add(new int[] {3});
-                    elevationOfPoint.add(locElev-0.05);
-                    
-                        //Two new points acting as buffer for the initial network point
-                        //An if statement is needed to avoid hillslope points where there is river network
-
-                        if(magnitudes[xyBasin[1][i]-delta_xP][xyBasin[0][i]+delta_yP] <= 0 || matDir[xyBasin[1][i]-delta_xP][xyBasin[0][i]+delta_yP] != 10-directionsKey[1-delta_xP][1+delta_yP]){
-                            nLatP=latP-delta_xP*adjustFactorLat*bfs/4.0;
-                            nLonP=lonP+delta_yP*adjustFactorLon*bfs/4.0;
-
-                            pointsInTriangulation.add(new Gdc_Coord_3d(nLatP,nLonP,locElev));
-                            typeOfPoint.add(new int[] {5});
-                            elevationOfPoint.add(currentElev);
-                        }
-
-                        if(magnitudes[xyBasin[1][i]+delta_xP][xyBasin[0][i]-delta_yP] <= 0 || matDir[xyBasin[1][i]+delta_xP][xyBasin[0][i]-delta_yP] != 10-directionsKey[1+delta_xP][1-delta_yP]){
-                            nLatP=latP+delta_xP*adjustFactorLat*bfs/4.0;
-                            nLonP=lonP-delta_yP*adjustFactorLon*bfs/4.0;
-
-                            pointsInTriangulation.add(new Gdc_Coord_3d(nLatP,nLonP,locElev));
-                            typeOfPoint.add(new int[] {5});
-                            elevationOfPoint.add(currentElev);
-                        }
-                    
-                }
-            }
-        }
-        //Adding points in the basin divide
-        for(int i=0;i<lonLatsDivide[0].length-1;i++){
-            latP=(lonLatsDivide[1][i]+lonLatsDivide[1][i+1])/2.0;
-            lonP=(lonLatsDivide[0][i]+lonLatsDivide[0][i+1])/2.0;
-            
-            spotValue=(visad.RealTuple) demField.evaluate(new visad.RealTuple(domain, new double[] {lonP,latP}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
-                
-            locElev=spotValue.getValues()[0];
-
-            pointsInTriangulation.add(new Gdc_Coord_3d(latP,lonP,locElev));
-            typeOfPoint.add(new int[] {1});
-            elevationOfPoint.add(locElev);
-            
-        }
-        int lastElemIndex=typeOfPoint.size()-2;
-        typeOfPoint.setElementAt(new int[] {2},lastElemIndex);
-        System.out.println("Done Creating points grid");
+        System.out.println(baseLatticePercent);
         
-        int numPoints=pointsInTriangulation.size();
-        Gdc_Coord_3d[] gdc=new Gdc_Coord_3d[numPoints];
-        Utm_Coord_3d[] utm=new Utm_Coord_3d[numPoints];
+        initializeNetworkPoints(0,1,1);
+        filterPoints(0,0,0);
         
-        for(int i=0;i<numPoints;i++){
-            gdc[i]=(Gdc_Coord_3d)pointsInTriangulation.get(i);
-            utm[i]=new Utm_Coord_3d();
-        }
-        
-        Gdc_To_Utm_Converter.Init(new WE_Ellipsoid());
-        Gdc_To_Utm_Converter.Convert(gdc,utm);
-        
-        System.out.println("Done Tranforming coordinates");
-
-        minX=Double.MAX_VALUE;
-        minY=Double.MAX_VALUE;
-        for (int i = 0; i < numPoints; i++) {
-            minX=Math.min(minX,utm[i].x);
-            minY=Math.min(minY,utm[i].y);
-        }
-        
-        pointsInTriangulation.removeAllElements();
-        
-        pointProps=new float[3][numPoints];
-        float[][] elevPoints=new float[1][numPoints];
-        
-        for(int i=0;i<numPoints;i++){
-            pointProps[0][i]=(float)(utm[i].x-minX);
-            pointProps[1][i]=(float)(utm[i].y-minY);
-            pointProps[2][i]=(float)((int[])typeOfPoint.get(i))[0];
-            pointsInTriangulation.add(utm[i]);
-            elevPoints[0][i]=((Double)elevationOfPoint.get(i)).floatValue();
-        }
-        
-        System.out.println("Done Creating Vector pointsInTriangulation");
-
-        float[][] pointIndex=new float[1][pointProps[1].length];
-        for(int i=0;i<pointProps[0].length;i++){
-            pointIndex[0][i]=(float)i;//xyLinkValues[0][i];
-        }
-        
-        Irregular1DSet xVarIndex=new Irregular1DSet(posIndex,pointIndex);
-        
-        vals_ff_Li = new FlatField( func_Inex_to_xEasting_yNorthing_Color, xVarIndex);
-        vals_ff_Li.setSamples( pointProps );
-        
-        System.out.println("Done Creating fields");
-
-        
-        filteredPointsInTriangulation=(java.util.Vector)pointsInTriangulation.clone();
-        filteredTypeOfPoint=(java.util.Vector)typeOfPoint.clone();
-        filteredElevationOfPoint=(java.util.Vector)elevationOfPoint.clone();
+        intializeBoundaryPolygon();
 
     }
     
@@ -489,128 +286,439 @@ public class BasinTIN {
         
     }
     
-    public int getOutletNode(){
-        return outletNodeID;
-    }
-    
-    public double[] getAspect(){
-        hydroScalingAPI.util.statistics.Stats eastStats=new hydroScalingAPI.util.statistics.Stats(pointProps[1]);
-        hydroScalingAPI.util.statistics.Stats nortStats=new hydroScalingAPI.util.statistics.Stats(pointProps[0]);
+    public void initializeNetworkPoints(int netLevel, int pathDensity, int bufferType) throws RemoteException, VisADException, java.io.IOException{
         
-        return new double[] {Math.min(1,(nortStats.maxValue-nortStats.minValue)/(eastStats.maxValue-eastStats.minValue)), 
-                             Math.min(1,(eastStats.maxValue-eastStats.minValue)/(nortStats.maxValue-nortStats.minValue))};
-        
-    }
-    
-    public void filterPoints(int ridges, float Zr) throws RemoteException, VisADException{
-        
-        if(Zr == -9999) maxZr=0.0;
-        
+        float[][] lonLatsBasin=myCuenca.getLonLatBasin();
         int[][] xyBasin=myCuenca.getXYBasin();
         
-        filteredPointsInTriangulation=new java.util.Vector();//(java.util.Vector)pointsInTriangulation.clone();
-        filteredTypeOfPoint=new java.util.Vector();//(java.util.Vector)typeOfPoint.clone();
-        filteredElevationOfPoint=new java.util.Vector();//(java.util.Vector)elevationOfPoint.clone();
+        float[][] lonLatsDivide=myCuenca.getLonLatBasinDivide();
+        int[][] xyDivide=myCuenca.getXYBasinDivide();
         
-        java.util.Vector filteredRidges=new java.util.Vector();
+        pointsInTriangulation=new java.util.Vector();
+        typeOfPoint=new java.util.Vector();
+        elevationOfPoint=new java.util.Vector();
         
-        int pointsPreserved=0;
+        adjustFactorLat=metaDatos.getResLat()/3600.0;
+        adjustFactorLon=metaDatos.getResLon()/3600.0;
         
-        //First: determine ridges at the desired scale
-        if(ridges > 0){
-            
-            int[][] hillSlopesMask=myCuenca.getEncapsulatedHillslopesMask(matDir,myRSNAnalysis,ridges);
-            
-            int numRidges=0;
-            visad.RealTuple spotValue; double locElev;
-            
-            int cuencaMinX=myCuenca.getMinX();
-            int cuencaMinY=myCuenca.getMinY();
-            double cuencaResLon=metaDatos.getResLon();
-            double cuencaResLat=metaDatos.getResLat();
-            double cuencaMinLon=metaDatos.getMinLon();
-            double cuencaMinLat=metaDatos.getMinLat();
-            
-            
-            for (int i = 0; i < hillSlopesMask.length; i++) {
-                for (int j = 0; j < hillSlopesMask[0].length; j++) {
-                    if(hillSlopesMask[i][j] != 0 && magnitudes[i+cuencaMinY-1][j+cuencaMinX-1] <= 0){
+        float bfs=0.5f;
+        
+        //adding points along the river network
+        for (int i = 0;i<xyBasin[0].length;i++){
+            if(hortonOrder[xyBasin[1][i]][xyBasin[0][i]] > netLevel){
+                int yP=xyBasin[1][i];
+                int xP=xyBasin[0][i];
+                
+                latP=lonLatsBasin[1][i]+adjustFactorLat/2.0;
+                lonP=lonLatsBasin[0][i]+adjustFactorLon/2.0;
+                
+                spotValue=(visad.RealTuple) demField.evaluate(new visad.RealTuple(domain, new double[] {lonP,latP}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
+                
+                locElev=spotValue.getValues()[0];
+
+                pointsInTriangulation.add(new Gdc_Coord_3d(latP,lonP,locElev));
+                typeOfPoint.add(new int[] {3});
+                elevationOfPoint.add(locElev-1.00);
+                
+                int delta_yP=((matDir[(int)yP][xP]-1)/3)-1;
+                int delta_xP=((matDir[yP][xP]-1)%3)-1;
+                
+                nLatP=latP+delta_yP*adjustFactorLat;
+                nLonP=lonP+delta_xP*adjustFactorLon;
+                
+                spotValue=(visad.RealTuple) demField.evaluate(new visad.RealTuple(domain, new double[] {nLonP,nLatP}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
+                
+                double currentElev=locElev;
+                double forwardElev=spotValue.getValues()[0];
+                
+                if (i>0){
+                    
+                    //if this is a channel head add a point a quarter of the way backwards (avoids problems with triangulation of almost colinear points)
+                    int llegan = 0;
+                    for (int k=0; k <= 8; k++){
+                        if (matDir[yP+(k/3)-1][xP+(k%3)-1]==9-k && hortonOrder[yP+(k/3)-1][xP+(k%3)-1] > netLevel)
+                            llegan++;
+                    }
+                    
+                    if(llegan == 0) {
+                        nLatP=latP-delta_yP*adjustFactorLat*1.0/4.0;
+                        nLonP=lonP-delta_xP*adjustFactorLon*1.0/4.0;
+
+                        locElev=currentElev;
+
+                        pointsInTriangulation.add(new Gdc_Coord_3d(nLatP,nLonP,locElev));
+                        typeOfPoint.add(new int[] {5});
+                        elevationOfPoint.add(locElev);
+                    }
+                    
+                    if (pathDensity >= 2){
+                    
+                        //A new point a quarter of the way forward
+
+                        nLatP=latP+delta_yP*adjustFactorLat*1.0/4.0;
+                        nLonP=lonP+delta_xP*adjustFactorLon*1.0/4.0;
+
+                        locElev=(3*currentElev+forwardElev)/4.0;
+
+                        pointsInTriangulation.add(new Gdc_Coord_3d(nLatP,nLonP,locElev));
+                        typeOfPoint.add(new int[] {3});
+                        elevationOfPoint.add(locElev-1.00);
+
+                    }
+                    
+                    
+                    if (pathDensity >= 1){
+                    
+                        //A new point half way forward
+                    
+                        nLatP=latP+delta_yP*adjustFactorLat*2.0/4.0;
+                        nLonP=lonP+delta_xP*adjustFactorLon*2.0/4.0;
+
+                        locElev=(2*currentElev+2*forwardElev)/4.0;
+
+                        pointsInTriangulation.add(new Gdc_Coord_3d(nLatP,nLonP,locElev));
+                        typeOfPoint.add(new int[] {3});
+                        elevationOfPoint.add(locElev-1.00);
                         
-                        double myLon=(j+cuencaMinX-1+0.5)*cuencaResLon/3600.0+cuencaMinLon;
-                        double myLat=(i+cuencaMinY-1+0.5)*cuencaResLat/3600.0+cuencaMinLat;
-                        
-                        
-                        boolean gotIn=false;
-                        float normalizer=0f;
-                        float pushX=0f;
-                        float pushY=0f;
-                        
-                        for (int k=0; k <= 8; k++){
-                            int ii=i+(k/3)-1;
-                            int jj=j+(k%3)-1;
+                        if (bufferType == 1){
+
+                            //New points creating a buffer for the river
+
+                            nLatP=latP+(2*delta_yP-bfs*delta_xP)*adjustFactorLat/4.0;
+                            nLonP=lonP+(2*delta_xP+bfs*delta_yP)*adjustFactorLon/4.0;
+
+                            pointsInTriangulation.add(new Gdc_Coord_3d(nLatP,nLonP,locElev));
+                            typeOfPoint.add(new int[] {5});
+                            elevationOfPoint.add(locElev);
+
+                            nLatP=latP+(2*delta_yP+bfs*delta_xP)*adjustFactorLat/4.0;
+                            nLonP=lonP+(2*delta_xP-bfs*delta_yP)*adjustFactorLon/4.0;
+
+                            pointsInTriangulation.add(new Gdc_Coord_3d(nLatP,nLonP,locElev));
+                            typeOfPoint.add(new int[] {5});
+                            elevationOfPoint.add(locElev);
                             
-                            if ((k==1 || k==3 || k==5 || k==7) && hillSlopesMask[ii][jj] != hillSlopesMask[i][j]){
-                                
-                                normalizer++;
-                                pushX+=jj-j;
-                                pushY+=ii-i;
-                                
-                                
-                                if(gotIn == false) numRidges++;
-                                gotIn=true;
-                            }
                         }
-                        if(gotIn){
-                            
-                            double[] lonLatPair=new double[] {myLon,myLat};
-                            
-                            spotValue=(visad.RealTuple) demField.evaluate(new visad.RealTuple(domain, lonLatPair),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
-                            locElev=spotValue.getValues()[0];
-                            filteredRidges.add(new Gdc_Coord_3d(myLat,myLon,locElev));
-                            filteredElevationOfPoint.add(locElev);
-                            pointsPreserved++;
+                    }
+                    
+                    if (pathDensity >= 2){
+
+                        //A new point three quarters of the way forward
+
+                        nLatP=latP+delta_yP*adjustFactorLat*3.0/4.0;
+                        nLonP=lonP+delta_xP*adjustFactorLon*3.0/4.0;
+
+                        spotValue=(visad.RealTuple) demField.evaluate(new visad.RealTuple(domain, new double[] {lonP,latP}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
+
+                        locElev=(currentElev+3*forwardElev)/4.0;
+
+                        pointsInTriangulation.add(new Gdc_Coord_3d(nLatP,nLonP,locElev));
+                        typeOfPoint.add(new int[] {3});
+                        elevationOfPoint.add(locElev-1.00);
+                        
+                    }
+                    
+                    if (bufferType == 1){
+
+                        //Two new points acting as buffer for the initial network point
+                        //An if statement is needed to avoid hillslope points where there is river network
+
+                        if(hortonOrder[xyBasin[1][i]-delta_xP][xyBasin[0][i]+delta_yP] <= 0 || matDir[xyBasin[1][i]-delta_xP][xyBasin[0][i]+delta_yP] != 10-directionsKey[1-delta_xP][1+delta_yP]){
+                            nLatP=latP-delta_xP*adjustFactorLat*bfs/4.0;
+                            nLonP=lonP+delta_yP*adjustFactorLon*bfs/4.0;
+
+                            pointsInTriangulation.add(new Gdc_Coord_3d(nLatP,nLonP,locElev));
+                            typeOfPoint.add(new int[] {5});
+                            elevationOfPoint.add(currentElev);
+                        }
+
+                        if(hortonOrder[xyBasin[1][i]+delta_xP][xyBasin[0][i]-delta_yP] <= 0 || matDir[xyBasin[1][i]+delta_xP][xyBasin[0][i]-delta_yP] != 10-directionsKey[1+delta_xP][1-delta_yP]){
+                            nLatP=latP+delta_xP*adjustFactorLat*bfs/4.0;
+                            nLonP=lonP-delta_yP*adjustFactorLon*bfs/4.0;
+
+                            pointsInTriangulation.add(new Gdc_Coord_3d(nLatP,nLonP,locElev));
+                            typeOfPoint.add(new int[] {5});
+                            elevationOfPoint.add(currentElev);
                         }
                     }
                 }
             }
+        }
+        
+        //Adding points in the basin divide
+        int numPoints=lonLatsDivide[0].length-1;
+        for(int i=0;i<lonLatsDivide[0].length-1;i++){
+            latP=(lonLatsDivide[1][i]+lonLatsDivide[1][i+1])/2.0;
+            lonP=(lonLatsDivide[0][i]+lonLatsDivide[0][i+1])/2.0;
             
-            System.out.println(">>> Number of points in ridges: "+numRidges);
-            
-            Gdc_Coord_3d[] gdc=new Gdc_Coord_3d[numRidges];
-            Utm_Coord_3d[] utm=new Utm_Coord_3d[numRidges];
+            spotValue=(visad.RealTuple) demField.evaluate(new visad.RealTuple(domain, new double[] {lonP,latP}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
+                
+            locElev=spotValue.getValues()[0];
 
-            for(int i=0;i<numRidges;i++){
-                gdc[i]=(Gdc_Coord_3d)filteredRidges.get(i);
+            pointsInTriangulation.add(new Gdc_Coord_3d(latP,lonP,locElev));
+            typeOfPoint.add(new int[] {1});
+            elevationOfPoint.add(locElev);
+        }
+        int lastElemIndex=typeOfPoint.size()-2;
+        typeOfPoint.setElementAt(new int[] {2},lastElemIndex);
+        System.out.println("Done Creating points grid");
+        
+    }
+    
+    private void intializeBoundaryPolygon() throws visad.VisADException{
+        float[][] lonLatsDivide=myCuenca.getLonLatBasinDivide();
+        
+        int numPoints=lonLatsDivide[0].length-1;
+        Gdc_Coord_3d[] gdc=new Gdc_Coord_3d[numPoints];
+        Utm_Coord_3d[] utm=new Utm_Coord_3d[numPoints];
+
+        for(int i=0;i<lonLatsDivide[0].length-1;i++){
+            
+            latP=(lonLatsDivide[1][i]+lonLatsDivide[1][i+1])/2.0;
+            lonP=(lonLatsDivide[0][i]+lonLatsDivide[0][i+1])/2.0;
+            
+            gdc[i]=new Gdc_Coord_3d();
+                gdc[i].longitude=lonP;
+                gdc[i].latitude=latP;
+
+            utm[i]=new Utm_Coord_3d();
+            
+        }
+        
+        Gdc_To_Utm_Converter.Init(new WE_Ellipsoid());
+        Gdc_To_Utm_Converter.Convert(gdc,utm);
+        
+        float[][] xyContour=new float[2][utm.length];
+        for (int i = 0; i < utm.length; i++) {
+            xyContour[0][i]=(float)(utm[i].x-minX);
+            xyContour[1][i]=(float)(utm[i].y-minY);
+        }
+        
+        polygonCountour=new visad.Gridded2DSet(domainXLYL,xyContour,xyContour[0].length);
+    }
+    
+    public visad.Gridded2DSet getPolygon() throws visad.VisADException {
+        return polygonCountour;
+    }
+    
+    public int getOutletNode(){
+        return outletNodeID;
+    }
+    
+    public int getNumPoints(){
+        return pointsInTriangulation.size();
+    }
+    
+    public double[] getAspect(){
+        hydroScalingAPI.util.statistics.Stats eastStats=new hydroScalingAPI.util.statistics.Stats(pointProps[0]);
+        hydroScalingAPI.util.statistics.Stats nortStats=new hydroScalingAPI.util.statistics.Stats(pointProps[1]);
+        
+        return new double[] {Math.min(1,(eastStats.maxValue-eastStats.minValue)/(nortStats.maxValue-nortStats.minValue)),
+                             Math.min(1,(nortStats.maxValue-nortStats.minValue)/(eastStats.maxValue-eastStats.minValue))};
+        
+    }
+    
+    public void filterPoints(int ridges, float Zr, int netLevel) throws RemoteException, VisADException{
+        
+        float[][] lonLatsBasin=myCuenca.getLonLatBasin();
+        int[][] xyBasin=myCuenca.getXYBasin();
+        
+        filteredPointsInTriangulation=pointsInTriangulation;
+        filteredTypeOfPoint=typeOfPoint;
+        filteredElevationOfPoint=elevationOfPoint;
+        
+        int numPointsT=pointsInTriangulation.size();
+        int numPointsO=0;
+        
+        System.out.println(">>> Done adding border and network points");
+        
+        if(Zr == 0){
+            
+            //adding points inside the basin
+            for (int i = 0;i<xyBasin[0].length;i++){
+                if(hortonOrder[xyBasin[1][i]][xyBasin[0][i]] <= netLevel){
+                    latP=lonLatsBasin[1][i]+adjustFactorLat/2.0;
+                    lonP=lonLatsBasin[0][i]+adjustFactorLon/2.0;
+
+                    spotValue=(visad.RealTuple) demField.evaluate(new visad.RealTuple(domain, new double[] {lonP,latP}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
+
+                    locElev=spotValue.getValues()[0];
+
+                    filteredPointsInTriangulation.add(new Gdc_Coord_3d(latP,lonP,locElev));
+                    filteredTypeOfPoint.add(new int[] {0});
+                    filteredElevationOfPoint.add(locElev);
+                    numPointsBasin++;
+                }
+            }
+        
+            int numPoints=filteredPointsInTriangulation.size();
+            Gdc_Coord_3d[] gdc=new Gdc_Coord_3d[numPoints];
+            Utm_Coord_3d[] utm=new Utm_Coord_3d[numPoints];
+
+            for(int i=0;i<numPoints;i++){
+                gdc[i]=(Gdc_Coord_3d)filteredPointsInTriangulation.get(i);
                 utm[i]=new Utm_Coord_3d();
             }
 
             Gdc_To_Utm_Converter.Init(new WE_Ellipsoid());
             Gdc_To_Utm_Converter.Convert(gdc,utm);
-            for(int i=0;i<numRidges;i++){
-                filteredPointsInTriangulation.add(utm[i]);
-                filteredTypeOfPoint.add(new int[] {0});
+            
+            TIN_Zone=utm[0].zone;
+            TIN_Hemisphere=utm[0].hemisphere_north;
+
+            System.out.println("Done Tranforming coordinates");
+
+            minX=Double.MAX_VALUE;
+            minY=Double.MAX_VALUE;
+            for (int i = 0; i < numPoints; i++) {
+                minX=Math.min(minX,utm[i].x);
+                minY=Math.min(minY,utm[i].y);
+            }
+
+            pointProps=new float[3][numPoints];
+            float[][] elevPoints=new float[1][numPoints];
+
+            for(int i=0;i<numPoints;i++){
+                pointProps[0][i]=(float)(utm[i].x-minX);
+                pointProps[1][i]=(float)(utm[i].y-minY);
+                pointProps[2][i]=(float)((int[])typeOfPoint.get(i))[0];
+                elevPoints[0][i]=((Double)elevationOfPoint.get(i)).floatValue();
+            }
+
+            System.out.println("Done Creating Array pointsInTriangulation");
+
+            float[][] pointIndex=new float[1][pointProps[1].length];
+            for(int i=0;i<pointProps[0].length;i++){
+                pointIndex[0][i]=(float)i;//xyLinkValues[0][i];
+            }
+
+            Irregular1DSet xVarIndex=new Irregular1DSet(posIndex,pointIndex);
+
+            vals_ff_Li = new FlatField( func_Inex_to_xEasting_yNorthing_Color, xVarIndex);
+            vals_ff_Li.setSamples( pointProps );
+
+            System.out.println("Done Creating fields");
+
+            return;
+        }
+        
+        //First: determine ridges at the desired scale
+            
+        int[][] hillSlopesMask=myCuenca.getEncapsulatedHillslopesMask(matDir,myRSNAnalysis,ridges+1);
+
+        visad.RealTuple spotValue; double locElev;
+
+        int cuencaMinX=myCuenca.getMinX();
+        int cuencaMinY=myCuenca.getMinY();
+        double cuencaResLon=metaDatos.getResLon();
+        double cuencaResLat=metaDatos.getResLat();
+        double cuencaMinLon=metaDatos.getMinLon();
+        double cuencaMinLat=metaDatos.getMinLat();
+
+        double randomThreshold=1-baseLatticePercent/Zr;//0.95;//0.95-ridges*0.05;
+
+        System.out.println(randomThreshold);
+
+
+        for (int i = 0; i < hillSlopesMask.length; i++) {
+            for (int j = 0; j < hillSlopesMask[0].length; j++) {
+                if(hillSlopesMask[i][j] != 0 && hortonOrder[i+cuencaMinY-1][j+cuencaMinX-1] <= netLevel){
+
+                    double myLon=(j+cuencaMinX-1+0.5)*cuencaResLon/3600.0+cuencaMinLon;
+                    double myLat=(i+cuencaMinY-1+0.5)*cuencaResLat/3600.0+cuencaMinLat;
+
+
+                    boolean gotIn=false;
+                    float normalizer=0f;
+                    float pushX=0f;
+                    float pushY=0f;
+
+                    for (int k=0; k <= 8; k++){
+                        int ii=i+(k/3)-1;
+                        int jj=j+(k%3)-1;
+
+                        if ((k==1 || k==3 || k==5 || k==7) && hillSlopesMask[ii][jj] != hillSlopesMask[i][j]){
+
+                            normalizer++;
+                            pushX+=jj-j;
+                            pushY+=ii-i;
+
+
+                            gotIn=true;
+                        }
+                    }
+
+                    if(!gotIn && Zr < 20){
+                        if(Math.random() > randomThreshold){
+                            gotIn=true;
+                        }
+                    }
+
+                    if(gotIn){
+
+                        double[] lonLatPair=new double[] {myLon,myLat};
+
+                        spotValue=(visad.RealTuple) demField.evaluate(new visad.RealTuple(domain, lonLatPair),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
+                        locElev=spotValue.getValues()[0];
+                        filteredPointsInTriangulation.add(new Gdc_Coord_3d(myLat,myLon,locElev));
+                        filteredTypeOfPoint.add(new int[] {0});
+                        filteredElevationOfPoint.add(locElev);
+                    }
+                }
             }
         }
         
         
-        //Second: remove points according to Zr
+        //Third: Project and add to display
         
-        //a) Create base triangulation
-        
-        System.out.println(">>> Including nodes for initial triangulation");
-        
-        int numPointsT=pointsInTriangulation.size();
-        int numPointsO=0;
-        
-        for (int i = 0; i < numPointsT; i++) {
-            if(((int[])typeOfPoint.get(i))[0] != 0){
-                filteredPointsInTriangulation.add(pointsInTriangulation.get(i));
-                filteredTypeOfPoint.add(typeOfPoint.get(i));
-                filteredElevationOfPoint.add(elevationOfPoint.get(i));
-            } else numPointsO++;
+        int numPoints=filteredPointsInTriangulation.size();
+        Gdc_Coord_3d[] gdc=new Gdc_Coord_3d[numPoints];
+        Utm_Coord_3d[] utm=new Utm_Coord_3d[numPoints];
+
+        for(int i=0;i<numPoints;i++){
+            gdc[i]=(Gdc_Coord_3d)filteredPointsInTriangulation.get(i);
+            utm[i]=new Utm_Coord_3d();
         }
-            
-        System.out.println(">>> Done adding border and network points");
+
+        Gdc_To_Utm_Converter.Init(new WE_Ellipsoid());
+        Gdc_To_Utm_Converter.Convert(gdc,utm);
+
+        System.out.println("Done Tranforming coordinates");
+
+//        minX=Double.MAX_VALUE;
+//        minY=Double.MAX_VALUE;
+//        for (int i = 0; i < numPoints; i++) {
+//            minX=Math.min(minX,utm[i].x);
+//            minY=Math.min(minY,utm[i].y);
+//        }
+
+        pointProps=new float[3][numPoints];
+        float[][] elevPoints=new float[1][numPoints];
+
+        for(int i=numPoints-1;i>=0;i--){
+            pointProps[0][i]=(float)(utm[i].x-minX);
+            pointProps[1][i]=(float)(utm[i].y-minY);
+            pointProps[2][i]=(float)((int[])typeOfPoint.get(i))[0];
+            elevPoints[0][i]=((Double)elevationOfPoint.get(i)).floatValue();
+        }
+
+        System.out.println("Done Creating Array pointsInTriangulation");
+
+        float[][] pointIndex=new float[1][pointProps[1].length];
+        for(int i=0;i<pointProps[0].length;i++){
+            pointIndex[0][i]=(float)i;//xyLinkValues[0][i];
+        }
+
+        Irregular1DSet xVarIndex=new Irregular1DSet(posIndex,pointIndex);
+
+        vals_ff_Li = new FlatField( func_Inex_to_xEasting_yNorthing_Color, xVarIndex);
+        vals_ff_Li.setSamples( pointProps );
+
+        System.out.println("Done Creating fields");
+        
+        if(true) return;
+        
+        //Second: remove points according to Zr
         
         int iii=0;
         float[][] samplesO=new float[5][numPointsO];
@@ -631,7 +739,8 @@ public class BasinTIN {
         
         
         //ITERATIVE COMPONENT
-        int numPoints;
+        
+        int pointsPreserved;
         float[][] samples;
         float[] samplesElevs;
         
@@ -787,33 +896,13 @@ public class BasinTIN {
                 passNumber++;
             }
         } else maxZr = 40;
-
-        //Third: Create arrays for triangulation step
         
-        numPoints=filteredPointsInTriangulation.size();
-        float[][] xyLinkValues=new float[3][numPoints];
-        for(int i=0;i<numPoints;i++){
-            Utm_Coord_3d utmLocal=(Utm_Coord_3d)filteredPointsInTriangulation.get(i);
-            xyLinkValues[0][i]=(float)(utmLocal.x-minX);
-            xyLinkValues[1][i]=(float)(utmLocal.y-minY);
-            xyLinkValues[2][i]=(float)((int[])filteredTypeOfPoint.get(i))[0];
-        }
-        
-        float[][] linkAccumAVal=new float[1][xyLinkValues[1].length];
-        for(int i=0;i<xyLinkValues[0].length;i++){
-            linkAccumAVal[0][i]=(float)i;//xyLinkValues[0][i];
-        }
-        
-        Irregular1DSet xVarIndex=new Irregular1DSet(posIndex,linkAccumAVal);
-        
-        vals_ff_Li = new FlatField( func_Inex_to_xEasting_yNorthing_Color, xVarIndex);
-        vals_ff_Li.setSamples( xyLinkValues );
         
 
         //Fourth: Calculate triangulation and Voronoi Polygons
         samples=new float[2][];
-        samples[0]=xyLinkValues[0];//.clone();
-        samples[1]=xyLinkValues[1];//.clone();
+        samples[0]=pointProps[0];//.clone();
+        samples[1]=pointProps[1];//.clone();
         System.out.println("the DelaunayClarkson algorithm.");
         long start = System.currentTimeMillis();
         Delaunay.perturb(samples,0.5f,false);
@@ -825,7 +914,7 @@ public class BasinTIN {
         //samples[0]=xyLinkValues[0].clone();
         //samples[1]=xyLinkValues[1].clone();
 
-        vals_ff_Li.setSamples( xyLinkValues );
+        vals_ff_Li.setSamples( pointProps );
 
 //        System.out.println(delaun.NumEdges);
 //
@@ -857,8 +946,8 @@ public class BasinTIN {
         allTriang=new UnionSet(domainXLYL,triangles);
 
         int numValidPoints=0;
-        for(int j=0;j<xyLinkValues[2].length;j++) {
-            if(xyLinkValues[2][j] != 1 ) numValidPoints++;
+        for(int j=0;j<pointProps[2].length;j++) {
+            if(pointProps[2][j] != 1 ) numValidPoints++;
         }
 
         float[] s0 = samples[0];
@@ -870,9 +959,9 @@ public class BasinTIN {
 
         Gridded2DSet[] polygons=new Gridded2DSet[numValidPoints-1];
         int kp=0;
-        for(int k=0;k<xyLinkValues[2].length;k++) {
+        for(int k=0;k<pointProps[2].length;k++) {
         //for(int k=0;k<5;k++) {    
-            if(xyLinkValues[2][k] != 1 && xyLinkValues[2][k] != 2){
+            if(pointProps[2][k] != 1 && pointProps[2][k] != 2){
                 float[][] lines1=new float[2][delaun.Vertices[k].length+1];
                 for(int j=0;j<delaun.Vertices[k].length;j++){
 
@@ -941,6 +1030,8 @@ public class BasinTIN {
             
     }
     
+
+    
     /**
      * Creates a {@link visad.RealTuple} to be plotted in a {@link visad.Display}
      * @return The {@link visad.RealTuple}
@@ -992,6 +1083,10 @@ public class BasinTIN {
     }
     
     public void writeTriangulation(java.io.File outputLocation) throws java.io.IOException{
+        
+        //I could never get this to work
+        if (true) return;
+        
         
         int numPoints=filteredPointsInTriangulation.size();
         float[][] samples=new float[3][numPoints];
@@ -1172,9 +1267,22 @@ public class BasinTIN {
     public void writePoints(java.io.File outputLocation) throws java.io.IOException{
         
         int numPoints=filteredPointsInTriangulation.size();
+        Gdc_Coord_3d[] gdc=new Gdc_Coord_3d[numPoints];
+        Utm_Coord_3d[] utm=new Utm_Coord_3d[numPoints];
+
+        for(int i=0;i<numPoints;i++){
+            gdc[i]=(Gdc_Coord_3d)filteredPointsInTriangulation.get(i);
+            utm[i]=new Utm_Coord_3d();
+        }
+
+        Gdc_To_Utm_Converter.Init(new WE_Ellipsoid());
+        Gdc_To_Utm_Converter.Convert(gdc,utm);
+
+        System.out.println("Done Tranforming coordinates");
+        
         float[][] samples=new float[4][numPoints];
         for(int i=0;i<numPoints;i++){
-            Utm_Coord_3d utmLocal=(Utm_Coord_3d)filteredPointsInTriangulation.get(i);
+            Utm_Coord_3d utmLocal=utm[i];
             samples[0][i]=(float)utmLocal.x;
             samples[1][i]=(float)utmLocal.y;
             samples[2][i]=((Double)filteredElevationOfPoint.get(i)).floatValue();
@@ -1191,10 +1299,9 @@ public class BasinTIN {
         java.io.BufferedWriter writerNodes = new java.io.BufferedWriter(new java.io.FileWriter(nodesFileLocation));
         writerNodes.write(samples[0].length+"\n");
         
-        
         for (int i=0; i<samples[0].length; i++){
-            writerNodes.write(samples[0][i]+" ");
-            writerNodes.write(samples[1][i]+" ");
+            writerNodes.write((samples[0][i]+Math.random()*0.2)+" ");
+            writerNodes.write((samples[1][i]+Math.random()*0.2)+" ");
             writerNodes.write(samples[2][i]+" ");
             writerNodes.write((int)samples[3][i]+"\n");
         }

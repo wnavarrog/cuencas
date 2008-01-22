@@ -163,8 +163,9 @@ public class SimulationToFile extends java.lang.Object {
                         Resulatdos
              
              */
-        String Directory="/tmp/";
-        //String Directory="/ResultsSimulations/simulationsWalnutGulch/";
+        
+        String Directory="/Users/ricardo/simulationResults/";
+        
         String demName=md.getLocationBinaryFile().getName().substring(0,md.getLocationBinaryFile().getName().lastIndexOf("."));
         String routingString="";
         switch (routingType) {
@@ -326,7 +327,7 @@ public class SimulationToFile extends java.lang.Object {
         
         for (int k=0;k<numPeriods;k++) {
             System.out.println("Period "+(k+1)+" of "+numPeriods);
-            rainRunoffRaining.jumpsRunToFile(storm.stormInitialTimeInMinutes()+k*storm.stormRecordResolutionInMinutes(),storm.stormInitialTimeInMinutes()+(k+1)*storm.stormRecordResolutionInMinutes(),30,initialCondition,newfile);
+            rainRunoffRaining.jumpsRunToFile(storm.stormInitialTimeInMinutes()+k*storm.stormRecordResolutionInMinutes(),storm.stormInitialTimeInMinutes()+(k+1)*storm.stormRecordResolutionInMinutes(),20,initialCondition,newfile);
             initialCondition=rainRunoffRaining.finalCond;
             rainRunoffRaining.setBasicTimeStep(30/60.);
         }
@@ -765,9 +766,9 @@ public class SimulationToFile extends java.lang.Object {
     
     public static void subMain11(String args[]) throws java.io.IOException, VisADException {
         
-        java.io.File theFile=new java.io.File("//mantilla/hidrosigDataBases/Gila_River_DB/Rasters/Topography/1_ArcSec/mogollon.metaDEM");
+        java.io.File theFile=new java.io.File("/hidrosigDataBases/Gila River DB/Rasters/Topography/1_ArcSec/mogollon.metaDEM");
         hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
-        metaModif.setLocationBinaryFile(new java.io.File("//mantilla/hidrosigDataBases/Gila_River_DB/Rasters/Topography/1_ArcSec/mogollon.dir"));
+        metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Gila River DB/Rasters/Topography/1_ArcSec/mogollon.dir"));
         
         String formatoOriginal=metaModif.getFormat();
         metaModif.setFormat("Byte");
@@ -791,7 +792,7 @@ public class SimulationToFile extends java.lang.Object {
         routingParams.put("lambda1",0.2f);
         routingParams.put("lambda2",-0.1f);
         
-        stormFile=new java.io.File("//mantilla/hidrosigDataBases/Gila_River_DB/Rasters/Hydrology/NexradPrecipitation/wholeSummer2005/nexrad_prec.metaVHC");
+        stormFile=new java.io.File("/hidrosigDataBases/Gila River DB/Rasters/Hydrology/NexradPrecipitation/summer2002/nexrad_prec.metaVHC");
         new SimulationToFile(282, 298,matDirs,magnitudes,metaModif,stormFile,0.0f,2,routingParams);
         //new SimulationToFile(981, 387,matDirs,magnitudes,metaModif,stormFile,0.0f,2,routingParams);
         
