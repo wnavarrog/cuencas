@@ -59,7 +59,7 @@ public class HydroClimateViewer2D  extends hydroScalingAPI.subGUIs.widgets.Raste
         dispGMC.setScaleEnable(true);
         
         visad.ProjectionControl pc = display.getProjectionControl();
-        pc.setAspectCartesian(new double[] {1.0, (double)metaData.getNumRows()/(double)metaData.getNumCols()});
+        pc.setAspectCartesian(new double[] {1.0, (double)metaData.getNumRows()/(double)metaData.getNumCols()*metaData.getResLat()/metaData.getResLon()});
         
         latitudeMap=new visad.ScalarMap(visad.RealType.Latitude, visad.Display.YAxis);
         latitudeMap.getAxisScale().setFont(font);

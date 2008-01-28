@@ -388,7 +388,7 @@ public class SimulationToFile extends java.lang.Object {
         try{
             
             //Uniform Rain
-            //subMain1(args);  //The test case for Whitewater
+            subMain1(args);  //The test case for Whitewater
             //subMain3(args);  //The test case for Walnut Gulch 30m
             //subMain4(args);   //The test case for TestDem
             //subMain5(args);   //The Man-Vis Tree
@@ -401,7 +401,7 @@ public class SimulationToFile extends java.lang.Object {
             //subMain2(args);   //using constant infiltration in space
             //subMain7(args);   //using a map to set infiltration values
             //subMain10(args);     //Simulations for Upper Rio Puerco Using Nexrad
-            subMain11(args);     //Simulations for Mogollon Basin Using Nexrad
+            //subMain11(args);     //Simulations for Mogollon Basin Using Nexrad
         } catch (java.io.IOException IOE){
             System.out.print(IOE);
             System.exit(0);
@@ -416,13 +416,13 @@ public class SimulationToFile extends java.lang.Object {
     
     public static void subMain1(String args[]) throws java.io.IOException, VisADException {
         
-        //java.io.File theFile=new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS/Whitewaters.metaDEM");
-        //hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
-        //metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS/Whitewaters.dir"));
-
-        java.io.File theFile=new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Topography/0.3_ArcSecUSGS/89883214.metaDEM");
+        java.io.File theFile=new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS/Whitewaters.metaDEM");
         hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
-        metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Topography/0.3_ArcSecUSGS/89883214.dir"));
+        metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS/Whitewaters.dir"));
+
+        //java.io.File theFile=new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Topography/0.3_ArcSecUSGS/89883214.metaDEM");
+        //hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
+        //metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Topography/0.3_ArcSecUSGS/89883214.dir"));
         
         String formatoOriginal=metaModif.getFormat();
         metaModif.setFormat("Byte");
@@ -441,10 +441,10 @@ public class SimulationToFile extends java.lang.Object {
           Rock Creek: */
         
         //stormFile=new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Hydrology/storms/simulated_events/uniform_100_01.metaVHC");
-        //new SimulationToFile(1063,496,matDirs,magnitudes,metaModif,stormFile,0.0f,0);
+        //new SimulationToFile(1064,496,matDirs,magnitudes,metaModif,stormFile,0.0f,0);
         
         //stormFile=new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Hydrology/storms/simulated_events/random_45_10.metaVHC");
-        //new SimulationToFile(1063,496,matDirs,magnitudes,metaModif,stormFile,0.0f,0);
+        //new SimulationToFile(1064,496,matDirs,magnitudes,metaModif,stormFile,0.0f,0);
         
         /*stormFile=new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Hydrology/storms/simulated_events/uniform_100_01.metaVHC");
         new SimulationToFile(3162,1456,matDirs,magnitudes,metaModif,stormFile,0.0f,2);*/
@@ -452,8 +452,22 @@ public class SimulationToFile extends java.lang.Object {
         /*stormFile=new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Hydrology/storms/simulated_events/uniform_100_10.metaVHC");
         new SimulationToFile(3162,1456,matDirs,magnitudes,metaModif,stormFile,0.0f,2);*/
 
-        stormFile=new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Hydrology/storms/simulated_events/uniform_100_120.metaVHC");
-        new SimulationToFile(3162,1456,matDirs,magnitudes,metaModif,stormFile,0.0f,2,null);
+        //stormFile=new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Hydrology/storms/simulated_events/uniform_100_120.metaVHC");
+        //new SimulationToFile(3162,1456,matDirs,magnitudes,metaModif,stormFile,0.0f,2,null);
+        
+        java.util.Hashtable routingParams=new java.util.Hashtable();
+        routingParams.put("widthCoeff",1.0f);
+        routingParams.put("widthExponent",0.4f);
+        routingParams.put("widthStdDev",0.0f);
+        
+        routingParams.put("chezyCoeff",14.2f);
+        routingParams.put("chezyExponent",-1/3.0f);
+        
+        routingParams.put("lambda1",0.2f);
+        routingParams.put("lambda2",-0.1f);
+        
+        stormFile=new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Hydrology/storms/simulRain/prec.metaVHC");
+        new SimulationToFile(1064,496,matDirs,magnitudes,metaModif,stormFile,0.0f,2,routingParams);
 
     }
     
@@ -766,9 +780,9 @@ public class SimulationToFile extends java.lang.Object {
     
     public static void subMain11(String args[]) throws java.io.IOException, VisADException {
         
-        java.io.File theFile=new java.io.File("/hidrosigDataBases/Gila River DB/Rasters/Topography/1_ArcSec/mogollon.metaDEM");
+        java.io.File theFile=new java.io.File("/hidrosigDataBases/Gila_River_DB/Rasters/Topography/1_ArcSec/mogollon.metaDEM");
         hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
-        metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Gila River DB/Rasters/Topography/1_ArcSec/mogollon.dir"));
+        metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Gila_River_DB/Rasters/Topography/1_ArcSec/mogollon.dir"));
         
         String formatoOriginal=metaModif.getFormat();
         metaModif.setFormat("Byte");
@@ -792,7 +806,7 @@ public class SimulationToFile extends java.lang.Object {
         routingParams.put("lambda1",0.2f);
         routingParams.put("lambda2",-0.1f);
         
-        stormFile=new java.io.File("/hidrosigDataBases/Gila River DB/Rasters/Hydrology/NexradPrecipitation/summer2002/nexrad_prec.metaVHC");
+        stormFile=new java.io.File("/hidrosigDataBases/Gila_River_DB/Rasters/Hydrology/NexradPrecipitation/summer2002/nexrad_prec.metaVHC");
         new SimulationToFile(282, 298,matDirs,magnitudes,metaModif,stormFile,0.0f,2,routingParams);
         //new SimulationToFile(981, 387,matDirs,magnitudes,metaModif,stormFile,0.0f,2,routingParams);
         

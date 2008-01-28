@@ -3717,8 +3717,8 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
     public static void main(String args[]) {
 
           //Uncomment when testing the input interface
-//        main0(args);
-//        if(true) return;
+        main0(args);
+        if(true) return;
         
 //        args=new String[3];
 //        args[0]="-ou";

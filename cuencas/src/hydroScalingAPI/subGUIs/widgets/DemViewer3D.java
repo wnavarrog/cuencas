@@ -56,7 +56,7 @@ public class DemViewer3D extends hydroScalingAPI.subGUIs.widgets.RasterViewer im
         dispGMC.setScaleEnable(true);
         
         visad.ProjectionControl pc = display.getProjectionControl();
-        pc.setAspectCartesian(new double[] {1.0, (double)metaData.getNumRows()/(double)metaData.getNumCols()});
+        pc.setAspectCartesian(new double[] {1.0, (double)metaData.getNumRows()/(double)metaData.getNumCols()*metaData.getResLat()/metaData.getResLon()});
         
         latitudeMap=new visad.ScalarMap(visad.RealType.Latitude, visad.Display.YAxis);
         latitudeMap.getAxisScale().setFont(font);

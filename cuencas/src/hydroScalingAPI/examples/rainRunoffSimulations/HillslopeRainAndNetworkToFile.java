@@ -99,6 +99,11 @@ public class HillslopeRainAndNetworkToFile {
     }
     
     public static void main(String args[]) {
+        //main0(args); //The mogollon test case
+        main1(args); //Whitewater 15-minute Rain
+    }
+    
+    public static void main0(String args[]) {
         
         try{
             java.io.File theFile=new java.io.File("/hidrosigDataBases/Gila_River_DB/Rasters/Topography/1_ArcSec/mogollon.metaDEM");
@@ -112,17 +117,6 @@ public class HillslopeRainAndNetworkToFile {
             metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".magn"));
             metaModif.setFormat("Integer");
             int [][] magnitudes=new hydroScalingAPI.io.DataRaster(metaModif).getInt();
-
-            java.util.Hashtable routingParams=new java.util.Hashtable();
-            routingParams.put("widthCoeff",1.0f);
-            routingParams.put("widthExponent",0.4f);
-            routingParams.put("widthStdDev",0.0f);
-
-            routingParams.put("chezyCoeff",14.2f);
-            routingParams.put("chezyExponent",-1/3.0f);
-
-            routingParams.put("lambda1",0.2f);
-            routingParams.put("lambda2",-0.1f);
 
             java.io.File stormFile;
             stormFile=new java.io.File("/hidrosigDataBases/Gila_River_DB/Rasters/Hydrology/NexradPrecipitation/wholeSummer2005/nexrad_prec.metaVHC");
@@ -140,4 +134,35 @@ public class HillslopeRainAndNetworkToFile {
         
     }
     
+    public static void main1(String args[]) {
+        
+        try{
+            java.io.File theFile=new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS/Whitewaters.metaDEM");
+            hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
+            metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS/Whitewaters.dir"));
+
+            String formatoOriginal=metaModif.getFormat();
+            metaModif.setFormat("Byte");
+            byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
+
+            metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".magn"));
+            metaModif.setFormat("Integer");
+            int [][] magnitudes=new hydroScalingAPI.io.DataRaster(metaModif).getInt();
+
+            java.io.File stormFile;
+            stormFile=new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Hydrology/storms/simulRain/prec.metaVHC");
+
+        
+            new HillslopeRainAndNetworkToFile(1064,496,matDirs,magnitudes,metaModif,stormFile);
+            
+        } catch (java.io.IOException IOE){
+            System.out.print(IOE);
+            System.exit(0);
+        } catch (VisADException v){
+            System.out.print(v);
+            System.exit(0);
+        }
+        
+    }
+
 }
