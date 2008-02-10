@@ -101,7 +101,7 @@ public class StormManager {
         java.util.Arrays.sort(arCron);
         
         //Una vez leidos los archivos:
-            //Lleno la matriz de direcciones
+        //Lleno la matriz de direcciones
         
         int[][] matDirBox=new int[myCuenca.getMaxY()-myCuenca.getMinY()+3][myCuenca.getMaxX()-myCuenca.getMinX()+3];
         
@@ -164,21 +164,6 @@ public class StormManager {
             double [][] dataSnapShot, dataSection;
             int MatX,MatY;
             
-            double[] dx;
-            double dy;
-            
-            dy = 6378.0*metaDatos.getResLat()*Math.PI/(3600.0*180.0);
-            dx = new double[metaDatos.getNumRows()];
-            /*Se calcula para cada fila del DEMC el valor de la distancia horizontal del pixel 
-              y la diagonal, dependiendo de la latitud.*/
-            for (int i=0 ; i<metaDatos.getNumRows() ; i++){
-              dx[i] = 6378.0*Math.cos(((i+1)*metaDatos.getResLat()/3600.0 + metaDatos.getMinLat())*Math.PI/180.0)*metaDatos.getResLat()*Math.PI/(3600.0*180.0);
-            }
-            float[][] upAreaValues=linksStructure.getVarValues(0);
-            
-            //for (int i=0;i<upAreaValues[0].length;i++) System.out.print(upAreaValues[0][i]+" ");
-            //System.out.println("");
-            
             //System.out.println("-----------------Start of Files Reading----------------");
             
             totalPixelBasedPrec=new float[matDirBox.length][matDirBox[0].length];
@@ -196,6 +181,8 @@ public class StormManager {
                 //recorto la seccion que esta en la cuenca (TIENE QUE CONTENERLA)
                 
                 double[] currentHillBasedPrec=new double[precOnBasin.length];
+                float[] currentHillNumPixels=new float[precOnBasin.length];
+                
                 
                 double demMinLon=metaDatos.getMinLon();
                 double demMinLat=metaDatos.getMinLat();
@@ -210,7 +197,6 @@ public class StormManager {
                 double stormResLon=metaStorm.getResLon();
                 double stormResLat=metaStorm.getResLat();
                 
-                
                 for (int j=0;j<matrizPintada.length;j++) for (int k=0;k<matrizPintada[0].length;k++){
 
                     evalSpot=new double[] {demMinLon+(basinMinX+k-1)*demResLon/3600.0,
@@ -220,7 +206,8 @@ public class StormManager {
                     MatY=(int) Math.floor((evalSpot[1]-stormMinLat)/stormResLat*3600.0);
                     
                     if (matrizPintada[j][k] > 0){
-                        currentHillBasedPrec[matrizPintada[j][k]-1]+=dataSnapShot[MatY][MatX]*(double)(dy*dx[j+basinMinY-1]);
+                        currentHillBasedPrec[matrizPintada[j][k]-1]+=dataSnapShot[MatY][MatX];
+                        currentHillNumPixels[matrizPintada[j][k]-1]++;
                     }
                     
                     totalPixelBasedPrec[j][k]+=(float) dataSnapShot[MatY][MatX];
@@ -234,8 +221,8 @@ public class StormManager {
                             veryFirstDrop=false;
                         }
                         
-                        precOnBasin[j].addDateAndValue(arCron[i].getDate(),new Float(currentHillBasedPrec[j]/upAreaValues[0][j])); //
-                        totalHillBasedPrec[j]+=currentHillBasedPrec[j]/upAreaValues[0][j];
+                        precOnBasin[j].addDateAndValue(arCron[i].getDate(),new Float(currentHillBasedPrec[j]/currentHillNumPixels[j])); //
+                        totalHillBasedPrec[j]+=currentHillBasedPrec[j]/currentHillNumPixels[j];
                         lastWaterDrop=arCron[i].getDate();
                         
                         

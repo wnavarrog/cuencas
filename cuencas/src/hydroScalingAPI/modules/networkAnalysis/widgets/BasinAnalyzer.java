@@ -248,8 +248,11 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
         maxRegOrderHortonianLabel.setText(""+myHortonStructure.getBasinOrder());
         
         //creo la estructura grafica para los graficos de Horton
+        visad.java3d.DisplayRendererJ3D drI=new visad.java3d.TwoDDisplayRendererJ3D();
+        displayH = new DisplayImplJ3D("displayHorton",drI);
         
-        displayH = new DisplayImplJ3D("displayHorton",new visad.java3d.TwoDDisplayRendererJ3D());
+        
+        
         
         GraphicsModeControl dispGMC = (GraphicsModeControl) displayH.getGraphicsModeControl();
         dispGMC.setScaleEnable(true);
@@ -269,7 +272,10 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
         
         //creo la estructura grafica para los graficos de Distribuciones
         
-        displayCDF = new DisplayImplJ3D("displayCumulativeDF",new visad.java3d.TwoDDisplayRendererJ3D());
+        drI=new visad.java3d.TwoDDisplayRendererJ3D();
+        displayCDF = new DisplayImplJ3D("displayCumulativeDF",drI);
+        
+        
         
         dispGMC = (GraphicsModeControl) displayCDF.getGraphicsModeControl();
         dispGMC.setScaleEnable(true);
@@ -309,7 +315,10 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
         
         //creo la estructura grafica para el analisis basado en Links
         
-        display_Links = new DisplayImplJ3D("displayLinks",new visad.java3d.TwoDDisplayRendererJ3D());
+        drI=new visad.java3d.TwoDDisplayRendererJ3D();
+        display_Links = new DisplayImplJ3D("displayLinks",drI);
+        
+        
         
         dispGMC = (GraphicsModeControl) display_Links.getGraphicsModeControl();
         dispGMC.setScaleEnable(true);
@@ -356,7 +365,10 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
         
         //creo la estructura grafica para los graficos del analisis de RSNs
         
-        displayMap_RSNs = new DisplayImplJ3D("displayMap",new visad.java3d.TwoDDisplayRendererJ3D());
+        drI=new visad.java3d.TwoDDisplayRendererJ3D();
+        displayMap_RSNs = new DisplayImplJ3D("displayMap",drI);
+        
+        
         
         displayMap_RSNs.addDisplayListener(this);
         
@@ -400,8 +412,15 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
         
         //creo la estructura grafica para los graficos del analisis Hortoniano
         
-        display_Hortonian_Means = new DisplayImplJ3D("displayHortonianMean",new visad.java3d.TwoDDisplayRendererJ3D());
-        display_Hortonian_Dists = new DisplayImplJ3D("displayHortonianDist",new visad.java3d.TwoDDisplayRendererJ3D());
+        drI=new visad.java3d.TwoDDisplayRendererJ3D();
+        display_Hortonian_Means = new DisplayImplJ3D("displayHortonianMean",drI);
+        
+        
+        
+        drI=new visad.java3d.TwoDDisplayRendererJ3D();
+        display_Hortonian_Dists = new DisplayImplJ3D("displayHortonianDist",drI);
+        
+        
         
         dispGMC = (GraphicsModeControl) display_Hortonian_Means.getGraphicsModeControl();
         dispGMC.setScaleEnable(true);
@@ -463,7 +482,10 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
         }
         
         
-        displayMap_Hortonian = new DisplayImplJ3D("displayMapHortonian",new visad.java3d.TwoDDisplayRendererJ3D());
+        drI=new visad.java3d.TwoDDisplayRendererJ3D();
+        displayMap_Hortonian = new DisplayImplJ3D("displayMapHortonian",drI);
+        
+        
         
         dispGMC = (GraphicsModeControl) displayMap_Hortonian.getGraphicsModeControl();
         dispGMC.setScaleEnable(true);
@@ -480,7 +502,8 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
         
         //creo la estructura grafica para la Hypsometric Curve
         
-        displayHC = new DisplayImplJ3D("displayHypsometricCurve",new visad.java3d.TwoDDisplayRendererJ3D());
+        drI=new visad.java3d.TwoDDisplayRendererJ3D();
+        displayHC = new DisplayImplJ3D("displayHypsometricCurve",drI);
         
         dispGMC = (GraphicsModeControl) displayHC.getGraphicsModeControl();
         dispGMC.setScaleEnable(true);
@@ -498,7 +521,10 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
         
         //creo la estructura grafica para la Drainage Density
         
-        displayDD = new DisplayImplJ3D("displayDrainageDensity",new visad.java3d.TwoDDisplayRendererJ3D());
+        drI=new visad.java3d.TwoDDisplayRendererJ3D();
+        displayDD = new DisplayImplJ3D("displayDrainageDensity",drI);
+        
+        
         
         dispGMC = (GraphicsModeControl) displayDD.getGraphicsModeControl();
         dispGMC.setScaleEnable(true);
@@ -518,7 +544,10 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
         
         //creo la estructura grafica para la width function
         
-        displayW = new DisplayImplJ3D("displayWidthFunction",new visad.java3d.TwoDDisplayRendererJ3D());
+        drI=new visad.java3d.TwoDDisplayRendererJ3D();
+        displayW = new DisplayImplJ3D("displayWidthFunction",drI);
+        
+        
         
         dispGMC = (GraphicsModeControl) displayW.getGraphicsModeControl();
         dispGMC.setScaleEnable(true);
@@ -3249,9 +3278,9 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
 //            hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
 //            metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Topography/1_ArcSec_USGS/walnutGulchUpdated.dir"));
             
-            java.io.File theFile=new java.io.File("/hidrosigDataBases/Gila River DB/Rasters/Topography/1_ArcSec/mogollon.metaDEM");
+            java.io.File theFile=new java.io.File("/hidrosigDataBases/Gila_River_DB/Rasters/Topography/1_ArcSec/mogollon.metaDEM");
             hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
-            metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Gila River DB/Rasters/Topography/1_ArcSec/mogollon.dir"));
+            metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Gila_River_DB/Rasters/Topography/1_ArcSec/mogollon.dir"));
             
 //            java.io.File theFile=new java.io.File("/hidrosigDataBases/Rio Salado DB/Rasters/Topography/NED_26084992.metaDEM");
 //            hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);

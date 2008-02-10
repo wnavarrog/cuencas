@@ -716,191 +716,191 @@ public class BasinTIN {
 
         System.out.println("Done Creating fields");
         
-        if(true) return;
-        
-        //Second: remove points according to Zr
-        
-        int iii=0;
-        float[][] samplesO=new float[5][numPointsO];
-        for(int j=0;j<numPointsO;j++){
-            if(((int[])typeOfPoint.get(j))[0] == 0){
-                Utm_Coord_3d utmLocal=(Utm_Coord_3d)pointsInTriangulation.get(j);
-                samplesO[0][iii]=(float)(utmLocal.x-minX);
-                samplesO[1][iii]=(float)(utmLocal.y-minY);
-                samplesO[2][iii]=j;
-                samplesO[3][iii]=1;
-                samplesO[4][iii]=((Double)elevationOfPoint.get(j)).floatValue();
-                iii++;
-            }
-        }
-        
-        System.out.println(">>> Created array of interior points with "+numPointsO+" elements");
+        if(false){
 
-        
-        
-        //ITERATIVE COMPONENT
-        
-        int pointsPreserved;
-        float[][] samples;
-        float[] samplesElevs;
-        
-        if(maxZr != 0.0){
+            //Second: remove points according to Zr
 
-            pointsPreserved=-1;
-        
-            int passNumber=0;
-
-            System.out.println(">>> Initializing Zr Iterations");
-
-            while(pointsPreserved != 0){
-
-                pointsPreserved=0;
-
-                numPoints=filteredPointsInTriangulation.size();
-                samples=new float[2][numPoints];
-                samplesElevs=new float[numPoints];
-                for(int i=0;i<numPoints;i++){
-                    Utm_Coord_3d utmLocal=(Utm_Coord_3d)filteredPointsInTriangulation.get(i);
-                    samples[0][i]=(float)(utmLocal.x-minX);
-                    samples[1][i]=(float)(utmLocal.y-minY);
-                    samplesElevs[i]=((Double)filteredElevationOfPoint.get(i)).floatValue();
+            int iii=0;
+            float[][] samplesO=new float[5][numPointsO];
+            for(int j=0;j<numPointsO;j++){
+                if(((int[])typeOfPoint.get(j))[0] == 0){
+                    Utm_Coord_3d utmLocal=(Utm_Coord_3d)pointsInTriangulation.get(j);
+                    samplesO[0][iii]=(float)(utmLocal.x-minX);
+                    samplesO[1][iii]=(float)(utmLocal.y-minY);
+                    samplesO[2][iii]=j;
+                    samplesO[3][iii]=1;
+                    samplesO[4][iii]=((Double)elevationOfPoint.get(j)).floatValue();
+                    iii++;
                 }
+            }
 
-                long startQ = System.currentTimeMillis();
-
-                System.out.println("DelaunayClarkson algorithm.");
-                delaun = (Delaunay) new DelaunayClarkson(samples);
-
-                double passThreshold=0.03125*Math.exp(0.6931*passNumber);
-
-                System.out.println("Walk through algorithm.");
-                for (int i = 0; i < delaun.Tri.length; i++) {
-
-                    int px1=(int)(1e5*samples[0][delaun.Tri[i][0]]);
-                    int px2=(int)(1e5*samples[0][delaun.Tri[i][1]]);
-                    int px3=(int)(1e5*samples[0][delaun.Tri[i][2]]);
-
-                    int py1=(int)(1e5*samples[1][delaun.Tri[i][0]]);
-                    int py2=(int)(1e5*samples[1][delaun.Tri[i][1]]);
-                    int py3=(int)(1e5*samples[1][delaun.Tri[i][2]]);
-
-                    java.awt.Polygon myTri=
-                            new java.awt.Polygon(
-                                new int[] {px1,px2,px3}, 
-                                new int[] {py1,py2,py3},
-                                3);
-
-                    java.awt.Rectangle myBounds=myTri.getBounds();
-
-    //                System.out.println("Now working on Triangle "+i+" with bounds "+myBounds.x+" "+(myBounds.x+myBounds.width) + " "+myBounds.y+" "+(myBounds.y+myBounds.height));
-    //                System.out.println(" CoordinatesX "+px1+" "+px2+" "+px3);
-    //                System.out.println(" CoordinatesY "+py1+" "+py2+" "+py3);
+            System.out.println(">>> Created array of interior points with "+numPointsO+" elements");
 
 
-                    int pointX_C=(int)((px1+px2+px3)/3.0);
-                    int pointY_C=(int)((py1+py2+py3)/3.0);
 
-                    double d1_C=Math.sqrt(Math.pow(pointX_C-px1,2)+Math.pow(pointY_C-py1,2));
-                    double d2_C=Math.sqrt(Math.pow(pointX_C-px2,2)+Math.pow(pointY_C-py2,2));
-                    double d3_C=Math.sqrt(Math.pow(pointX_C-px3,2)+Math.pow(pointY_C-py3,2));
+            //ITERATIVE COMPONENT
 
-                    if(d1_C < 3e6 && d2_C < 3e6 && d3_C < 3e6) {
-                        continue;
+            int pointsPreserved;
+            float[][] samples;
+            float[] samplesElevs;
+
+            if(maxZr != 0.0){
+
+                pointsPreserved=-1;
+
+                int passNumber=0;
+
+                System.out.println(">>> Initializing Zr Iterations");
+
+                while(pointsPreserved != 0){
+
+                    pointsPreserved=0;
+
+                    numPoints=filteredPointsInTriangulation.size();
+                    samples=new float[2][numPoints];
+                    samplesElevs=new float[numPoints];
+                    for(int i=0;i<numPoints;i++){
+                        Utm_Coord_3d utmLocal=(Utm_Coord_3d)filteredPointsInTriangulation.get(i);
+                        samples[0][i]=(float)(utmLocal.x-minX);
+                        samples[1][i]=(float)(utmLocal.y-minY);
+                        samplesElevs[i]=((Double)filteredElevationOfPoint.get(i)).floatValue();
                     }
 
-                    if(passNumber > 0){
-                        if(Math.random() > passThreshold){
+                    long startQ = System.currentTimeMillis();
+
+                    System.out.println("DelaunayClarkson algorithm.");
+                    delaun = (Delaunay) new DelaunayClarkson(samples);
+
+                    double passThreshold=0.03125*Math.exp(0.6931*passNumber);
+
+                    System.out.println("Walk through algorithm.");
+                    for (int i = 0; i < delaun.Tri.length; i++) {
+
+                        int px1=(int)(1e5*samples[0][delaun.Tri[i][0]]);
+                        int px2=(int)(1e5*samples[0][delaun.Tri[i][1]]);
+                        int px3=(int)(1e5*samples[0][delaun.Tri[i][2]]);
+
+                        int py1=(int)(1e5*samples[1][delaun.Tri[i][0]]);
+                        int py2=(int)(1e5*samples[1][delaun.Tri[i][1]]);
+                        int py3=(int)(1e5*samples[1][delaun.Tri[i][2]]);
+
+                        java.awt.Polygon myTri=
+                                new java.awt.Polygon(
+                                    new int[] {px1,px2,px3}, 
+                                    new int[] {py1,py2,py3},
+                                    3);
+
+                        java.awt.Rectangle myBounds=myTri.getBounds();
+
+        //                System.out.println("Now working on Triangle "+i+" with bounds "+myBounds.x+" "+(myBounds.x+myBounds.width) + " "+myBounds.y+" "+(myBounds.y+myBounds.height));
+        //                System.out.println(" CoordinatesX "+px1+" "+px2+" "+px3);
+        //                System.out.println(" CoordinatesY "+py1+" "+py2+" "+py3);
+
+
+                        int pointX_C=(int)((px1+px2+px3)/3.0);
+                        int pointY_C=(int)((py1+py2+py3)/3.0);
+
+                        double d1_C=Math.sqrt(Math.pow(pointX_C-px1,2)+Math.pow(pointY_C-py1,2));
+                        double d2_C=Math.sqrt(Math.pow(pointX_C-px2,2)+Math.pow(pointY_C-py2,2));
+                        double d3_C=Math.sqrt(Math.pow(pointX_C-px3,2)+Math.pow(pointY_C-py3,2));
+
+                        if(d1_C < 3e6 && d2_C < 3e6 && d3_C < 3e6) {
                             continue;
                         }
-                    }
 
-
-                    java.util.Vector potentialCandidates=new java.util.Vector();
-                    int maxIndex=-9999;
-                    float maxVal=-1.0f;
-
-                    int numPointsAnalyzed=0;
-
-                    for(int j=0;j<samplesO[0].length;j++){
-
-                        int pointX=(int)(1e5*samplesO[0][j]);
-                        int pointY=(int)(1e5*samplesO[1][j]);
-
-                        if(samplesO[3][j] == 1){
-                            double d1=Math.sqrt(Math.pow(pointX-px1,2)+Math.pow(pointY-py1,2));
-                            double d2=Math.sqrt(Math.pow(pointX-px2,2)+Math.pow(pointY-py2,2));
-                            double d3=Math.sqrt(Math.pow(pointX-px3,2)+Math.pow(pointY-py3,2));
-
-                            if(d1 < 1e5 || d2 < 1e5 || d3 < 1e5) samplesO[3][j] = 0;
+                        if(passNumber > 0){
+                            if(Math.random() > passThreshold){
+                                continue;
+                            }
                         }
 
 
-                        if(samplesO[3][j] == 1 && pointX > myBounds.x && pointX < myBounds.x+myBounds.width && pointY > myBounds.y && pointY < myBounds.y+myBounds.height){
-                            if(myTri.contains(pointX,pointY)) {
+                        java.util.Vector potentialCandidates=new java.util.Vector();
+                        int maxIndex=-9999;
+                        float maxVal=-1.0f;
 
-                                double e0=samplesO[4][j];
-                                double e1=samplesElevs[delaun.Tri[i][0]];
+                        int numPointsAnalyzed=0;
+
+                        for(int j=0;j<samplesO[0].length;j++){
+
+                            int pointX=(int)(1e5*samplesO[0][j]);
+                            int pointY=(int)(1e5*samplesO[1][j]);
+
+                            if(samplesO[3][j] == 1){
                                 double d1=Math.sqrt(Math.pow(pointX-px1,2)+Math.pow(pointY-py1,2));
-                                double e2=samplesElevs[delaun.Tri[i][1]];
                                 double d2=Math.sqrt(Math.pow(pointX-px2,2)+Math.pow(pointY-py2,2));
-                                double e3=samplesElevs[delaun.Tri[i][2]];
                                 double d3=Math.sqrt(Math.pow(pointX-px3,2)+Math.pow(pointY-py3,2));
 
-                                float diffElev=(float)((e1*d1+e2*d2+e3*d3)/(d1+d2+d3)-e0);
-
-                                if(Math.abs(diffElev) > maxVal) {
-                                    maxIndex=potentialCandidates.size();
-                                    maxVal=Math.abs(diffElev);
-                                }
-
-                                int indexToGet=(int)samplesO[2][j];
-                                potentialCandidates.add(new float[] {pointX/1e5f,pointY/1e5f,indexToGet,diffElev,j});
+                                if(d1 < 1e5 || d2 < 1e5 || d3 < 1e5) samplesO[3][j] = 0;
                             }
-                            numPointsAnalyzed++;
+
+
+                            if(samplesO[3][j] == 1 && pointX > myBounds.x && pointX < myBounds.x+myBounds.width && pointY > myBounds.y && pointY < myBounds.y+myBounds.height){
+                                if(myTri.contains(pointX,pointY)) {
+
+                                    double e0=samplesO[4][j];
+                                    double e1=samplesElevs[delaun.Tri[i][0]];
+                                    double d1=Math.sqrt(Math.pow(pointX-px1,2)+Math.pow(pointY-py1,2));
+                                    double e2=samplesElevs[delaun.Tri[i][1]];
+                                    double d2=Math.sqrt(Math.pow(pointX-px2,2)+Math.pow(pointY-py2,2));
+                                    double e3=samplesElevs[delaun.Tri[i][2]];
+                                    double d3=Math.sqrt(Math.pow(pointX-px3,2)+Math.pow(pointY-py3,2));
+
+                                    float diffElev=(float)((e1*d1+e2*d2+e3*d3)/(d1+d2+d3)-e0);
+
+                                    if(Math.abs(diffElev) > maxVal) {
+                                        maxIndex=potentialCandidates.size();
+                                        maxVal=Math.abs(diffElev);
+                                    }
+
+                                    int indexToGet=(int)samplesO[2][j];
+                                    potentialCandidates.add(new float[] {pointX/1e5f,pointY/1e5f,indexToGet,diffElev,j});
+                                }
+                                numPointsAnalyzed++;
+                            }
+
+                        }
+
+        //                System.out.println("Number of Potential Candidates: "+potentialCandidates.size()+" Number of points considered: "+numPointsAnalyzed);
+
+                        if(potentialCandidates.size() > 0){
+
+                            maxZr=Math.max(maxVal,maxZr);
+
+        //                    System.out.println(maxIndex+" "+maxVal);
+        //                    for (int j = 0; j < potentialCandidates.size(); j++) {
+        //                        System.out.println(java.util.Arrays.toString((float[])potentialCandidates.get(j)));
+        //                    }
+                            if(Zr != -9999 && maxVal > Zr){
+                                float[] infoPoint=(float[])potentialCandidates.get(maxIndex);
+                                int indexToGet=(int)infoPoint[2];
+                                filteredPointsInTriangulation.add(pointsInTriangulation.get(indexToGet));
+                                filteredTypeOfPoint.add(typeOfPoint.get(indexToGet));
+                                filteredElevationOfPoint.add(elevationOfPoint.get(indexToGet));
+
+                                samplesO[3][(int)infoPoint[4]]=0;
+                                pointsPreserved++;
+
+                            }
                         }
 
                     }
+                    long endQ = System.currentTimeMillis();
+                    float timeQ = (endQ - startQ) / 1000f;
+                    System.out.println("Going through took " + timeQ + " seconds.");
 
-    //                System.out.println("Number of Potential Candidates: "+potentialCandidates.size()+" Number of points considered: "+numPointsAnalyzed);
+                    System.out.println("Pass: "+passNumber);
+                    System.out.println("Number of points included is: "+pointsPreserved);
+                    System.out.println("Random Threshold: "+passThreshold);
 
-                    if(potentialCandidates.size() > 0){
-
-                        maxZr=Math.max(maxVal,maxZr);
-
-    //                    System.out.println(maxIndex+" "+maxVal);
-    //                    for (int j = 0; j < potentialCandidates.size(); j++) {
-    //                        System.out.println(java.util.Arrays.toString((float[])potentialCandidates.get(j)));
-    //                    }
-                        if(Zr != -9999 && maxVal > Zr){
-                            float[] infoPoint=(float[])potentialCandidates.get(maxIndex);
-                            int indexToGet=(int)infoPoint[2];
-                            filteredPointsInTriangulation.add(pointsInTriangulation.get(indexToGet));
-                            filteredTypeOfPoint.add(typeOfPoint.get(indexToGet));
-                            filteredElevationOfPoint.add(elevationOfPoint.get(indexToGet));
-
-                            samplesO[3][(int)infoPoint[4]]=0;
-                            pointsPreserved++;
-
-                        }
-                    }
-
+                    passNumber++;
                 }
-                long endQ = System.currentTimeMillis();
-                float timeQ = (endQ - startQ) / 1000f;
-                System.out.println("Going through took " + timeQ + " seconds.");
+            } else maxZr = 40;
 
-                System.out.println("Pass: "+passNumber);
-                System.out.println("Number of points included is: "+pointsPreserved);
-                System.out.println("Random Threshold: "+passThreshold);
-
-                passNumber++;
-            }
-        } else maxZr = 40;
-        
-        
+        }
 
         //Fourth: Calculate triangulation and Voronoi Polygons
-        samples=new float[2][];
+        float[][] samples=new float[2][];
         samples[0]=pointProps[0];//.clone();
         samples[1]=pointProps[1];//.clone();
         System.out.println("the DelaunayClarkson algorithm.");

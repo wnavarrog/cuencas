@@ -85,6 +85,8 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
     private int lastSelectedTab=0;
     private int standAlone=0;
     
+    private java.util.Hashtable landCategories,soilCategories;
+    
     private Connection conn;
     
     /**
@@ -217,7 +219,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         mainFrame=parent;
         
         //Set up general interface
-        setTitle("TRIBS I/O Module");
+        setTitle("TRIBS Visualization Modules");
         setBounds(0,0, 950, 730);
         java.awt.Rectangle marcoParent=mainFrame.getBounds();
         java.awt.Rectangle thisMarco=this.getBounds();
@@ -449,6 +451,8 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         pc.setAspectCartesian(basTIN_I.getAspect());
         data_refFill_GW = new DataReferenceImpl("data_refFill_GW");
         display_GW.addReference( data_refFill_GW );
+        
+        panel_IO.remove(jPanel_O);
 
         
     }
@@ -728,6 +732,8 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         spatialMoments=hydroScalingAPI.tools.ArrayTools.concatentate(spatialMoments,fdm.getKeys());
         avaTimesCombo.setModel(new javax.swing.DefaultComboBoxModel(spatialMoments));
         System.out.println("Step done");
+        
+        panel_IO.remove(jPanel_I);
         
     }
     
@@ -1017,7 +1023,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
     private void initComponents() {
         mrfButtonGroup = new javax.swing.ButtonGroup();
         panel_IO = new javax.swing.JTabbedPane();
-        jPanel10 = new javax.swing.JPanel();
+        jPanel_I = new javax.swing.JPanel();
         panelInputs = new javax.swing.JTabbedPane();
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
@@ -1076,7 +1082,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         jLabel11 = new javax.swing.JLabel();
         writeInFile = new javax.swing.JButton();
         jLabel12 = new javax.swing.JLabel();
-        jPanel11 = new javax.swing.JPanel();
+        jPanel_O = new javax.swing.JPanel();
         panelOutputs = new javax.swing.JTabbedPane();
         jPanel24 = new javax.swing.JPanel();
         mrfPanel = new javax.swing.JPanel();
@@ -1202,7 +1208,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         });
 
         panel_IO.setTabLayoutPolicy(javax.swing.JTabbedPane.SCROLL_TAB_LAYOUT);
-        jPanel10.setLayout(new java.awt.BorderLayout());
+        jPanel_I.setLayout(new java.awt.BorderLayout());
 
         jPanel1.setLayout(new java.awt.BorderLayout());
 
@@ -1233,6 +1239,12 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
 
         resetLattice.setFont(new java.awt.Font("Lucida Grande", 0, 10));
         resetLattice.setText("Reset Lattice Settings");
+        resetLattice.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                resetLatticeActionPerformed(evt);
+            }
+        });
+
         jPanel5.add(resetLattice);
 
         exportTriButton.setFont(new java.awt.Font("Lucida Grande", 0, 10));
@@ -1532,11 +1544,11 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
 
         panelInputs.addTab("Input File", jPanel9);
 
-        jPanel10.add(panelInputs, java.awt.BorderLayout.CENTER);
+        jPanel_I.add(panelInputs, java.awt.BorderLayout.CENTER);
 
-        panel_IO.addTab("Input Options", jPanel10);
+        panel_IO.addTab("Input Options", jPanel_I);
 
-        jPanel11.setLayout(new java.awt.BorderLayout());
+        jPanel_O.setLayout(new java.awt.BorderLayout());
 
         panelOutputs.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
@@ -2170,9 +2182,9 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
 
         panelOutputs.addTab("Network Structure", jPanel34);
 
-        jPanel11.add(panelOutputs, java.awt.BorderLayout.CENTER);
+        jPanel_O.add(panelOutputs, java.awt.BorderLayout.CENTER);
 
-        panel_IO.addTab("Output Analysis", jPanel11);
+        panel_IO.addTab("Output Analysis", jPanel_O);
 
         getContentPane().add(panel_IO, java.awt.BorderLayout.CENTER);
 
@@ -2255,9 +2267,31 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void resetLatticeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetLatticeActionPerformed
+        zrSlider.setValue(0);
+        try {
+            plotPoints();
+        } catch (RemoteException ex) {
+            ex.printStackTrace();
+        } catch (VisADException ex) {
+            ex.printStackTrace();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }//GEN-LAST:event_resetLatticeActionPerformed
+
     private void writeInFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_writeInFileActionPerformed
         try {
-            String fileAscSalida=pathTextField.getText()+"/"+baseNameTextField.getText()+".in";
+            javax.swing.JFileChooser fc=new javax.swing.JFileChooser(pathTextField.getText());
+            fc.setFileSelectionMode(fc.FILES_ONLY);
+            fc.setDialogTitle("Input File Selection");
+            javax.swing.filechooser.FileFilter mdtFilter = new visad.util.ExtensionFileFilter("in","IN File");
+            fc.addChoosableFileFilter(mdtFilter);
+            fc.showSaveDialog(this);
+            
+            if (fc.getSelectedFile() == null) return;
+            
+            String fileAscSalida=fc.getSelectedFile().getAbsolutePath();//pathTextField.getText()+"/"+baseNameTextField.getText()+".in";
             
             java.io.FileOutputStream        outputDir;
             java.io.OutputStreamWriter      newfile;
@@ -2298,8 +2332,8 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
     private void selectGWActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectGWActionPerformed
         javax.swing.JFileChooser fcI=new javax.swing.JFileChooser(mainFrame.getInfoManager().dataBaseRastersHydPath);
         fcI.setFileSelectionMode(fcI.FILES_ONLY);
-        fcI.setDialogTitle("Hydroclimatic File Selection");
-        javax.swing.filechooser.FileFilter vhcFilter = new visad.util.ExtensionFileFilter("metaVHC","Hydroclimatic File");
+        fcI.setDialogTitle("Initial Groundwater File Selection");
+        javax.swing.filechooser.FileFilter vhcFilter = new visad.util.ExtensionFileFilter("metaVHC","Initial Groundwater File");
         fcI.addChoosableFileFilter(vhcFilter);
         int result=fcI.showOpenDialog(this);
         java.io.File fileInput = fcI.getSelectedFile();
@@ -2308,7 +2342,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         
         try{
             java.io.File theMetaFile=new java.io.File(fileInput.getPath().substring(0,fileInput.getPath().lastIndexOf("."))+".metaVHC");
-            hydroScalingAPI.subGUIs.widgets.HydroOpenDialog openVhc=new hydroScalingAPI.subGUIs.widgets.HydroOpenDialog(mainFrame,new hydroScalingAPI.io.MetaRaster(theMetaFile),"Export");
+            hydroScalingAPI.subGUIs.widgets.HydroOpenDialog openVhc=new hydroScalingAPI.subGUIs.widgets.HydroOpenDialog(mainFrame,new hydroScalingAPI.io.MetaRaster(theMetaFile),"Select");
             openVhc.setVisible(true);
             if (!openVhc.mapsSelected()){
                 return;
@@ -2383,8 +2417,8 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
     private void selectSoilsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectSoilsActionPerformed
         javax.swing.JFileChooser fcI=new javax.swing.JFileChooser(mainFrame.getInfoManager().dataBaseRastersHydPath);
         fcI.setFileSelectionMode(fcI.FILES_ONLY);
-        fcI.setDialogTitle("Hydroclimatic File Selection");
-        javax.swing.filechooser.FileFilter vhcFilter = new visad.util.ExtensionFileFilter("metaVHC","Hydroclimatic File");
+        fcI.setDialogTitle("Soils File Selection");
+        javax.swing.filechooser.FileFilter vhcFilter = new visad.util.ExtensionFileFilter("metaVHC","Soils File");
         fcI.addChoosableFileFilter(vhcFilter);
         int result=fcI.showOpenDialog(this);
         java.io.File fileInput = fcI.getSelectedFile();
@@ -2393,7 +2427,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         
         try{
             java.io.File theMetaFile=new java.io.File(fileInput.getPath().substring(0,fileInput.getPath().lastIndexOf("."))+".metaVHC");
-            hydroScalingAPI.subGUIs.widgets.HydroOpenDialog openVhc=new hydroScalingAPI.subGUIs.widgets.HydroOpenDialog(mainFrame,new hydroScalingAPI.io.MetaRaster(theMetaFile),"Export");
+            hydroScalingAPI.subGUIs.widgets.HydroOpenDialog openVhc=new hydroScalingAPI.subGUIs.widgets.HydroOpenDialog(mainFrame,new hydroScalingAPI.io.MetaRaster(theMetaFile),"Select");
             openVhc.setVisible(true);
             if (!openVhc.mapsSelected()){
                 return;
@@ -2401,6 +2435,9 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
             
             hydroScalingAPI.io.MetaRaster theActualMeta=openVhc.getSelectedMetaRasters()[0];
             visad.FlatField theActualField=theActualMeta.getField();
+            
+            if(theActualMeta.getUnits().equalsIgnoreCase("categories"))
+                soilCategories=theActualMeta.getCategoriesTable();
             
             double[] er=eastMap_I.getRange();
             double[] nr=northMap_I.getRange();
@@ -2552,10 +2589,23 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
             
             int k=0;
             for (int j=0;j<values_SOIL[0].length;j++) {
-                Integer valueInteger=new Integer((int)values_SOIL[0][nrMap*ncMap-(k+1)*ncMap+(j%ncMap)]);
+                Integer valueInteger=new Integer((int)values_SOIL[0][j]);
                 if(!uniqueValues.contains(valueInteger)) uniqueValues.add(valueInteger);
+            }
+            
+            java.util.Hashtable histogramCounter=new java.util.Hashtable<Integer,Integer>();
+            
+            for (Iterator it = uniqueValues.iterator(); it.hasNext();) {
+                histogramCounter.put((Integer)it.next(),new Integer(0));
+            }
+            
+            k=0;
+            for (int j=0;j<values_SOIL[0].length;j++) {
+                Integer valueInteger=new Integer((int)values_SOIL[0][nrMap*ncMap-(k+1)*ncMap+(j%ncMap)]);
                 
-                newfile.write(values_SOIL[0][nrMap*ncMap-(k+1)*ncMap+(j%ncMap)]+" ");
+                histogramCounter.put(valueInteger,new Integer(((Integer)histogramCounter.get(valueInteger)).intValue()+1));
+                
+                newfile.write((uniqueValues.indexOf(valueInteger)+1)+" ");
                 if((j+1)%ncMap == 0) {
                     k++;
                     newfile.write(retorno);
@@ -2574,9 +2624,13 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
             newfile=new java.io.OutputStreamWriter(bufferout);
             
             newfile.write(uniqueValues.size()+" 12"+retorno);
+            k=1;
             for (Iterator it = uniqueValues.iterator(); it.hasNext();) {
                 Integer elem = (Integer) it.next();
-                newfile.write(elem.intValue()+" Edit with appropriate parameter values"+retorno);
+                String type=""+elem.intValue();
+                if(soilCategories != null)
+                    type=(String)soilCategories.get(type);
+                newfile.write((k++)+" Corresponds to Soil Type "+type+" which covers "+(((Integer)histogramCounter.get(elem)).intValue()/((float)values_SOIL[0].length)*100)+"%. Edit this line appropriate parameter values"+retorno);
             }
             
             newfile.close();
@@ -2626,10 +2680,24 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
             
             int k=0;
             for (int j=0;j<values_LULC[0].length;j++) {
-                Integer valueInteger=new Integer((int)values_LULC[0][nrMap*ncMap-(k+1)*ncMap+(j%ncMap)]);
-                if(!uniqueValues.contains(valueInteger)) uniqueValues.add(valueInteger);
+                Integer valueInteger=new Integer((int)values_LULC[0][j]);
                 
-                newfile.write(values_LULC[0][nrMap*ncMap-(k+1)*ncMap+(j%ncMap)]+" ");
+                if(!uniqueValues.contains(valueInteger))uniqueValues.add(valueInteger);
+            }
+            
+            java.util.Hashtable histogramCounter=new java.util.Hashtable<Integer,Integer>();
+            
+            for (Iterator it = uniqueValues.iterator(); it.hasNext();) {
+                Integer elem=(Integer)it.next();
+                histogramCounter.put(elem,new Integer(0));
+            }
+            
+            k=0;
+            for (int j=0;j<values_LULC[0].length;j++) {
+                Integer valueInteger=new Integer((int)values_LULC[0][nrMap*ncMap-(k+1)*ncMap+(j%ncMap)]);
+                histogramCounter.put(valueInteger,new Integer(((Integer)histogramCounter.get(valueInteger)).intValue()+1));
+                
+                newfile.write((uniqueValues.indexOf(valueInteger)+1)+" ");
                 if((j+1)%ncMap == 0) {
                     k++;
                     newfile.write(retorno);
@@ -2648,9 +2716,13 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
             newfile=new java.io.OutputStreamWriter(bufferout);
             
             newfile.write(uniqueValues.size()+" 12"+retorno);
+            k=1;
             for (Iterator it = uniqueValues.iterator(); it.hasNext();) {
                 Integer elem = (Integer) it.next();
-                newfile.write(elem.intValue()+" Edit with appropriate parameter values"+retorno);
+                String type=""+elem.intValue();
+                if(landCategories != null)
+                    type=(String)landCategories.get(type);
+                newfile.write((k++)+" Corresponds to Land Use Type "+type+" which covers "+(((Integer)histogramCounter.get(elem)).intValue()/((float)values_LULC[0].length)*100)+"%. Edit this line appropriate parameter values"+retorno);
             }
             
             newfile.close();
@@ -2671,8 +2743,8 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
     private void selectLandCoverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectLandCoverActionPerformed
         javax.swing.JFileChooser fcI=new javax.swing.JFileChooser(mainFrame.getInfoManager().dataBaseRastersHydPath);
         fcI.setFileSelectionMode(fcI.FILES_ONLY);
-        fcI.setDialogTitle("Hydroclimatic File Selection");
-        javax.swing.filechooser.FileFilter vhcFilter = new visad.util.ExtensionFileFilter("metaVHC","Hydroclimatic File");
+        fcI.setDialogTitle("Land Cover File Selection");
+        javax.swing.filechooser.FileFilter vhcFilter = new visad.util.ExtensionFileFilter("metaVHC","Land Cover File");
         fcI.addChoosableFileFilter(vhcFilter);
         int result=fcI.showOpenDialog(this);
         java.io.File fileInput = fcI.getSelectedFile();
@@ -2681,7 +2753,7 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
         
         try{
             java.io.File theMetaFile=new java.io.File(fileInput.getPath().substring(0,fileInput.getPath().lastIndexOf("."))+".metaVHC");
-            hydroScalingAPI.subGUIs.widgets.HydroOpenDialog openVhc=new hydroScalingAPI.subGUIs.widgets.HydroOpenDialog(mainFrame,new hydroScalingAPI.io.MetaRaster(theMetaFile),"Export");
+            hydroScalingAPI.subGUIs.widgets.HydroOpenDialog openVhc=new hydroScalingAPI.subGUIs.widgets.HydroOpenDialog(mainFrame,new hydroScalingAPI.io.MetaRaster(theMetaFile),"Select");
             openVhc.setVisible(true);
             if (!openVhc.mapsSelected()){
                 return;
@@ -2689,6 +2761,9 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
             
             hydroScalingAPI.io.MetaRaster theActualMeta=openVhc.getSelectedMetaRasters()[0];
             visad.FlatField theActualField=theActualMeta.getField();
+            
+            if(theActualMeta.getUnits().equalsIgnoreCase("categories"))
+                landCategories=theActualMeta.getCategoriesTable();
             
             double[] er=eastMap_I.getRange();
             double[] nr=northMap_I.getRange();
@@ -3717,8 +3792,8 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
     public static void main(String args[]) {
 
           //Uncomment when testing the input interface
-        main0(args);
-        if(true) return;
+//        main0(args);
+//        if(true) return;
         
 //        args=new String[3];
 //        args[0]="-ou";
@@ -3872,8 +3947,6 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel10;
-    private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel14;
@@ -3932,6 +4005,8 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
+    private javax.swing.JPanel jPanel_I;
+    private javax.swing.JPanel jPanel_O;
     private javax.swing.JRadioButton jRadioButton1;
     private javax.swing.JRadioButton jRadioButton10;
     private javax.swing.JRadioButton jRadioButton11;

@@ -124,7 +124,7 @@ public class NetworkTools extends javax.swing.JDialog {
         getContentPane().add(BasinDivideToPoly);
 
         TribsInput.setFont(new java.awt.Font("Dialog", 0, 10));
-        TribsInput.setText("tRIBS I/O");
+        TribsInput.setText("tRIBS Input Module");
         TribsInput.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 TribsInputActionPerformed(evt);
@@ -189,6 +189,11 @@ public class NetworkTools extends javax.swing.JDialog {
             if (result == javax.swing.JFileChooser.CANCEL_OPTION) return;
             
             new java.io.File(fc.getSelectedFile().getPath()+"/Input").mkdirs();
+            new java.io.File(fc.getSelectedFile().getPath()+"/Output/hyd/").mkdirs();
+            new java.io.File(fc.getSelectedFile().getPath()+"/Output/voronoi/").mkdirs();
+            new java.io.File(fc.getSelectedFile().getPath()+"/Output/Rain/").mkdirs();
+            new java.io.File(fc.getSelectedFile().getPath()+"/Output/Weather/").mkdirs();
+            
 
             hydroScalingAPI.mainGUI.widgets.InfoRequest ir=new hydroScalingAPI.mainGUI.widgets.InfoRequest(mainFrame);
             ir.setVisible(true);

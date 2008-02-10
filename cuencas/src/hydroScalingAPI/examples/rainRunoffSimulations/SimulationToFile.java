@@ -388,7 +388,7 @@ public class SimulationToFile extends java.lang.Object {
         try{
             
             //Uniform Rain
-            subMain1(args);  //The test case for Whitewater
+            //subMain1(args);  //The test case for Whitewater
             //subMain3(args);  //The test case for Walnut Gulch 30m
             //subMain4(args);   //The test case for TestDem
             //subMain5(args);   //The Man-Vis Tree
@@ -401,7 +401,7 @@ public class SimulationToFile extends java.lang.Object {
             //subMain2(args);   //using constant infiltration in space
             //subMain7(args);   //using a map to set infiltration values
             //subMain10(args);     //Simulations for Upper Rio Puerco Using Nexrad
-            //subMain11(args);     //Simulations for Mogollon Basin Using Nexrad
+            subMain11(args);     //Simulations for Mogollon Basin Using Nexrad
         } catch (java.io.IOException IOE){
             System.out.print(IOE);
             System.exit(0);
@@ -806,7 +806,7 @@ public class SimulationToFile extends java.lang.Object {
         routingParams.put("lambda1",0.2f);
         routingParams.put("lambda2",-0.1f);
         
-        stormFile=new java.io.File("/hidrosigDataBases/Gila_River_DB/Rasters/Hydrology/NexradPrecipitation/summer2002/nexrad_prec.metaVHC");
+        stormFile=new java.io.File("/hidrosigDataBases/Gila_River_DB/Rasters/Hydrology/NexradPrecipitation/wholeSummer2005/nexrad_prec.metaVHC");
         new SimulationToFile(282, 298,matDirs,magnitudes,metaModif,stormFile,0.0f,2,routingParams);
         //new SimulationToFile(981, 387,matDirs,magnitudes,metaModif,stormFile,0.0f,2,routingParams);
         

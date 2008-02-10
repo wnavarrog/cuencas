@@ -41,7 +41,7 @@ public class HillslopeRainAndNetworkToFile {
         
         thisHillsInfo.setStormManager(storm);
         
-        String Directory="/tmp/";
+       String Directory="/tmp/";
         String demName=md.getLocationBinaryFile().getName().substring(0,md.getLocationBinaryFile().getName().lastIndexOf("."));
         java.io.File theFile=new java.io.File(Directory+demName+"-"+storm.stormName()+".dat");
         System.out.println(theFile);
@@ -99,8 +99,8 @@ public class HillslopeRainAndNetworkToFile {
     }
     
     public static void main(String args[]) {
-        //main0(args); //The mogollon test case
-        main1(args); //Whitewater 15-minute Rain
+        main0(args); //The mogollon test case
+        //main1(args); //Whitewater 15-minute Rain
     }
     
     public static void main0(String args[]) {
@@ -119,9 +119,8 @@ public class HillslopeRainAndNetworkToFile {
             int [][] magnitudes=new hydroScalingAPI.io.DataRaster(metaModif).getInt();
 
             java.io.File stormFile;
-            stormFile=new java.io.File("/hidrosigDataBases/Gila_River_DB/Rasters/Hydrology/NexradPrecipitation/wholeSummer2005/nexrad_prec.metaVHC");
+            stormFile=new java.io.File("/hidrosigDataBases/Gila_River_DB/Rasters/Hydrology/NexradPrecipitation/wholeSummer2003/nexrad_prec.metaVHC");
 
-        
             new HillslopeRainAndNetworkToFile(282, 298,matDirs,magnitudes,metaModif,stormFile);
             
         } catch (java.io.IOException IOE){

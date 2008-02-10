@@ -1316,11 +1316,12 @@ public class ParentGUI extends javax.swing.JFrame implements javax.swing.event.I
 
         modules.add(jSeparator12);
 
-        jMenu1.setText("tRIBS I/O Module");
+        jMenu1.setText("tRIBS Visualization Modules");
         jMenu1.setFont(new java.awt.Font("Verdana", 0, 10));
         tRIBS_input.setFont(new java.awt.Font("Verdana", 0, 10));
         tRIBS_input.setMnemonic('o');
         tRIBS_input.setText("Input Module");
+        tRIBS_input.setEnabled(false);
         jMenu1.add(tRIBS_input);
 
         tRIBS_output.setFont(new java.awt.Font("Verdana", 0, 10));

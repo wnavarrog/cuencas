@@ -90,7 +90,6 @@ public class HillSlopeTimeSeries {
         
         java.util.Calendar serchForTime = java.util.Calendar.getInstance();
         serchForTime.setTimeInMillis(iniTimeMill+regInterval*((atThisTime.getTimeInMillis()-iniTimeMill)/regInterval)); //To round the time to the previous exact record time
-        
         Float valueToReturn=((Float)recordTimeValue.get(serchForTime));
         
         if (valueToReturn == null){
@@ -123,6 +122,7 @@ public class HillSlopeTimeSeries {
      * @return The record lenght
      */
     public float getSize(){
+//        return recordTime.size();
         return recordTimeValue.size();
     }
     

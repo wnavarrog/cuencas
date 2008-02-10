@@ -429,6 +429,14 @@ public class MetaRaster{
     }
     
     /**
+     * Returns the Hashtable of categories for this variable
+     * @return A Hashtable with cagegories
+     */
+    public java.util.Hashtable getCategoriesTable(){
+        return categories;
+    }
+    
+    /**
      * Returns the value associated to the [# Rows] tag
      * @return An integer number with the number of Rows
      */

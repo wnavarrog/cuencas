@@ -164,7 +164,7 @@ public class HydroClimateViewer2D  extends hydroScalingAPI.subGUIs.widgets.Raste
                 setLatitudeLabel(hydroScalingAPI.tools.DegreesToDMS.getprettyString(resultY,0)+" ["+MatY+"]");
                 visad.RealTuple spotValue=(visad.RealTuple) localField.evaluate(new visad.RealTuple(domain, new double[] {resultX,resultY}),visad.Data.NEAREST_NEIGHBOR,visad.Data.NO_ERRORS);
                 if(metaData.getUnits().equalsIgnoreCase("categories"))
-                    setValueLabel(spotValue.getValues()[0]+"-"+metaData.getCategory(""+(int)spotValue.getValues()[0]));
+                    setValueLabel(spotValue.getValues()[0]+" - "+metaData.getCategory(""+(int)spotValue.getValues()[0]));
                 else
                     setValueLabel(""+spotValue.getValues()[0]);
             }
