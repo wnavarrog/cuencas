@@ -191,8 +191,8 @@ public class NetworkTools extends javax.swing.JDialog {
             new java.io.File(fc.getSelectedFile().getPath()+"/Input").mkdirs();
             new java.io.File(fc.getSelectedFile().getPath()+"/Output/hyd/").mkdirs();
             new java.io.File(fc.getSelectedFile().getPath()+"/Output/voronoi/").mkdirs();
-            new java.io.File(fc.getSelectedFile().getPath()+"/Output/Rain/").mkdirs();
-            new java.io.File(fc.getSelectedFile().getPath()+"/Output/Weather/").mkdirs();
+            new java.io.File(fc.getSelectedFile().getPath()+"/Rain/").mkdirs();
+            new java.io.File(fc.getSelectedFile().getPath()+"/Weather/").mkdirs();
             
 
             hydroScalingAPI.mainGUI.widgets.InfoRequest ir=new hydroScalingAPI.mainGUI.widgets.InfoRequest(mainFrame);

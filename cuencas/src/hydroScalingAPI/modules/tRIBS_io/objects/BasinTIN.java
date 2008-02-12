@@ -924,9 +924,6 @@ public class BasinTIN {
 //            }
 //            System.out.println();
 //        }
-        sortTriangles(delaun,samples);
-
-
         Gridded2DSet[] triangles=new Gridded2DSet[delaun.Tri.length];
 
         float[][] lines=new float[2][4];
@@ -945,88 +942,90 @@ public class BasinTIN {
 
         allTriang=new UnionSet(domainXLYL,triangles);
 
-        int numValidPoints=0;
-        for(int j=0;j<pointProps[2].length;j++) {
-            if(pointProps[2][j] != 1 ) numValidPoints++;
-        }
-
-        float[] s0 = samples[0];
-        float[] s1 = samples[1];
-
-        countNoBorder=numValidPoints-1;
-
-        nodesPerPolygon=new int[countNoBorder];
-
-        Gridded2DSet[] polygons=new Gridded2DSet[numValidPoints-1];
-        int kp=0;
-        for(int k=0;k<pointProps[2].length;k++) {
-        //for(int k=0;k<5;k++) {    
-            if(pointProps[2][k] != 1 && pointProps[2][k] != 2){
-                float[][] lines1=new float[2][delaun.Vertices[k].length+1];
-                for(int j=0;j<delaun.Vertices[k].length;j++){
-
-                    int i=delaun.Vertices[k][j];
-                    float v1X=s0[delaun.Tri[i][1]]-s0[delaun.Tri[i][0]];
-                    float v1Y=s1[delaun.Tri[i][1]]-s1[delaun.Tri[i][0]];
-                    float v2X=s0[delaun.Tri[i][2]]-s0[delaun.Tri[i][0]];
-                    float v2Y=s1[delaun.Tri[i][2]]-s1[delaun.Tri[i][0]];
-
-                    float kComp=v1X*v2Y-v2X*v1Y;
-
-                    int pPos=0;
-                    for (int l=1; l<3; l++) if(k == delaun.Tri[i][l]) pPos=l;
-                    //System.out.println("P"+k+" In Triang("+(kComp>0?"+":"-")+"):"+" P"+tri[i][0]+" P"+tri[i][1]+" P"+tri[i][2]+" pPos "+pPos);
-                    int L1pos=(pPos+1+(kComp>0?0:1))%3;
-                    int L2pos=(pPos+1+(kComp>0?1:0))%3;
-
-                    double xs1=s0[delaun.Tri[i][pPos]];
-                    double ys1=s1[delaun.Tri[i][pPos]];
-
-                    double xs2=s0[delaun.Tri[i][L2pos]];
-                    double ys2=s1[delaun.Tri[i][L2pos]];
-
-                    double xa1=(xs1+xs2)/2.0f;
-                    double ya1=(ys1+ys2)/2.0f;
-                    double xb1=0;
-                    double yb1;
-                    if(ys2-ys1 != 0)
-                        yb1=ya1+(xs2-xs1)/(ys2-ys1)*xa1;
-                    else{
-                        xb1=xa1;
-                        yb1=0;
-                    }
-
-                    double xs3=s0[delaun.Tri[i][L1pos]];
-                    double ys3=s1[delaun.Tri[i][L1pos]];
-
-                    double xa2=(xs1+xs3)/2.0f;
-                    double ya2=(ys1+ys3)/2.0f;
-                    double xb2=0;
-                    double yb2;
-                    if(ys3-ys1 != 0)
-                        yb2=ya2+(xs3-xs1)/(ys3-ys1)*xa2;
-                    else{
-                        xb2=xa1;
-                        yb2=0;
-                    }
-
-                    double[] result=intersection(xa1,ya1,xb1,yb1,xa2,ya2,xb2,yb2);
-
-                    double xvoi=result[0];
-                    double yvoi=result[1];
-
-                    lines1[0][j]=(float)xvoi;
-                    lines1[1][j]=(float)yvoi;
-
-                }
-                lines1[0][delaun.Vertices[k].length]=lines1[0][0];
-                lines1[1][delaun.Vertices[k].length]=lines1[1][0];
-
-                polygons[kp]=new Gridded2DSet(domainXLYL,lines1,lines1[0].length);
-                nodesPerPolygon[kp++]=lines1[0].length;
-            }
-        }
-        allPoly=new UnionSet(domainXLYL,polygons);
+//        sortTriangles(delaun,samples);
+//
+//        int numValidPoints=0;
+//        for(int j=0;j<pointProps[2].length;j++) {
+//            if(pointProps[2][j] != 1 ) numValidPoints++;
+//        }
+//
+//        float[] s0 = samples[0];
+//        float[] s1 = samples[1];
+//
+//        countNoBorder=numValidPoints-1;
+//
+//        nodesPerPolygon=new int[countNoBorder];
+//
+//        Gridded2DSet[] polygons=new Gridded2DSet[numValidPoints-1];
+//        int kp=0;
+//        for(int k=0;k<pointProps[2].length;k++) {
+//        //for(int k=0;k<5;k++) {    
+//            if(pointProps[2][k] != 1 && pointProps[2][k] != 2){
+//                float[][] lines1=new float[2][delaun.Vertices[k].length+1];
+//                for(int j=0;j<delaun.Vertices[k].length;j++){
+//
+//                    int i=delaun.Vertices[k][j];
+//                    float v1X=s0[delaun.Tri[i][1]]-s0[delaun.Tri[i][0]];
+//                    float v1Y=s1[delaun.Tri[i][1]]-s1[delaun.Tri[i][0]];
+//                    float v2X=s0[delaun.Tri[i][2]]-s0[delaun.Tri[i][0]];
+//                    float v2Y=s1[delaun.Tri[i][2]]-s1[delaun.Tri[i][0]];
+//
+//                    float kComp=v1X*v2Y-v2X*v1Y;
+//
+//                    int pPos=0;
+//                    for (int l=1; l<3; l++) if(k == delaun.Tri[i][l]) pPos=l;
+//                    //System.out.println("P"+k+" In Triang("+(kComp>0?"+":"-")+"):"+" P"+tri[i][0]+" P"+tri[i][1]+" P"+tri[i][2]+" pPos "+pPos);
+//                    int L1pos=(pPos+1+(kComp>0?0:1))%3;
+//                    int L2pos=(pPos+1+(kComp>0?1:0))%3;
+//
+//                    double xs1=s0[delaun.Tri[i][pPos]];
+//                    double ys1=s1[delaun.Tri[i][pPos]];
+//
+//                    double xs2=s0[delaun.Tri[i][L2pos]];
+//                    double ys2=s1[delaun.Tri[i][L2pos]];
+//
+//                    double xa1=(xs1+xs2)/2.0f;
+//                    double ya1=(ys1+ys2)/2.0f;
+//                    double xb1=0;
+//                    double yb1;
+//                    if(ys2-ys1 != 0)
+//                        yb1=ya1+(xs2-xs1)/(ys2-ys1)*xa1;
+//                    else{
+//                        xb1=xa1;
+//                        yb1=0;
+//                    }
+//
+//                    double xs3=s0[delaun.Tri[i][L1pos]];
+//                    double ys3=s1[delaun.Tri[i][L1pos]];
+//
+//                    double xa2=(xs1+xs3)/2.0f;
+//                    double ya2=(ys1+ys3)/2.0f;
+//                    double xb2=0;
+//                    double yb2;
+//                    if(ys3-ys1 != 0)
+//                        yb2=ya2+(xs3-xs1)/(ys3-ys1)*xa2;
+//                    else{
+//                        xb2=xa1;
+//                        yb2=0;
+//                    }
+//
+//                    double[] result=intersection(xa1,ya1,xb1,yb1,xa2,ya2,xb2,yb2);
+//
+//                    double xvoi=result[0];
+//                    double yvoi=result[1];
+//
+//                    lines1[0][j]=(float)xvoi;
+//                    lines1[1][j]=(float)yvoi;
+//
+//                }
+//                lines1[0][delaun.Vertices[k].length]=lines1[0][0];
+//                lines1[1][delaun.Vertices[k].length]=lines1[1][0];
+//
+//                polygons[kp]=new Gridded2DSet(domainXLYL,lines1,lines1[0].length);
+//                nodesPerPolygon[kp++]=lines1[0].length;
+//            }
+//        }
+//        allPoly=new UnionSet(domainXLYL,polygons);
             
     }
     
@@ -1290,7 +1289,7 @@ public class BasinTIN {
             if(samples[3][i]==5) samples[3][i]=0;
         }
         
-        System.out.println("Points File");
+        System.out.println("Writing Points File");
         
         String sufix="";
         if(outputLocation.getPath().indexOf(".points") == -1) sufix=".points";
@@ -1300,13 +1299,44 @@ public class BasinTIN {
         writerNodes.write(samples[0].length+"\n");
         
         for (int i=0; i<samples[0].length; i++){
-            writerNodes.write((samples[0][i]+Math.random()*0.2)+" ");
-            writerNodes.write((samples[1][i]+Math.random()*0.2)+" ");
-            writerNodes.write(samples[2][i]+" ");
-            writerNodes.write((int)samples[3][i]+"\n");
+            if(samples[3][i] == 0){
+                writerNodes.write((samples[0][i]+Math.random()*0.2)+" ");
+                writerNodes.write((samples[1][i]+Math.random()*0.2)+" ");
+                writerNodes.write(samples[2][i]+" ");
+                writerNodes.write((int)samples[3][i]+"\n");
+            }
         }
         
+        for (int i=0; i<samples[0].length; i++){
+            if(samples[3][i] == 1){
+                writerNodes.write((samples[0][i]+Math.random()*0.2)+" ");
+                writerNodes.write((samples[1][i]+Math.random()*0.2)+" ");
+                writerNodes.write(samples[2][i]+" ");
+                writerNodes.write((int)samples[3][i]+"\n");
+            }
+        }
+
+        for (int i=0; i<samples[0].length; i++){
+            if(samples[3][i] == 3){
+                writerNodes.write((samples[0][i]+Math.random()*0.2)+" ");
+                writerNodes.write((samples[1][i]+Math.random()*0.2)+" ");
+                writerNodes.write(samples[2][i]+" ");
+                writerNodes.write((int)samples[3][i]+"\n");
+            }
+        }
+
+        for (int i=0; i<samples[0].length; i++){
+            if(samples[3][i] == 2){
+                writerNodes.write((samples[0][i]+Math.random()*0.2)+" ");
+                writerNodes.write((samples[1][i]+Math.random()*0.2)+" ");
+                writerNodes.write(samples[2][i]+" ");
+                writerNodes.write((int)samples[3][i]+"\n");
+            }
+        }
+
         writerNodes.close();
+
+        System.out.println("Done Writing Points File");
         
     }
     
