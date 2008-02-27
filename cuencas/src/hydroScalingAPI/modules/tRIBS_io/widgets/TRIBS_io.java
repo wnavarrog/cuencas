@@ -2238,6 +2238,47 @@ public class TRIBS_io extends javax.swing.JDialog  implements visad.DisplayListe
             bufferout.close();
             outputDir.close();
             
+            fileAscSalida=pathTextField.getText()+"/Input/Nodes/oNodes.dat";
+                    
+            outputDir = new java.io.FileOutputStream(fileAscSalida);
+            bufferout=new java.io.BufferedOutputStream(outputDir);
+            newfile=new java.io.OutputStreamWriter(bufferout);
+            
+            newfile.write("1"+retorno);
+            newfile.write("0");
+            
+            newfile.close();
+            bufferout.close();
+            outputDir.close();
+            
+            fileAscSalida=pathTextField.getText()+"/Input/Nodes/hNodes.dat";
+                    
+            outputDir = new java.io.FileOutputStream(fileAscSalida);
+            bufferout=new java.io.BufferedOutputStream(outputDir);
+            newfile=new java.io.OutputStreamWriter(bufferout);
+            
+            newfile.write("1"+retorno);
+            newfile.write("0");
+            
+            newfile.close();
+            bufferout.close();
+            outputDir.close();
+            
+            fileAscSalida=pathTextField.getText()+"/Input/Nodes/pNodes.dat";
+                    
+            outputDir = new java.io.FileOutputStream(fileAscSalida);
+            bufferout=new java.io.BufferedOutputStream(outputDir);
+            newfile=new java.io.OutputStreamWriter(bufferout);
+            
+            newfile.write("1"+retorno);
+            newfile.write("0");
+            
+            newfile.close();
+            bufferout.close();
+            outputDir.close();
+            
+            
+            
         } catch (NumberFormatException ex) {
             ex.printStackTrace();
         } catch (FileNotFoundException ex) {

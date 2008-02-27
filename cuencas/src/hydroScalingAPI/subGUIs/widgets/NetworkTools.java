@@ -189,6 +189,7 @@ public class NetworkTools extends javax.swing.JDialog {
             if (result == javax.swing.JFileChooser.CANCEL_OPTION) return;
             
             new java.io.File(fc.getSelectedFile().getPath()+"/Input").mkdirs();
+            new java.io.File(fc.getSelectedFile().getPath()+"/Input/Nodes/").mkdirs();
             new java.io.File(fc.getSelectedFile().getPath()+"/Output/hyd/").mkdirs();
             new java.io.File(fc.getSelectedFile().getPath()+"/Output/voronoi/").mkdirs();
             new java.io.File(fc.getSelectedFile().getPath()+"/Rain/").mkdirs();
