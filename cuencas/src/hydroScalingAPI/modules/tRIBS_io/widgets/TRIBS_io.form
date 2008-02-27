@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<Form version="1.0" type="org.netbeans.modules.form.forminfo.JDialogFormInfo">
+<Form version="1.2" maxVersion="1.2" type="org.netbeans.modules.form.forminfo.JDialogFormInfo">
   <NonVisualComponents>
     <Component class="javax.swing.ButtonGroup" name="mrfButtonGroup">
     </Component>
@@ -12,7 +12,9 @@
     <EventHandler event="windowClosing" listener="java.awt.event.WindowListener" parameters="java.awt.event.WindowEvent" handler="closeDialog"/>
   </Events>
   <AuxValues>
+    <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
     <AuxValue name="FormSettings_generateMnemonicsCode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_i18nAutoMode" type="java.lang.Boolean" value="false"/>
     <AuxValue name="FormSettings_layoutCodeTarget" type="java.lang.Integer" value="2"/>
     <AuxValue name="FormSettings_listenerGenerationStyle" type="java.lang.Integer" value="0"/>
     <AuxValue name="FormSettings_variablesLocal" type="java.lang.Boolean" value="false"/>
@@ -393,11 +395,6 @@
                             </Property>
                             <Property name="selected" type="boolean" value="true"/>
                             <Property name="text" type="java.lang.String" value="Show Points"/>
-                            <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-                              <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
-                                <EmptyBorder bottom="0" left="0" right="0" top="0"/>
-                              </Border>
-                            </Property>
                             <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                               <Insets value="[0, 0, 0, 0]"/>
                             </Property>
@@ -413,11 +410,6 @@
                             </Property>
                             <Property name="selected" type="boolean" value="true"/>
                             <Property name="text" type="java.lang.String" value="Show Triangles"/>
-                            <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-                              <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
-                                <EmptyBorder bottom="0" left="0" right="0" top="0"/>
-                              </Border>
-                            </Property>
                             <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                               <Insets value="[0, 0, 0, 0]"/>
                             </Property>
@@ -726,7 +718,7 @@
                               <Font name="Courier New" size="13" style="1"/>
                             </Property>
                             <Property name="rows" type="int" value="5"/>
-                            <Property name="text" type="java.lang.String" value="##############################################################################&#xa;##&#xa;##                    tRIBS Distributed Hydrologic Model&#xa;##&#xa;##              TIN-based Real-time Integrated Basin Simulator&#xa;##                       Ralph M. Parsons Laboratory&#xa;##                  Massachusetts Institute of Technology&#xa;## &#xa;##&#xa;##  template.in&#x9;&#x9;Input File Template for Generation of tRIBS *.in&#xa;##                      files used for model parameters and file path names.&#xa;##&#xa;##############################################################################&#xa;&#xa;&#xa;##=========================================================================&#xa;##&#xa;##&#xa;##&#x9;&#x9;&#x9;Section 1: Model Run Parameters&#xa;##&#xa;##&#xa;##=========================================================================&#xa;&#xa;## Time Variables&#xa;## --------------&#xa;&#xa;STARTDATE:      Starting time &#x9;&#x9;&#x9; &#x9; (#MM/DD/YYYY/HH#)&#xa;XX/XX/XXXX/XX&#xa;&#xa;RUNTIME:     &#x9;Run duration&#x9;&#x9;&#x9;&#x9; (#hours#)&#xa;XXX.X&#xa;&#xa;TIMESTEP:    &#x9;Unsaturated zone computational time step (#mins#)&#xa;3.75&#xa;&#xa;GWSTEP:      &#x9;Saturated zone computational time step &#x9; (#mins#)&#xa;7.5&#xa;&#xa;METSTEP:     &#x9;Meteorological data time step &#x9;&#x9; (#mins#)&#xa;60.0&#xa;&#xa;ETISTEP:&#x9;Evapotran/Interception computational time step (hours)&#xa;60.0&#xa;&#xa;RAININTRVL:  &#x9;Time interval in rainfall input &#x9; (#hours#)&#xa;1&#xa;&#xa;OPINTRVL:    &#x9;Output interval &#x9;&#x9;&#x9; (#hours#)&#xa;1&#xa;&#xa;SPOPINTRVL:   &#x9;Spatial output interval &#x9;&#x9; (#hours#)&#xa;10&#xa;&#xa;INTSTORMMAX: &#x9;Interstorm interval &#x9;&#x9;&#x9; (#hours#)&#xa;8760&#xa;&#xa;RAINSEARCH:&#x9;Rainfall search interval (hours)&#xa;2400&#xa;&#xa;&#xa;## Routing Variables&#xa;## -----------------&#xa;&#xa;&#xa;BASEFLOW:    &#x9;Baseflow discharge &#x9;&#x9;&#x9; (#m3/s#)  &#xa;0.01&#xa;&#xa;VELOCITYCOEF: &#x9;Discharge-velocity coefficient &#x9;&#x9; (#m/s#)&#xa;0.5&#xa;&#xa;VELOCITYRATIO: &#x9;Stream to hillslope velocity coefficient (#D/L#)&#xa;5&#xa;&#xa;KINEMVELCOEF:   Coefficient in power law for non-linear routing&#xa;0.1&#xa;&#xa;FLOWEXP: &#x9;Nonlinear discharge coefficient&#x9;&#x9; (#D/L#)&#xa;0.0000001&#xa;&#xa;CHANNELROUGHNESS: Uniform channel roughness value        (#D/L#)&#xa;0.15&#xa;&#xa;CHANNELWIDTH:     Uniform channel width                  (# m #)&#xa;10&#xa;&#xa;CHANNELWIDTHCOEFF:&#x9;Coefficient in width-area relationship &#xa;1.0&#xa;&#xa;CHANNELWIDTHEXPNT:&#x9;Exponent in width-area relationship &#xa;0.3&#xa;&#xa;CHANNELWIDTHFILE:&#x9;Filename that contains channel widths&#xa;&#xa;## Radiation Variable&#xa;## ------------------&#xa;&#xa;&#xa;TLINKE:&#x9;&#x9;&#x9;Atmospheric turbidity parameter&#xa;2.5&#xa;&#xa;##=========================================================================&#xa;##&#xa;##&#xa;##&#x9;&#x9;&#x9;Section 2: Model Run Options&#xa;##&#xa;##&#xa;##  OPTMESHINPUT:&#x9;1  tMesh data&#x9;&#x9;5  Arc/Info *.net&#xa;##&#x9;&#x9;&#x9;2  Point file&#x9;&#x9;6  Arc/Info *.lin,*.pnt&#xa;##&#x9;&#x9;&#x9;3  ArcGrid (random)&#x9;7  Scratch&#xa;##&#x9;&#x9;&#x9;4  ArcGrid (hex)&#x9;8  Point Triangulator&#xa;##&#xa;##  RAINSOURCE:&#x9;&#x9;1  Stage III radar&#xa;##&#x9;&#x9;&#x9;2  WSI radar&#xa;##                      3  Rain gauges&#xa;##&#xa;##  RAINDISTRIBUTION:&#x9;0  Spatially-distributed Radar&#xa;##&#x9;&#x9;&#x9;1  Mean Areal Precipitation Radar&#xa;##&#xa;##  OPTEVAPOTRANS:&#x9;0  Inactive evapotranspiration&#xa;##&#x9;&#x9;&#x9;1  Penman-Monteith method&#xa;##                      2  Deardorff method&#xa;##  &#x9;&#x9;&#x9;3  Priestley-Taylor method&#xa;##                      4  Pan evaporation measurements&#xa;##&#xa;##  OPTINTERCEPT:&#x9;0  Inactive interception &#xa;## &#x9;&#x9;&#x9;1  Canopy storage method&#xa;##&#x9;&#x9;&#x9;2  Canopy water balance method&#xa;##  &#xa;##  GFLUXOPTION:&#x9;0  Inactive ground heat flux&#xa;##&#x9;&#x9;&#x9;1  Temperature gradient method&#xa;##                      2  Force_Restore method&#xa;##&#xa;##  METDATAOPTION:&#x9;0  Inactive meteorological data&#xa;##&#x9;&#x9;&#x9;1  Weather station point data&#xa;##&#x9;&#x9;&#x9;2  Gridded meteorological data&#xa;##&#xa;##  CONVERTDATA:&#x9;0  Inactive data preprocessing&#xa;##&#x9;&#x9;&#x9;1  Active met data preprocessing&#xa;##     &#x9;&#x9;&#x9;2  Active rain gauge data preprocessing&#xa;##&#x9;&#x9;&#x9;3  Active DMIP met data preprocessing&#xa;##&#xa;##  OPTBEDROCK:&#x9;&#x9;0  Uniform bedrock depth (double)&#xa;##&#x9;&#x9;&#x9;1  Variable bedrock depth (grid)&#xa;##&#xa;##  WIDTHINTERPOLATION: 0  Interpolate between measured and observed&#xa;##&#x9;                1  Interpolate only between measured&#xa;##&#xa;##  OPTGWFILE:&#x9;&#x9;0  Resample ASCII grid file in GWATERFILE&#xa;##&#x9;&#x9;      &#x9;1  Read in Voronoi polygon file with GW levels&#xa;##&#xa;##  OPTRUNON:&#x9;&#x9;0  No Runon&#xa;##&#x9;&#x9;&#x9;1  Runon &#xa;##&#xa;##=========================================================================&#xa;&#xa;&#xa;OPTMESHINPUT:   Mesh input data option&#xa;2&#xa;&#xa;RAINSOURCE:  &#x9;Rainfall data source option &#xa;2&#xa;&#xa;OPTEVAPOTRANS: &#x9;Option for evapoTranspiration scheme&#xa;1&#xa;&#xa;OPTINTERCEPT: &#x9;Option for interception scheme&#xa;2&#xa;&#xa;GFLUXOPTION: &#x9;Option for ground heat flux&#xa;2&#xa;&#xa;METDATAOPTION:  Option for meteorological data&#xa;1&#xa;&#xa;CONVERTDATA:   &#x9;Option to convert met data format&#xa;0&#xa;&#xa;OPTBEDROCK:&#x9;Option for uniform or variable depth&#xa;0&#xa;&#xa;WIDTHINTERPOLATION:  Option for interpolating width values&#xa;0&#xa;&#xa;OPTGWFILE: &#x9;Option for groundwater initial file&#xa;0&#xa;&#xa;OPTRUNON:&#x9;Option for runon in overland flow paths&#xa;0&#xa;&#xa;##=========================================================================&#xa;##&#xa;##&#xa;##&#x9;&#x9;&#x9;Section 3: Model Input Files and Pathnames&#xa;##&#xa;##&#xa;##=========================================================================&#xa;&#xa;## Mesh Generation&#xa;## -----------------&#xa;&#xa;&#xa;INPUTDATAFILE:    tMesh input file base name for Mesh files&#xa;Output/voronoi/basename&#xa;&#xa;INPUTTIME:&#x9;  tMesh input time slice (Option 1)&#xa;&#xa;&#xa;ARCINFOFILENAME:  tMesh input file base name Arc files&#xa;&#xa;&#xa;POINTFILENAME:    tMesh input file name Points files&#xa;Input/basename.points&#xa;&#xa;&#xa;## Resampling Grids&#xa;## -----------------&#xa;&#xa;&#xa;SOILTABLENAME:    Soil parameter reference table (*.sdt)&#xa;Input/basename.sdt&#xa;&#xa;SOILMAPNAME:      Soil texture ASCII grid (*.soi)&#xa;Input/basename.soi&#xa;&#xa;LANDTABLENAME:    Land use parameter reference table (*.ldt)&#xa;Input/basename.ldt&#xa;&#xa;LANDMAPNAME:  &#x9;  Land use ASCII grid (*.lan)&#xa;Input/basename.lan&#xa;&#xa;GWATERFILE:       Ground water ASCII grid (*.iwt) &#xa;Input/basename.iwt&#xa;&#xa;RAINFILE:         Base name of the radar ASCII grid&#xa;Rain/p&#xa;&#xa;RAINEXTENSION:    Extension for the radar ASCII grid &#xa;txt&#xa;&#xa;DEPTHTOBEDROCK:   Uniform depth to bedrock (meters)&#xa;5&#xa;&#xa;BEDROCKFILE:      Bedrock depth ASCII grid (*.brd)&#xa;Input/basename.brd&#xa;&#xa;&#xa;## Meterological Data&#xa;## ------------------&#xa;&#xa;&#xa;HYDROMETSTATIONS:  Hydrometeorological station file (*.sdf)&#xa;Weather/weatherGauge.sdf&#xa;&#xa;HYDROMETGRID:  &#x9;   Hydrometeorological ASCII grid (*.gdf)&#xa;Weather/&#xa;&#xa;HYDROMETCONVERT:   Hydrometeorological data input file (*.mdi)&#xa;Weather/&#xa;&#xa;HYDROMETBASENAME:  Hydrometeorological data file (*.mdf)&#xa;Weather/weatherField&#xa;&#xa;GAUGESTATIONS: &#x9;   Rain Gauge station file (*.sdf)&#xa;Rain/rainGauge.sdf&#xa;&#xa;GAUGECONVERT:      Rain Gauge data conversion file (*.mdi)&#xa;&#xa;&#xa;GAUGEBASENAME:&#x9;   Rain Gauge data BASE name (*.mdf)&#xa;&#xa;&#xa;&#xa;## Output Data&#xa;## -----------&#xa;&#xa;&#xa;OUTFILENAME:&#x9;   Base name of the tMesh and dynamic variable output&#xa;Output/voronoi/basename&#xa;&#xa;OUTHYDROFILENAME:  Base name for hydrograph output&#xa;Output/hyd/basename&#xa;&#xa;OUTHYDROEXTENSION: Extension for hydrograph output&#xa;mrf&#xa;&#xa;RIBSHYDOUTPUT:     RIBS comp-ty: Opt 0: basin lumped quant, Opt 1: prev+curr &#xa;0&#xa;&#xa;NODEOUTPUTLIST&#xa;Input/Nodes/pNodes.dat&#xa;&#xa;HYDRONODELIST&#xa;Input/Nodes/hNodes.dat&#xa;&#xa;OUTLETNODELIST&#xa;Input/Nodes/oNodes.dat&#xa;&#xa;##=========================================================================&#xa;##&#xa;##&#xa;##&#x9;&#x9;&#x9;Section 4: Model Modes&#xa;##&#xa;##&#xa;##  FORECASTMODE:&#x9;0  No Forecasting&#x9;&#x9;&#xa;##&#x9;&#x9;&#x9;1  Single or Updating QPF Forecast&#xa;##&#x9;&#x9;&#x9;2  Persistence Forecast&#xa;## &#x9;                3  Climatological Forecast&#xa;##&#xa;##  RAINDISTRIBUTION:&#x9;0  Spatially-distributed Radar&#xa;##&#x9;&#x9;&#x9;1  Mean Areal Precipitation Radar&#xa;##&#xa;##  STOCHASTICMODE:&#x9;0  No Stochastic Mode&#x9; 4  Mean+Sine Forcing&#xa;##                      1  Mean Forcing     &#x9; 5  Random+Sine Forcing&#xa;##                      2  Random Forcing&#x9; 6  Weather Generator&#xa;##                      3  Sinusoidal Forcing&#xa;##                      &#xa;##=========================================================================&#xa;&#xa;&#xa;## Rainfall Forecasting&#xa;## --------------------&#xa;&#xa;&#xa;FORECASTMODE:&#x9;   Rainfall Forecasting Mode Option&#xa;&#xa;&#xa;FORECASTTIME:&#x9;   Forecast Time (hours from start)&#xa;&#xa;&#xa;FORECASTLEADTIME:  Forecast Lead Time (hours) &#xa;&#xa;&#xa;FORECASTLENGTH:&#x9;   Forecast Window Length (hours)&#xa;&#xa;&#xa;FORECASTFILE:&#x9;   Base name of the radar QPF grids&#xa;&#xa;&#xa;CLIMATOLOGY:&#x9;   Rainfall climatology (mm/hr)&#xa;&#xa;&#xa;RAINDISTRIBUTION:  Distributed or MAP radar rainfall&#x9;&#xa;&#xa;&#xa;## Stochastic Climate Forcing&#xa;## --------------------------&#xa;&#xa;STOCHASTICMODE:&#x9;   Stochastic Climate Mode Option&#xa;0&#xa;&#xa;PMEAN:&#x9;&#x9;   Mean rainfall intensity (mm/hr)&#x9;&#xa;0.0&#xa;&#xa;STDUR:&#x9;&#x9;   Mean storm duration (hours)&#xa;0.0&#xa;&#xa;ISTDUR:&#x9;&#x9;   Mean time interval between storms (hours) &#xa;0.0&#xa;&#xa;SEED:&#x9;&#x9;   Random seed&#xa;11&#xa;&#xa;PERIOD:&#x9;&#x9;   Period of variation (hours) &#xa;0&#xa;&#xa;MAXPMEAN:&#x9;   Maximum value of mean rainfall intensity (mm/hr) &#xa;0&#xa;&#xa;MAXSTDURMN:        Maximum value of mean storm duration (hours) &#xa;0&#xa;&#xa;MAXISTDURMN: &#x9;   Maximum value of mean interstorm period (hours) &#xa;0&#xa;&#xa;WEATHERTABLENAME:  File with input parameters for weather generator&#xa;Input/pramsWG.T&#xa;&#xa;##=========================================================================&#xa;##&#xa;##&#xa;##&#x9;&#x9;&#x9;End of Template.in&#xa;##&#xa;##&#xa;##========================================================================="/>
+                            <Property name="text" type="java.lang.String" value="##############################################################################&#xa;##&#xa;##                    tRIBS Distributed Hydrologic Model&#xa;##&#xa;##              TIN-based Real-time Integrated Basin Simulator&#xa;##                       Ralph M. Parsons Laboratory&#xa;##                  Massachusetts Institute of Technology&#xa;## &#xa;##&#xa;##  template.in&#x9;&#x9;Input File Template for Generation of tRIBS *.in&#xa;##                      files used for model parameters and file path names.&#xa;##&#xa;##############################################################################&#xa;&#xa;&#xa;##=========================================================================&#xa;##&#xa;##&#xa;##&#x9;&#x9;&#x9;Section 1: Model Run Parameters&#xa;##&#xa;##&#xa;##=========================================================================&#xa;&#xa;## Time Variables&#xa;## --------------&#xa;&#xa;STARTDATE:      Starting time &#x9;&#x9;&#x9; &#x9; (#MM/DD/YYYY/HH#)&#xa;XX/XX/XXXX/XX&#xa;&#xa;RUNTIME:     &#x9;Run duration&#x9;&#x9;&#x9;&#x9; (#hours#)&#xa;XXX.X&#xa;&#xa;TIMESTEP:    &#x9;Unsaturated zone computational time step (#mins#)&#xa;3.75&#xa;&#xa;GWSTEP:      &#x9;Saturated zone computational time step &#x9; (#mins#)&#xa;7.5&#xa;&#xa;METSTEP:     &#x9;Meteorological data time step &#x9;&#x9; (#mins#)&#xa;60.0&#xa;&#xa;ETISTEP:&#x9;Evapotran/Interception computational time step (hours)&#xa;60.0&#xa;&#xa;RAININTRVL:  &#x9;Time interval in rainfall input &#x9; (#hours#)&#xa;1&#xa;&#xa;OPINTRVL:    &#x9;Output interval &#x9;&#x9;&#x9; (#hours#)&#xa;1&#xa;&#xa;SPOPINTRVL:   &#x9;Spatial output interval &#x9;&#x9; (#hours#)&#xa;10&#xa;&#xa;INTSTORMMAX: &#x9;Interstorm interval &#x9;&#x9;&#x9; (#hours#)&#xa;8760&#xa;&#xa;RAINSEARCH:&#x9;Rainfall search interval (hours)&#xa;2400&#xa;&#xa;&#xa;## Routing Variables&#xa;## -----------------&#xa;&#xa;&#xa;BASEFLOW:    &#x9;Baseflow discharge &#x9;&#x9;&#x9; (#m3/s#)  &#xa;0.01&#xa;&#xa;VELOCITYCOEF: &#x9;Discharge-velocity coefficient &#x9;&#x9; (#m/s#)&#xa;0.5&#xa;&#xa;VELOCITYRATIO: &#x9;Stream to hillslope velocity coefficient (#D/L#)&#xa;5&#xa;&#xa;KINEMVELCOEF:   Coefficient in power law for non-linear routing&#xa;0.1&#xa;&#xa;FLOWEXP: &#x9;Nonlinear discharge coefficient&#x9;&#x9; (#D/L#)&#xa;0.0000001&#xa;&#xa;CHANNELROUGHNESS: Uniform channel roughness value        (#D/L#)&#xa;0.15&#xa;&#xa;CHANNELWIDTH:     Uniform channel width                  (# m #)&#xa;10&#xa;&#xa;CHANNELWIDTHCOEFF:&#x9;Coefficient in width-area relationship &#xa;1.0&#xa;&#xa;CHANNELWIDTHEXPNT:&#x9;Exponent in width-area relationship &#xa;0.3&#xa;&#xa;CHANNELWIDTHFILE:&#x9;Filename that contains channel widths&#xa;&#xa;## Radiation Variable&#xa;## ------------------&#xa;&#xa;&#xa;TLINKE:&#x9;&#x9;&#x9;Atmospheric turbidity parameter&#xa;2.5&#xa;&#xa;##=========================================================================&#xa;##&#xa;##&#xa;##&#x9;&#x9;&#x9;Section 2: Model Run Options&#xa;##&#xa;##&#xa;##  OPTMESHINPUT:&#x9;1  tMesh data&#x9;&#x9;5  Arc/Info *.net&#xa;##&#x9;&#x9;&#x9;2  Point file&#x9;&#x9;6  Arc/Info *.lin,*.pnt&#xa;##&#x9;&#x9;&#x9;3  ArcGrid (random)&#x9;7  Scratch&#xa;##&#x9;&#x9;&#x9;4  ArcGrid (hex)&#x9;8  Point Triangulator&#xa;##&#xa;##  RAINSOURCE:&#x9;&#x9;1  Stage III radar&#xa;##&#x9;&#x9;&#x9;2  WSI radar&#xa;##                      3  Rain gauges&#xa;##&#xa;##  RAINDISTRIBUTION:&#x9;0  Spatially-distributed Radar&#xa;##&#x9;&#x9;&#x9;1  Mean Areal Precipitation Radar&#xa;##&#xa;##  OPTEVAPOTRANS:&#x9;0  Inactive evapotranspiration&#xa;##&#x9;&#x9;&#x9;1  Penman-Monteith method&#xa;##                      2  Deardorff method&#xa;##  &#x9;&#x9;&#x9;3  Priestley-Taylor method&#xa;##                      4  Pan evaporation measurements&#xa;##&#xa;##  OPTINTERCEPT:&#x9;0  Inactive interception &#xa;## &#x9;&#x9;&#x9;1  Canopy storage method&#xa;##&#x9;&#x9;&#x9;2  Canopy water balance method&#xa;##  &#xa;##  GFLUXOPTION:&#x9;0  Inactive ground heat flux&#xa;##&#x9;&#x9;&#x9;1  Temperature gradient method&#xa;##                      2  Force_Restore method&#xa;##&#xa;##  METDATAOPTION:&#x9;0  Inactive meteorological data&#xa;##&#x9;&#x9;&#x9;1  Weather station point data&#xa;##&#x9;&#x9;&#x9;2  Gridded meteorological data&#xa;##&#xa;##  CONVERTDATA:&#x9;0  Inactive data preprocessing&#xa;##&#x9;&#x9;&#x9;1  Active met data preprocessing&#xa;##     &#x9;&#x9;&#x9;2  Active rain gauge data preprocessing&#xa;##&#x9;&#x9;&#x9;3  Active DMIP met data preprocessing&#xa;##&#xa;##  OPTBEDROCK:&#x9;&#x9;0  Uniform bedrock depth (double)&#xa;##&#x9;&#x9;&#x9;1  Variable bedrock depth (grid)&#xa;##&#xa;##  WIDTHINTERPOLATION: 0  Interpolate between measured and observed&#xa;##&#x9;                1  Interpolate only between measured&#xa;##&#xa;##  OPTGWFILE:&#x9;&#x9;0  Resample ASCII grid file in GWATERFILE&#xa;##&#x9;&#x9;      &#x9;1  Read in Voronoi polygon file with GW levels&#xa;##&#xa;##  OPTRUNON:&#x9;&#x9;0  No Runon&#xa;##&#x9;&#x9;&#x9;1  Runon &#xa;##&#xa;##=========================================================================&#xa;&#xa;&#xa;OPTMESHINPUT:   Mesh input data option&#xa;2&#xa;&#xa;RAINSOURCE:  &#x9;Rainfall data source option &#xa;2&#xa;&#xa;OPTEVAPOTRANS: &#x9;Option for evapoTranspiration scheme&#xa;1&#xa;&#xa;OPTINTERCEPT: &#x9;Option for interception scheme&#xa;2&#xa;&#xa;GFLUXOPTION: &#x9;Option for ground heat flux&#xa;2&#xa;&#xa;METDATAOPTION:  Option for meteorological data&#xa;1&#xa;&#xa;CONVERTDATA:   &#x9;Option to convert met data format&#xa;0&#xa;&#xa;OPTBEDROCK:&#x9;Option for uniform or variable depth&#xa;0&#xa;&#xa;WIDTHINTERPOLATION:  Option for interpolating width values&#xa;0&#xa;&#xa;OPTGWFILE: &#x9;Option for groundwater initial file&#xa;0&#xa;&#xa;OPTRUNON:&#x9;Option for runon in overland flow paths&#xa;0&#xa;&#xa;##=========================================================================&#xa;##&#xa;##&#xa;##&#x9;&#x9;&#x9;Section 3: Model Input Files and Pathnames&#xa;##&#xa;##&#xa;##=========================================================================&#xa;&#xa;## Mesh Generation&#xa;## -----------------&#xa;&#xa;&#xa;INPUTDATAFILE:    tMesh input file base name for Mesh files&#xa;Output/voronoi/basename&#xa;&#xa;INPUTTIME:&#x9;  tMesh input time slice (Option 1)&#xa;&#xa;&#xa;ARCINFOFILENAME:  tMesh input file base name Arc files&#xa;&#xa;&#xa;POINTFILENAME:    tMesh input file name Points files&#xa;Input/basename.points&#xa;&#xa;&#xa;## Resampling Grids&#xa;## -----------------&#xa;&#xa;&#xa;SOILTABLENAME:    Soil parameter reference table (*.sdt)&#xa;Input/basename.sdt&#xa;&#xa;SOILMAPNAME:      Soil texture ASCII grid (*.soi)&#xa;Input/basename.soi&#xa;&#xa;LANDTABLENAME:    Land use parameter reference table (*.ldt)&#xa;Input/basename.ldt&#xa;&#xa;LANDMAPNAME:  &#x9;  Land use ASCII grid (*.lan)&#xa;Input/basename.lan&#xa;&#xa;GWATERFILE:       Ground water ASCII grid (*.iwt) &#xa;Input/basename.iwt&#xa;&#xa;RAINFILE:         Base name of the radar ASCII grid&#xa;Rain/p&#xa;&#xa;RAINEXTENSION:    Extension for the radar ASCII grid &#xa;txt&#xa;&#xa;DEPTHTOBEDROCK:   Uniform depth to bedrock (meters)&#xa;5&#xa;&#xa;BEDROCKFILE:      Bedrock depth ASCII grid (*.brd)&#xa;Input/basename.brd&#xa;&#xa;&#xa;## Meterological Data&#xa;## ------------------&#xa;&#xa;&#xa;HYDROMETSTATIONS:  Hydrometeorological station file (*.sdf)&#xa;Weather/weatherGauge.sdf&#xa;&#xa;HYDROMETGRID:  &#x9;   Hydrometeorological ASCII grid (*.gdf)&#xa;Weather/&#xa;&#xa;HYDROMETCONVERT:   Hydrometeorological data input file (*.mdi)&#xa;Weather/&#xa;&#xa;HYDROMETBASENAME:  Hydrometeorological data file (*.mdf)&#xa;Weather/weatherField&#xa;&#xa;GAUGESTATIONS: &#x9;   Rain Gauge station file (*.sdf)&#xa;Rain/rainGauge.sdf&#xa;&#xa;GAUGECONVERT:      Rain Gauge data conversion file (*.mdi)&#xa;&#xa;&#xa;GAUGEBASENAME:&#x9;   Rain Gauge data BASE name (*.mdf)&#xa;&#xa;&#xa;&#xa;## Output Data&#xa;## -----------&#xa;&#xa;&#xa;OUTFILENAME:&#x9;   Base name of the tMesh and dynamic variable output&#xa;Output/voronoi/basename&#xa;&#xa;OUTHYDROFILENAME:  Base name for hydrograph output&#xa;Output/hyd/basename&#xa;&#xa;OUTHYDROEXTENSION: Extension for hydrograph output&#xa;mrf&#xa;&#xa;RIBSHYDOUTPUT:     RIBS comp-ty: Opt 0: basin lumped quant, Opt 1: prev+curr &#xa;0&#xa;&#xa;NODEOUTPUTLIST&#xa;Input/Nodes/pNodes.dat&#xa;&#xa;HYDRONODELIST&#xa;Input/Nodes/hNodes.dat&#xa;&#xa;OUTLETNODELIST&#xa;Input/Nodes/oNodes.dat&#xa;&#xa;##=========================================================================&#xa;##&#xa;##&#xa;##&#x9;&#x9;&#x9;Section 4: Model Modes&#xa;##&#xa;##&#xa;##  FORECASTMODE:&#x9;0  No Forecasting&#x9;&#x9;&#xa;##&#x9;&#x9;&#x9;1  Single or Updating QPF Forecast&#xa;##&#x9;&#x9;&#x9;2  Persistence Forecast&#xa;## &#x9;                3  Climatological Forecast&#xa;##&#xa;##  RAINDISTRIBUTION:&#x9;0  Spatially-distributed Radar&#xa;##&#x9;&#x9;&#x9;1  Mean Areal Precipitation Radar&#xa;##&#xa;##  STOCHASTICMODE:&#x9;0  No Stochastic Mode&#x9; 4  Mean+Sine Forcing&#xa;##                      1  Mean Forcing     &#x9; 5  Random+Sine Forcing&#xa;##                      2  Random Forcing&#x9; 6  Weather Generator&#xa;##                      3  Sinusoidal Forcing&#xa;##                      &#xa;##=========================================================================&#xa;&#xa;&#xa;## Rainfall Forecasting&#xa;## --------------------&#xa;&#xa;&#xa;FORECASTMODE:&#x9;   Rainfall Forecasting Mode Option&#xa;0&#xa;&#xa;FORECASTTIME:&#x9;   Forecast Time (hours from start)&#xa;&#xa;&#xa;FORECASTLEADTIME:  Forecast Lead Time (hours) &#xa;&#xa;&#xa;FORECASTLENGTH:&#x9;   Forecast Window Length (hours)&#xa;&#xa;&#xa;FORECASTFILE:&#x9;   Base name of the radar QPF grids&#xa;&#xa;&#xa;CLIMATOLOGY:&#x9;   Rainfall climatology (mm/hr)&#xa;&#xa;&#xa;RAINDISTRIBUTION:  Distributed or MAP radar rainfall&#x9;&#xa;0&#xa;&#xa;## Stochastic Climate Forcing&#xa;## --------------------------&#xa;&#xa;STOCHASTICMODE:&#x9;   Stochastic Climate Mode Option&#xa;0&#xa;&#xa;PMEAN:&#x9;&#x9;   Mean rainfall intensity (mm/hr)&#x9;&#xa;0.0&#xa;&#xa;STDUR:&#x9;&#x9;   Mean storm duration (hours)&#xa;0.0&#xa;&#xa;ISTDUR:&#x9;&#x9;   Mean time interval between storms (hours) &#xa;0.0&#xa;&#xa;SEED:&#x9;&#x9;   Random seed&#xa;11&#xa;&#xa;PERIOD:&#x9;&#x9;   Period of variation (hours) &#xa;0&#xa;&#xa;MAXPMEAN:&#x9;   Maximum value of mean rainfall intensity (mm/hr) &#xa;0&#xa;&#xa;MAXSTDURMN:        Maximum value of mean storm duration (hours) &#xa;0&#xa;&#xa;MAXISTDURMN: &#x9;   Maximum value of mean interstorm period (hours) &#xa;0&#xa;&#xa;WEATHERTABLENAME:  File with input parameters for weather generator&#xa;Input/pramsWG.T&#xa;&#xa;##=========================================================================&#xa;##&#xa;##&#xa;##&#x9;&#x9;&#x9;End of Template.in&#xa;##&#xa;##&#xa;##========================================================================="/>
                           </Properties>
                         </Component>
                       </SubComponents>
@@ -853,11 +845,6 @@
                                 </Property>
                                 <Property name="selected" type="boolean" value="true"/>
                                 <Property name="text" type="java.lang.String" value="Mean Areal Precipitation [mm/h]"/>
-                                <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-                                  <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
-                                    <EmptyBorder bottom="0" left="0" right="0" top="0"/>
-                                  </Border>
-                                </Property>
                                 <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                                   <Insets value="[0, 0, 0, 0]"/>
                                 </Property>
@@ -875,11 +862,6 @@
                                   <Font name="Lucida Grande" size="10" style="0"/>
                                 </Property>
                                 <Property name="text" type="java.lang.String" value="Maximum Rainfall Rate [mm/h]"/>
-                                <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-                                  <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
-                                    <EmptyBorder bottom="0" left="0" right="0" top="0"/>
-                                  </Border>
-                                </Property>
                                 <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                                   <Insets value="[0, 0, 0, 0]"/>
                                 </Property>
@@ -897,11 +879,6 @@
                                   <Font name="Lucida Grande" size="10" style="0"/>
                                 </Property>
                                 <Property name="text" type="java.lang.String" value="Minimum Rainfall Rate [mm/h]"/>
-                                <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-                                  <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
-                                    <EmptyBorder bottom="0" left="0" right="0" top="0"/>
-                                  </Border>
-                                </Property>
                                 <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                                   <Insets value="[0, 0, 0, 0]"/>
                                 </Property>
@@ -919,11 +896,6 @@
                                   <Font name="Lucida Grande" size="10" style="0"/>
                                 </Property>
                                 <Property name="text" type="java.lang.String" value="Forecast State [ ]"/>
-                                <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-                                  <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
-                                    <EmptyBorder bottom="0" left="0" right="0" top="0"/>
-                                  </Border>
-                                </Property>
                                 <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                                   <Insets value="[0, 0, 0, 0]"/>
                                 </Property>
@@ -941,11 +913,6 @@
                                   <Font name="Lucida Grande" size="10" style="0"/>
                                 </Property>
                                 <Property name="text" type="java.lang.String" value="Mean Surface Soil Moisture [m^3/m^3]"/>
-                                <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-                                  <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
-                                    <EmptyBorder bottom="0" left="0" right="0" top="0"/>
-                                  </Border>
-                                </Property>
                                 <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                                   <Insets value="[0, 0, 0, 0]"/>
                                 </Property>
@@ -963,11 +930,6 @@
                                   <Font name="Lucida Grande" size="10" style="0"/>
                                 </Property>
                                 <Property name="text" type="java.lang.String" value="Mean Soil Moisture in Root Zone [m^3/m^3]"/>
-                                <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-                                  <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
-                                    <EmptyBorder bottom="0" left="0" right="0" top="0"/>
-                                  </Border>
-                                </Property>
                                 <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                                   <Insets value="[0, 0, 0, 0]"/>
                                 </Property>
@@ -985,11 +947,6 @@
                                   <Font name="Lucida Grande" size="10" style="0"/>
                                 </Property>
                                 <Property name="text" type="java.lang.String" value="Mean Soil Moisture in Unsaturated Zone [m^3/m^3]"/>
-                                <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-                                  <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
-                                    <EmptyBorder bottom="0" left="0" right="0" top="0"/>
-                                  </Border>
-                                </Property>
                                 <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                                   <Insets value="[0, 0, 0, 0]"/>
                                 </Property>
@@ -1007,11 +964,6 @@
                                   <Font name="Lucida Grande" size="10" style="0"/>
                                 </Property>
                                 <Property name="text" type="java.lang.String" value="Mean Depth to Groundwater [mm]"/>
-                                <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-                                  <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
-                                    <EmptyBorder bottom="0" left="0" right="0" top="0"/>
-                                  </Border>
-                                </Property>
                                 <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                                   <Insets value="[0, 0, 0, 0]"/>
                                 </Property>
@@ -1029,11 +981,6 @@
                                   <Font name="Lucida Grande" size="10" style="0"/>
                                 </Property>
                                 <Property name="text" type="java.lang.String" value="Mean Evapotranspiration [mm]"/>
-                                <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-                                  <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
-                                    <EmptyBorder bottom="0" left="0" right="0" top="0"/>
-                                  </Border>
-                                </Property>
                                 <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                                   <Insets value="[0, 0, 0, 0]"/>
                                 </Property>
@@ -1051,11 +998,6 @@
                                   <Font name="Lucida Grande" size="10" style="0"/>
                                 </Property>
                                 <Property name="text" type="java.lang.String" value="Areal Fraction of Surface Saturation [ ]"/>
-                                <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-                                  <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
-                                    <EmptyBorder bottom="0" left="0" right="0" top="0"/>
-                                  </Border>
-                                </Property>
                                 <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                                   <Insets value="[0, 0, 0, 0]"/>
                                 </Property>
@@ -1073,11 +1015,6 @@
                                   <Font name="Lucida Grande" size="10" style="0"/>
                                 </Property>
                                 <Property name="text" type="java.lang.String" value="Areal Fraction of Rainfall [ ]"/>
-                                <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-                                  <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
-                                    <EmptyBorder bottom="0" left="0" right="0" top="0"/>
-                                  </Border>
-                                </Property>
                                 <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                                   <Insets value="[0, 0, 0, 0]"/>
                                 </Property>
@@ -1137,11 +1074,6 @@
                                 </Property>
                                 <Property name="selected" type="boolean" value="true"/>
                                 <Property name="text" type="java.lang.String" value="Infiltration-excess Runoff"/>
-                                <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-                                  <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
-                                    <EmptyBorder bottom="0" left="0" right="0" top="0"/>
-                                  </Border>
-                                </Property>
                                 <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                                   <Insets value="[0, 0, 0, 0]"/>
                                 </Property>
@@ -1157,11 +1089,6 @@
                                 </Property>
                                 <Property name="selected" type="boolean" value="true"/>
                                 <Property name="text" type="java.lang.String" value="Saturation-excess Runoff"/>
-                                <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-                                  <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
-                                    <EmptyBorder bottom="0" left="0" right="0" top="0"/>
-                                  </Border>
-                                </Property>
                                 <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                                   <Insets value="[0, 0, 0, 0]"/>
                                 </Property>
@@ -1177,11 +1104,6 @@
                                 </Property>
                                 <Property name="selected" type="boolean" value="true"/>
                                 <Property name="text" type="java.lang.String" value="Perched Return Flow"/>
-                                <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-                                  <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
-                                    <EmptyBorder bottom="0" left="0" right="0" top="0"/>
-                                  </Border>
-                                </Property>
                                 <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                                   <Insets value="[0, 0, 0, 0]"/>
                                 </Property>
@@ -1197,11 +1119,6 @@
                                 </Property>
                                 <Property name="selected" type="boolean" value="true"/>
                                 <Property name="text" type="java.lang.String" value="Groundwater Exfiltration"/>
-                                <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-                                  <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
-                                    <EmptyBorder bottom="0" left="0" right="0" top="0"/>
-                                  </Border>
-                                </Property>
                                 <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                                   <Insets value="[0, 0, 0, 0]"/>
                                 </Property>
@@ -1273,11 +1190,6 @@
                                 </Property>
                                 <Property name="selected" type="boolean" value="true"/>
                                 <Property name="text" type="java.lang.String" value="Discharge"/>
-                                <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-                                  <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
-                                    <EmptyBorder bottom="0" left="0" right="0" top="0"/>
-                                  </Border>
-                                </Property>
                                 <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                                   <Insets value="[0, 0, 0, 0]"/>
                                 </Property>
@@ -1293,11 +1205,6 @@
                                 </Property>
                                 <Property name="selected" type="boolean" value="true"/>
                                 <Property name="text" type="java.lang.String" value="Channel stage"/>
-                                <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-                                  <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
-                                    <EmptyBorder bottom="0" left="0" right="0" top="0"/>
-                                  </Border>
-                                </Property>
                                 <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                                   <Insets value="[0, 0, 0, 0]"/>
                                 </Property>
@@ -1451,11 +1358,6 @@
                             </Property>
                             <Property name="selected" type="boolean" value="true"/>
                             <Property name="text" type="java.lang.String" value="Show Points"/>
-                            <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-                              <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
-                                <EmptyBorder bottom="0" left="0" right="0" top="0"/>
-                              </Border>
-                            </Property>
                             <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                               <Insets value="[0, 0, 0, 0]"/>
                             </Property>
@@ -1471,11 +1373,6 @@
                             </Property>
                             <Property name="selected" type="boolean" value="true"/>
                             <Property name="text" type="java.lang.String" value="Show Network"/>
-                            <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-                              <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
-                                <EmptyBorder bottom="0" left="0" right="0" top="0"/>
-                              </Border>
-                            </Property>
                             <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                               <Insets value="[0, 0, 0, 0]"/>
                             </Property>
@@ -1491,11 +1388,6 @@
                             </Property>
                             <Property name="selected" type="boolean" value="true"/>
                             <Property name="text" type="java.lang.String" value="Show Triangles"/>
-                            <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-                              <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
-                                <EmptyBorder bottom="0" left="0" right="0" top="0"/>
-                              </Border>
-                            </Property>
                             <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                               <Insets value="[0, 0, 0, 0]"/>
                             </Property>
@@ -1511,11 +1403,6 @@
                             </Property>
                             <Property name="selected" type="boolean" value="true"/>
                             <Property name="text" type="java.lang.String" value="Show Voronoi Polygons"/>
-                            <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-                              <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
-                                <EmptyBorder bottom="0" left="0" right="0" top="0"/>
-                              </Border>
-                            </Property>
                             <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                               <Insets value="[0, 0, 0, 0]"/>
                             </Property>
@@ -1531,11 +1418,6 @@
                             </Property>
                             <Property name="selected" type="boolean" value="true"/>
                             <Property name="text" type="java.lang.String" value="Show Variable Values"/>
-                            <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-                              <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
-                                <EmptyBorder bottom="0" left="0" right="0" top="0"/>
-                              </Border>
-                            </Property>
                             <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                               <Insets value="[0, 0, 0, 0]"/>
                             </Property>

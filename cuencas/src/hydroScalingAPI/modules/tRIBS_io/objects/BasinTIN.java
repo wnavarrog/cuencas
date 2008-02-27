@@ -566,7 +566,7 @@ public class BasinTIN {
             TIN_Zone=utm[0].zone;
             TIN_Hemisphere=utm[0].hemisphere_north;
 
-            System.out.println("Done Tranforming coordinates");
+            System.out.println("Done Tranforming coordinates. Your UTM ZONE is "+TIN_Zone);
 
             minX=Double.MAX_VALUE;
             minY=Double.MAX_VALUE;
