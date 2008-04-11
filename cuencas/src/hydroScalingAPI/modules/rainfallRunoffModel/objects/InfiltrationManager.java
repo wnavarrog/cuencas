@@ -185,4 +185,12 @@ public class InfiltrationManager {
         
     }
     
+    public void randomizeValues(){
+        float baseInfiltration=infiltrationValue[0];
+        for (int i = 0; i < infiltrationValue.length; i++) {
+            infiltrationValue[i]=(float)(baseInfiltration+20*Math.random());
+
+        }
+    }
+    
 }

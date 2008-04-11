@@ -320,7 +320,7 @@ public class MetaNetwork {
             java.util.Vector oneStream=(java.util.Vector)allStreams.get(i);
             float[][] riverPath=new float[2][oneStream.size()];
             System.out.println();
-            System.out.println("Stream "+(orderRequested*1e4+i+1));
+            System.out.println("Stream "+(int)(orderRequested*1e6+i+1));
             for (int j=0;j<riverPath[0].length;j++){
                 float[] riverNode=(float[])oneStream.get(j);
                 System.out.println(riverNode[0]+" "+riverNode[1]);
@@ -377,7 +377,7 @@ public class MetaNetwork {
             java.util.Vector oneStream=(java.util.Vector)allStreams.get(i);
             float[][] riverPath=new float[2][oneStream.size()];
             System.out.println();
-            System.out.println("Stream "+(orderRequested*1e4+i+1));
+            System.out.println("Stream "+(int)(orderRequested*1e6+i+1));
             for (int j=0;j<riverPath[0].length;j++){
                 float[] riverNode=(float[])oneStream.get(j);
                 System.out.println(riverNode[0]+" "+riverNode[1]);
@@ -393,15 +393,15 @@ public class MetaNetwork {
     public static void main(String[] args) {
         
         try{
-            java.io.File theFile=new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Topography/0.3_ArcSecUSGS/89883214.metaDEM");
+            java.io.File theFile=new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS/Whitewaters.metaDEM");
             hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
-            metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Topography/0.3_ArcSecUSGS/89883214.dir"));
+            metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS/Whitewaters.dir"));
         
             String formatoOriginal=metaModif.getFormat();
             metaModif.setFormat("Byte");
             byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
             
-            hydroScalingAPI.util.geomorphology.objects.Basin laCuenca=new hydroScalingAPI.util.geomorphology.objects.Basin(3187,1490,matDirs,metaModif);
+            hydroScalingAPI.util.geomorphology.objects.Basin laCuenca=new hydroScalingAPI.util.geomorphology.objects.Basin(1064,496,matDirs,metaModif);
             
             byte[][] basMask=laCuenca.getBasinMask();
 

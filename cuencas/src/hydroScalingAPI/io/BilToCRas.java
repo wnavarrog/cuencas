@@ -205,8 +205,8 @@ public class BilToCRas {
      */
     public static void main(String[] args) {
         try{
-            new hydroScalingAPI.io.BilToCRas(new java.io.File("/home/furey/basin1/25941066"),
-                                            new java.io.File("/tmp/25941066.metaDEM"),0);
+            new hydroScalingAPI.io.BilToCRas(new java.io.File("/Users/ricardo/Desktop/NED_77861520"),
+                                            new java.io.File("/tmp/"),0);
         }catch(java.io.IOException ioe){
             System.err.println("error");
             ioe.printStackTrace();

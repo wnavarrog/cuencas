@@ -26,6 +26,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 package hydroScalingAPI.util.geomorphology.objects;
 
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  * This class organizes network related information in the context of the
  * Horton-Strahler order scheme
@@ -63,18 +67,6 @@ public class HortonAnalysis extends java.lang.Object {
      */
     public int[][] tailsArray;
     
-    private String[] extenciones={".areas",
-                                  ".magn",
-                                  ".lcp",
-                                  ".dtopo",
-                                  ".ltc",
-                                  ".slopes",
-                                  ".tcd",
-                                  ".mcd",
-                                  ".corrDEM"};
-                                  
-    private int[] formatosAsoc={0,1,0,1,0,2,0,0,2}; //0:Flotantes, 1:Enteros, 2:Doubles
-
     /**
      * Creates new HortonAnalysis
      * @param bas The Basin on which the analysis is performed
@@ -306,6 +298,20 @@ public class HortonAnalysis extends java.lang.Object {
         
     }
     
+    private String[] extenciones={".areas",
+                                  ".magn",
+                                  ".lcp",
+                                  ".dtopo",
+                                  ".ltc",
+                                  ".slopes",
+                                  ".tcd",
+                                  ".mcd",
+                                  ".corrDEM",
+                                  ".gdo",
+                                  ".tdo"};
+                                  
+    private int[] formatosAsoc={0,1,0,1,0,2,0,0,2,0,1}; //0:Flotantes, 1:Enteros, 2:Doubles
+
     /**
      * Calculates an array with the values of a quantity for complete Horton streams.  Available quantities
      * are:
@@ -318,6 +324,8 @@ public class HortonAnalysis extends java.lang.Object {
      * <p>6: Total channel drop</p>
      * <p>7: Maximum channel drop</p>
      * <p>8: Channel elevation</p>
+     * <p>9: Geometric Channel Length/p>
+     * <p>10: Topologic Channel Length</p>
      * @param varToGet The variable to get
      * @throws java.io.IOException Captures errors while reading the values
      * @return A float[maxOrder][numStreamsOmega] with the values
@@ -340,23 +348,35 @@ public class HortonAnalysis extends java.lang.Object {
                 
                 switch(formatosAsoc[varToGet]){
                     case 0:
-                        fileQuantity.seek(4*contactsArray[i][j]);
-                        quantityArray[i][j]=fileQuantity.readFloat();
+                        if(varToGet == 9){
+                            fileQuantity.seek(4*headsArray[i][j]);
+                            quantityArray[i][j]=fileQuantity.readFloat();
+                            fileQuantity.seek(4*tailsArray[i][j]);
+                            quantityArray[i][j]-=fileQuantity.readFloat();
+                        } else {
+                            fileQuantity.seek(4*contactsArray[i][j]);
+                            quantityArray[i][j]=fileQuantity.readFloat();
+                        }
                         break;
                     case 1:
-                        fileQuantity.seek(4*contactsArray[i][j]);
-                        quantityArray[i][j]=(float) fileQuantity.readInt();
+                        if(varToGet == 10){
+                            if(i==0){
+                                quantityArray[i][j]=1.0f;
+                            } else {
+                                fileQuantity.seek(4*headsArray[i][j]);
+                                quantityArray[i][j]=fileQuantity.readInt();
+                                fileQuantity.seek(4*tailsArray[i][j]);
+                                quantityArray[i][j]-=fileQuantity.readInt();
+                            }
+                            
+                        } else {
+                            fileQuantity.seek(4*contactsArray[i][j]);
+                            quantityArray[i][j]=(float) fileQuantity.readInt();
+                        }
                         break;
                     case 2:
-                        if(varToGet == 8){
-                            fileQuantity.seek(8*headsArray[i][j]);
-                            quantityArray[i][j]=(float) fileQuantity.readDouble();
-                            fileQuantity.seek(8*tailsArray[i][j]);
-                            quantityArray[i][j]-=(float) fileQuantity.readDouble();
-                        } else {
-                            fileQuantity.seek(8*contactsArray[i][j]);
-                            quantityArray[i][j]=(float) fileQuantity.readDouble();
-                        }
+                        fileQuantity.seek(8*contactsArray[i][j]);
+                        quantityArray[i][j]=(float) fileQuantity.readDouble();
                         break;
                 }
                 
@@ -453,70 +473,75 @@ public class HortonAnalysis extends java.lang.Object {
      * @return A float[maxOrder][numStreamsOmega] with the values
      */
     public float[][] getLengthDistributionPerOrder(int metric){
-        //This method returns all the areas for links of order w
-        
-        byte [][] rasterNetworkMatrix=new byte[1][1];;
-        try{
-            localMetaRaster.setLocationBinaryFile(new java.io.File(localMetaRaster.getLocationBinaryFile().getPath().substring(0,localMetaRaster.getLocationBinaryFile().getPath().lastIndexOf("."))+".redRas"));
-            localMetaRaster.setFormat("Byte");
-            rasterNetworkMatrix=new hydroScalingAPI.io.DataRaster(localMetaRaster).getByte();
-        } catch (java.io.IOException IOE){
-            System.out.print("IOException at getLengthDistributionPerOrder: "+metric);
-            System.out.print(IOE);
+        try {
+
+            float[][] lengthArray = getQuantityDistributionPerOrder(9 + metric);
+
+//        byte [][] rasterNetworkMatrix=new byte[1][1];;
+//        try{
+//            localMetaRaster.setLocationBinaryFile(new java.io.File(localMetaRaster.getLocationBinaryFile().getPath().substring(0,localMetaRaster.getLocationBinaryFile().getPath().lastIndexOf("."))+".redRas"));
+//            localMetaRaster.setFormat("Byte");
+//            rasterNetworkMatrix=new hydroScalingAPI.io.DataRaster(localMetaRaster).getByte();
+//        } catch (java.io.IOException IOE){
+//            System.out.print("IOException at getLengthDistributionPerOrder: "+metric);
+//            System.out.print(IOE);
+//        }
+//        
+//        double dy = 6378.0*localMetaRaster.getResLat()*Math.PI/(3600.0*180.0);
+//        double[] dx = new double[localMetaRaster.getNumRows()+1];
+//        double[] dxy = new double[localMetaRaster.getNumRows()+1];
+//        /*Se calcula para cada fila del DEMC el valor de la distancia horizontal del pixel
+//          y la diagonal, dependiendo de la latitud.*/
+//        
+//        int numCols=localMetaRaster.getNumCols();
+//        int numRows=localMetaRaster.getNumRows();
+//        
+//        for (int i=1 ; i<=numRows ; i++){
+//            dx[i] = 6378.0*Math.cos((i*localMetaRaster.getResLat()/3600.0 + localMetaRaster.getMinLat())*Math.PI/180.0)*localMetaRaster.getResLat()*Math.PI/(3600.0*180.0);
+//            dxy[i] = Math.sqrt(dx[i]*dx[i] + dy*dy);
+//        }
+//        
+//        float[][] lengthArray=new float[basinOrder][];
+//        
+//        for (int i=0;i<lengthArray.length;i++){
+//            lengthArray[i]=new float[tailsArray[i].length];
+//            for (int j=0;j<lengthArray[i].length;j++){
+//                double rayLength=0;
+//                
+//                int upID=headsArray[i][j]; 
+//                do{
+//                    int upIDX=upID%numCols;
+//                    int upIDY=upID/numCols;
+//                    
+//                    int downIDX=upIDX-1+(fullDirMatrix[upIDY][upIDX]-1)%3;
+//                    int downIDY=upIDY-1+(fullDirMatrix[upIDY][upIDX]-1)/3;
+//                    
+//                    int downID=downIDY*numCols+downIDX;
+//                    
+//                    if (metric == 0){
+//                        rayLength+=Math.sqrt(Math.pow(dx[upIDY],2)*Math.abs(downIDX-upIDX)+Math.pow(dy,2)*Math.abs(downIDY-upIDY));
+//                    } else {
+//                        //check if a neighbor gets to me
+//                        byte endLink=0;
+//                        for (int k=0; k <= 8; k++){
+//                           int existent=(int)Math.max(0,(double)rasterNetworkMatrix[downIDY+(k/3)-1][downIDX+(k%3)-1]);
+//                           if ((existent*fullDirMatrix[downIDY+(k/3)-1][downIDX+(k%3)-1]) == 9-k){
+//                               endLink++;
+//                           }
+//                       }
+//                       rayLength+=((endLink>1)?1:0);
+//                    }
+//                    upID=downID;
+//                } while(upID != tailsArray[i][j]);
+//                lengthArray[i][j]=(float)rayLength;
+//            }
+//            
+//        }
+            return lengthArray;
+        } catch (IOException ex) {
+            Logger.getLogger(HortonAnalysis.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        double dy = 6378.0*localMetaRaster.getResLat()*Math.PI/(3600.0*180.0);
-        double[] dx = new double[localMetaRaster.getNumRows()+1];
-        double[] dxy = new double[localMetaRaster.getNumRows()+1];
-        /*Se calcula para cada fila del DEMC el valor de la distancia horizontal del pixel
-          y la diagonal, dependiendo de la latitud.*/
-        
-        int numCols=localMetaRaster.getNumCols();
-        int numRows=localMetaRaster.getNumRows();
-        
-        for (int i=1 ; i<=numRows ; i++){
-            dx[i] = 6378.0*Math.cos((i*localMetaRaster.getResLat()/3600.0 + localMetaRaster.getMinLat())*Math.PI/180.0)*localMetaRaster.getResLat()*Math.PI/(3600.0*180.0);
-            dxy[i] = Math.sqrt(dx[i]*dx[i] + dy*dy);
-        }
-        
-        float[][] lengthArray=new float[basinOrder][];
-        
-        for (int i=0;i<lengthArray.length;i++){
-            lengthArray[i]=new float[tailsArray[i].length];
-            for (int j=0;j<lengthArray[i].length;j++){
-                double rayLength=0;
-                
-                int upID=headsArray[i][j]; 
-                do{
-                    int upIDX=upID%numCols;
-                    int upIDY=upID/numCols;
-                    
-                    int downIDX=upIDX-1+(fullDirMatrix[upIDY][upIDX]-1)%3;
-                    int downIDY=upIDY-1+(fullDirMatrix[upIDY][upIDX]-1)/3;
-                    
-                    int downID=downIDY*numCols+downIDX;
-                    
-                    if (metric == 0){
-                        rayLength+=Math.sqrt(Math.pow(dx[upIDY],2)*Math.abs(downIDX-upIDX)+Math.pow(dy,2)*Math.abs(downIDY-upIDY));
-                    } else {
-                        //check if a neighbor gets to me
-                        byte endLink=0;
-                        for (int k=0; k <= 8; k++){
-                           int existent=(int)Math.max(0,(double)rasterNetworkMatrix[downIDY+(k/3)-1][downIDX+(k%3)-1]);
-                           if ((existent*fullDirMatrix[downIDY+(k/3)-1][downIDX+(k%3)-1]) == 9-k){
-                               endLink++;
-                           }
-                       }
-                       rayLength+=((endLink>1)?1:0);
-                    }
-                    upID=downID;
-                } while(upID != tailsArray[i][j]);
-                lengthArray[i][j]=(float)rayLength;
-            }
-            
-        }
-        
-        return lengthArray;
+        return null;
     }
     
     /**
@@ -584,23 +609,27 @@ public class HortonAnalysis extends java.lang.Object {
         
         try{
             
-            java.io.File theFile=new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Topography/0.3_ArcSecUSGS/89883214.metaDEM");
+            java.io.File theFile=new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS/Whitewaters.metaDEM");
             hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
-            metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Topography/0.3_ArcSecUSGS/89883214.dir"));
+            metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS/Whitewaters.dir"));
         
             String formatoOriginal=metaModif.getFormat();
             metaModif.setFormat("Byte");
             byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
             
-            hydroScalingAPI.util.geomorphology.objects.Basin laCuenca=new hydroScalingAPI.util.geomorphology.objects.Basin(3083,1688,matDirs,metaModif);
+            hydroScalingAPI.util.geomorphology.objects.Basin laCuenca=new hydroScalingAPI.util.geomorphology.objects.Basin(1064,496,matDirs,metaModif);
             
             HortonAnalysis myResults=new HortonAnalysis(laCuenca, metaModif, matDirs);
             
-            metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Topography/0.3_ArcSecUSGS/89883214.dem"));
+            metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS/Whitewaters.dem"));
             metaModif.restoreOriginalFormat();
             float[][] myDEM=new hydroScalingAPI.io.DataRaster(metaModif).getFloat();
             
-            for (int i=1;i< myResults.contactsArray.length;i++){
+            float[][] myAreas=myResults.getQuantityDistributionPerOrder(0);
+            float[][] myLenghts=myResults.getLengthDistributionPerOrder(0);
+            
+            
+            for (int i=0;i< myResults.contactsArray.length;i++){
                 int k=1;
                 //System.out.println("Order "+(i+1));
                 for (int j=0;j< myResults.contactsArray[i].length;j++){
@@ -611,8 +640,8 @@ public class HortonAnalysis extends java.lang.Object {
                     double resultX=upIDX*metaModif.getResLon()/3600.0+metaModif.getMinLon();
                     double resultY=upIDY*metaModif.getResLat()/3600.0+metaModif.getMinLat();
                     
-                    //System.out.println("O"+(i+1)+(new Float((float)k/10000.+0.000001).toString().substring(2,6))+" N"+hydroScalingAPI.tools.DegreesToDMS.getprettyString(resultY,0)+" W"+hydroScalingAPI.tools.DegreesToDMS.getprettyString(resultX,1)+" "+myDEM[upIDY][upIDX]);
-                    System.out.println((i+1)+dpoint2.format(new Double((double)k/10000.0)).substring(2,6)+"B\t"+resultY+"\t"+resultX+"\t"+myDEM[upIDY][upIDX]);
+                    System.out.println((int)((i+1)*1e6+(j+1))+","+hydroScalingAPI.tools.DegreesToDMS.getprettyString(resultY,0)+","+hydroScalingAPI.tools.DegreesToDMS.getprettyString(resultX,1)+","+myDEM[upIDY][upIDX]+","+myAreas[i][j]+","+myLenghts[i][j]);
+                    //System.out.println((i+1)+dpoint2.format(new Double((double)k/10000.0)).substring(2,6)+"B\t"+resultY+"\t"+resultX+"\t"+myDEM[upIDY][upIDX]);
                     
                     upIDX=myResults.headsArray[i][j]%metaModif.getNumCols();
                     upIDY=myResults.headsArray[i][j]/metaModif.getNumCols();
@@ -621,11 +650,10 @@ public class HortonAnalysis extends java.lang.Object {
                     resultY=upIDY*metaModif.getResLat()/3600.0+metaModif.getMinLat();
                     
                     //System.out.println("O"+(i+1)+(new Float((float)k/10000.+0.000001).toString().substring(2,6))+" N"+hydroScalingAPI.tools.DegreesToDMS.getprettyString(resultY,0)+" W"+hydroScalingAPI.tools.DegreesToDMS.getprettyString(resultX,1)+" "+myDEM[upIDY][upIDX]);
-                    System.out.println((i+1)+dpoint2.format(new Double((double)k/10000.0)).substring(2,6)+"T\t"+resultY+"\t"+resultX+"\t"+myDEM[upIDY][upIDX]);
+                    //System.out.println((i+1)+dpoint2.format(new Double((double)k/10000.0)).substring(2,6)+"T\t"+resultY+"\t"+resultX+"\t"+myDEM[upIDY][upIDX]);
                     
                     k++;
                     
-                    System.exit(0);
                 }
             }
                 

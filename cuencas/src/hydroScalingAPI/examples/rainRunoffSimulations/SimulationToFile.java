@@ -68,9 +68,11 @@ public class SimulationToFile extends java.lang.Object {
         
         float lam1=((Float)routingParams.get("lambda1")).floatValue();
         float lam2=((Float)routingParams.get("lambda2")).floatValue();
-        
-        thisNetworkGeom.setVqParams(1.0f,0.0f,lam1,lam2);
-        
+
+        float v_o=(float)(1.0/Math.pow(200,lam1)/Math.pow(1100,lam2));
+
+        thisNetworkGeom.setVqParams(v_o,0.0f,lam1,lam2);
+
         int linkID=0;
         
         /*
@@ -150,6 +152,9 @@ public class SimulationToFile extends java.lang.Object {
             infilMan=new hydroScalingAPI.modules.rainfallRunoffModel.objects.InfiltrationManager(myCuenca,linksStructure,infiltMetaRaster,matDir,magnitudes);
         
         thisHillsInfo.setInfManager(infilMan);
+        
+        infilMan.randomizeValues();
+        
         
             /*
                 Escribo en un theFile lo siguiente:
@@ -327,7 +332,7 @@ public class SimulationToFile extends java.lang.Object {
         
         for (int k=0;k<numPeriods;k++) {
             System.out.println("Period "+(k+1)+" of "+numPeriods);
-            rainRunoffRaining.jumpsRunToFile(storm.stormInitialTimeInMinutes()+k*storm.stormRecordResolutionInMinutes(),storm.stormInitialTimeInMinutes()+(k+1)*storm.stormRecordResolutionInMinutes(),20,initialCondition,newfile);
+            rainRunoffRaining.jumpsRunToFile(storm.stormInitialTimeInMinutes()+k*storm.stormRecordResolutionInMinutes(),storm.stormInitialTimeInMinutes()+(k+1)*storm.stormRecordResolutionInMinutes(),storm.stormRecordResolutionInMinutes()/1.0f,initialCondition,newfile);
             initialCondition=rainRunoffRaining.finalCond;
             rainRunoffRaining.setBasicTimeStep(30/60.);
         }
@@ -335,7 +340,7 @@ public class SimulationToFile extends java.lang.Object {
         System.out.println("Intermedia Time:"+interTime.toString());
         System.out.println("Running Time:"+(.001*(interTime.getTime()-startTime.getTime()))+" seconds");
         
-        rainRunoffRaining.jumpsRunToFile(storm.stormInitialTimeInMinutes()+numPeriods*storm.stormRecordResolutionInMinutes(),(storm.stormInitialTimeInMinutes()+(numPeriods+1)*storm.stormRecordResolutionInMinutes())+90,30,initialCondition,newfile);
+        rainRunoffRaining.jumpsRunToFile(storm.stormInitialTimeInMinutes()+numPeriods*storm.stormRecordResolutionInMinutes(),(storm.stormInitialTimeInMinutes()+(numPeriods+1)*storm.stormRecordResolutionInMinutes())+3000,10,initialCondition,newfile);
         
         System.out.println("Termina simulacion RKF");
         java.util.Date endTime=new java.util.Date();
@@ -388,7 +393,7 @@ public class SimulationToFile extends java.lang.Object {
         try{
             
             //Uniform Rain
-            //subMain1(args);  //The test case for Whitewater
+            subMain1(args);  //The test case for Whitewater
             //subMain3(args);  //The test case for Walnut Gulch 30m
             //subMain4(args);   //The test case for TestDem
             //subMain5(args);   //The Man-Vis Tree
@@ -401,7 +406,7 @@ public class SimulationToFile extends java.lang.Object {
             //subMain2(args);   //using constant infiltration in space
             //subMain7(args);   //using a map to set infiltration values
             //subMain10(args);     //Simulations for Upper Rio Puerco Using Nexrad
-            subMain11(args);     //Simulations for Mogollon Basin Using Nexrad
+            //subMain11(args);     //Simulations for Mogollon Basin Using Nexrad
         } catch (java.io.IOException IOE){
             System.out.print(IOE);
             System.exit(0);
@@ -416,9 +421,9 @@ public class SimulationToFile extends java.lang.Object {
     
     public static void subMain1(String args[]) throws java.io.IOException, VisADException {
         
-        java.io.File theFile=new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS/Whitewaters.metaDEM");
+        java.io.File theFile=new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS_2005/Whitewaters.metaDEM");
         hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
-        metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS/Whitewaters.dir"));
+        metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS_2005/Whitewaters.dir"));
 
         //java.io.File theFile=new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Topography/0.3_ArcSecUSGS/89883214.metaDEM");
         //hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
@@ -463,11 +468,54 @@ public class SimulationToFile extends java.lang.Object {
         routingParams.put("chezyCoeff",14.2f);
         routingParams.put("chezyExponent",-1/3.0f);
         
-        routingParams.put("lambda1",0.2f);
-        routingParams.put("lambda2",-0.1f);
+        routingParams.put("lambda1",3.0f);
+        routingParams.put("lambda2",1.0f);
         
-        stormFile=new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Hydrology/storms/simulRain/prec.metaVHC");
-        new SimulationToFile(1064,496,matDirs,magnitudes,metaModif,stormFile,0.0f,2,routingParams);
+//        stormFile=new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Hydrology/storms/simulated_events/uniform_004_180.metaVHC");
+//        new SimulationToFile(1063,496,matDirs,magnitudes,metaModif,stormFile,0.0f,2,routingParams);
+//        stormFile=new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Hydrology/storms/simulated_events/uniform_006_120.metaVHC");
+//        new SimulationToFile(1063,496,matDirs,magnitudes,metaModif,stormFile,0.0f,2,routingParams);
+//        stormFile=new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Hydrology/storms/simulated_events/uniform_012_060.metaVHC");
+//        new SimulationToFile(1063,496,matDirs,magnitudes,metaModif,stormFile,0.0f,2,routingParams);
+//        stormFile=new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Hydrology/storms/simulated_events/uniform_024_030.metaVHC");
+//        new SimulationToFile(1063,496,matDirs,magnitudes,metaModif,stormFile,0.0f,2,routingParams);
+//        stormFile=new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Hydrology/storms/simulated_events/uniform_048_015.metaVHC");
+//        new SimulationToFile(1063,496,matDirs,magnitudes,metaModif,stormFile,0.0f,2,routingParams);
+//        stormFile=new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Hydrology/storms/simulated_events/uniform_072_010.metaVHC");
+//        new SimulationToFile(1063,496,matDirs,magnitudes,metaModif,stormFile,0.0f,2,routingParams);
+//        stormFile=new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Hydrology/storms/simulated_events/uniform_144_005.metaVHC");
+//        new SimulationToFile(1063,496,matDirs,magnitudes,metaModif,stormFile,0.0f,2,routingParams);
+//        stormFile=new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Hydrology/storms/simulated_events/uniform_720_001.metaVHC");
+//        new SimulationToFile(1063,496,matDirs,magnitudes,metaModif,stormFile,0.0f,2,routingParams);
+        
+//        stormFile=new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Hydrology/storms/simulated_events/uniform_050_120.metaVHC");
+//        new SimulationToFile(1063,496,matDirs,magnitudes,metaModif,stormFile,0.0f,5,routingParams);
+        
+//        routingParams.put("lambda1",1.0f);
+//        routingParams.put("lambda2",1.0f);
+//
+//        stormFile=new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Hydrology/storms/simulated_events/double_020_040_120.metaVHC");
+//        new SimulationToFile(1063,496,matDirs,magnitudes,metaModif,stormFile,0.0f,2,routingParams);
+
+        routingParams.put("lambda1",40.0f);
+        
+        for (float i = 31; i <= 40; i++) {
+
+            routingParams.put("lambda2",i);
+
+            stormFile=new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Hydrology/storms/simulated_events/uniform_050_120.metaVHC");
+            new SimulationToFile(1063,496,matDirs,magnitudes,metaModif,stormFile,40.0f,2,routingParams);
+
+        }
+        
+//        int lam1=3;
+//        int lam2=5;
+//        
+//        routingParams.put("lambda1",(float)lam1);
+//        routingParams.put("lambda2",(float)lam2);
+//
+//        stormFile=new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Hydrology/storms/simulRain/Scenario4/Case"+lam2+"/prec.metaVHC");
+//        new SimulationToFile(1063,496,matDirs,magnitudes,metaModif,stormFile,0.0f,2,routingParams);
 
     }
     

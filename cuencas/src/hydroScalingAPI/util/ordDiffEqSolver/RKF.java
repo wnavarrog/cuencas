@@ -319,8 +319,8 @@ public class RKF extends java.lang.Object {
      */
     public void jumpsRunToFile(double iniTime, double finalTime, double incrementalTime, double[] IC, java.io.DataOutputStream outputStream) throws java.io.IOException {
         
-        outputStream.writeInt((int) Math.round((finalTime-iniTime)/incrementalTime)+1);
-        System.out.println(((int) Math.round((finalTime-iniTime)/incrementalTime)+1));
+        outputStream.writeInt((int) Math.ceil((finalTime-iniTime)/incrementalTime)+1);
+        System.out.println(((int) Math.ceil((finalTime-iniTime)/incrementalTime)+1));
         double currentTime=iniTime,targetTime;
         
         outputStream.writeDouble(currentTime);
