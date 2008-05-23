@@ -38,13 +38,16 @@ public class SimulationToFile extends java.lang.Object {
     private byte[][] matDir;
     
     /** Creates new simulationsRep3 */
+    public SimulationToFile(int x, int y, byte[][] direcc, int[][] magnitudes, hydroScalingAPI.io.MetaRaster md, float rainIntensity, float rainDuration, float infiltRate, int routingType,java.util.Hashtable routingParams) throws java.io.IOException, VisADException{
+        this(x,y,direcc,magnitudes,md,rainIntensity,rainDuration,null,null,infiltRate,routingType,routingParams);
+    }
     public SimulationToFile(int x, int y, byte[][] direcc, int[][] magnitudes, hydroScalingAPI.io.MetaRaster md, java.io.File stormFile, hydroScalingAPI.io.MetaRaster infiltMetaRaster, int routingType,java.util.Hashtable routingParams) throws java.io.IOException, VisADException{
-        this(x,y,direcc,magnitudes,md,stormFile,infiltMetaRaster,0.0f,routingType,routingParams);
+        this(x,y,direcc,magnitudes,md,0.0f,0.0f,stormFile,infiltMetaRaster,0.0f,routingType,routingParams);
     }
     public SimulationToFile(int x, int y, byte[][] direcc, int[][] magnitudes, hydroScalingAPI.io.MetaRaster md, java.io.File stormFile, float infiltRate, int routingType,java.util.Hashtable routingParams) throws java.io.IOException, VisADException{
-        this(x,y,direcc,magnitudes,md,stormFile,null,infiltRate,routingType,routingParams);
+        this(x,y,direcc,magnitudes,md,0.0f,0.0f,stormFile,null,infiltRate,routingType,routingParams);
     }
-    public SimulationToFile(int x, int y, byte[][] direcc, int[][] magnitudes, hydroScalingAPI.io.MetaRaster md, java.io.File stormFile, hydroScalingAPI.io.MetaRaster infiltMetaRaster,float infiltRate, int routingType,java.util.Hashtable routingParams) throws java.io.IOException, VisADException{
+    public SimulationToFile(int x, int y, byte[][] direcc, int[][] magnitudes, hydroScalingAPI.io.MetaRaster md, float rainIntensity, float rainDuration, java.io.File stormFile, hydroScalingAPI.io.MetaRaster infiltMetaRaster,float infiltRate, int routingType,java.util.Hashtable routingParams) throws java.io.IOException, VisADException{
         
         matDir=direcc;
         metaDatos=md;
@@ -69,7 +72,7 @@ public class SimulationToFile extends java.lang.Object {
         float lam1=((Float)routingParams.get("lambda1")).floatValue();
         float lam2=((Float)routingParams.get("lambda2")).floatValue();
 
-        float v_o=(float)(1.0/Math.pow(200,lam1)/Math.pow(1100,lam2));
+        float v_o=(float)(2.5/Math.pow(200,lam1)/Math.pow(1100,lam2));
 
         thisNetworkGeom.setVqParams(v_o,0.0f,lam1,lam2);
 
@@ -139,7 +142,12 @@ public class SimulationToFile extends java.lang.Object {
         System.out.println("Loading Storm ...");
         
         hydroScalingAPI.modules.rainfallRunoffModel.objects.StormManager storm;
-        storm=new hydroScalingAPI.modules.rainfallRunoffModel.objects.StormManager(stormFile,myCuenca,linksStructure,metaDatos,matDir,magnitudes);
+        
+        if(stormFile == null)
+            storm=new hydroScalingAPI.modules.rainfallRunoffModel.objects.StormManager(linksStructure,rainIntensity,rainDuration);
+        else
+            storm=new hydroScalingAPI.modules.rainfallRunoffModel.objects.StormManager(stormFile,myCuenca,linksStructure,metaDatos,matDir,magnitudes);
+        
         if (!storm.isCompleted()) return;
         
         thisHillsInfo.setStormManager(storm);
@@ -153,7 +161,7 @@ public class SimulationToFile extends java.lang.Object {
         
         thisHillsInfo.setInfManager(infilMan);
         
-        infilMan.randomizeValues();
+        //infilMan.randomizeValues();
         
         
             /*
@@ -468,8 +476,11 @@ public class SimulationToFile extends java.lang.Object {
         routingParams.put("chezyCoeff",14.2f);
         routingParams.put("chezyExponent",-1/3.0f);
         
-        routingParams.put("lambda1",3.0f);
-        routingParams.put("lambda2",1.0f);
+        routingParams.put("lambda1",0.3f);
+        routingParams.put("lambda2",-0.1f);
+
+        new SimulationToFile(1063,496,matDirs,magnitudes,metaModif,2,60,0.0f,5,routingParams);
+        
         
 //        stormFile=new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Hydrology/storms/simulated_events/uniform_004_180.metaVHC");
 //        new SimulationToFile(1063,496,matDirs,magnitudes,metaModif,stormFile,0.0f,2,routingParams);
@@ -497,16 +508,16 @@ public class SimulationToFile extends java.lang.Object {
 //        stormFile=new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Hydrology/storms/simulated_events/double_020_040_120.metaVHC");
 //        new SimulationToFile(1063,496,matDirs,magnitudes,metaModif,stormFile,0.0f,2,routingParams);
 
-        routingParams.put("lambda1",40.0f);
-        
-        for (float i = 31; i <= 40; i++) {
-
-            routingParams.put("lambda2",i);
-
-            stormFile=new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Hydrology/storms/simulated_events/uniform_050_120.metaVHC");
-            new SimulationToFile(1063,496,matDirs,magnitudes,metaModif,stormFile,40.0f,2,routingParams);
-
-        }
+//        routingParams.put("lambda1",10.0f);
+//        
+//        for (float i = 39; i <= 39; i++) {
+//
+//            routingParams.put("lambda2",i);
+//
+//            stormFile=new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Hydrology/storms/simulated_events/uniform_050_120.metaVHC");
+//            new SimulationToFile(1063,496,matDirs,magnitudes,metaModif,stormFile,0.0f,2,routingParams);
+//
+//        }
         
 //        int lam1=3;
 //        int lam2=5;

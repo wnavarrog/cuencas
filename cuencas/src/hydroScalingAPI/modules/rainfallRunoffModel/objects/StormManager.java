@@ -48,6 +48,8 @@ public class StormManager {
     
     private double recordResolutionInMinutes;
     
+    private String thisStormName;
+    
     /**
      * Creates a new instance of StormManager (with constant rainfall rate
      * over the basin during a given period of time)
@@ -71,6 +73,9 @@ public class StormManager {
         }
         
         recordResolutionInMinutes=rainDuration;
+        
+        thisStormName="UniformEvent_INT_"+rainIntensity+"_DUR_"+rainDuration;
+        
         success=true;
        
     }
@@ -87,6 +92,7 @@ public class StormManager {
      * @param magnitudes The magnitudes matrix of the DEM that contains the basin
      */
     public StormManager(java.io.File locFile, hydroScalingAPI.util.geomorphology.objects.Basin myCuenca, hydroScalingAPI.util.geomorphology.objects.LinksAnalysis linksStructure, hydroScalingAPI.io.MetaRaster metaDatos, byte[][] matDir, int[][] magnitudes) {
+        
         
         java.io.File directorio=locFile.getParentFile();
         String baseName=locFile.getName().substring(0,locFile.getName().lastIndexOf("."));
@@ -112,6 +118,10 @@ public class StormManager {
         try{
             
             metaStorm=new hydroScalingAPI.io.MetaRaster(locFile);
+            
+            thisStormName=metaStorm.getLocationBinaryFile().getName().substring(0,metaStorm.getLocationBinaryFile().getName().lastIndexOf("."));
+
+            
             /****** OJO QUE ACA PUEDE HABER UN ERROR (POR LA CUESTION DE LA COBERTURA DEL MAPA SOBRE LA CUENCA)*****************/
             if (metaStorm.getMinLon() > metaDatos.getMinLon()+myCuenca.getMinX()*metaDatos.getResLon()/3600.0 ||
                 metaStorm.getMinLat() > metaDatos.getMinLat()+myCuenca.getMinY()*metaDatos.getResLat()/3600.0 ||
@@ -294,7 +304,7 @@ public class StormManager {
      * @return A String that describes this storm
      */
     public String stormName(){
-        return metaStorm.getLocationBinaryFile().getName().substring(0,metaStorm.getLocationBinaryFile().getName().lastIndexOf("."));
+        return thisStormName;
     }
     
     /**
