@@ -758,7 +758,18 @@ public class Rainfall_Runoff_Model extends javax.swing.JDialog implements Displa
         System.setOut(redirect);
 
         try{
-            Thread t1 = new Thread(new hydroScalingAPI.examples.rainRunoffSimulations.SimulationToAsciiFile(xOulet,yOulet,matDir,magnitudes,metaDatos,rainIntensityValue,rainDurationValue,0.0f,1,selectedFile));
+            java.util.Hashtable routingParams=new java.util.Hashtable();
+            routingParams.put("widthCoeff",1.0f);
+            routingParams.put("widthExponent",0.4f);
+            routingParams.put("widthStdDev",0.0f);
+
+            routingParams.put("chezyCoeff",14.2f);
+            routingParams.put("chezyExponent",-1/3.0f);
+
+            routingParams.put("lambda1",0.5f);
+            routingParams.put("lambda2",-0.1f);
+        
+            Thread t1 = new Thread(new hydroScalingAPI.examples.rainRunoffSimulations.SimulationToAsciiFile(xOulet,yOulet,matDir,magnitudes,metaDatos,rainIntensityValue,rainDurationValue,0.0f,1,selectedFile,routingParams));
             t1.start();
         } catch(java.io.IOException ioe){
             System.err.println(ioe);
@@ -798,7 +809,19 @@ public class Rainfall_Runoff_Model extends javax.swing.JDialog implements Displa
         xOulet=myCuenca.getOutletID()%metaDatos.getNumCols();
         yOulet=myCuenca.getOutletID()/metaDatos.getNumCols();
         try{
-        new hydroScalingAPI.examples.rainRunoffSimulations.SimulationToAsciiFile(xOulet,yOulet,matDir,magnitudes,metaDatos,locFile,0.0f,2,selectedFile);
+            java.util.Hashtable routingParams=new java.util.Hashtable();
+            routingParams.put("widthCoeff",1.0f);
+            routingParams.put("widthExponent",0.4f);
+            routingParams.put("widthStdDev",0.0f);
+
+            routingParams.put("chezyCoeff",14.2f);
+            routingParams.put("chezyExponent",-1/3.0f);
+
+            routingParams.put("lambda1",0.5f);
+            routingParams.put("lambda2",-0.1f);
+        
+            
+            new hydroScalingAPI.examples.rainRunoffSimulations.SimulationToAsciiFile(xOulet,yOulet,matDir,magnitudes,metaDatos,locFile,0.0f,2,selectedFile,routingParams);
         } catch(java.io.IOException ioe){
             System.err.println(ioe);
             return;
@@ -838,7 +861,18 @@ public class Rainfall_Runoff_Model extends javax.swing.JDialog implements Displa
         System.setOut(redirect);
 
         try{
-            Thread t1 = new Thread(new hydroScalingAPI.examples.rainRunoffSimulations.SimulationToAsciiFile(xOulet,yOulet,matDir,magnitudes,metaDatos,rainIntensityValue,rainDurationValue,0.0f,2,selectedFile));
+            java.util.Hashtable routingParams=new java.util.Hashtable();
+            routingParams.put("widthCoeff",1.0f);
+            routingParams.put("widthExponent",0.4f);
+            routingParams.put("widthStdDev",0.0f);
+
+            routingParams.put("chezyCoeff",14.2f);
+            routingParams.put("chezyExponent",-1/3.0f);
+
+            routingParams.put("lambda1",0.5f);
+            routingParams.put("lambda2",-0.1f);
+        
+            Thread t1 = new Thread(new hydroScalingAPI.examples.rainRunoffSimulations.SimulationToAsciiFile(xOulet,yOulet,matDir,magnitudes,metaDatos,rainIntensityValue,rainDurationValue,0.0f,2,selectedFile,routingParams));
             t1.start();
         } catch(java.io.IOException ioe){
             System.err.println(ioe);

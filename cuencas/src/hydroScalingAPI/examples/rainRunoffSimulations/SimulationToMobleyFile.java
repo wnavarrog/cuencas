@@ -357,7 +357,7 @@ public class SimulationToMobleyFile extends java.lang.Object {
         hydroScalingAPI.mainGUI.ParentGUI tempFrame=new hydroScalingAPI.mainGUI.ParentGUI();
         
         //new SimulationToAsciiFile(44,111,matDirs,magnitudes,metaModif,0,1,0.0f,0,new java.io.File("/tmp/"));
-        new SimulationToAsciiFile(8,8,matDirs,magnitudes,metaModif,0,1,0.0f,2,new java.io.File("/tmp/"));
+        new SimulationToMobleyFile(8,8,matDirs,magnitudes,metaModif,0,1,0.0f,2,new java.io.File("/tmp/"));
         
         System.exit(0);
         
@@ -372,10 +372,10 @@ public class SimulationToMobleyFile extends java.lang.Object {
         
         java.io.File stormFile;
         stormFile=new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Hydrology/storms/precipitation_events/event_06/precipitation_interpolated_ev06.metaVHC");
-        new SimulationToAsciiFile(777, 324,matDirs,magnitudes,metaModif,stormFile,0.0f,0,new java.io.File("/tmp/"));
+        new SimulationToMobleyFile(777, 324,matDirs,magnitudes,metaModif,stormFile,0.0f,0,new java.io.File("/tmp/"));
         
         stormFile=new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Hydrology/storms/precipitation_events/event_10/precipitation_interpolated_ev10.metaVHC");
-        new SimulationToAsciiFile(777, 324,matDirs,magnitudes,metaModif,stormFile,0.0f,0,new java.io.File("/tmp/"));
+        new SimulationToMobleyFile(777, 324,matDirs,magnitudes,metaModif,stormFile,0.0f,0,new java.io.File("/tmp/"));
         
     }
         

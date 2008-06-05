@@ -476,10 +476,10 @@ public class SimulationToFile extends java.lang.Object {
         routingParams.put("chezyCoeff",14.2f);
         routingParams.put("chezyExponent",-1/3.0f);
         
-        routingParams.put("lambda1",0.3f);
+        routingParams.put("lambda1",0.5f);
         routingParams.put("lambda2",-0.1f);
 
-        new SimulationToFile(1063,496,matDirs,magnitudes,metaModif,2,60,0.0f,5,routingParams);
+        new SimulationToFile(1063,496,matDirs,magnitudes,metaModif,50,30,0.0f,5,routingParams);
         
         
 //        stormFile=new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Hydrology/storms/simulated_events/uniform_004_180.metaVHC");
