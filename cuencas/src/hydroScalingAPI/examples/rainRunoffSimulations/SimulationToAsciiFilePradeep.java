@@ -252,7 +252,7 @@ public class SimulationToAsciiFilePradeep extends java.lang.Object implements Ru
         System.out.println("Number of Links on this simulation: "+(initialCondition.length/2.0));
         System.out.println("Inicia simulacion RKF");
         
-        hydroScalingAPI.util.ordDiffEqSolver.RKFPradeep rainRunoffRaining=new hydroScalingAPI.util.ordDiffEqSolver.RKFPradeep(thisBasinEqSys,1e-3,10/60.);
+        hydroScalingAPI.util.ordDiffEqSolver.RKF rainRunoffRaining=new hydroScalingAPI.util.ordDiffEqSolver.RKF(thisBasinEqSys,1e-3,10/60.);
         
         int numPeriods = 1;
         
@@ -268,7 +268,7 @@ public class SimulationToAsciiFilePradeep extends java.lang.Object implements Ru
         if(stormFile == null){
             for (int k=0;k<numPeriods;k++) {
                 System.out.println("Period"+(k)+" out of "+numPeriods);
-                rainRunoffRaining.jumpsRunToAsciiFile(storm.stormInitialTimeInMinutes()+k*rainDuration,storm.stormInitialTimeInMinutes()+(k+1)*rainDuration,rainDuration,initialCondition,newfile,linksStructure,thisNetworkGeom);
+                rainRunoffRaining.jumpsRunToAsciiFileTabs(storm.stormInitialTimeInMinutes()+k*rainDuration,storm.stormInitialTimeInMinutes()+(k+1)*rainDuration,rainDuration,initialCondition,newfile,linksStructure,thisNetworkGeom);
                 //rainRunoffRaining.jumpsRunToAsciiFile(storm.stormInitialTimeInMinutes()+k*rainDuration,storm.stormInitialTimeInMinutes()+(k+1)*rainDuration,10,initialCondition,newfile,linksStructure,thisNetworkGeom);
                 initialCondition=rainRunoffRaining.finalCond;
                 rainRunoffRaining.setBasicTimeStep(10/60.);
@@ -277,12 +277,12 @@ public class SimulationToAsciiFilePradeep extends java.lang.Object implements Ru
             java.util.Date interTime=new java.util.Date();
             System.out.println("Intermedia Time:"+interTime.toString());
             System.out.println("Running Time:"+(.001*(interTime.getTime()-startTime.getTime()))+" seconds");
-            rainRunoffRaining.jumpsRunToAsciiFile(storm.stormInitialTimeInMinutes()+numPeriods*rainDuration,(storm.stormInitialTimeInMinutes()+(numPeriods+1)*rainDuration)+8000,2,initialCondition,newfile,linksStructure,thisNetworkGeom);
+            rainRunoffRaining.jumpsRunToAsciiFileTabs(storm.stormInitialTimeInMinutes()+numPeriods*rainDuration,(storm.stormInitialTimeInMinutes()+(numPeriods+1)*rainDuration)+8000,2,initialCondition,newfile,linksStructure,thisNetworkGeom);
             
         } else {
             for (int k=0;k<numPeriods;k++) {
                 System.out.println("Period "+(k+1)+" of "+numPeriods);
-                rainRunoffRaining.jumpsRunToAsciiFile(storm.stormInitialTimeInMinutes()+k*storm.stormRecordResolutionInMinutes(),storm.stormInitialTimeInMinutes()+(k+1)*storm.stormRecordResolutionInMinutes(),1,initialCondition,newfile,linksStructure,thisNetworkGeom);
+                rainRunoffRaining.jumpsRunToAsciiFileTabs(storm.stormInitialTimeInMinutes()+k*storm.stormRecordResolutionInMinutes(),storm.stormInitialTimeInMinutes()+(k+1)*storm.stormRecordResolutionInMinutes(),1,initialCondition,newfile,linksStructure,thisNetworkGeom);
                 initialCondition=rainRunoffRaining.finalCond;
                 rainRunoffRaining.setBasicTimeStep(10/60.);
             }
@@ -291,7 +291,7 @@ public class SimulationToAsciiFilePradeep extends java.lang.Object implements Ru
             System.out.println("Intermedia Time:"+interTime.toString());
             System.out.println("Running Time:"+(.001*(interTime.getTime()-startTime.getTime()))+" seconds");
             
-            rainRunoffRaining.jumpsRunToAsciiFile(storm.stormInitialTimeInMinutes()+numPeriods*storm.stormRecordResolutionInMinutes(),(storm.stormInitialTimeInMinutes()+(numPeriods+1)*storm.stormRecordResolutionInMinutes())+8000,5,initialCondition,newfile,linksStructure,thisNetworkGeom);
+            rainRunoffRaining.jumpsRunToAsciiFileTabs(storm.stormInitialTimeInMinutes()+numPeriods*storm.stormRecordResolutionInMinutes(),(storm.stormInitialTimeInMinutes()+(numPeriods+1)*storm.stormRecordResolutionInMinutes())+8000,5,initialCondition,newfile,linksStructure,thisNetworkGeom);
         }
         
         System.out.println("Termina simulacion RKF");
