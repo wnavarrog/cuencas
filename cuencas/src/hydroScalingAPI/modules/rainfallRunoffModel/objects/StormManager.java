@@ -119,9 +119,6 @@ public class StormManager {
             
             metaStorm=new hydroScalingAPI.io.MetaRaster(locFile);
             
-            thisStormName=metaStorm.getLocationBinaryFile().getName().substring(0,metaStorm.getLocationBinaryFile().getName().lastIndexOf("."));
-
-            
             /****** OJO QUE ACA PUEDE HABER UN ERROR (POR LA CUESTION DE LA COBERTURA DEL MAPA SOBRE LA CUENCA)*****************/
             if (metaStorm.getMinLon() > metaDatos.getMinLon()+myCuenca.getMinX()*metaDatos.getResLon()/3600.0 ||
                 metaStorm.getMinLat() > metaDatos.getMinLat()+myCuenca.getMinY()*metaDatos.getResLat()/3600.0 ||
@@ -184,7 +181,7 @@ public class StormManager {
                 System.out.println("--> Loading data from "+arCron[i].fileName.getName());
                 dataSnapShot=new hydroScalingAPI.io.DataRaster(metaStorm).getDouble();
                 
-                hydroScalingAPI.util.statistics.Stats rainStats=new hydroScalingAPI.util.statistics.Stats(dataSnapShot,-999);
+                hydroScalingAPI.util.statistics.Stats rainStats=new hydroScalingAPI.util.statistics.Stats(dataSnapShot,new Double(metaStorm.getMissing()).doubleValue());
                 System.out.println("    --> Stats of the File:  Max = "+rainStats.maxValue+" Min = "+rainStats.minValue+" Mean = "+rainStats.meanValue);
                 
                 
@@ -246,6 +243,8 @@ public class StormManager {
                 totalHillBasedPrec[j]/=precOnBasin[j].getSize();
             }
             
+            thisStormName=metaStorm.getLocationBinaryFile().getName().substring(0,metaStorm.getLocationBinaryFile().getName().lastIndexOf("."));
+
             success=true;
             
             System.out.println("-----------------Done with Files Reading----------------");
