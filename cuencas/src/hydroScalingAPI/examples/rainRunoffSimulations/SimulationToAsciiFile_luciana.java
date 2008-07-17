@@ -182,10 +182,10 @@ public class SimulationToAsciiFile_luciana extends java.lang.Object implements R
         bufferout.close();
         
         if(stormFile == null)
-            theFile=new java.io.File(outputDirectory.getAbsolutePath()+"/"+demName+"-INT_"+rainIntensity+"-DUR_"+rainDuration+"-IR_"+infiltRate+"-Routing_"+routingString+"_"+lam1+"_"+lam2+".csv");
+        {theFile=new java.io.File(outputDirectory.getAbsolutePath()+"/"+demName+"-INT_"+rainIntensity+"-DUR_"+rainDuration+"-IR_"+infiltRate+"-Routing_"+routingString+"_"+lam1+"_"+lam2+".csv");}
         else
-            theFile=new java.io.File(outputDirectory.getAbsolutePath()+"/"+demName+"-"+stormFile.getName()+"-IR_"+infiltRate+"-Routing_"+routingString+lam1+"_"+lam2+".csv");
-        
+        {if (routingType==5) theFile=new java.io.File(outputDirectory.getAbsolutePath()+"/"+demName+"-"+stormFile.getName()+"-IR_"+infiltRate+"-Routing_"+routingString+lam1+"_"+lam2+".csv");
+         if (routingType==2) theFile=new java.io.File(outputDirectory.getAbsolutePath()+"/"+demName+"-"+stormFile.getName()+"-IR_"+infiltRate+"-Routing_"+routingString+"_0.5.csv");}
         System.out.println(theFile);
         
         salida = new java.io.FileOutputStream(theFile);
@@ -303,7 +303,7 @@ public class SimulationToAsciiFile_luciana extends java.lang.Object implements R
         } else {
             for (int k=0;k<numPeriods;k++) {
                 System.out.println("Period "+(k+1)+" of "+numPeriods);
-                rainRunoffRaining.jumpsRunToAsciiFile_luciana(storm.stormInitialTimeInMinutes()+k*storm.stormRecordResolutionInMinutes(),storm.stormInitialTimeInMinutes()+(k+1)*storm.stormRecordResolutionInMinutes(),5,initialCondition,newfile,linksStructure,thisNetworkGeom);
+                rainRunoffRaining.jumpsRunToAsciiFile_luciana(storm.stormInitialTimeInMinutes()+k*storm.stormRecordResolutionInMinutes(),storm.stormInitialTimeInMinutes()+(k+1)*storm.stormRecordResolutionInMinutes(),30,initialCondition,newfile,linksStructure,thisNetworkGeom);
                 initialCondition=rainRunoffRaining.finalCond;
                 rainRunoffRaining.setBasicTimeStep(10/60.);
             }
@@ -315,10 +315,10 @@ public class SimulationToAsciiFile_luciana extends java.lang.Object implements R
             // define duration - as same duration as rainfall +350 minutes
             // incremental time is 5 - can i use 15????
             
-            //rainRunoffRaining.jumpsRunToAsciiFile_luciana(storm.stormInitialTimeInMinutes()+numPeriods*storm.stormRecordResolutionInMinutes(),(storm.stormInitialTimeInMinutes()+(numPeriods+1)*storm.stormRecordResolutionInMinutes())+350,5,initialCondition,newfile,linksStructure,thisNetworkGeom);
+    //        rainRunoffRaining.jumpsRunToAsciiFile_luciana(storm.stormInitialTimeInMinutes()+numPeriods*storm.stormRecordResolutionInMinutes(),(storm.stormInitialTimeInMinutes()+(numPeriods+1)*storm.stormRecordResolutionInMinutes())+350,5,initialCondition,newfile,linksStructure,thisNetworkGeom);
             double ndays = 5;
-            double durevent = ndays*24*60 - (storm.stormInitialTimeInMinutes()+(numPeriods+1)*storm.stormRecordResolutionInMinutes());
-            rainRunoffRaining.jumpsRunToAsciiFile_luciana(storm.stormInitialTimeInMinutes()+numPeriods*storm.stormRecordResolutionInMinutes(),durevent,15,initialCondition,newfile,linksStructure,thisNetworkGeom);
+            double durevent = storm.stormInitialTimeInMinutes()+ndays*24*60;
+            rainRunoffRaining.jumpsRunToAsciiFile_luciana(storm.stormInitialTimeInMinutes()+numPeriods*storm.stormRecordResolutionInMinutes(),durevent,30,initialCondition,newfile,linksStructure,thisNetworkGeom);
         }
         
         System.out.println("Termina simulacion RKF");
@@ -379,10 +379,6 @@ public class SimulationToAsciiFile_luciana extends java.lang.Object implements R
                     newfile.write("\n");
         }
         
-        System.out.println("Termina escritura de Precipitaciones");       
-        newfile.close();
-        bufferout.close();
-        
         System.out.println("Termina escritura de Resultados");
         
         newfile.close();
@@ -409,7 +405,9 @@ public class SimulationToAsciiFile_luciana extends java.lang.Object implements R
         try{
             
             subMain1(args);   //11140102 - Blue River       
-     
+            //subMain2(args);   //11110103 - Illinois, Arkansas 
+            //subMain3(args);   //11070208 - Elk River Near Tiff 
+            //subMain4(args);   //Clear Creek               
         } catch (java.io.IOException IOE){
             System.out.print(IOE);
             System.exit(0);
@@ -417,43 +415,7 @@ public class SimulationToAsciiFile_luciana extends java.lang.Object implements R
             System.out.print(v);
             System.exit(0);
         }
-        
-        try{
-            
-            subMain2(args);   //11110103 - Illinois, Arkansas
-      
-        } catch (java.io.IOException IOE){
-            System.out.print(IOE);
-            System.exit(0);
-        } catch (VisADException v){
-            System.out.print(v);
-            System.exit(0);
-        }
-        
-        try{
-            
-            subMain3(args);   //11070208 - Elk River Near Tiff   
-     
-        } catch (java.io.IOException IOE){
-            System.out.print(IOE);
-            System.exit(0);
-        } catch (VisADException v){
-            System.out.print(v);
-            System.exit(0);
-        }
-        
-       try{
-            
-            subMain4(args);   //Clear Creek   
-     
-        } catch (java.io.IOException IOE){
-            System.out.print(IOE);
-            System.exit(0);
-        } catch (VisADException v){
-            System.out.print(v);
-            System.exit(0);
-        }
-        
+             
         System.exit(0);
         
     }
@@ -520,12 +482,12 @@ public class SimulationToAsciiFile_luciana extends java.lang.Object implements R
        routingParams.put("lambda1",0.285f);
        routingParams.put("lambda2",-0.10f); 
     
-  //     new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),0.0f,2,new java.io.File(path),routingParams).executeSimulation();
-       new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),10.0f,2,new java.io.File(path),routingParams).executeSimulation();
+       new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),0.0f,2,new java.io.File(path),routingParams).executeSimulation();
+       new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),5.0f,2,new java.io.File(path),routingParams).executeSimulation();
   //     new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),20.0f,2,new java.io.File(path),routingParams).executeSimulation();        
-  //     new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),0.0f,5,new java.io.File(path),routingParams).executeSimulation();    
-       new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),10.0f,5,new java.io.File(path),routingParams).executeSimulation();          
-       new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),20.0f,5,new java.io.File(path),routingParams).executeSimulation();          
+       new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),0.0f,5,new java.io.File(path),routingParams).executeSimulation();    
+       new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),5.0f,5,new java.io.File(path),routingParams).executeSimulation();          
+  //     new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),20.0f,5,new java.io.File(path),routingParams).executeSimulation();          
 
        
     }
@@ -662,5 +624,6 @@ public class SimulationToAsciiFile_luciana extends java.lang.Object implements R
   //      new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),10.0f,5,new java.io.File(path),routingParams).executeSimulation();          
   //      new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),20.0f,5,new java.io.File(path),routingParams).executeSimulation();          
     }
-    
+
+
 }
