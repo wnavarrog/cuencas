@@ -105,7 +105,10 @@ public class SimulationToAsciiFile_luciana extends java.lang.Object implements R
 
         float v_o=(float)(1.5/Math.pow(200,lam1)/Math.pow(1100,lam2));
 
-        thisNetworkGeom.setVqParams(v_o,0.0f,lam1,lam2);
+        //Command to take the particular links that are from interSome particular links relevant to Wlanut Gulch, AZ
+        //linkID=linksStructure.getResSimID(194,281);
+  
+    thisNetworkGeom.setVqParams(v_o,0.0f,lam1,lam2);
         
         hydroScalingAPI.modules.rainfallRunoffModel.objects.HillSlopesInfo thisHillsInfo=new hydroScalingAPI.modules.rainfallRunoffModel.objects.HillSlopesInfo(linksStructure);
         
@@ -119,6 +122,7 @@ public class SimulationToAsciiFile_luciana extends java.lang.Object implements R
             storm=new hydroScalingAPI.modules.rainfallRunoffModel.objects.StormManager(stormFile,myCuenca,linksStructure,metaDatos,matDir,magnitudes);
         
         if (!storm.isCompleted()) return;
+        
         
         thisHillsInfo.setStormManager(storm);
         
@@ -366,7 +370,7 @@ public class SimulationToAsciiFile_luciana extends java.lang.Object implements R
             // incremental time is 5 - can i use 15????
             
     //        rainRunoffRaining.jumpsRunToAsciiFile_luciana(storm.stormInitialTimeInMinutes()+numPeriods*storm.stormRecordResolutionInMinutes(),(storm.stormInitialTimeInMinutes()+(numPeriods+1)*storm.stormRecordResolutionInMinutes())+350,5,initialCondition,newfile,linksStructure,thisNetworkGeom);
-            double ndays = 4;
+            double ndays = 10;
             double durevent = storm.stormInitialTimeInMinutes()+ndays*24*60;
             rainRunoffRaining.jumpsRunToAsciiFile_luciana(storm.stormInitialTimeInMinutes()+numPeriods*storm.stormRecordResolutionInMinutes(),durevent,30,initialCondition,newfile,linksStructure,thisNetworkGeom);
         }
@@ -409,9 +413,10 @@ public class SimulationToAsciiFile_luciana extends java.lang.Object implements R
         try{
             
             //subMain1(args);   //11140102 - Blue River       
-            subMain2(args);   //11110103 - Illinois, Arkansas 
+           //subMain2(args);   //11110103 - Illinois, Arkansas 
             //subMain3(args);   //11070208 - Elk River Near Tiff 
-            //subMain4(args);   //Clear Creek               
+            //subMain4(args);   //Clear Creek        
+            subMain5(args);   //Whitewater  
         } catch (java.io.IOException IOE){
             System.out.print(IOE);
             System.exit(0);
@@ -435,7 +440,7 @@ public class SimulationToAsciiFile_luciana extends java.lang.Object implements R
         routingParams.put("chezyExponent",-1/3.0f);
         
         routingParams.put("lambda1",0.285f);
-        routingParams.put("lambda2",-0.10f); 
+        routingParams.put("lambda2",-0.20f); 
         
        String pathinput = "C:/CUENCAS/11140102/Rasters/Topography/";
         java.io.File theFile=new java.io.File(pathinput + "NED_20864854" + ".metaDEM");
@@ -453,52 +458,19 @@ public class SimulationToAsciiFile_luciana extends java.lang.Object implements R
         hydroScalingAPI.mainGUI.ParentGUI tempFrame=new hydroScalingAPI.mainGUI.ParentGUI();
         
         
-        String path = "C:/CUENCAS/11140102/results/event1/";
-        String rain = "C:/CUENCAS/11140102/data/radar/event1/prec.metaVHC";
+        String path = "C:/CUENCAS/11140102/results/event4/";
+        String rain = "C:/CUENCAS/11140102/data/radar/event4/prec.metaVHC";
         int x = 2444;
         int y = 1611;
- //      new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),0.0f,2,new java.io.File(path),routingParams).executeSimulation();
- //      new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),10.0f,2,new java.io.File(path),routingParams).executeSimulation();
- //      new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),20.0f,2,new java.io.File(path),routingParams).executeSimulation();        
- //      new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),0.0f,5,new java.io.File(path),routingParams).executeSimulation();    
- //      new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),10.0f,5,new java.io.File(path),routingParams).executeSimulation();          
- //       routingParams.put("lambda1",0.285f);
- //       routingParams.put("lambda2",-0.10f); 
- //       new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),20.0f,5,new java.io.File(path),routingParams).executeSimulation();          
+        new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),0.0f,2,new java.io.File(path),routingParams).executeSimulation();
+  //      new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),0.0f,5,new java.io.File(path),routingParams).executeSimulation();    
         
- //       routingParams.put("lambda1",0.350f);
- //       routingParams.put("lambda2",-0.20f);
- 
- //       new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),20.0f,5,new java.io.File(path),routingParams).executeSimulation();          
- //       path = "C:/CUENCAS/11140102/results/event2/";
- //       rain = "C:/CUENCAS/11140102/data/radar/event2/prec.metaVHC";
-      
-       //new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),0.0f,2,new java.io.File(path),routingParams).executeSimulation();
-       //new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),10.0f,2,new java.io.File(path),routingParams).executeSimulation();
-       //new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),20.0f,2,new java.io.File(path),routingParams).executeSimulation();        
-       //new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),0.0f,5,new java.io.File(path),routingParams).executeSimulation();    
-       //new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),10.0f,5,new java.io.File(path),routingParams).executeSimulation();          
-       //new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),20.0f,5,new java.io.File(path),routingParams).executeSimulation();          
-
-      path = "C:/CUENCAS/11140102/results/event3/";
-      rain = "C:/CUENCAS/11140102/data/radar/event3/prec.metaVHC";
-   
-       routingParams.put("lambda1",0.285f);
-       routingParams.put("lambda2",-0.10f); 
-    
-       new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),0.0f,2,new java.io.File(path),routingParams).executeSimulation();
-       new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),5.0f,2,new java.io.File(path),routingParams).executeSimulation();
-  //     new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),20.0f,2,new java.io.File(path),routingParams).executeSimulation();        
-       new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),0.0f,5,new java.io.File(path),routingParams).executeSimulation();    
-       new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),5.0f,5,new java.io.File(path),routingParams).executeSimulation();          
-  //     new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),20.0f,5,new java.io.File(path),routingParams).executeSimulation();          
-
        
     }
     
     public static void subMain2(String args[]) throws java.io.IOException, VisADException {
        
-             java.util.Hashtable routingParams=new java.util.Hashtable();
+        java.util.Hashtable routingParams=new java.util.Hashtable();
         routingParams.put("widthCoeff",1.0f);
         routingParams.put("widthExponent",0.4f);
         routingParams.put("widthStdDev",0.0f);
@@ -506,8 +478,8 @@ public class SimulationToAsciiFile_luciana extends java.lang.Object implements R
         routingParams.put("chezyCoeff",14.2f);
         routingParams.put("chezyExponent",-1/3.0f);
         
-        routingParams.put("lambda1",0.278f);
-        routingParams.put("lambda2",-0.16f); 
+        routingParams.put("lambda1",0.285f);
+        routingParams.put("lambda2",-0.40f); 
         
         String pathinput = "C:/CUENCAS/11110103/Rasters/Topography/";
         java.io.File theFile=new java.io.File(pathinput + "NED_71821716" + ".metaDEM");
@@ -530,26 +502,21 @@ public class SimulationToAsciiFile_luciana extends java.lang.Object implements R
         int x = 497;
         int y = 773;
       
-       new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),0.0f,2,new java.io.File(path),routingParams).executeSimulation();
+  //     new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),0.0f,2,new java.io.File(path),routingParams).executeSimulation();
   //     new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),5.0f,2,new java.io.File(path),routingParams).executeSimulation();
   //     new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),20.0f,2,new java.io.File(path),routingParams).executeSimulation();        
-       new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),0.0f,5,new java.io.File(path),routingParams).executeSimulation();    
+  //     new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),0.0f,5,new java.io.File(path),routingParams).executeSimulation();    
   //     new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),5.0f,5,new java.io.File(path),routingParams).executeSimulation();          
   //     new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),20.0f,5,new java.io.File(path),routingParams).executeSimulation();          
    
-        path = "C:/CUENCAS/11110103/results/07196500/event2";
-        rain = "C:/CUENCAS/11110103/Data/07196500/radar/event2/prec.metaVHC";     
- //       new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),0.0f,2,new java.io.File(path),routingParams).executeSimulation();
- //       new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),0.0f,5,new java.io.File(path),routingParams).executeSimulation();    
- //       path = "C:/CUENCAS/11110103/results/07197000/GK_0.20_0.35/";
- //       x = 804;
- //       y = 766;
+ 
+        x = 804;
+        y = 766;
         
- //       new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,20, 10,0.0f,5,new java.io.File(path),routingParams).executeSimulation();
- //       new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,20, 20,0.0f,5,new java.io.File(path),routingParams).executeSimulation();
- //       new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,20,60,0.0f,5,new java.io.File(path),routingParams).executeSimulation();
- //       new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,20,120,0.0f,5,new java.io.File(path),routingParams).executeSimulation();
- //       new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,20,360,0.0f,5,new java.io.File(path),routingParams).executeSimulation();
+        path = "C:/CUENCAS/11110103/Data/07197000/sat/event1";
+        rain = "C:/CUENCAS/11110103/Data/07197000/sat/event1/prec.metaVHC";     
+        new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),0.0f,5,new java.io.File(path),routingParams).executeSimulation();    
+        new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),0.0f,2,new java.io.File(path),routingParams).executeSimulation();
 
     }
    
@@ -581,15 +548,14 @@ public class SimulationToAsciiFile_luciana extends java.lang.Object implements R
         
         hydroScalingAPI.mainGUI.ParentGUI tempFrame=new hydroScalingAPI.mainGUI.ParentGUI();
         
-        String path = "C:/CUENCAS/11070208/results/GK_0.20_0.35/";
+
         int x = 296;
         int y = 1167;
         
- //       new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,20, 10,0.0f,5,new java.io.File(path),routingParams).executeSimulation();
- //       new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,20, 20,0.0f,5,new java.io.File(path),routingParams).executeSimulation();
- //       new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,20,60,0.0f,5,new java.io.File(path),routingParams).executeSimulation();
- //       new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,20,120,0.0f,5,new java.io.File(path),routingParams).executeSimulation();
- //       new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,20,360,0.0f,5,new java.io.File(path),routingParams).executeSimulation();
+        String path = "C:/CUENCAS/11070208/results/event2";
+        String rain = "C:/CUENCAS/11070208/Data/event2/prec.metaVHC";     
+        new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),0.0f,5,new java.io.File(path),routingParams).executeSimulation();    
+        new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),0.0f,2,new java.io.File(path),routingParams).executeSimulation();
     }
       
       
@@ -628,13 +594,49 @@ public class SimulationToAsciiFile_luciana extends java.lang.Object implements R
         routingParams.put("lambda1",0.375f);
         routingParams.put("lambda2",-0.10f); 
         
-  //      new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),0.0f,2,new java.io.File(path),routingParams).executeSimulation();
+        new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),10.0f,2,new java.io.File(path),routingParams).executeSimulation();
   //      new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),10.0f,2,new java.io.File(path),routingParams).executeSimulation();
   //      new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),20.0f,2,new java.io.File(path),routingParams).executeSimulation();        
   //      new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),0.0f,5,new java.io.File(path),routingParams).executeSimulation();    
   //      new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),10.0f,5,new java.io.File(path),routingParams).executeSimulation();          
   //      new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),20.0f,5,new java.io.File(path),routingParams).executeSimulation();          
     }
-
+   public static void subMain5(String args[]) throws java.io.IOException, VisADException {
+        
+        java.util.Hashtable routingParams=new java.util.Hashtable();
+        routingParams.put("widthCoeff",1.0f);
+        routingParams.put("widthExponent",0.4f);
+        routingParams.put("widthStdDev",0.0f);
+        
+        routingParams.put("chezyCoeff",14.2f);
+        routingParams.put("chezyExponent",-1/3.0f);
+        
+        routingParams.put("lambda1",0.3f);
+        routingParams.put("lambda2",-0.10f); 
+        
+        String pathinput = "C:/CUENCAS/Whitewater_database/Rasters/Topography/1_ArcSec_USGS_2005/";
+        java.io.File theFile=new java.io.File(pathinput + "Whitewaters" + ".metaDEM");
+        hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
+        metaModif.setLocationBinaryFile(new java.io.File(pathinput + "Whitewaters" + ".dir"));
+        
+        String formatoOriginal=metaModif.getFormat();
+        metaModif.setFormat("Byte");
+        byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
+        
+        metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".magn"));
+        metaModif.setFormat("Integer");
+        int [][] magnitudes=new hydroScalingAPI.io.DataRaster(metaModif).getInt();
+        
+        hydroScalingAPI.mainGUI.ParentGUI tempFrame=new hydroScalingAPI.mainGUI.ParentGUI();
+        
+        String path = "C:/CUENCAS/Whitewater_database/Rasters/Hydrology/storms/sat/may2007/results";
+        String rain = "C:/CUENCAS/Whitewater_database/Rasters/Hydrology/storms/sat/may2007/bin";
+        int x = 1063;
+        int y = 496;
+        routingParams.put("lambda1",0.375f);
+        routingParams.put("lambda2",-0.10f); 
+        
+        new SimulationToAsciiFile_luciana(x,y,matDirs,magnitudes,metaModif,new java.io.File(rain),0.0f,5,new java.io.File(path),routingParams).executeSimulation();
+     }
 
 }
