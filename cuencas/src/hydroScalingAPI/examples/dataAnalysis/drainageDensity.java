@@ -178,7 +178,7 @@ public class drainageDensity {
         //StringTokenizer tokenizer = new StringTokenizer("B_26	1104	474	B_26");
         StringTokenizer tokenizer = new StringTokenizer(args[0]);
         String path = "/hidrosigDataBases/Continental_US_database/Rasters/";
-        String filepath = path + "Topography/Dd_Basins_30_ArcSec/" + tokenizer.nextToken();
+        String filepath = path + "Topography/Dd_Basins_1_ArcSec/" + tokenizer.nextToken();
         int x_outlet = Integer.parseInt(tokenizer.nextToken());
         int y_outlet = Integer.parseInt(tokenizer.nextToken());
         String filename = filepath + "/" + tokenizer.nextToken();
