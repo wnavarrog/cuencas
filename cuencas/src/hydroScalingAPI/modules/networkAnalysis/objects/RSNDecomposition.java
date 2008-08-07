@@ -398,9 +398,9 @@ public class RSNDecomposition {
         //args=new String[] {"WalnutCreek_KS  1309  312  walnutCreek"};
         
         //args=new String[] {"kentuckyRiver  845 2596  kentuckyRiver"};
-        args=new String[] {"kentuckyRiver  845 2595  kentuckyRiver"};
+        //args=new String[] {"kentuckyRiver  845 2595  kentuckyRiver"};
         
-        //subMain1(args); //writes generators and geoemtric properties to files.  This algortithm is called
+        subMain1(args); //writes generators and geoemtric properties to files.  This algortithm is called
                         //by runAllBasinsRSN.sh
         
         //subMain2(args); //Test for Extended Horton Laws
@@ -411,7 +411,7 @@ public class RSNDecomposition {
         
         //subMain5(args); //Test for divergence of areas across scales
         
-        subMain6(args); //Bug of no side tributaties
+        //subMain6(args); //Bug of no side tributaties
     }
     
     /**
