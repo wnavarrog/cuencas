@@ -8,7 +8,7 @@ package hydroScalingAPI.util.plot;
 
 /**
  *
- * @author  olver
+ * @author Olver Hernandez
  * @version
  */
 

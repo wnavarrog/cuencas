@@ -8,7 +8,7 @@ package hydroScalingAPI.util.plot;
 
 /**
  *
- * @author  olver
+ * @author Olver Hernandez
  * @version
  */
 
@@ -17,11 +17,9 @@ import java.awt.image.*;
 import java.io.PrintStream;
 import java.util.Vector;
 
-class XYAxis
-{
-
-    XYAxis(int i, int j, int k, int l, Component component, int t, String [] lab)
-    {
+class XYAxis {
+    
+    XYAxis(int i, int j, int k, int l, Component component, int t, String [] lab) {
         labels = lab;
         tipo = t;
         deBug = false;
@@ -91,16 +89,14 @@ class XYAxis
         pxw = pxe - pxs;
         pyw = pys - pye;
     }
-
-    private void calcXLabels()
-    {
+    
+    private void calcXLabels() {
         xlabtic = new LabelAndTics(xmin, xmax);
         xLabel = xlabtic.label();
         xTic = xlabtic.tic();
     }
-
-    private void calcYLabels()
-    {
+    
+    private void calcYLabels() {
         ylabtic = new LabelAndTics(ymin, ymax);
         yLabel = ylabtic.label();
         yTic = ylabtic.tic();
@@ -108,24 +104,19 @@ class XYAxis
     public void setTipo(int t){
         tipo = t;
     }
-    private int[] rot90Pixels(int ai[], int i, int j, Color color, Color color1)
-    {
+    private int[] rot90Pixels(int ai[], int i, int j, Color color, Color color1) {
         ColorModel colormodel = ColorModel.getRGBdefault();
         int ai1[] = null;
-        if(i * j == ai.length)
-        {
+        if(i * j == ai.length) {
             ai1 = new int[i * j];
             int k = 0;
             int l = 0;
             int i1 = (i - 1) * j;
-            for(; k < i * j; k++)
-            {
+            for(; k < i * j; k++) {
                 int j1 = ai[k];
-                if(colormodel.getBlue(j1) == 0 && colormodel.getGreen(j1) == 0 && colormodel.getRed(j1) == 0)
-                {
+                if(colormodel.getBlue(j1) == 0 && colormodel.getGreen(j1) == 0 && colormodel.getRed(j1) == 0) {
                     j1 = color.getRGB();
-                } else
-                {
+                } else {
                     float f = (float)colormodel.getBlue(j1) / 256F;
                     int k1 = (int)((float)color1.getBlue() * f) + (int)((double)(float)color.getBlue() * (1.0D - (double)f));
                     int l1 = (int)((float)color1.getGreen() * f) + (int)((double)(float)color.getGreen() * (1.0D - (double)f));
@@ -134,20 +125,18 @@ class XYAxis
                 }
                 ai1[i1] = j1;
                 i1 -= j;
-                if(i1 < 0)
-                {
+                if(i1 < 0) {
                     l++;
                     i1 = (i - 1) * j + l;
                 }
             }
-
+            
         }
         return ai1;
     }
-
-    private void drawVerticalString(int i, int j, int k, String s, String s1, Color color, Color color1, 
-            Font font)
-    {
+    
+    private void drawVerticalString(int i, int j, int k, String s, String s1, Color color, Color color1,
+            Font font) {
         int l = appFM.stringWidth(s);
         int i1 = appFM.getHeight();
         int j1 = appFM.getMaxDescent();
@@ -159,10 +148,8 @@ class XYAxis
             System.out.println("STRINGMATCH:   newString=\"" + s + "\"  Len=" + s.length() + "  previousString=\"" + s1 + "\"  Len=" + s1.length() + "  " + s1.compareTo(s));
         if(vertImage == null && deBug)
             System.out.println("NULL:          Index=" + i + "  VertImage=" + vertImage);
-        if(s1.compareTo(s) != 0 || vertImage == null)
-        {
-            if(i1 != 0 && l != 0)
-            {
+        if(s1.compareTo(s) != 0 || vertImage == null) {
+            if(i1 != 0 && l != 0) {
                 Image image = currentComponent.createImage(l, i1);
                 Graphics g1 = image.getGraphics();
                 if(deBug)
@@ -177,37 +164,29 @@ class XYAxis
                     System.out.println("Creating new Image, vertImageSize=" + vertImages.size());
                 int ai[] = new int[l * i1];
                 PixelGrabber pixelgrabber = new PixelGrabber(image, 0, 0, l, i1, ai, 0, l);
-                try
-                {
+                try {
                     pixelgrabber.grabPixels();
                     vertImage = currentComponent.createImage(new MemoryImageSource(i1, l, rot90Pixels(ai, l, i1, color, color1), 0, i1));
-                }
-                catch(InterruptedException interruptedexception)
-                {
+                } catch(InterruptedException interruptedexception) {
                     interruptedexception.printStackTrace();
                 }
-                if(vertImage != null)
-                {
+                if(vertImage != null) {
                     g.drawImage(vertImage, j - i1 / 2, k, currentComponent);
-                    if(i < vertImages.size())
-                    {
+                    if(i < vertImages.size()) {
                         vertImages.setElementAt(vertImage, i);
                         return;
-                    } else
-                    {
+                    } else {
                         vertImages.addElement(vertImage);
                         return;
                     }
                 }
             }
-        } else
-        {
+        } else {
             g.drawImage(vertImage, j - i1 / 2, k, currentComponent);
         }
     }
-
-    public void draw()
-    {
+    
+    public void draw() {
 /*        g.setColor(Color.blue);
         g.drawString("mal",200,50);*/
         double d = xmax - xmin;
@@ -221,7 +200,7 @@ class XYAxis
         
         g.drawRect(pxs,pye,pxw,pyw);
         g.drawRect(pxs+1,pye+1,pxw-2,pyw-2);
-
+        
         g.setFont(titleFont);
         appFM = g.getFontMetrics();
         g.drawString(title, (pxs + pxw / 2) - appFM.stringWidth(title) / 2, 3 + appFM.getAscent());
@@ -229,13 +208,11 @@ class XYAxis
         appFM = g.getFontMetrics();
         g.drawString(xtitle, (pxs + pxw / 2) - appFM.stringWidth(xtitle) / 2, h - appFM.getDescent() - 5);
         int i3 = appFM.getHeight() + 5;
-        if(oldYString != ytitle)
-        {
+        if(oldYString != ytitle) {
             textWidth = appFM.stringWidth(ytitle);
             int j3 = appFM.getHeight();
             int l3 = appFM.getMaxDescent();
-            if(j3 != 0 && textWidth != 0)
-            {
+            if(j3 != 0 && textWidth != 0) {
                 Image image = currentComponent.createImage(textWidth, j3);
                 Graphics g1 = image.getGraphics();
                 g1.setColor(Color.black);
@@ -246,13 +223,10 @@ class XYAxis
                 rotImage = null;
                 int ai[] = new int[textWidth * j3];
                 PixelGrabber pixelgrabber = new PixelGrabber(image, 0, 0, textWidth, j3, ai, 0, textWidth);
-                try
-                {
+                try {
                     pixelgrabber.grabPixels();
                     rotImage = currentComponent.createImage(new MemoryImageSource(j3, textWidth, rot90Pixels(ai, textWidth, j3, backgroundColor, axisColor), 0, j3));
-                }
-                catch(InterruptedException interruptedexception)
-                {
+                } catch(InterruptedException interruptedexception) {
                     interruptedexception.printStackTrace();
                 }
                 if(rotImage != null)
@@ -260,34 +234,29 @@ class XYAxis
                 oldYString = ytitle;
             }
         } else
-        if(rotImage != null)
-            g.drawImage(rotImage, 3, (pye + pyw / 2) - textWidth / 2, currentComponent);
+            if(rotImage != null)
+                g.drawImage(rotImage, 3, (pye + pyw / 2) - textWidth / 2, currentComponent);
         appFM = g.getFontMetrics();
-        if(pxw < 400 && d / xLabel + 1.0D > 6D)
-        {
+        if(pxw < 400 && d / xLabel + 1.0D > 6D) {
             xLabel *= 2D;
             xTic *= 2D;
         }
-        if(pyw < 250 && d1 / yLabel + 1.0D > 6D)
-        {
+        if(pyw < 250 && d1 / yLabel + 1.0D > 6D) {
             yLabel *= 2D;
             yTic *= 2D;
         }
-        if(d1 / yLabel + 1.0D < 4D)
-        {
+        if(d1 / yLabel + 1.0D < 4D) {
             yLabel /= 2D;
             yTic /= 2D;
         }
-        if(d / xLabel + 1.0D < 4D)
-        {
+        if(d / xLabel + 1.0D < 4D) {
             xLabel /= 2D;
             xTic /= 2D;
         }
         XYLine xyline;
         try{xyline = (XYLine)lines.elementAt(0);}catch(Exception ex){return;}
         int l2 = xyline.pointCount();
-        if(firstColumnLabelsFlag)
-        {
+        if(firstColumnLabelsFlag) {
             if(xLabel < 1.0D)
                 xLabel = 1.0D;
             if(xTic < 1.0D)
@@ -296,26 +265,22 @@ class XYAxis
         int j1 = (int)(d / xLabel + 1.0D);
         int k1 = (int)(xmin / xLabel);
         int k3 = 1;
-        for(int i = k1; i <= j1 + k1; i++)
-        {
+        for(int i = k1; i <= j1 + k1; i++) {
             int l1 = (int)((double)pxs + (double)pxw * (((double)i * xLabel - xmin) / d));
             if(deBug)
                 System.out.println("x istep=" + l1);
-            if(l1 >= pxs && l1 <= pxe && (firstColumnLabelsFlag && (double)i * xLabel >= 0.0D && (double)i * xLabel < (double)l2 || !firstColumnLabelsFlag))
-            {
+            if(l1 >= pxs && l1 <= pxe && (firstColumnLabelsFlag && (double)i * xLabel >= 0.0D && (double)i * xLabel < (double)l2 || !firstColumnLabelsFlag)) {
                 g.setColor(labelColor);
                 g.setFont(labelXFont);
                 appFM = g.getFontMetrics();
                 Float float1 = new Float(xLabel * (double)(float)i);
                 String s;
-                if(!firstColumnLabelsFlag)
-                {
+                if(!firstColumnLabelsFlag) {
                     if(tipo == 0){
                         s = new String(float1.toString());
                         if(s.endsWith(".0"))
                             s = s.substring(0, s.length() - 2);
-                    }
-                    else{ //if(tipo == 1)
+                    } else{ //if(tipo == 1)
                         float tmp =float1.floatValue() - (float)(float1.intValue());
                         if(tmp == 0){
                             try{
@@ -323,17 +288,14 @@ class XYAxis
                             }catch(ArrayIndexOutOfBoundsException ex){
                                 s = "";
                             }
-                        }
-                        else
+                        } else
                             s="";
                     }
-                } else
-                {
+                } else {
                     s = xyline.pointLabel((int)xLabel * i);
                     
                 }
-                if(xLabelsVerticalFlag)
-                {
+                if(xLabelsVerticalFlag) {
                     if(deBug)
                         System.out.println("labelCount=" + k3);
                     if(deBug)
@@ -342,8 +304,7 @@ class XYAxis
                         vertLabels.addElement("empty");
                     drawVerticalString(k3 - 1, l1, pys + 16, s, (String)vertLabels.elementAt(k3 - 1), backgroundColor, labelColor, labelXFont);
                     vertLabels.setElementAt(s, k3 - 1);
-                    if(appFM.stringWidth(s) > bottomMargin - i3 - 16)
-                    {
+                    if(appFM.stringWidth(s) > bottomMargin - i3 - 16) {
                         bottomMargin = appFM.stringWidth(s) + i3 + 16;
                         pxs = x + leftMargin;
                         pxe = w - rightMargin;
@@ -352,8 +313,7 @@ class XYAxis
                         pxw = pxe - pxs;
                         pyw = pys - pye;
                     }
-                } else
-                {
+                } else {
                     g.drawString(s, l1 - appFM.stringWidth(s) / 2, pys + appFM.getAscent() + 16);
                 }
                 k3++;
@@ -362,23 +322,20 @@ class XYAxis
                 g.setColor(axisColor);
             }
         }
-
-        if(deBug)
-        {
+        
+        if(deBug) {
             for(int j = 0; j < vertLabels.size(); j++)
                 System.out.println("vertLabels" + j + "=" + (String)vertLabels.elementAt(j));
-
+            
         }
         j1 = (int)(d1 / yLabel + 1.0D);
         k1 = (int)(ymin / yLabel);
         boolean flag = false;
-        for(int k = k1; k <= j1 + k1; k++)
-        {
+        for(int k = k1; k <= j1 + k1; k++) {
             int i2 = (int)((double)pys - (double)pyw * (((double)k * yLabel - ymin) / d1));
             if(deBug)
                 System.out.println("y istep=" + i2);
-            if(i2 >= pye && i2 <= pys)
-            {
+            if(i2 >= pye && i2 <= pys) {
                 g.setColor(labelColor);
                 g.setFont(labelYFont);
                 appFM = g.getFontMetrics();
@@ -387,442 +344,362 @@ class XYAxis
                 if(s1.endsWith(".0"))
                     s1 = s1.substring(0, s1.length() - 2);
                 g.drawString(s1, pxs - 14 - appFM.stringWidth(s1), i2 + appFM.getAscent() / 3);
-
+                
                 g.setColor(java.awt.Color.gray);
                 g.drawLine(pxs,i2,pxe,i2);
                 g.setColor(axisColor);
             }
         }
-
+        
         j1 = (int)(d / xTic + 1.0D);
         k1 = (int)(xmin / xTic);
         flag = false;
-        for(int l = k1; l <= j1 + k1; l++)
-        {
+        for(int l = k1; l <= j1 + k1; l++) {
             int j2 = (int)((double)pxs + (double)pxw * (((double)l * xTic - xmin) / d));
-            if(j2 >= pxs && j2 <= pxe)
-            {
+            if(j2 >= pxs && j2 <= pxe) {
                 g.setColor(axisColor);
                 //g.drawLine(j2, pys, j2, pys + ticLength);
                 g.drawLine(j2, pys, j2, pys - ticLength);
                 g.drawLine(j2, pye, j2, pye + ticLength);
             }
         }
-
+        
         j1 = (int)(d1 / yTic + 1.0D);
         k1 = (int)(ymin / yTic);
         flag = false;
-        for(int i1 = k1; i1 <= j1 + k1; i1++)
-        {
+        for(int i1 = k1; i1 <= j1 + k1; i1++) {
             int k2 = (int)((double)pys - (double)pyw * (((double)i1 * yTic - ymin) / d1));
-            if(k2 >= pye && k2 <= pys)
-            {
+            if(k2 >= pye && k2 <= pys) {
                 g.setColor(axisColor);
                 g.drawLine(pxs, k2, pxs + ticLength, k2);
                 g.drawLine(pxe, k2, pxe - ticLength, k2);
             }
         }
-
+        
     }
-
-    public void Update()
-    {
+    
+    public void Update() {
         if(isVisible)
             draw();
     }
-
-    public int x()
-    {
+    
+    public int x() {
         return x;
     }
-
-    public int y()
-    {
+    
+    public int y() {
         return y;
     }
-
-    public int width()
-    {
+    
+    public int width() {
         return w;
     }
-
-    public int height()
-    {
+    
+    public int height() {
         return h;
     }
-
-    public int rightMargin()
-    {
+    
+    public int rightMargin() {
         return rightMargin;
     }
-
-    public int leftMargin()
-    {
+    
+    public int leftMargin() {
         return leftMargin;
     }
-
-    public int topMargin()
-    {
+    
+    public int topMargin() {
         return topMargin;
     }
-
-    public int bottomMargin()
-    {
+    
+    public int bottomMargin() {
         return bottomMargin;
     }
-
-    public int plotWidth()
-    {
+    
+    public int plotWidth() {
         return pxw;
     }
-
-    public int plotHeight()
-    {
+    
+    public int plotHeight() {
         return pyw;
     }
-
-    public int plotXstart()
-    {
+    
+    public int plotXstart() {
         return pxs;
     }
-
-    public int plotXend()
-    {
+    
+    public int plotXend() {
         return pxe;
     }
-
-    public int plotYstart()
-    {
+    
+    public int plotYstart() {
         return pys;
     }
-
-    public int plotYend()
-    {
+    
+    public int plotYend() {
         return pye;
     }
-
-    public Color axisColor()
-    {
+    
+    public Color axisColor() {
         return axisColor;
     }
-
-    public void axisColor(Color color)
-    {
+    
+    public void axisColor(Color color) {
         axisColor = color;
     }
-
-    public Color labelColor()
-    {
+    
+    public Color labelColor() {
         return labelColor;
     }
-
-    public void labelColor(Color color)
-    {
+    
+    public void labelColor(Color color) {
         labelColor = color;
     }
-
-    public Color gridColor()
-    {
+    
+    public Color gridColor() {
         return gridColor;
     }
-
-    public void gridColor(Color color)
-    {
+    
+    public void gridColor(Color color) {
         gridColor = color;
     }
-
-    public void backgroundColor(Color color)
-    {
+    
+    public void backgroundColor(Color color) {
         backgroundColor = color;
     }
-
-    public Color backgroundColor()
-    {
+    
+    public Color backgroundColor() {
         return backgroundColor;
     }
-
-    public String labelXFontFamily()
-    {
+    
+    public String labelXFontFamily() {
         return labelXFontFamily;
     }
-
-    public void labelXFontFamily(String s)
-    {
+    
+    public void labelXFontFamily(String s) {
         labelXFontFamily = s;
         labelXFont = new Font(labelXFontFamily, labelXFontStyle, labelXFontSize);
     }
-
-    public int labelXFontSize()
-    {
+    
+    public int labelXFontSize() {
         return labelXFontSize;
     }
-
-    public void labelXFontSize(int i)
-    {
+    
+    public void labelXFontSize(int i) {
         labelXFontSize = i;
         labelXFont = new Font(labelXFontFamily, labelXFontStyle, labelXFontSize);
     }
-
-    public int labelXFontStyle()
-    {
+    
+    public int labelXFontStyle() {
         return labelXFontStyle;
     }
-
-    public void labelXFontStyle(int i)
-    {
+    
+    public void labelXFontStyle(int i) {
         labelXFontStyle = i;
         labelXFont = new Font(labelXFontFamily, labelXFontStyle, labelXFontSize);
     }
-
-    public String labelYFontFamily()
-    {
+    
+    public String labelYFontFamily() {
         return labelYFontFamily;
     }
-
-    public void labelYFontFamily(String s)
-    {
+    
+    public void labelYFontFamily(String s) {
         labelYFontFamily = s;
         labelYFont = new Font(labelYFontFamily, labelYFontStyle, labelYFontSize);
     }
-
-    public int labelYFontSize()
-    {
+    
+    public int labelYFontSize() {
         return labelYFontSize;
     }
-
-    public void labelYFontSize(int i)
-    {
+    
+    public void labelYFontSize(int i) {
         labelYFontSize = i;
         labelYFont = new Font(labelYFontFamily, labelYFontStyle, labelYFontSize);
     }
-
-    public int labelYFontStyle()
-    {
+    
+    public int labelYFontStyle() {
         return labelYFontStyle;
     }
-
-    public void labelYFontStyle(int i)
-    {
+    
+    public void labelYFontStyle(int i) {
         labelYFontStyle = i;
         labelYFont = new Font(labelYFontFamily, labelYFontStyle, labelYFontSize);
     }
-
-    public Font labelYFont()
-    {
+    
+    public Font labelYFont() {
         return labelYFont;
     }
-
-    public String axisFontFamily()
-    {
+    
+    public String axisFontFamily() {
         return axisFontFamily;
     }
-
-    public void axisFontFamily(String s)
-    {
+    
+    public void axisFontFamily(String s) {
         axisFontFamily = s;
         axisFont = new Font(axisFontFamily, axisFontStyle, axisFontSize);
     }
-
-    public int axisFontSize()
-    {
+    
+    public int axisFontSize() {
         return axisFontSize;
     }
-
-    public void axisFontSize(int i)
-    {
+    
+    public void axisFontSize(int i) {
         axisFontSize = i;
         axisFont = new Font(axisFontFamily, axisFontStyle, axisFontSize);
     }
-
-    public int axisFontStyle()
-    {
+    
+    public int axisFontStyle() {
         return axisFontStyle;
     }
-
-    public void axisFontStyle(int i)
-    {
+    
+    public void axisFontStyle(int i) {
         axisFontStyle = i;
         axisFont = new Font(axisFontFamily, axisFontStyle, axisFontSize);
     }
-
-    public String titleFontFamily()
-    {
+    
+    public String titleFontFamily() {
         return titleFontFamily;
     }
-
-    public void titleFontFamily(String s)
-    {
+    
+    public void titleFontFamily(String s) {
         titleFontFamily = s;
         titleFont = new Font(titleFontFamily, titleFontStyle, titleFontSize);
     }
-
-    public int titleFontSize()
-    {
+    
+    public int titleFontSize() {
         return titleFontSize;
     }
-
-    public void titleFontSize(int i)
-    {
+    
+    public void titleFontSize(int i) {
         titleFontSize = i;
         titleFont = new Font(titleFontFamily, titleFontStyle, titleFontSize);
     }
-
-    public int titleFontStyle()
-    {
+    
+    public int titleFontStyle() {
         return titleFontStyle;
     }
-
-    public void titleFontStyle(int i)
-    {
+    
+    public void titleFontStyle(int i) {
         titleFontStyle = i;
         titleFont = new Font(titleFontFamily, titleFontStyle, titleFontSize);
     }
-
-    public int ticLength()
-    {
+    
+    public int ticLength() {
         return ticLength;
     }
-
-    public void ticLength(int i)
-    {
+    
+    public void ticLength(int i) {
         ticLength = i;
     }
-
-    public int labelLength()
-    {
+    
+    public int labelLength() {
         return labelLength;
     }
-
-    public void labelLength(int i)
-    {
+    
+    public void labelLength(int i) {
         labelLength = i;
     }
-
-    public boolean gridY()
-    {
+    
+    public boolean gridY() {
         return gridY;
     }
-
-    public boolean gridX()
-    {
+    
+    public boolean gridX() {
         return gridX;
     }
-
-    public void gridY(boolean flag)
-    {
+    
+    public void gridY(boolean flag) {
         gridY = flag;
     }
-
-    public void gridX(boolean flag)
-    {
+    
+    public void gridX(boolean flag) {
         gridX = flag;
     }
-
-    public boolean openAxis()
-    {
+    
+    public boolean openAxis() {
         return openAxis;
     }
-
-    public void openAxis(boolean flag)
-    {
+    
+    public void openAxis(boolean flag) {
         openAxis = flag;
     }
-
-    public double xmin()
-    {
+    
+    public double xmin() {
         return xmin;
     }
-
-    public void xmin(double d)
-    {
+    
+    public void xmin(double d) {
         xmin = d;
         calcXLabels();
     }
-
-    public double ymin()
-    {
+    
+    public double ymin() {
         return ymin;
     }
-
-    public void ymin(double d)
-    {
+    
+    public void ymin(double d) {
         ymin = d;
         calcYLabels();
     }
-
-    public double xmax()
-    {
+    
+    public double xmax() {
         return xmax;
     }
-
-    public void xmax(double d)
-    {
+    
+    public void xmax(double d) {
         xmax = d;
         calcXLabels();
     }
-
-    public double ymax()
-    {
+    
+    public double ymax() {
         return ymax;
     }
-
-    public void ymax(double d)
-    {
+    
+    public void ymax(double d) {
         ymax = d;
         calcYLabels();
     }
-
-    public boolean isVisible()
-    {
+    
+    public boolean isVisible() {
         return isVisible;
     }
-
-    public boolean hasGraphicsBeenSet()
-    {
+    
+    public boolean hasGraphicsBeenSet() {
         return hasGraphicsBeenSet;
     }
-
-    public Graphics graphics()
-    {
+    
+    public Graphics graphics() {
         return g;
     }
-
-    public void graphics(Graphics g1)
-    {
+    
+    public void graphics(Graphics g1) {
         g = g1;
         hasGraphicsBeenSet = true;
     }
-
-    public void title(String s)
-    {
+    
+    public void title(String s) {
         title = s;
     }
-
-    public void xTitle(String s)
-    {
+    
+    public void xTitle(String s) {
         xtitle = s;
     }
-
-    public void yTitle(String s)
-    {
+    
+    public void yTitle(String s) {
         ytitle = s;
     }
-
-    public void firstColumnLabels(boolean flag)
-    {
+    
+    public void firstColumnLabels(boolean flag) {
         firstColumnLabelsFlag = flag;
     }
-
-    public void xLabelsVerticalFlag(boolean flag)
-    {
+    
+    public void xLabelsVerticalFlag(boolean flag) {
         xLabelsVerticalFlag = flag;
     }
-
-    public void setData(Vector vector)
-    {
+    
+    public void setData(Vector vector) {
         lines = vector;
     }
-
+    
     private boolean deBug;
     private int x;
     private int y;

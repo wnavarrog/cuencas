@@ -1,5 +1,5 @@
 /*
- * plot1.java
+ * XYJPlot.java
  *
  * Created on 23 de julio de 2001, 03:48 PM
  */
@@ -8,7 +8,7 @@ package hydroScalingAPI.util.plot;
 
 /**
  *
- * @author  olver
+ * @author Olver Hernandez
  * @version
  */
 

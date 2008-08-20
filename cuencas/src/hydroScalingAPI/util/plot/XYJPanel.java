@@ -8,68 +8,68 @@ package hydroScalingAPI.util.plot;
 
 /**
  *
- * @author  olver 
+ * @author Olver Hernandez
  */
 public class XYJPanel extends javax.swing.JPanel {
-
+    
     /** Creates new form XYJPanel */
     XYJPlot Pplot;
- 
+    
     public XYJPanel(String Title,String xLabel,String yLabel){
-        initComponents ();
+        initComponents();
         Pplot = new XYJPlot(this,Title,xLabel,yLabel);
         
     }
- 
+    
     
     public XYJPanel(double[][] datos,String Title,String xLabel,String yLabel,double falt){
-        initComponents ();
+        initComponents();
         Pplot = new XYJPlot(this,datos,Title,xLabel,yLabel,falt);
         
     }
     public XYJPanel(double[] datos,String Title,String xLabel,String yLabel,double falt){
-        initComponents ();
+        initComponents();
         Pplot = new XYJPlot(this,datos,Title,xLabel,yLabel,falt);
         
     }
     public XYJPanel(double[] datos,String [] labels,String Title,String xLabel,String yLabel,double falt){
-        initComponents ();
+        initComponents();
         Pplot = new XYJPlot(this,datos,labels,Title,xLabel,yLabel,falt);
         
     }
     public XYJPanel(double[] datosx,double[] datosy,String Title,String xLabel,String yLabel,double falt){
-        initComponents ();
+        initComponents();
         Pplot = new XYJPlot(this,datosx,datosy,Title,xLabel,yLabel,falt);
         
     }
     public XYJPanel(double[][] datosx,double[][] datosy,String[] leg,String Title,String xLabel,String yLabel,double falt){
-        initComponents ();
+        initComponents();
         Pplot = new XYJPlot(this,datosx,datosy,leg,Title,xLabel,yLabel,falt);
         
     }
-
+    
     public XYJPanel(double[][] datos,String Title,String xLabel,String yLabel,double falt,java.awt.Color c,int t){
-        initComponents ();
+        initComponents();
         Pplot = new XYJPlot(this,datos,Title,xLabel,yLabel,falt,c,t);
         
     }
     public XYJPanel(double[] datos,String Title,String xLabel,String yLabel,double falt,java.awt.Color c,int t){
-        initComponents ();
+        initComponents();
         Pplot = new XYJPlot(this,datos,Title,xLabel,yLabel,falt,c,t);
         
     }
     public XYJPanel(double[] datos, String [] labels,String Title,String xLabel,String yLabel,double falt,java.awt.Color c,int t){
-        initComponents ();
+        initComponents();
         Pplot = new XYJPlot(this,datos,labels,Title,xLabel,yLabel,falt,c,t);
         
     }
     public XYJPanel(double[] datosx,double[] datosy,String Title,String xLabel,String yLabel,double falt,java.awt.Color c,int t){
-        initComponents ();
+        initComponents();
         Pplot = new XYJPlot(this,datosx,datosy,Title,xLabel,yLabel,falt,c,t);
         
     }
     public XYJPanel(double[][] datosx,double[][] datosy,String[] leg,String Title,String xLabel,String yLabel,double falt,java.awt.Color c,int t){
-        initComponents ();
+        initComponents();
         Pplot = new XYJPlot(this,datosx,datosy,leg,Title,xLabel,yLabel,falt,c,t);
         
     }
@@ -77,11 +77,11 @@ public class XYJPanel extends javax.swing.JPanel {
     public void paint(java.awt.Graphics g){
         Pplot.paint(g);
     }
-
+    
     public void setXRange(double min,double max){
         Pplot.setXRange(min,max);
     }
-
+    
     public void setYRange(double min,double max){
         Pplot.setYRange(min,max);
     }
@@ -122,7 +122,7 @@ public class XYJPanel extends javax.swing.JPanel {
         Pplot.create();
         repaint();
     }
-
+    
     public void removeAll(){
         Pplot.deleteAll();
         Pplot.create();
@@ -143,9 +143,9 @@ public class XYJPanel extends javax.swing.JPanel {
         setLayout (new java.awt.BorderLayout ());
 
     }//GEN-END:initComponents
-
-
+    
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
-
+    
 }

@@ -2,7 +2,7 @@ package hydroScalingAPI.modules.networkExtraction.objects;
 
 /**
  *
- * @author  Jorge Mario Ramirez
+ * @author Jorge Mario Ramirez
  */
 public abstract class RasterNetworkBlueLines extends Object {
     

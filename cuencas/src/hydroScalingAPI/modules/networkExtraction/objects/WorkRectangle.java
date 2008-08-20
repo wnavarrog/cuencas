@@ -2,7 +2,7 @@ package hydroScalingAPI.modules.networkExtraction.objects;
 
 /**
  *
- * @author  Jorge Mario Ramirez
+ * @author Jorge Mario Ramirez and Ricardo Mantilla
  */
 public class WorkRectangle extends Object  {
     public int ini_i;

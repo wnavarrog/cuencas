@@ -2,7 +2,7 @@ package hydroScalingAPI.modules.networkExtraction.objects;
 
 /**
  *
- * @author  Jorge Mario Ramirez
+ * @author Jorge Mario Ramirez
  */
 public class GeomorphCell_2 extends Object {
     public double lcp; //Longest Channel lenght
