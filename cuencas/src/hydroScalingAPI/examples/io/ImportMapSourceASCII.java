@@ -22,7 +22,7 @@ package hydroScalingAPI.examples.io;
 
 /**
  * This class was created to import GPS locations from a *.cvs file created using
- * MapSource.  It also associates images.  ()
+ * MapSource.  It also associates images.
  * @author Ricardo Mantilla
  */
 public class ImportMapSourceASCII {
