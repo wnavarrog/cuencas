@@ -93,9 +93,9 @@ public class SimulationToAsciiFilePradeep extends java.lang.Object implements Ru
         thisNetworkGeom.setCheziHG(chezLawCoeff, chezLawExpon);
         
         //PARAMETERS FOR GK ROUTING
-        float lam1=3.0f;
-        float lam2=1.0f;
-        float vo=(float)(1.5/Math.pow(200,lam1)/Math.pow(1100,lam2));
+        float lam1=0.3f;
+        float lam2=-0.1f;
+        float vo=(float)(1.0/Math.pow(200,lam1)/Math.pow(1100,lam2));
         thisNetworkGeom.setVqParams(vo,0.0f,lam1,lam2);
         
         hydroScalingAPI.modules.rainfallRunoffModel.objects.HillSlopesInfo thisHillsInfo=new hydroScalingAPI.modules.rainfallRunoffModel.objects.HillSlopesInfo(linksStructure);
@@ -360,17 +360,15 @@ public class SimulationToAsciiFilePradeep extends java.lang.Object implements Ru
         
         hydroScalingAPI.mainGUI.ParentGUI tempFrame=new hydroScalingAPI.mainGUI.ParentGUI();
         
-        //new SimulationToAsciiFile(194,281,matDirs,magnitudes,metaModif,150, 2,3.0f,2,new java.io.File("/home/ricardo/simulationResults/walnutGulch/")).executeSimulation();
-        //new SimulationToAsciiFile(194,281,matDirs,magnitudes,metaModif, 50, 6,3.0f,2,new java.io.File("/home/ricardo/simulationResults/walnutGulch/")).executeSimulation();
-        //new SimulationToAsciiFile(194,281,matDirs,magnitudes,metaModif, 10,30,3.0f,2,new java.io.File("/home/ricardo/simulationResults/walnutGulch/")).executeSimulation();
+
         //new SimulationToAsciiFile(194,281,matDirs,magnitudes,metaModif,  5,60,3.0f,2,new java.io.File("/home/ricardo/simulationResults/walnutGulch/")).executeSimulation();
         
-        //new SimulationToAsciiFilePradeep(1063,496,matDirs,magnitudes,metaModif,  25,360,0.0f,2,new java.io.File("E:/Documents and Settings/pmandapa/My Documents/Research/Cuencas/Sc1IntensityORDuration")).executeSimulation();
+        //new SimulationToAsciiFilePradeep(1063,496,matDirs,magnitudes,metaModif,  5,5,0.0f,5,new java.io.File("E:/Documents and Settings/pmandapa/My Documents/Research/Cuencas/GKRouting/Sc1IntensityORDuration")).executeSimulation();
+        new SimulationToAsciiFilePradeep(1063,496,matDirs,magnitudes,metaModif,  5,5,0.0f,2,new java.io.File("E:/Documents and Settings/pmandapa/My Documents/Research/Cuencas/CVRouting/Sc1IntensityORDuration")).executeSimulation();
         
-        
-        java.io.File stormFile;
-        stormFile=new java.io.File("C:/Documents and Settings/pmandapa/My Documents/Simulations/ForCuencas/Bin1Cuencas9_3/prec.metaVHC");
-        new SimulationToAsciiFilePradeep(1063,496,matDirs,magnitudes,metaModif,  stormFile,0.0f,2,new java.io.File("E:/Documents and Settings/pmandapa/My Documents/Research/Cuencas/RainfallRealizations")).executeSimulation();
+        //java.io.File stormFile;
+        //stormFile=new java.io.File("C:/Documents and Settings/pmandapa/My Documents/Simulations/ForCuencas/Bin1Cuencas9_3/prec.metaVHC");
+        //new SimulationToAsciiFilePradeep(1063,496,matDirs,magnitudes,metaModif,  stormFile,0.0f,2,new java.io.File("E:/Documents and Settings/pmandapa/My Documents/Research/Cuencas/RainfallRealizations")).executeSimulation();
     }
     
 }
