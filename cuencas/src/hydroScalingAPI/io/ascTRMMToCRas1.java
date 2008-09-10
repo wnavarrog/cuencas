@@ -3,12 +3,17 @@
  * and open the template in the editor.
  */
 
+
 package hydroScalingAPI.io;
 import java.io.*;
-/**
- *
- * @author pmandapa
- */
+
+// This program converts TRMM ascii data to CRas data
+// Steps to run this model 
+//1) Download the data from: http://disc.sci.gsfc.nasa.gov/data/datapool/TRMM_DP/01_Data_Products/02_Gridded/index.html
+//2) Use ftp commands acording NASA manual to download the data
+//3) Convert data to asc file usind "select_vNsds_linux" program in batch mode
+//4) Use to convert files to cuencas format - edit the domain (main function) and metadata file.
+// 
 
 import java.io.*;
 import java.util.*;
@@ -43,10 +48,7 @@ public class ascTRMMToCRas1 extends Object {
         System.out.println("buffer the data"+"column=" +columns+"rows="+rows);  
         south= "33:13:00.00 N";
         west= "97:30:00.00 W";
-        
-        //String temp = Double.toString(LimSouth);
-        //////////////////// parei aqui//////////////////////
-        
+         
         int oricolumns = 1440;
         int orirows = 400;        
         matrix = new double[orirows][oricolumns];
@@ -57,22 +59,7 @@ public class ascTRMMToCRas1 extends Object {
         String data = buffer.readLine();
         int i=0;
         int j=0;  
-// south to north 
-//        while (data != null)
-//        {
-//            tokens = new StringTokenizer(data,"     ");
-//            while (tokens.hasMoreTokens()) {
-//             if(i==(orirows))
-//             {j=j+1;
-//              i=0;}
-//              matrix[i][j] = new Double(tokens.nextToken());
-//             // matrix[i][j] = new Double(tokens.nextToken()).doubleValue();
-//              i=i+1; 
-//            }
-//        data = buffer.readLine();
-//        }       
 
-// north to south 
         i=orirows-1;
         j=0;
         while (data != null)
@@ -89,22 +76,6 @@ public class ascTRMMToCRas1 extends Object {
             }
         data = buffer.readLine();
         }       
-        
-        //for (int i=0;i<11;i++) buffer.readLine();
-        
-        //for (int i=0;i<rows;i++) {
-            
-        //    linea = buffer.readLine();
-        
-        //    tokens = new StringTokenizer(linea);
-        //    for (int j=0;j<columns;j++) {
-       //         try{
-       //             matrix[i][j] = new Float(tokens.nextToken()).floatValue();
-       //         } catch (NumberFormatException NFE){
-       //             matrix[i][j] = -9999;
-       //         }
-       //     }
-       // }
        
         buffer.close();
         
@@ -271,7 +242,7 @@ public class ascTRMMToCRas1 extends Object {
         timeStamp[4]="30"; // min
         monthString=months[(Integer.parseInt(timeStamp[1])-1)];
         String vhcFilename;
-        if(type=="Bin") {vhcFilename="prec."+timeStamp[3]+timeStamp[4]+"00."+timeStamp[2]+"."+monthString+"."+timeStamp[0]+".vhc";}
+        if (type.equals("Bin")) {vhcFilename="prec."+timeStamp[3]+timeStamp[4]+"00."+timeStamp[2]+"."+monthString+"."+timeStamp[0]+".vhc";}
         else {vhcFilename="prec."+timeStamp[3]+timeStamp[4]+"00."+timeStamp[2]+"."+monthString+"."+timeStamp[0]+".asc";}
         System.out.println(" to "+vhcFilename);
        return vhcFilename;
@@ -281,9 +252,10 @@ public class ascTRMMToCRas1 extends Object {
         
         
         java.io.File OriginalFile;
-        File folder = new File("C:/CUENCAS/11110103/Data/07197000/sat/raw"); // input folder
-        String OutputDirBin="C:/CUENCAS/11110103/Data/07197000/sat/Bin"; // output folder - Binary files
-        String OutputDirAsc="C:/CUENCAS/11110103/Data/07197000/sat/Asc"; // output folder - Asc files
+        File folder = new File("C:/CUENCAS/Whitewater_database/Rasters/Hydrology/storms/sat/jun2007/raw"); // input folder
+        String OutputDirBin="C:/CUENCAS/Whitewater_database/Rasters/Hydrology/storms/sat/jun2007/bin"; // output folder - Binary files
+        String OutputDirAsc="C:/CUENCAS/Whitewater_database/Rasters/Hydrology/storms/sat/jun2007/asc"; // output folder - Asc files
+// Define the limits of the raster to be generated - in this case I include the Oklahoma basins, Kansas and Iowa
         double LimSouth = 33.75;
         double LimNorth = 42.00;
         double LimEast = -91.25;
