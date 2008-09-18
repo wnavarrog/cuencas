@@ -284,8 +284,8 @@ public static void main(String[] args) throws java.io.IOException{
       {
             new_t_res=it;
  /*****DEFINE THE FOLDER WITH NEXRAD DATA AND OUTPUT FOLDER*******/           
-        File folder_nexrad = new File("C:/CUENCAS/Whitewater_database/Eventmay/15min_no_missing/NEXRAD/");
-        String OutputDir="C:/CUENCAS/Whitewater_database/Eventmay/15min_no_missing/"+NDecRes+"/";
+        File folder_nexrad = new File("C:/CUENCAS/Whitewater_database/EventJun/15minAnalysis/NEXRAD/");
+        String OutputDir="C:/CUENCAS/Whitewater_database/EventJun/15minAnalysis/"+NDecRes+"/";
         new File(OutputDir).mkdirs();
         OutputDir=OutputDir+"/"+new_t_res+"min/";
         new File(OutputDir).mkdirs();
@@ -352,7 +352,7 @@ public static void main(String[] args) throws java.io.IOException{
                       
         java.util.Arrays.sort(arCron); // sort the files
         createMetaFile(new java.io.File(OutputDirt),new_s_res,new_t_res,Frows,Fcolumns);
-
+ System.out.println("before time = "+OutputDirs);
              try {  
                  new HydroNexradRes_time(arCron,OutputDirt,Frows,Fcolumns,new_s_res,orig_t_res,new_t_res,missing);
               
@@ -360,6 +360,7 @@ public static void main(String[] args) throws java.io.IOException{
                  System.err.print(IOE);
                  System.exit(0);
              }
+ System.out.println("after time = "+OutputDirs);
         }     
      }    
 }
