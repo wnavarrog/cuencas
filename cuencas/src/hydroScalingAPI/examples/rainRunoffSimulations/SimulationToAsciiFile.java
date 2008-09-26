@@ -175,7 +175,7 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
                 newfile.write("\n");
             }
         }
-        
+      
         newfile.close();
         bufferout.close();
         
@@ -284,12 +284,12 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
             System.out.println("Intermedia Time:"+interTime.toString());
             System.out.println("Running Time:"+(.001*(interTime.getTime()-startTime.getTime()))+" seconds");
             
-            rainRunoffRaining.jumpsRunToAsciiFile(storm.stormInitialTimeInMinutes()+numPeriods*rainDuration,(storm.stormInitialTimeInMinutes()+(numPeriods+1)*rainDuration)+800,2,initialCondition,newfile,linksStructure,thisNetworkGeom);
+            rainRunoffRaining.jumpsRunToAsciiFile(storm.stormInitialTimeInMinutes()+numPeriods*rainDuration,(storm.stormInitialTimeInMinutes()+(numPeriods+1)*rainDuration)+800,rainDuration,initialCondition,newfile,linksStructure,thisNetworkGeom);
             
         } else {
             for (int k=0;k<numPeriods;k++) {
                 System.out.println("Period "+(k+1)+" of "+numPeriods);
-                rainRunoffRaining.jumpsRunToAsciiFile(storm.stormInitialTimeInMinutes()+k*storm.stormRecordResolutionInMinutes(),storm.stormInitialTimeInMinutes()+(k+1)*storm.stormRecordResolutionInMinutes(),1,initialCondition,newfile,linksStructure,thisNetworkGeom);
+                rainRunoffRaining.jumpsRunToAsciiFile(storm.stormInitialTimeInMinutes()+k*storm.stormRecordResolutionInMinutes(),storm.stormInitialTimeInMinutes()+(k+1)*storm.stormRecordResolutionInMinutes(),10,initialCondition,newfile,linksStructure,thisNetworkGeom);
                 initialCondition=rainRunoffRaining.finalCond;
                 rainRunoffRaining.setBasicTimeStep(10/60.);
             }
@@ -306,7 +306,19 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
         System.out.println("End Time:"+endTime.toString());
         System.out.println("Running Time:"+(.001*(endTime.getTime()-startTime.getTime()))+" seconds");
         
+        
+        double[] maximumsAchieved=rainRunoffRaining.getMaximumAchieved();
+        
+        newfile.write("\n");
+        newfile.write("\n");
+        newfile.write("Maximum Discharge [m^3/s],");
+        for (int i=0;i<linksStructure.completeStreamLinksArray.length;i++){
+            if(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > 1)
+                newfile.write(maximumsAchieved[linksStructure.completeStreamLinksArray[i]]+",");
+        }
+        
         System.out.println("Inicia escritura de Resultados");
+        newfile.write("\n");
         
         newfile.close();
         bufferout.close();

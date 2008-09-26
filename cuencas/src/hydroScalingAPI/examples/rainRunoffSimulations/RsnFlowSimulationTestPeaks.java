@@ -116,7 +116,7 @@ public class RsnFlowSimulationTestPeaks extends java.lang.Object {
 
         while(givenStep[1][0] > 1e-3){
             
-            givenStep=rainRunoffRaining.step(currentTime, initialCondition , basicTimeStep,false);
+            //givenStep=rainRunoffRaining.step(currentTime, initialCondition , basicTimeStep,false);
             basicTimeStep=givenStep[0][0];
             currentTime+=basicTimeStep;
             givenStep[0][0]=currentTime;

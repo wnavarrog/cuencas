@@ -59,7 +59,7 @@ public class RKF extends java.lang.Object {
      double[] cStar={2825/27648.,  0.,  18575/48384.,    13525/55296.,    277/14336.,  1/4.     };
      
      double[] Derivs;
-     double[] carrier,k0,k1,k2,k3,k4,k5,newY,newYstar;
+     double[] carrier,k0,k1,k2,k3,k4,k5,newY,newYstar,maxAchieved;
      
      double Delta,newTimeStep,factor;
 
@@ -85,7 +85,13 @@ public class RKF extends java.lang.Object {
      * it needs to be refined
      * @return The value of the multivatiate function
      */
-    public double[][] step(double currentTime, double[] IC, double timeStep, boolean finalize){
+    private double[][] step(double currentTime, double[] IC, double timeStep, boolean finalize){
+        
+        //if first time call ever define array maxAchieved
+        if(maxAchieved == null) {
+            maxAchieved=new double[IC.length];
+            java.util.Arrays.fill(maxAchieved,Double.MIN_VALUE);
+        }
         
         carrier=new double[IC.length];
         
@@ -127,6 +133,9 @@ public class RKF extends java.lang.Object {
         newTimeStep=timeStep;
 
         if (finalize){
+            
+            for (int i = 0; i < IC.length; i++) maxAchieved[i]=Math.max( maxAchieved[i], newY[i]);
+
             return new double[][] {{newTimeStep},newY};
         }
         else {
@@ -1060,6 +1069,15 @@ public class RKF extends java.lang.Object {
         basicTimeStep=newBTS;
     }
 
+    /**
+     * Returns an array with the maximum value calculated during the iteration process
+     * @param newBTS The time step to assign
+     */
+    public double[] getMaximumAchieved(){
+        return maxAchieved;
+    }
+
+    
     /**
      * Tests for the class
      * @param args the command line arguments
