@@ -562,16 +562,16 @@ public class RKF extends java.lang.Object {
      * @throws java.io.IOException Captures errors while writing to the file
      */
     public void jumpsRunToAsciiFileTabs(double iniTime, double finalTime, double incrementalTime, double[] IC, java.io.OutputStreamWriter outputStream, hydroScalingAPI.util.geomorphology.objects.LinksAnalysis linksStructure, hydroScalingAPI.modules.rainfallRunoffModel.objects.LinksInfo thisNetworkGeom) throws java.io.IOException {
-        
+       
         double currentTime=iniTime,targetTime;
         
         int ouletID=linksStructure.getOutletID();
         
         outputStream.write("\n");
-       outputStream.write(currentTime+",");
+        outputStream.write(currentTime+"\t");
         for (int i=0;i<linksStructure.completeStreamLinksArray.length;i++){
-            if(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > 1)
-                outputStream.write(IC[linksStructure.completeStreamLinksArray[i]]+",");
+            //if(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > 1)
+                outputStream.write(IC[linksStructure.completeStreamLinksArray[i]]+"\t");
         }
         
         java.util.Calendar thisDate=java.util.Calendar.getInstance();
@@ -631,10 +631,10 @@ public class RKF extends java.lang.Object {
             IC=givenStep[1];
             
             outputStream.write("\n");
-            outputStream.write(currentTime+",");
+            outputStream.write(currentTime+"\t");
             for (int i=0;i<linksStructure.completeStreamLinksArray.length;i++){
-                if(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > 1)
-                    outputStream.write(IC[linksStructure.completeStreamLinksArray[i]]+",");
+                //if(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > 1)
+                    outputStream.write(IC[linksStructure.completeStreamLinksArray[i]]+"\t");
             }
             
             thisDate=java.util.Calendar.getInstance();
@@ -654,10 +654,10 @@ public class RKF extends java.lang.Object {
             IC=givenStep[1];
 
             outputStream.write("\n");
-            outputStream.write(currentTime+",");
+            outputStream.write(currentTime+"\t");
             for (int i=0;i<linksStructure.completeStreamLinksArray.length;i++){
-                if(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > 1)
-                    outputStream.write(IC[linksStructure.completeStreamLinksArray[i]]+",");
+                //if(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > 1)
+                    outputStream.write(IC[linksStructure.completeStreamLinksArray[i]]+"\t");
             }
 
             thisDate=java.util.Calendar.getInstance();
