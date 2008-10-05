@@ -18,12 +18,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
 
-/*
- * simulationsRep3.java
- *
- * Created on December 6, 2001, 10:34 AM
- */
-
 package hydroScalingAPI.examples.rainRunoffSimulations;
 
 import visad.*;
@@ -154,48 +148,30 @@ public class SimulationToAsciiFilePradeep extends java.lang.Object implements Ru
         
         double[][] wfs=linksStructure.getWidthFunctions(linksStructure.completeStreamLinksArray,0);
        
-        java.io.File wfsLengthFile;        
-        wfsLengthFile=new java.io.File(outputDirectory.getAbsolutePath()+"/"+demName+"-SN_"+infiltRate+".wfs.length");
-        System.out.println("Writing Width Function lengths - "+wfsLengthFile);
-        java.io.FileOutputStream fout = new java.io.FileOutputStream(wfsLengthFile);
-        java.io.BufferedOutputStream buffOut = new java.io.BufferedOutputStream(fout);
-        java.io.OutputStreamWriter OutFile = new java.io.OutputStreamWriter(buffOut);
-        
-        for (int i=0;i<linksStructure.completeStreamLinksArray.length;i++){        
-                OutFile.write("Link #"+linksStructure.completeStreamLinksArray[i]+"\t");                        
-                OutFile.write(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i])+"\t");        
-                OutFile.write(wfs[i].length+"\t");
-                OutFile.write("\n");        
-        }
-        
-        OutFile.close();
-        buffOut.close();
-        
         java.io.File theFile;
         
-        theFile=new java.io.File(outputDirectory.getAbsolutePath()+"/"+demName+"-SN_"+infiltRate+".wfs");
+        theFile=new java.io.File(outputDirectory.getAbsolutePath()+"/"+demName+"-SN_"+infiltRate+".AreasWFS");
         System.out.println("Writing Width Functions - "+theFile);
         java.io.FileOutputStream salida = new java.io.FileOutputStream(theFile);
         java.io.BufferedOutputStream bufferout = new java.io.BufferedOutputStream(salida);
         java.io.OutputStreamWriter newfile = new java.io.OutputStreamWriter(bufferout);
         
         for (int i=0;i<linksStructure.completeStreamLinksArray.length;i++){
-        //    if(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > 1){
                 newfile.write("Link #"+linksStructure.completeStreamLinksArray[i]+"\t");                        
-                newfile.write(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i])+"\t");        
+                newfile.write(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i])+"\t");
+                newfile.write(thisNetworkGeom.upStreamArea(linksStructure.completeStreamLinksArray[i])+"\t");
+                newfile.write(wfs[i].length+"\t");
                 for (int j=0;j<wfs[i].length;j++) newfile.write(wfs[i][j]+"\t");
                 newfile.write("\n");
-        //    }
-        }
-        
+        }        
         newfile.close();
         bufferout.close();
        
        
         if(stormFile == null)
-            theFile=new java.io.File(outputDirectory.getAbsolutePath()+"/"+demName+"-INT_"+rainIntensity+"-DUR_"+rainDuration+"-IR_"+infiltRate+"-Routing_0.2_-0.3_"+routingString+chezLawExpon+".hydrographs");
+            theFile=new java.io.File(outputDirectory.getAbsolutePath()+"/"+demName+"-INT_"+rainIntensity+"-DUR_"+rainDuration+"-IR_"+infiltRate+"-Routing_"+routingString+chezLawExpon+".hydrographs");
         else
-            theFile=new java.io.File(outputDirectory.getAbsolutePath()+"/"+demName+"-GaussNoise"+stormFile.getName()+"-IR_"+infiltRate+"-Routing_"+routingString+"_params_0.1_1_dat.hydrographs");
+            theFile=new java.io.File(outputDirectory.getAbsolutePath()+"/"+demName+"-GaussNoise"+stormFile.getName()+"-IR_"+infiltRate+"-Routing_"+routingString+"_params_9.0_4_dat.hydrographs");
         
         System.out.println(theFile);
         
@@ -208,34 +184,29 @@ public class SimulationToAsciiFilePradeep extends java.lang.Object implements Ru
         newfile.write("Link #\t");
         
         for (int i=0;i<linksStructure.completeStreamLinksArray.length;i++){
-        //    if(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > 1)
-                newfile.write("Link-"+linksStructure.completeStreamLinksArray[i]+"\t");
+             newfile.write("Link-"+linksStructure.completeStreamLinksArray[i]+"\t");
         }
         
         newfile.write("\n");
         newfile.write("Horton Order\t");
         
         for (int i=0;i<linksStructure.completeStreamLinksArray.length;i++){
-        //    if(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > 1)
-                newfile.write(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i])+"\t");
+             newfile.write(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i])+"\t");
         }
         
         newfile.write("\n");
         newfile.write("Upstream Area [km^2]\t");
         
         for (int i=0;i<linksStructure.completeStreamLinksArray.length;i++){
-        //    if(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > 1)
-                newfile.write(thisNetworkGeom.upStreamArea(linksStructure.completeStreamLinksArray[i])+"\t");
+             newfile.write(thisNetworkGeom.upStreamArea(linksStructure.completeStreamLinksArray[i])+"\t");
         }
         
         newfile.write("\n");
         newfile.write("Link Outlet ID\t");
         
         for (int i=0;i<linksStructure.completeStreamLinksArray.length;i++){
-        //    if(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > 1)
-                newfile.write(linksStructure.contactsArray[linksStructure.completeStreamLinksArray[i]]+"\t");
+             newfile.write(linksStructure.contactsArray[linksStructure.completeStreamLinksArray[i]]+"\t");
         }
-        
         
         newfile.write("\n");
         newfile.write("Results of flow simulations in your basin");
@@ -244,8 +215,7 @@ public class SimulationToAsciiFilePradeep extends java.lang.Object implements Ru
         newfile.write("Time\t");
         
         for (int i=0;i<linksStructure.completeStreamLinksArray.length;i++){
-        //    if(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > 1)
-                newfile.write("Link-"+linksStructure.completeStreamLinksArray[i]+"\t");
+             newfile.write("Link-"+linksStructure.completeStreamLinksArray[i]+"\t");
         }
         
         hydroScalingAPI.modules.rainfallRunoffModel.objects.NetworkEquations_ChannelLosses thisBasinEqSys=new hydroScalingAPI.modules.rainfallRunoffModel.objects.NetworkEquations_ChannelLosses(linksStructure,thisHillsInfo,thisNetworkGeom,routingType);
@@ -301,7 +271,7 @@ public class SimulationToAsciiFilePradeep extends java.lang.Object implements Ru
         } else {
             for (int k=0;k<numPeriods;k++) {
                 System.out.println("Period "+(k+1)+" of "+numPeriods);
-                rainRunoffRaining.jumpsRunToAsciiFileTabs(storm.stormInitialTimeInMinutes()+k*storm.stormRecordResolutionInMinutes(),storm.stormInitialTimeInMinutes()+(k+1)*storm.stormRecordResolutionInMinutes(),1,initialCondition,newfile,linksStructure,thisNetworkGeom);
+                rainRunoffRaining.jumpsRunToAsciiFileTabs(storm.stormInitialTimeInMinutes()+k*storm.stormRecordResolutionInMinutes(),storm.stormInitialTimeInMinutes()+(k+1)*storm.stormRecordResolutionInMinutes(),10,initialCondition,newfile,linksStructure,thisNetworkGeom);
                 initialCondition=rainRunoffRaining.finalCond;
                 rainRunoffRaining.setBasicTimeStep(10/60.);
             }
@@ -323,8 +293,7 @@ public class SimulationToAsciiFilePradeep extends java.lang.Object implements Ru
         newfile.write("\n");
         newfile.write("Maximum Discharge\t");
         for (int i=0;i<linksStructure.completeStreamLinksArray.length;i++){
-            //if(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > 1)
-                newfile.write(maximumsAchieved[linksStructure.completeStreamLinksArray[i]]+"\t");
+             newfile.write(maximumsAchieved[linksStructure.completeStreamLinksArray[i]]+"\t");
         }
         
         System.out.println("Inicia escritura de Resultados");
@@ -392,10 +361,10 @@ public class SimulationToAsciiFilePradeep extends java.lang.Object implements Ru
         //new SimulationToAsciiFile(194,281,matDirs,magnitudes,metaModif,  5,60,3.0f,2,new java.io.File("/home/ricardo/simulationResults/walnutGulch/")).executeSimulation();
         
         //new SimulationToAsciiFilePradeep(1063,496,matDirs,magnitudes,metaModif,  25,120,0.0f,5,new java.io.File("E:/Documents and Settings/pmandapa/My Documents/Research/Cuencas/GKRouting/ScChannelVelocityGK")).executeSimulation();
-        //new SimulationToAsciiFilePradeep(1063,496,matDirs,magnitudes,metaModif,  25,5,0.0f,2,new java.io.File("E:/Documents and Settings/pmandapa/My Documents/Research/Cuencas/CVRouting/Sc1IntensityOrDuration")).executeSimulation();
+        //new SimulationToAsciiFilePradeep(1063,496,matDirs,magnitudes,metaModif,  25,120,0.0f,2,new java.io.File("E:/Documents and Settings/pmandapa/My Documents/Research/Cuencas/CVRouting/Sc1IntensityOrDuration")).executeSimulation();
         
         java.io.File stormFile;
-        stormFile=new java.io.File("C:/Documents and Settings/pmandapa/My Documents/Simulations/ForCuencas/BinScGaussNoise_0.1_1/prec.metaVHC");
+        stormFile=new java.io.File("C:/Documents and Settings/pmandapa/My Documents/Simulations/ForCuencas/BinScGaussNoise_9.0_4/prec.metaVHC");
         new SimulationToAsciiFilePradeep(1063,496,matDirs,magnitudes,metaModif,  stormFile,0.0f,2,new java.io.File("E:/Documents and Settings/pmandapa/My Documents/Research/Cuencas/CVRouting/ScGaussNoise")).executeSimulation();
         //new SimulationToAsciiFilePradeep(1063,496,matDirs,magnitudes,metaModif,  stormFile,0.0f,5,new java.io.File("E:/Documents and Settings/pmandapa/My Documents/Research/Cuencas/CVRouting/ScWithBellRain")).executeSimulation();
     }
