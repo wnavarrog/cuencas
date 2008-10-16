@@ -26,10 +26,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 package hydroScalingAPI.util.geomorphology.objects;
 
-import java.rmi.RemoteException;
-import java.util.Iterator;
-import visad.VisADException;
-
 /**
  * This class manages the topologic structure of the river network of a basin.  This
  * is the most important class in CUENCAS.  It is used by the Network Analysis module
@@ -366,7 +362,7 @@ public class LinksAnalysis extends java.lang.Object {
                 OuletLinkNum=outlets[k];
 
                 float[][] wFunc=getDistancesToOutlet(bigDtoO,outlets[k]);
-
+                
                 hydroScalingAPI.util.statistics.Stats distStats=new hydroScalingAPI.util.statistics.Stats(wFunc[metric]);
 
                 double[][] laWFunc=new double[1][1+(int)Math.ceil(distStats.maxValue/binsize)];
@@ -520,7 +516,7 @@ public class LinksAnalysis extends java.lang.Object {
                 fileQuantity.seek(4*basin.getOutletID());
                 int ToToB=fileQuantity.readInt();
                 for (int i=0;i<quantityArray[0].length;i++){
-                    fileQuantity.seek(4*contactsArray[i]);
+                    fileQuantity.seek(4*tailsArray[i]);
                     quantityArray[0][i]=fileQuantity.readInt()-ToToB+1;
                 }
                 
