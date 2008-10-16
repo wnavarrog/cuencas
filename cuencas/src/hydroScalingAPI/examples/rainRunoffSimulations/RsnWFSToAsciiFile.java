@@ -165,34 +165,28 @@ public class RsnWFSToAsciiFile extends java.lang.Object {
     
     public static void subMain1(String args[]) throws java.io.IOException, VisADException {
         
-        String outDir="/home/ricardo/workFiles/myWorkingStuff/MateriasDoctorado/PhD_Thesis/results/widthFunctions/geometricRSNs/";
+        String outDir="/home/ricardo/simulationResults/widthFunctions/geometricRSNs/constantL/";
         
-        int iniExperiment=1;
-        int finExperiments=999;
+        int iniExperiment=150;
+        int finExperiments=199;
         
         java.text.NumberFormat labelFormat = java.text.NumberFormat.getNumberInstance();
         labelFormat.setGroupingUsed(false);
         labelFormat.setMinimumFractionDigits(2);
-                
-        for(double p_i=0.36;p_i<0.50;p_i+=0.04){
-            for(double p_e=0.45;p_e<0.55;p_e+=0.04){
-                
-                String fileString=outDir+"/p_i"+labelFormat.format(p_i)+"p_e"+labelFormat.format(p_e);
-                new java.io.File(fileString).mkdir();
-                
-                for(int sofi=2;sofi<=7;sofi++){
-
-                    fileString=outDir+"/p_i"+labelFormat.format(p_i)+"p_e"+labelFormat.format(p_e)+"/ord_"+sofi;
-
-                    new java.io.File(fileString).mkdir();
-
+        
+        for(double p_i=0.36;p_i<0.50;p_i+=0.02){
+            for(double p_e=0.45;p_e<0.55;p_e+=0.02){
+                new java.io.File(outDir+"p_i"+labelFormat.format(p_i)+"p_e"+labelFormat.format(p_e)).mkdir();
+                for(int sofi=2;sofi<=8;sofi++){
+                    new java.io.File(outDir+"p_i"+labelFormat.format(p_i)+"p_e"+labelFormat.format(p_e)+"/ord_"+sofi).mkdir();
+                    
                     for(int experiment=iniExperiment;experiment<=finExperiments;experiment++){
 
                         hydroScalingAPI.util.probability.DiscreteDistribution myUD_I=new hydroScalingAPI.util.probability.GeometricDistribution(p_i,0);
                         hydroScalingAPI.util.probability.DiscreteDistribution myUD_E=new hydroScalingAPI.util.probability.GeometricDistribution(p_e,1);
                         hydroScalingAPI.util.randomSelfSimilarNetworks.RsnStructure myRSN=new hydroScalingAPI.util.randomSelfSimilarNetworks.RsnStructure(sofi-1,myUD_I,myUD_E);
-                        new RsnWFSToAsciiFile(myRSN,0,1,experiment,5,new java.io.File(fileString)).executeSimulation();
-
+                        new RsnWFSToAsciiFile(myRSN,0,1,experiment,2,new java.io.File(outDir+"p_i"+labelFormat.format(p_i)+"p_e"+labelFormat.format(p_e)+"/ord_"+sofi)).executeSimulation();
+                        System.out.println("completed "+outDir+"p_i"+labelFormat.format(p_i)+"p_e"+labelFormat.format(p_e)+"/ord_"+sofi);
                     }
                 }
             }

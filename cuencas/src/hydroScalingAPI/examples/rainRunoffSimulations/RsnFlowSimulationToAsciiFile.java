@@ -194,7 +194,7 @@ public class RsnFlowSimulationToAsciiFile extends java.lang.Object {
         //double ic_sum = 0.0f;
         
         for (int i=0;i<linksStructure.connectionsArray.length;i++){
-            initialCondition[i]=0.5;
+            initialCondition[i]=1.0;
             //initialCondition[i]=( areasHillArray[0][i]*100.*1e3 ) / ( linkLengths[0][i] *1e3 )  ;//0.0;
             //System.out.println(areasHillArray[0][i]);
             initialCondition[i+linksStructure.connectionsArray.length]=1;
@@ -230,8 +230,20 @@ public class RsnFlowSimulationToAsciiFile extends java.lang.Object {
         System.out.println("Running Time:"+(.001*(interTime.getTime()-startTime.getTime()))+" seconds");
 
         //the discretization step should be Math.pow(2,(basinOrder-1))
-        rainRunoffRaining.jumpsRunToIncompleteAsciiFile(storm.stormInitialTimeInMinutes()+numPeriods*rainDuration,(storm.stormInitialTimeInMinutes()+(numPeriods+1)*rainDuration)+20000,Math.pow(2,(basinOrder-4)),initialCondition,newfile,linksStructure,thisNetworkGeom);
+        rainRunoffRaining.jumpsRunToIncompleteAsciiFile(storm.stormInitialTimeInMinutes()+numPeriods*rainDuration,(storm.stormInitialTimeInMinutes()+(numPeriods+1)*rainDuration)+20000,Math.pow(2,(basinOrder-1)),initialCondition,newfile,linksStructure,thisNetworkGeom);
  
+        
+        double[] maximumsAchieved=rainRunoffRaining.getMaximumAchieved();
+        
+        newfile.write("\n");
+        newfile.write("\n");
+        newfile.write("Maximum Discharge [m^3/s],");
+        for (int i=0;i<linksStructure.completeStreamLinksArray.length;i++){
+            if(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > Math.max(basinOrder-3,1))
+                newfile.write(maximumsAchieved[linksStructure.completeStreamLinksArray[i]]+",");
+        }
+        
+        
         System.out.println("Termina simulacion RKF");
         java.util.Date endTime=new java.util.Date();
         System.out.println("End Time:"+endTime.toString());
@@ -252,11 +264,11 @@ public class RsnFlowSimulationToAsciiFile extends java.lang.Object {
         
         try{
             
-            //subMain1(args);   //Geometrically Distributed generators, constant link-length
+            subMain1(args);   //Geometrically Distributed generators, constant link-length
             //subMain2(args);   //Geometrically Distributed generators, random link-length
             //subMain3(args);   //Geometrically Distributed generators, random link-length, random link-area
             //subMain4(args);   //Uniformly Distributed generators, constant link-length
-            subMain5(args);   //Tokunaga Trees E(1,2,3,4)I(0,1,2,3,4)
+            //subMain5(args);   //Tokunaga Trees E(1,2,3,4)I(0,1,2,3,4)
             
             //subMain6(args);   //Geometrically Distributed generators, constant link-length, HG and Non-Linear Velocities
             
@@ -275,19 +287,19 @@ public class RsnFlowSimulationToAsciiFile extends java.lang.Object {
     
     public static void subMain1(String args[]) throws java.io.IOException, VisADException {
         
-        String outDir="/home/ricardo/workFiles/myWorkingStuff/MateriasDoctorado/PhD_Thesis/results/flowSimulations/geometricRSNs/constantL/";
+        String outDir="/home/ricardo/simulationResults/geometricRSNs/constantL/";
         
         int iniExperiment=0;
-        int finExperiments=99;
+        int finExperiments=0;
         
         java.text.NumberFormat labelFormat = java.text.NumberFormat.getNumberInstance();
         labelFormat.setGroupingUsed(false);
         labelFormat.setMinimumFractionDigits(2);
         
-        for(double p_i=0.36;p_i<0.38;p_i+=0.02){
-            for(double p_e=0.45;p_e<0.47;p_e+=0.02){
+        for(double p_i=0.36;p_i<0.50;p_i+=0.02){
+            for(double p_e=0.45;p_e<0.55;p_e+=0.02){
                 new java.io.File(outDir+"p_i"+labelFormat.format(p_i)+"p_e"+labelFormat.format(p_e)).mkdir();
-                for(int sofi=2;sofi<=2;sofi++){
+                for(int sofi=2;sofi<=8;sofi++){
                     new java.io.File(outDir+"p_i"+labelFormat.format(p_i)+"p_e"+labelFormat.format(p_e)+"/ord_"+sofi).mkdir();
                     
                     for(int experiment=iniExperiment;experiment<=finExperiments;experiment++){

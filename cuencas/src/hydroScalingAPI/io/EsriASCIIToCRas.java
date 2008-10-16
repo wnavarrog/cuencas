@@ -75,8 +75,7 @@ public class EsriASCIIToCRas extends Object {
             linea = buffer.readLine();
             tokens = new StringTokenizer(linea);
             
-            basura = tokens.nextToken();
-            variables[i] = tokens.nextToken();
+            while(tokens.hasMoreTokens()) variables[i] = tokens.nextToken();
             
         }
         

@@ -282,8 +282,8 @@ public class LinksAnalysis extends java.lang.Object {
     public float[][] getDistancesToOutlet(){
         try{
             float[][] dToOutlet=new float[2][1];
-            dToOutlet[0]=getVarValues(7)[0];
-            dToOutlet[1]=getVarValues(8)[0];
+            dToOutlet[0]=getVarValues(8)[0];
+            dToOutlet[1]=getVarValues(7)[0];
             return dToOutlet;
         } catch (java.io.IOException IOE){
             System.err.println("Failed reading lengths for width Function");
@@ -297,37 +297,28 @@ public class LinksAnalysis extends java.lang.Object {
     /**
      * Returns the topologic and geometric distances of the upstream links to a
      * desired link in the basin
+     * @param dToOutlet An array with distances to the basin outlet using function getDistancesToOutlet()
      * @param outlet A list of desired outlets
      * @return A float[][] array. Where float[0] contains the array of topologic distances to
      * the desired link and float[1] contains the array of geometric distances to the
      * desired link
      */
-    public float[][] getDistancesToOutlet(int outlet){
-        try{
-            float[][] dToOutlet=new float[2][];
-            dToOutlet[0]=getVarValues(8)[0];
-            dToOutlet[1]=getVarValues(7)[0];
+    public float[][] getDistancesToOutlet(float[][] dToOutlet,int outlet){
             
-            java.util.Vector distToInclue=new java.util.Vector();
-            distToInclue.add(new float[] {dToOutlet[0][outlet],dToOutlet[1][outlet]});
-            addIncoming(dToOutlet,distToInclue,outlet);
-            
-            
-            float[][] shortGroupDists=new float[2][distToInclue.size()];
-            
-            for(int i=0;i<shortGroupDists[0].length;i++){
-                float[] myDists=(float[])distToInclue.get(i);
-                shortGroupDists[0][i]=myDists[0]-dToOutlet[0][outlet];
-                shortGroupDists[1][i]=myDists[1]-dToOutlet[1][outlet];
-            }
-            
-            return shortGroupDists;
-        } catch (java.io.IOException IOE){
-            System.err.println("Failed reading lengths for width Function");
-            System.err.println(IOE);
+        java.util.Vector distToInclue=new java.util.Vector();
+        distToInclue.add(new float[] {dToOutlet[0][outlet],dToOutlet[1][outlet]});
+        addIncoming(dToOutlet,distToInclue,outlet);
+
+
+        float[][] shortGroupDists=new float[2][distToInclue.size()];
+
+        for(int i=0;i<shortGroupDists[0].length;i++){
+            float[] myDists=(float[])distToInclue.get(i);
+            shortGroupDists[0][i]=myDists[0]-dToOutlet[0][outlet];
+            shortGroupDists[1][i]=myDists[1]-dToOutlet[1][outlet];
         }
-        
-        return null;
+
+        return shortGroupDists;
         
     }
     
@@ -346,70 +337,51 @@ public class LinksAnalysis extends java.lang.Object {
      * @return A double[numOutlets][numBins] array with the Width Functions
      */
     public double[][] getWidthFunctions(int[] outlets,int metric){
-        try {
-            
-            double[][] widthFunctions=new double[outlets.length][];
-            
-            int OriginalBasinOutlet=OuletLinkNum;
-            
-            float binsize=1;
-            
-            for(int k=0;k<outlets.length;k++){
-                if(magnitudeArray[outlets[k]] > 1){
-                    OuletLinkNum=outlets[k];
-
-                    float[][] wFunc=getDistancesToOutlet(outlets[k]);
-                    java.util.Arrays.sort(wFunc[metric]);
-
-                    float[][] gWFunc=new float[1][wFunc[metric].length];
-
-                    for (int i=0;i<wFunc[0].length;i++){
-                        gWFunc[0][i]=wFunc[metric][i];
-                    }
-                    
-//                    hydroScalingAPI.util.statistics.Stats distStats=new hydroScalingAPI.util.statistics.Stats(gWFunc);
-                    
-                    if(metric != 0){
-                        binsize=0.3f;
-                    }
-
-                    visad.RealType numLinks= visad.RealType.getRealType("numLinks");
-                    visad.RealType distanceToOut = visad.RealType.getRealType("distanceToOut");
-                    visad.FunctionType func_distanceToOut_numLinks= new visad.FunctionType(distanceToOut, numLinks);
-                    visad.FlatField vals_ff_W = new visad.FlatField( func_distanceToOut_numLinks, new visad.Linear1DSet(distanceToOut,1,gWFunc[0].length,gWFunc[0].length));
-                    vals_ff_W.setSamples( gWFunc );
-
-                    int numBins=(int) (gWFunc[0][gWFunc[0].length-1]/binsize)+1;
-                    visad.Linear1DSet binsSet = new visad.Linear1DSet(numLinks,binsize, gWFunc[0][gWFunc[0].length-1]+binsize,numBins);
-//                    if(metric == 1){
-//                        numBins =(int) ((distStats.maxValue-distStats.minValue)/binsize);
-//                        binsSet = new visad.Linear1DSet(numLinks,distStats.minValue, distStats.maxValue,numBins);
-//                    }
-                    
-                    visad.FlatField hist = visad.math.Histogram.makeHistogram(vals_ff_W, binsSet);
-
-                    float[][] laLinea=binsSet.getSamples();
-                    double[][] laWFunc=hist.getValues();
-
-                    widthFunctions[k]=laWFunc[0];
-                    widthFunctions[k][0]=1;
-                } else {
-                    widthFunctions[k]=new double[] {1};
-                }
-            }
-            
-            OuletLinkNum=OriginalBasinOutlet;
-            
-            return widthFunctions;
-        } catch (RemoteException ex) {
-            System.err.println("Failed while calculating histrograms");
-            ex.printStackTrace();
-        } catch (VisADException ex) {
-            System.err.println("Failed while calculating histrograms");
-            ex.printStackTrace();
-        }
         
-        return null;
+        float binsize=1;
+            
+        if(metric != 0){
+            binsize=0.3f;
+        }
+        return getWidthFunctions(outlets,metric,binsize);
+    }
+    
+    /**
+     * Returns the Topologic or Geometric Width Functions above a specified group of
+     * outlets
+     * @param outlets The list of links where the width function is desired
+     * @param metric 0 for topologic and 1 for geometric
+     * @return A double[numOutlets][numBins] array with the Width Functions
+     */
+    public double[][] getWidthFunctions(int[] outlets,int metric,float binsize){
+
+        double[][] widthFunctions=new double[outlets.length][];
+
+        int OriginalBasinOutlet=OuletLinkNum;
+
+        float[][] bigDtoO=getDistancesToOutlet();
+
+        for(int k=0;k<outlets.length;k++){
+            if(magnitudeArray[outlets[k]] > 1){
+                OuletLinkNum=outlets[k];
+
+                float[][] wFunc=getDistancesToOutlet(bigDtoO,outlets[k]);
+
+                hydroScalingAPI.util.statistics.Stats distStats=new hydroScalingAPI.util.statistics.Stats(wFunc[metric]);
+
+                double[][] laWFunc=new double[1][1+(int)Math.ceil(distStats.maxValue/binsize)];
+                for(int i=0;i<wFunc[metric].length;i++) laWFunc[0][(int)Math.ceil(wFunc[metric][i]/binsize)]++;
+
+                widthFunctions[k]=laWFunc[0];
+                widthFunctions[k][0]=1;
+            } else {
+                widthFunctions[k]=new double[] {1};
+            }
+        }
+
+        OuletLinkNum=OriginalBasinOutlet;
+
+        return widthFunctions;
         
     }
     
@@ -548,8 +520,8 @@ public class LinksAnalysis extends java.lang.Object {
                 fileQuantity.seek(4*basin.getOutletID());
                 int ToToB=fileQuantity.readInt();
                 for (int i=0;i<quantityArray[0].length;i++){
-                    fileQuantity.seek(4*headsArray[i]);
-                    quantityArray[0][i]=fileQuantity.readInt()-ToToB;
+                    fileQuantity.seek(4*contactsArray[i]);
+                    quantityArray[0][i]=fileQuantity.readInt()-ToToB+1;
                 }
                 
                 break;

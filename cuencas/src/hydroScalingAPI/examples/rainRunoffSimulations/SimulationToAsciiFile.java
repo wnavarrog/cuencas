@@ -168,6 +168,7 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
         java.io.OutputStreamWriter newfile = new java.io.OutputStreamWriter(bufferout);
         
         double[][] wfs=linksStructure.getWidthFunctions(linksStructure.completeStreamLinksArray,0);
+        
         for (int i=0;i<linksStructure.completeStreamLinksArray.length;i++){
             if(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > 1){
                 newfile.write("Link #"+linksStructure.completeStreamLinksArray[i]+",");
@@ -284,12 +285,12 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
             System.out.println("Intermedia Time:"+interTime.toString());
             System.out.println("Running Time:"+(.001*(interTime.getTime()-startTime.getTime()))+" seconds");
             
-            rainRunoffRaining.jumpsRunToAsciiFile(storm.stormInitialTimeInMinutes()+numPeriods*rainDuration,(storm.stormInitialTimeInMinutes()+(numPeriods+1)*rainDuration)+8000,rainDuration,initialCondition,newfile,linksStructure,thisNetworkGeom);
+            rainRunoffRaining.jumpsRunToAsciiFile(storm.stormInitialTimeInMinutes()+numPeriods*rainDuration,(storm.stormInitialTimeInMinutes()+(numPeriods+1)*rainDuration)+8000,15,initialCondition,newfile,linksStructure,thisNetworkGeom);
             
         } else {
             for (int k=0;k<numPeriods;k++) {
                 System.out.println("Period "+(k+1)+" of "+numPeriods);
-                rainRunoffRaining.jumpsRunToAsciiFile(storm.stormInitialTimeInMinutes()+k*storm.stormRecordResolutionInMinutes(),storm.stormInitialTimeInMinutes()+(k+1)*storm.stormRecordResolutionInMinutes(),10,initialCondition,newfile,linksStructure,thisNetworkGeom);
+                rainRunoffRaining.jumpsRunToAsciiFile(storm.stormInitialTimeInMinutes()+k*storm.stormRecordResolutionInMinutes(),storm.stormInitialTimeInMinutes()+(k+1)*storm.stormRecordResolutionInMinutes(),storm.stormRecordResolutionInMinutes(),initialCondition,newfile,linksStructure,thisNetworkGeom);
                 initialCondition=rainRunoffRaining.finalCond;
                 rainRunoffRaining.setBasicTimeStep(10/60.);
             }
@@ -298,7 +299,7 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
             System.out.println("Intermedia Time:"+interTime.toString());
             System.out.println("Running Time:"+(.001*(interTime.getTime()-startTime.getTime()))+" seconds");
             
-            rainRunoffRaining.jumpsRunToAsciiFile(storm.stormInitialTimeInMinutes()+numPeriods*storm.stormRecordResolutionInMinutes(),(storm.stormInitialTimeInMinutes()+(numPeriods+1)*storm.stormRecordResolutionInMinutes())+8000,5,initialCondition,newfile,linksStructure,thisNetworkGeom);
+            rainRunoffRaining.jumpsRunToAsciiFile(storm.stormInitialTimeInMinutes()+numPeriods*storm.stormRecordResolutionInMinutes(),(storm.stormInitialTimeInMinutes()+(numPeriods+1)*storm.stormRecordResolutionInMinutes())+8000,15,initialCondition,newfile,linksStructure,thisNetworkGeom);
         }
         
         System.out.println("Termina simulacion RKF");
@@ -499,7 +500,7 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
         //new SimulationToAsciiFile(194,281,matDirs,magnitudes,metaModif, 10,30,3.0f,2,new java.io.File("/home/ricardo/simulationResults/walnutGulch/")).executeSimulation();
         //new SimulationToAsciiFile(194,281,matDirs,magnitudes,metaModif,  5,60,3.0f,2,new java.io.File("/home/ricardo/simulationResults/walnutGulch/")).executeSimulation();
 
-        new SimulationToAsciiFile(88,245,matDirs,magnitudes,metaModif,  50,5,0.0f,5,new java.io.File("/home/ricardo/simulationResults/walnutGulch/"),routingParams).executeSimulation();
+        new SimulationToAsciiFile(88,245,matDirs,magnitudes,metaModif,  50,5,0.0f,2,new java.io.File("/home/ricardo/simulationResults/walnutGulch/"),routingParams).executeSimulation();
     }
     
     public static void subMain3(String args[]) throws java.io.IOException, VisADException {
@@ -567,7 +568,9 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
         routingParams.put("lambda2",-0.1f);
         
         
-        new SimulationToAsciiFile(1063,496,matDirs,magnitudes,metaModif,  25,120,0.0f,2,new java.io.File("/home/ricardo/simulationResults/walnutGulch/"),routingParams).executeSimulation();
+        java.io.File stormFile;
+        stormFile=new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Hydrology/storms/simulated_events/uniform_030_120.metaVHC");
+        new SimulationToAsciiFile(1063,496,matDirs,magnitudes,metaModif,stormFile,0.0f,2,new java.io.File("/home/ricardo/simulationResults/walnutGulch/"),routingParams).executeSimulation();
     }
     
 }
