@@ -51,32 +51,28 @@ public class RsnLinksAnalysis extends hydroScalingAPI.util.geomorphology.objects
     
     public float[][] getDistancesToOutlet(){
         float[][] dToOutlet=new float[2][magnitudeArray.length];
-        dToOutlet[0]=getVarValues(1)[0];
-        java.util.Arrays.fill(dToOutlet[1],1);
+        dToOutlet[1]=getVarValues(1)[0];
+        java.util.Arrays.fill(dToOutlet[0],1);
         getDistance(dToOutlet,0);
         
         return dToOutlet;
         
     }
     
-    public float[][] getDistancesToOutlet(int outlet){
-        float[][] dToOutlet=new float[2][magnitudeArray.length];
-        dToOutlet[0]=(float[])getVarValues(1)[0].clone();
-        java.util.Arrays.fill(dToOutlet[1],1);
-        getDistance(dToOutlet,outlet);
-        java.util.Vector ofInterest=new java.util.Vector();
-        ofInterest.add(new float[]{dToOutlet[0][0],1});
-        for(int i=0;i<magnitudeArray.length;i++) if(dToOutlet[1][i] > 1) ofInterest.add(new float[]{dToOutlet[0][i],dToOutlet[1][i]});
-        dToOutlet=new float[2][ofInterest.size()];
-        for(int i=0;i<dToOutlet[0].length;i++){
-            float[] vals=(float[])ofInterest.get(i);
-            dToOutlet[0][i]=vals[0];
-            dToOutlet[1][i]=vals[1];
-        }
-            
-        return dToOutlet;
-        
-    }
+//    public float[][] getDistancesToOutlet(float[][] dToOutlet,int outlet){
+//        java.util.Vector ofInterest=new java.util.Vector();
+//        ofInterest.add(new float[]{dToOutlet[0][0],1});
+//        for(int i=0;i<magnitudeArray.length;i++) if(dToOutlet[1][i] > 1) ofInterest.add(new float[]{dToOutlet[0][i],dToOutlet[1][i]});
+//        dToOutlet=new float[2][ofInterest.size()];
+//        for(int i=0;i<dToOutlet[0].length;i++){
+//            float[] vals=(float[])ofInterest.get(i);
+//            dToOutlet[0][i]=vals[0];
+//            dToOutlet[1][i]=vals[1];
+//        }
+//            
+//        return dToOutlet;
+//        
+//    }
     
     public void getDistance(float[][] dToOutlet,int li){
         for(int j=0;j<connectionsArray[li].length;j++) {

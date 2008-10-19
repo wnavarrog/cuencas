@@ -128,14 +128,9 @@ public class RsnWFSToAsciiFile extends java.lang.Object {
         java.io.BufferedOutputStream bufferout = new java.io.BufferedOutputStream(salida);
         java.io.OutputStreamWriter newfile = new java.io.OutputStreamWriter(bufferout);
 
-        double[][] wfs=linksStructure.getWidthFunctions(linksStructure.completeStreamLinksArray,0);
-        for (int i=0;i<linksStructure.completeStreamLinksArray.length;i++){
-            if(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > Math.max(basinOrder-3,1)){
-                newfile.write("Link #"+linksStructure.completeStreamLinksArray[i]+",");
-                for (int j=0;j<wfs[i].length;j++) newfile.write(wfs[i][j]+",");
-                newfile.write("\n");
-            }
-        }
+        double[][] wfs=linksStructure.getWidthFunctions(new int[] {0},0);
+        newfile.write("Link #0,");
+        for (int j=0;j<wfs[0].length;j++) newfile.write(wfs[0][j]+",");
         
         newfile.close();
         bufferout.close();
@@ -167,7 +162,7 @@ public class RsnWFSToAsciiFile extends java.lang.Object {
         
         String outDir="/home/ricardo/simulationResults/widthFunctions/geometricRSNs/constantL/";
         
-        int iniExperiment=150;
+        int iniExperiment=0;
         int finExperiments=199;
         
         java.text.NumberFormat labelFormat = java.text.NumberFormat.getNumberInstance();
@@ -177,7 +172,7 @@ public class RsnWFSToAsciiFile extends java.lang.Object {
         for(double p_i=0.36;p_i<0.50;p_i+=0.02){
             for(double p_e=0.45;p_e<0.55;p_e+=0.02){
                 new java.io.File(outDir+"p_i"+labelFormat.format(p_i)+"p_e"+labelFormat.format(p_e)).mkdir();
-                for(int sofi=2;sofi<=8;sofi++){
+                for(int sofi=2;sofi<=7;sofi++){
                     new java.io.File(outDir+"p_i"+labelFormat.format(p_i)+"p_e"+labelFormat.format(p_e)+"/ord_"+sofi).mkdir();
                     
                     for(int experiment=iniExperiment;experiment<=finExperiments;experiment++){

@@ -174,6 +174,14 @@ public class RsnFlowSimulationToAsciiFile extends java.lang.Object {
                 newfile.write(thisNetworkGeom.upStreamArea(linksStructure.completeStreamLinksArray[i])+",");
         }
         
+        newfile.write("\n");
+        newfile.write("Upstream Channel Lenght [km],");
+
+        for (int i=0;i<linksStructure.completeStreamLinksArray.length;i++){
+	    if(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > Math.max(basinOrder-3,1))
+                newfile.write(thisNetworkGeom.upStreamTotalLength(linksStructure.completeStreamLinksArray[i])+",");
+        }
+        
         newfile.write("\n\n\n");
         newfile.write("Results of flow simulations in your basin");
         
@@ -194,7 +202,7 @@ public class RsnFlowSimulationToAsciiFile extends java.lang.Object {
         //double ic_sum = 0.0f;
         
         for (int i=0;i<linksStructure.connectionsArray.length;i++){
-            initialCondition[i]=1.0;
+            initialCondition[i]=0.1;
             //initialCondition[i]=( areasHillArray[0][i]*100.*1e3 ) / ( linkLengths[0][i] *1e3 )  ;//0.0;
             //System.out.println(areasHillArray[0][i]);
             initialCondition[i+linksStructure.connectionsArray.length]=1;
@@ -208,7 +216,7 @@ public class RsnFlowSimulationToAsciiFile extends java.lang.Object {
         System.out.println("Number of Links on this simulation: "+(initialCondition.length/2.0));
         System.out.println("Inicia simulacion RKF");
         
-        hydroScalingAPI.util.ordDiffEqSolver.RKF rainRunoffRaining=new hydroScalingAPI.util.ordDiffEqSolver.RKF(thisBasinEqSys,1e-3,10/60.);
+        hydroScalingAPI.util.ordDiffEqSolver.RKF rainRunoffRaining=new hydroScalingAPI.util.ordDiffEqSolver.RKF(thisBasinEqSys,1e-2,10/60.);
         
         int numPeriods = 1;
         
@@ -299,7 +307,7 @@ public class RsnFlowSimulationToAsciiFile extends java.lang.Object {
         for(double p_i=0.36;p_i<0.50;p_i+=0.02){
             for(double p_e=0.45;p_e<0.55;p_e+=0.02){
                 new java.io.File(outDir+"p_i"+labelFormat.format(p_i)+"p_e"+labelFormat.format(p_e)).mkdir();
-                for(int sofi=2;sofi<=8;sofi++){
+                for(int sofi=7;sofi<=7;sofi++){
                     new java.io.File(outDir+"p_i"+labelFormat.format(p_i)+"p_e"+labelFormat.format(p_e)+"/ord_"+sofi).mkdir();
                     
                     for(int experiment=iniExperiment;experiment<=finExperiments;experiment++){
@@ -308,7 +316,7 @@ public class RsnFlowSimulationToAsciiFile extends java.lang.Object {
                         hydroScalingAPI.util.probability.DiscreteDistribution myUD_E=new hydroScalingAPI.util.probability.GeometricDistribution(p_e,1);
                         hydroScalingAPI.util.randomSelfSimilarNetworks.RsnStructure myRSN=new hydroScalingAPI.util.randomSelfSimilarNetworks.RsnStructure(sofi-1,myUD_I,myUD_E);
                         new RsnFlowSimulationToAsciiFile(myRSN,0,1,experiment,2,new java.io.File(outDir+"p_i"+labelFormat.format(p_i)+"p_e"+labelFormat.format(p_e)+"/ord_"+sofi)).executeSimulation();
-
+                        System.exit(0);
                     }
                 }
             }
