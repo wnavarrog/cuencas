@@ -491,7 +491,7 @@ public class Basin extends Object{
      * @param level 
      * @return A byte[][] with the basin network mask
      */
-     public  int[][] getEncapsulatedHillslopesMask(byte[][] matDir, hydroScalingAPI.modules.networkAnalysis.objects.RSNDecomposition myRSNAnalysis, int level){
+     public  int[][] getEncapsulatedHillslopesMask(byte[][] matDir, hydroScalingAPI.util.randomSelfSimilarNetworks.RSNDecomposition myRSNAnalysis, int level){
         try{
             java.io.File hortFile=new java.io.File(localMetaRaster.getLocationBinaryFile().getPath().substring(0,localMetaRaster.getLocationBinaryFile().getPath().lastIndexOf("."))+".horton");
             localMetaRaster.setLocationBinaryFile(hortFile);
@@ -503,7 +503,7 @@ public class Basin extends Object{
             int[][] matrizPintada=new int[maxY-minY+3][maxX-minX+3];
             int[][] headsTails=myRSNAnalysis.getHeadsAndTails(level);
             
-            hydroScalingAPI.modules.networkAnalysis.objects.RsnTile myTileActual;
+            hydroScalingAPI.util.randomSelfSimilarNetworks.RsnTile myTileActual;
             
             int numCols=localMetaRaster.getNumCols();
             
@@ -522,7 +522,7 @@ public class Basin extends Object{
                 int tileColor=i+1;
                 //System.out.println("Head: "+xOulet+","+yOulet+" Tail: "+xSource+","+ySource+" Color: "+tileColor+" Scale: "+(scale+1));
                 
-                myTileActual=new hydroScalingAPI.modules.networkAnalysis.objects.RsnTile(xOulet,yOulet,xSource,ySource,matDir,matOrders,localMetaRaster,level+1);
+                myTileActual=new hydroScalingAPI.util.randomSelfSimilarNetworks.RsnTile(xOulet,yOulet,xSource,ySource,matDir,matOrders,localMetaRaster,level+1);
                 int elementsInTile=myTileActual.getXYRsnTile()[0].length;
                 for (int j=0;j<elementsInTile;j++){
                     matrizPintada[myTileActual.getXYRsnTile()[1][j]-minY+1][myTileActual.getXYRsnTile()[0][j]-minX+1]=tileColor;

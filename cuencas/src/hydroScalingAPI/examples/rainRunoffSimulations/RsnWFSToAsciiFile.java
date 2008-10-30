@@ -162,8 +162,8 @@ public class RsnWFSToAsciiFile extends java.lang.Object {
         
         String outDir="/home/ricardo/simulationResults/widthFunctions/geometricRSNs/constantL/";
         
-        int iniExperiment=0;
-        int finExperiments=199;
+        int iniExperiment=200;
+        int finExperiments=499;
         
         java.text.NumberFormat labelFormat = java.text.NumberFormat.getNumberInstance();
         labelFormat.setGroupingUsed(false);

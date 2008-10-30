@@ -26,11 +26,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 package hydroScalingAPI.modules.networkAnalysis.widgets;
 
-import java.util.Iterator;
 import visad.*;
 import visad.java3d.DisplayImplJ3D;
 import java.rmi.RemoteException;
-import java.awt.Font;
 import java.io.IOException;
 
 /**
@@ -54,7 +52,7 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
     private byte[][] netMask;
     public hydroScalingAPI.util.geomorphology.objects.HortonAnalysis myHortonStructure;
     public hydroScalingAPI.util.geomorphology.objects.LinksAnalysis myLinksStructure;
-    public hydroScalingAPI.modules.networkAnalysis.objects.RSNDecomposition myRSNAnalysis;
+    public hydroScalingAPI.util.randomSelfSimilarNetworks.RSNDecomposition myRSNAnalysis;
     
     private String[] itemsToAnalize={   "Link's Hillslope Area [km^2]",
                                         "Link's Length [km]",
@@ -399,7 +397,7 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
         
         hydroScalingAPI.tools.VisadTools.addWheelFunctionality(displayMap_RSNs);
         
-        myRSNAnalysis=new hydroScalingAPI.modules.networkAnalysis.objects.RSNDecomposition(myLinksStructure);
+        myRSNAnalysis=new hydroScalingAPI.util.randomSelfSimilarNetworks.RSNDecomposition(myLinksStructure);
         plotRSNTiles(myHortonStructure.getBasinOrder()-1);
         plotNetwork(displayMap_RSNs,myHortonStructure.getBasinOrder()-1);
         
@@ -1456,7 +1454,7 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
             control.setTable(estaTabla);
             varMapRSN.setRange(0,maxColor);
             
-            hydroScalingAPI.modules.networkAnalysis.objects.RsnTile myTileActual;
+            hydroScalingAPI.util.randomSelfSimilarNetworks.RsnTile myTileActual;
             
             for(int i=0;i<headsTails[0].length;i++){
                 int xOulet=headsTails[0][i]%metaDatos.getNumCols();
@@ -1473,7 +1471,7 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
                 int tileColor=i+1;
                 //System.out.println("Head: "+xOulet+","+yOulet+" Tail: "+xSource+","+ySource+" Color: "+tileColor+" Scale: "+(scale+1));
                 
-                myTileActual=new hydroScalingAPI.modules.networkAnalysis.objects.RsnTile(xOulet,yOulet,xSource,ySource,matDir,matOrders,metaDatos,scale+1);
+                myTileActual=new hydroScalingAPI.util.randomSelfSimilarNetworks.RsnTile(xOulet,yOulet,xSource,ySource,matDir,matOrders,metaDatos,scale+1);
                 int elementsInTile=myTileActual.getXYRsnTile()[0].length;
                 for (int j=0;j<elementsInTile;j++){
                     matrizPintada[myTileActual.getXYRsnTile()[1][j]-myCuenca.getMinY()+1][myTileActual.getXYRsnTile()[0][j]-myCuenca.getMinX()+1]=tileColor;

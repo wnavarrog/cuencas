@@ -742,7 +742,7 @@ public java.util.Vector AreaBasin = new java.util.Vector();
     
         hydroScalingAPI.util.geomorphology.objects.LinksAnalysis myLinksStructure=new hydroScalingAPI.util.geomorphology.objects.LinksAnalysis(basinOrig,metaOrig, DIR);
         
-        hydroScalingAPI.modules.networkAnalysis.objects.RSNDecomposition myRSNAnalysis=new hydroScalingAPI.modules.networkAnalysis.objects.RSNDecomposition(myLinksStructure);
+        hydroScalingAPI.util.randomSelfSimilarNetworks.RSNDecomposition myRSNAnalysis=new hydroScalingAPI.util.randomSelfSimilarNetworks.RSNDecomposition(myLinksStructure);
 
         int[][] hillSlopesMask=basinOrig.getEncapsulatedHillslopesMask(DIR,myRSNAnalysis,1); // ridges corresponds to the basin order. In this case it is 1
         

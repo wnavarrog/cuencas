@@ -729,7 +729,7 @@ public class Rainfall_Runoff_Model extends javax.swing.JDialog implements Displa
 
     private void sim2ButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sim2ButtonActionPerformed
         javax.swing.JFileChooser fc=new javax.swing.JFileChooser("/");
-        fc.setFileSelectionMode(fc.DIRECTORIES_ONLY);
+        fc.setFileSelectionMode(javax.swing.JFileChooser.DIRECTORIES_ONLY);
         fc.setDialogTitle("Output directory");
         int result = fc.showDialog(this,"Select");
         java.io.File selectedFile = fc.getSelectedFile();
@@ -753,8 +753,6 @@ public class Rainfall_Runoff_Model extends javax.swing.JDialog implements Displa
         xOulet=myCuenca.getOutletID()%metaDatos.getNumCols();
         yOulet=myCuenca.getOutletID()/metaDatos.getNumCols();
         
-        
-
         System.setOut(redirect);
 
         try{
@@ -769,7 +767,7 @@ public class Rainfall_Runoff_Model extends javax.swing.JDialog implements Displa
             routingParams.put("lambda1",0.5f);
             routingParams.put("lambda2",-0.1f);
         
-            Thread t1 = new Thread(new hydroScalingAPI.examples.rainRunoffSimulations.SimulationToAsciiFile(xOulet,yOulet,matDir,magnitudes,metaDatos,rainIntensityValue,rainDurationValue,0.0f,1,selectedFile,routingParams));
+            Thread t1 = new Thread(new hydroScalingAPI.modules.rainfallRunoffModel.objects.SimulationToAsciiFile(xOulet,yOulet,matDir,magnitudes,metaDatos,rainIntensityValue,rainDurationValue,0.0f,1,selectedFile,routingParams));
             t1.start();
         } catch(java.io.IOException ioe){
             System.err.println(ioe);
@@ -783,7 +781,7 @@ public class Rainfall_Runoff_Model extends javax.swing.JDialog implements Displa
 
     private void rainButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rainButtonActionPerformed
         javax.swing.JFileChooser fc=new javax.swing.JFileChooser(mainFrame.getInfoManager().dataBaseRastersHydPath);
-        fc.setFileSelectionMode(fc.FILES_ONLY);
+        fc.setFileSelectionMode(javax.swing.JFileChooser.FILES_ONLY);
         fc.setDialogTitle("Select Rainfall Field");
         javax.swing.filechooser.FileFilter mdtFilter = new visad.util.ExtensionFileFilter("metaVHC","Hydrologic Variable");
         fc.addChoosableFileFilter(mdtFilter);
@@ -795,19 +793,22 @@ public class Rainfall_Runoff_Model extends javax.swing.JDialog implements Displa
         java.io.File locFile=fc.getSelectedFile();
         
         javax.swing.JFileChooser fc1=new javax.swing.JFileChooser("/");
-        fc1.setFileSelectionMode(fc1.DIRECTORIES_ONLY);
+        fc1.setFileSelectionMode(javax.swing.JFileChooser.DIRECTORIES_ONLY);
         fc1.setDialogTitle("Output directory");
         int result = fc1.showDialog(this,"Select");
         java.io.File selectedFile = fc1.getSelectedFile();
         
         if (result == javax.swing.JFileChooser.CANCEL_OPTION) return;
-        
+        System.out.println((result == javax.swing.JFileChooser.CANCEL_OPTION));
         
         simButton.setEnabled(false);
         
         int xOulet,yOulet;
         xOulet=myCuenca.getOutletID()%metaDatos.getNumCols();
         yOulet=myCuenca.getOutletID()/metaDatos.getNumCols();
+        
+        System.setOut(redirect);
+        
         try{
             java.util.Hashtable routingParams=new java.util.Hashtable();
             routingParams.put("widthCoeff",1.0f);
@@ -821,7 +822,8 @@ public class Rainfall_Runoff_Model extends javax.swing.JDialog implements Displa
             routingParams.put("lambda2",-0.1f);
         
             
-            new hydroScalingAPI.examples.rainRunoffSimulations.SimulationToAsciiFile(xOulet,yOulet,matDir,magnitudes,metaDatos,locFile,0.0f,2,selectedFile,routingParams);
+            Thread t1 = new Thread(new hydroScalingAPI.modules.rainfallRunoffModel.objects.SimulationToAsciiFile(xOulet,yOulet,matDir,magnitudes,metaDatos,locFile,0.0f,2,selectedFile,routingParams));
+            t1.start();
         } catch(java.io.IOException ioe){
             System.err.println(ioe);
             return;
@@ -836,7 +838,7 @@ public class Rainfall_Runoff_Model extends javax.swing.JDialog implements Displa
 
     private void simButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_simButtonActionPerformed
         javax.swing.JFileChooser fc=new javax.swing.JFileChooser("/");
-        fc.setFileSelectionMode(fc.DIRECTORIES_ONLY);
+        fc.setFileSelectionMode(javax.swing.JFileChooser.DIRECTORIES_ONLY);
         fc.setDialogTitle("Output directory");
         int result = fc.showDialog(this,"Select");
         java.io.File selectedFile = fc.getSelectedFile();
@@ -872,7 +874,7 @@ public class Rainfall_Runoff_Model extends javax.swing.JDialog implements Displa
             routingParams.put("lambda1",0.5f);
             routingParams.put("lambda2",-0.1f);
         
-            Thread t1 = new Thread(new hydroScalingAPI.examples.rainRunoffSimulations.SimulationToAsciiFile(xOulet,yOulet,matDir,magnitudes,metaDatos,rainIntensityValue,rainDurationValue,0.0f,2,selectedFile,routingParams));
+            Thread t1 = new Thread(new hydroScalingAPI.modules.rainfallRunoffModel.objects.SimulationToAsciiFile(xOulet,yOulet,matDir,magnitudes,metaDatos,rainIntensityValue,rainDurationValue,0.0f,2,selectedFile,routingParams));
             t1.start();
         } catch(java.io.IOException ioe){
             System.err.println(ioe);
@@ -922,7 +924,7 @@ public class Rainfall_Runoff_Model extends javax.swing.JDialog implements Displa
     private void openPrecipActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openPrecipActionPerformed
 
         javax.swing.JFileChooser fc=new javax.swing.JFileChooser(mainFrame.getInfoManager().dataBaseRastersHydPath);
-        fc.setFileSelectionMode(fc.FILES_ONLY);
+        fc.setFileSelectionMode(javax.swing.JFileChooser.FILES_ONLY);
         fc.setDialogTitle("Select Rainfall Field");
         javax.swing.filechooser.FileFilter mdtFilter = new visad.util.ExtensionFileFilter("metaVHC","Hydrologic Variable");
         fc.addChoosableFileFilter(mdtFilter);

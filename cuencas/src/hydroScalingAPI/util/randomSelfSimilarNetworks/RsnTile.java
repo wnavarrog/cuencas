@@ -24,7 +24,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * Created on November 13, 2001, 11:25 AM
  */
 
-package hydroScalingAPI.modules.networkAnalysis.objects;
+package hydroScalingAPI.util.randomSelfSimilarNetworks;
 
 /**
  * This is the analogous of the {@link hydroScalingAPI.util.geomorphology.objects.HillSlope} object for a river
@@ -247,7 +247,7 @@ public class RsnTile extends java.lang.Object {
             metaModif.setFormat("Byte");
             byte[][] matOrders=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
             
-            hydroScalingAPI.modules.networkAnalysis.objects.RsnTile myTileActual=new hydroScalingAPI.modules.networkAnalysis.objects.RsnTile(485,472,485,472,matDirs,matOrders,metaModif,4);
+            hydroScalingAPI.util.randomSelfSimilarNetworks.RsnTile myTileActual=new hydroScalingAPI.util.randomSelfSimilarNetworks.RsnTile(485,472,485,472,matDirs,matOrders,metaModif,4);
             
             
         } catch (java.io.IOException IOE){

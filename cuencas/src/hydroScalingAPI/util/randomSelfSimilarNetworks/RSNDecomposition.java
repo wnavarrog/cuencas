@@ -24,9 +24,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * Created on October 1, 2003, 3:07 PM
  */
 
-package hydroScalingAPI.modules.networkAnalysis.objects;
-
-import ij.util.Java2;
+package hydroScalingAPI.util.randomSelfSimilarNetworks;
 
 /**
  * This class applies the RSN decomposition algorithm to a real river network and

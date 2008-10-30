@@ -43,7 +43,7 @@ public class BasinTIN {
     
     private hydroScalingAPI.util.geomorphology.objects.Basin myCuenca;
     public hydroScalingAPI.util.geomorphology.objects.LinksAnalysis myLinksStructure;
-    public hydroScalingAPI.modules.networkAnalysis.objects.RSNDecomposition myRSNAnalysis;
+    public hydroScalingAPI.util.randomSelfSimilarNetworks.RSNDecomposition myRSNAnalysis;
     
     private byte[][] matDir;
     private byte[][] hortonOrder;
@@ -101,7 +101,7 @@ public class BasinTIN {
         
         myCuenca=new hydroScalingAPI.util.geomorphology.objects.Basin(x,y,matDir,metaDatos);
         myLinksStructure=new hydroScalingAPI.util.geomorphology.objects.LinksAnalysis(myCuenca, metaDatos, matDir);
-        myRSNAnalysis=new hydroScalingAPI.modules.networkAnalysis.objects.RSNDecomposition(myLinksStructure);
+        myRSNAnalysis=new hydroScalingAPI.util.randomSelfSimilarNetworks.RSNDecomposition(myLinksStructure);
         
         int[][] xyBasin=myCuenca.getXYBasin();
         int numPointsImportant=0;
