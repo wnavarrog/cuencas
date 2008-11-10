@@ -51,7 +51,7 @@ public class RsnLinksAnalysis extends hydroScalingAPI.util.geomorphology.objects
     
     public float[][] getDistancesToOutlet(){
         float[][] dToOutlet=new float[2][magnitudeArray.length];
-        dToOutlet[1]=getVarValues(1)[0];
+        dToOutlet[1]=getVarValues(1)[0].clone();
         java.util.Arrays.fill(dToOutlet[0],1);
         getDistance(dToOutlet,0);
         

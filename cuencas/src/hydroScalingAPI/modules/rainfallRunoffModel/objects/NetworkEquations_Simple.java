@@ -157,7 +157,7 @@ public class NetworkEquations_Simple implements hydroScalingAPI.util.ordDiffEqSo
             effPrecip=hillPrecIntensity-qd;
             
             qs=0.0;//((input[i+nLi] > So)?1:0)*(1/Ts*(input[i+nLi]-So));
-            qe=((input[i+nLi] > 0)?1:0)*(1/Te*(input[i+nLi]));
+            qe=0.0;//((input[i+nLi] > 0)?1:0)*(1/Te*(input[i+nLi]));
             
             Q_trib=0.0;
             for (int j=0;j<linksConectionStruct.connectionsArray[i].length;j++){
@@ -167,18 +167,18 @@ public class NetworkEquations_Simple implements hydroScalingAPI.util.ordDiffEqSo
             switch (routingType) {
                 
                 case 0:     K_Q=3/2.*Math.pow(input[i],1/3.)
-                                *Math.pow(cheziArray[0][i],2/3.)
-                                *Math.pow(widthArray[0][i],-1/3.)
-                                *Math.pow(lengthArray[0][i],-1)
-                                *Math.pow(slopeArray[0][i],1/3.);
+                                    *Math.pow(cheziArray[0][i],2/3.)
+                                    *Math.pow(widthArray[0][i],-1/3.)
+                                    *Math.pow(lengthArray[0][i],-1)
+                                    *Math.pow(slopeArray[0][i],1/3.);
 
                             break;    
 
                 case 1:     K_Q=3/2.*Math.pow(input[i],1/3.)
-                                *Math.pow(200.0,2/3.)
-                                *Math.pow(widthArray[0][i],-1/3.)
-                                *Math.pow(lengthArray[0][i],-1)
-                                *Math.pow(slopeArray[0][i],1/3.);
+                                    *Math.pow(200.0,2/3.)
+                                    *Math.pow(widthArray[0][i],-1/3.)
+                                    *Math.pow(lengthArray[0][i],-1)
+                                    *Math.pow(slopeArray[0][i],1/3.);
 
                             break;    
 
@@ -186,17 +186,17 @@ public class NetworkEquations_Simple implements hydroScalingAPI.util.ordDiffEqSo
                             break;
                 
                 case 3:     K_Q=5/3.*Math.pow(input[i],2/5.)
-                                *Math.pow(0.03,-3/5.)
-                                *Math.pow(widthArray[0][i],-2/5.)
-                                *Math.pow(lengthArray[0][i],-1)
-                                *Math.pow(slopeArray[0][i],3/10.);
+                                    *Math.pow(0.03,-3/5.)
+                                    *Math.pow(widthArray[0][i],-2/5.)
+                                    *Math.pow(lengthArray[0][i],-1)
+                                    *Math.pow(slopeArray[0][i],3/10.);
                             break;
                 
                 case 4:     K_Q=5/3.*Math.pow(input[i],2/5.)
-                                *Math.pow(manningArray[0][i],-3/5.)
-                                *Math.pow(widthArray[0][i],-2/5.)
-                                *Math.pow(lengthArray[0][i],-1)
-                                *Math.pow(slopeArray[0][i],3/10.);
+                                    *Math.pow(manningArray[0][i],-3/5.)
+                                    *Math.pow(widthArray[0][i],-2/5.)
+                                    *Math.pow(lengthArray[0][i],-1)
+                                    *Math.pow(slopeArray[0][i],3/10.);
                             break;
                 case 5:     K_Q=CkArray[0][i]*Math.pow(input[i],lamda1)*Math.pow(upAreasArray[0][i],lamda2)*Math.pow(lengthArray[0][i],-1);
             }

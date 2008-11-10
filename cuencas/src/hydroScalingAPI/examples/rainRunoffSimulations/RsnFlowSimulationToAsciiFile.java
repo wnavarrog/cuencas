@@ -193,7 +193,7 @@ public class RsnFlowSimulationToAsciiFile extends java.lang.Object {
                 newfile.write("Link-"+linksStructure.completeStreamLinksArray[i]+",");
         }
         
-        hydroScalingAPI.modules.rainfallRunoffModel.objects.NetworkEquations_Simple thisBasinEqSys=new hydroScalingAPI.modules.rainfallRunoffModel.objects.NetworkEquations_Simple(linksStructure,thisHillsInfo,thisNetworkGeom,routingType,2.0);
+        hydroScalingAPI.modules.rainfallRunoffModel.objects.NetworkEquations_Simple thisBasinEqSys=new hydroScalingAPI.modules.rainfallRunoffModel.objects.NetworkEquations_Simple(linksStructure,thisHillsInfo,thisNetworkGeom,routingType,1.0);
         double[] initialCondition=new double[linksStructure.connectionsArray.length*2];
         
         float[][] areasHillArray=thisHillsInfo.getAreasArray();
@@ -202,7 +202,7 @@ public class RsnFlowSimulationToAsciiFile extends java.lang.Object {
         //double ic_sum = 0.0f;
         
         for (int i=0;i<linksStructure.connectionsArray.length;i++){
-            initialCondition[i]=0.5;
+            initialCondition[i]=1.0;
             //initialCondition[i]=( areasHillArray[0][i]*100.*1e3 ) / ( linkLengths[0][i] *1e3 )  ;//0.0;
             //System.out.println(areasHillArray[0][i]);
             initialCondition[i+linksStructure.connectionsArray.length]=1;
@@ -297,8 +297,8 @@ public class RsnFlowSimulationToAsciiFile extends java.lang.Object {
         
         String outDir="/ResultsSimulations/flowSimulations/geometricRSNs/constantV/";
         
-        int iniExperiment=6;
-        int finExperiments=7;
+        int iniExperiment=0;
+        int finExperiments=1;
         
         java.text.NumberFormat labelFormat = java.text.NumberFormat.getNumberInstance();
         labelFormat.setGroupingUsed(false);
