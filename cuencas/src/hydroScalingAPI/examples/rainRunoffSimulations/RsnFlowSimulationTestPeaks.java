@@ -80,7 +80,7 @@ public class RsnFlowSimulationTestPeaks extends java.lang.Object {
                         break;
         }
         
-        hydroScalingAPI.modules.rainfallRunoffModel.objects.NetworkEquations_Simple thisBasinEqSys=new hydroScalingAPI.modules.rainfallRunoffModel.objects.NetworkEquations_Simple(linksStructure,thisHillsInfo,thisNetworkGeom,routingType);
+        hydroScalingAPI.modules.rainfallRunoffModel.objects.NetworkEquations_Simple thisBasinEqSys=new hydroScalingAPI.modules.rainfallRunoffModel.objects.NetworkEquations_Simple(linksStructure,thisHillsInfo,thisNetworkGeom,routingType,2);
         double[] initialCondition=new double[linksStructure.connectionsArray.length*2];
         
         float[][] areasHillArray=thisHillsInfo.getAreasArray();

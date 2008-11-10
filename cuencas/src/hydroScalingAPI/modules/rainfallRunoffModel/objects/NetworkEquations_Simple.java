@@ -48,6 +48,7 @@ public class NetworkEquations_Simple implements hydroScalingAPI.util.ordDiffEqSo
     private double So,Ts,Te; // not an array because I assume uniform soil properties
     
     private double lamda1,lamda2;
+    private double vConst;
     
     /**
      * Creates new NetworkEquations_Simple
@@ -62,7 +63,7 @@ public class NetworkEquations_Simple implements hydroScalingAPI.util.ordDiffEqSo
      * <p>4: Spatially variable Manning coefficient</p>
      * <p>5: Velocity based on parametrization v=Ck*q^lambda1*A^lambda2</p>
      */
-    public NetworkEquations_Simple(hydroScalingAPI.util.geomorphology.objects.LinksAnalysis links, hydroScalingAPI.modules.rainfallRunoffModel.objects.HillSlopesInfo hillinf, hydroScalingAPI.modules.rainfallRunoffModel.objects.LinksInfo linkIn, int rt){
+    public NetworkEquations_Simple(hydroScalingAPI.util.geomorphology.objects.LinksAnalysis links, hydroScalingAPI.modules.rainfallRunoffModel.objects.HillSlopesInfo hillinf, hydroScalingAPI.modules.rainfallRunoffModel.objects.LinksInfo linkIn, int rt, double vc){
         linksConectionStruct=links;
         basinHillSlopesInfo=hillinf;
         linksHydraulicInfo=linkIn;
@@ -84,6 +85,8 @@ public class NetworkEquations_Simple implements hydroScalingAPI.util.ordDiffEqSo
         lamda1=linksHydraulicInfo.getLamda1();
         lamda2=linksHydraulicInfo.getLamda2();
         CkArray=linksHydraulicInfo.getCkArray();
+        
+        vConst=vc;
         
     }
     
@@ -148,11 +151,9 @@ public class NetworkEquations_Simple implements hydroScalingAPI.util.ordDiffEqSo
             
             if (input[i] < 0) input[i]=0;
             
-            double hillPrecIntensity=basinHillSlopesInfo.precipitation(i,time);
+            double hillPrecIntensity=0.0;//basinHillSlopesInfo.precipitation(i,time);
             
-            maxInt=Math.max(maxInt,hillPrecIntensity);
-            
-            qd=Math.max(hillPrecIntensity-basinHillSlopesInfo.infiltRate(i,time),0.0);
+            qd=0.0;//Math.max(hillPrecIntensity-basinHillSlopesInfo.infiltRate(i,time),0.0);
             effPrecip=hillPrecIntensity-qd;
             
             qs=0.0;//((input[i+nLi] > So)?1:0)*(1/Ts*(input[i+nLi]-So));
@@ -181,7 +182,7 @@ public class NetworkEquations_Simple implements hydroScalingAPI.util.ordDiffEqSo
 
                             break;    
 
-                case 2:     K_Q=1.0/lengthArray[0][i];
+                case 2:     K_Q=vConst/lengthArray[0][i];
                             break;
                 
                 case 3:     K_Q=5/3.*Math.pow(input[i],2/5.)
