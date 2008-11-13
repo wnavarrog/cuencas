@@ -42,6 +42,7 @@ public class DataRaster extends Object {
     float[] FDA;
     double[] FDAD;
     int noFaltantes;
+    int nr,nc;
     
     /**
      * Creates a DataRaster object that will read files associated with the metaRaster
@@ -51,30 +52,34 @@ public class DataRaster extends Object {
      * @throws java.io.IOException Captures problems while reading the binary file
      */
     public DataRaster(hydroScalingAPI.io.MetaRaster metaInfo) throws java.io.IOException{
+        
         localMetaData=metaInfo;
                     
+        nr=localMetaData.getNumRows();
+        nc=localMetaData.getNumCols();
+        
         dataPath=new java.io.FileInputStream(localMetaData.getLocationBinaryFile());
         dataBuffer=new java.io.BufferedInputStream(dataPath);
         dataDataStream=new java.io.DataInputStream(dataBuffer);
         
         if (localMetaData.getProperty("[Format]").equalsIgnoreCase("Byte")){
-            dataByte=new byte[localMetaData.getNumRows()][localMetaData.getNumCols()];
-            for (int i=0;i<localMetaData.getNumRows();i++) for(int j=0;j<localMetaData.getNumCols();j++) dataByte[i][j]=dataDataStream.readByte();
+            dataByte=new byte[nr][nc];
+            for (int i=0;i<nr;i++) for(int j=0;j<nc;j++) dataByte[i][j]=dataDataStream.readByte();
         }
         
         if (localMetaData.getProperty("[Format]").equalsIgnoreCase("Integer")){
-            dataInteger=new int[localMetaData.getNumRows()][localMetaData.getNumCols()];
-            for (int i=0;i<localMetaData.getNumRows();i++) for(int j=0;j<localMetaData.getNumCols();j++) dataInteger[i][j]=dataDataStream.readInt();
+            dataInteger=new int[nr][nc];
+            for (int i=0;i<nr;i++) for(int j=0;j<nc;j++) dataInteger[i][j]=dataDataStream.readInt();
         }
         
         if (localMetaData.getProperty("[Format]").equalsIgnoreCase("Float")){
-            dataFloat=new float[localMetaData.getNumRows()][localMetaData.getNumCols()];
-            for (int i=0;i<localMetaData.getNumRows();i++) for(int j=0;j<localMetaData.getNumCols();j++) dataFloat[i][j]=dataDataStream.readFloat();
+            dataFloat=new float[nr][nc];
+            for (int i=0;i<nr;i++) for(int j=0;j<nc;j++) dataFloat[i][j]=dataDataStream.readFloat();
         }
        
         if (localMetaData.getProperty("[Format]").equalsIgnoreCase("Double")){
-            dataDouble=new double[localMetaData.getNumRows()][localMetaData.getNumCols()];
-            for (int i=0;i<localMetaData.getNumRows();i++) for(int j=0;j<localMetaData.getNumCols();j++) dataDouble[i][j]=dataDataStream.readDouble();
+            dataDouble=new double[nr][nc];
+            for (int i=0;i<nr;i++) for(int j=0;j<nc;j++) dataDouble[i][j]=dataDataStream.readDouble();
         }
         
         dataBuffer.close();
@@ -88,14 +93,14 @@ public class DataRaster extends Object {
     public byte[][] getByte(){
         if (dataByte != null) return dataByte;
         
-        byte[][] aDatosByte=new byte[localMetaData.getNumRows()][localMetaData.getNumCols()];
+        byte[][] aDatosByte=new byte[nr][nc];
         
         if (localMetaData.getProperty("[Format]").equalsIgnoreCase("Integer"))
-            for (int i=0;i<localMetaData.getNumRows();i++) for(int j=0;j<localMetaData.getNumCols();j++) aDatosByte[i][j]=(byte) dataInteger[i][j];
+            for (int i=0;i<nr;i++) for(int j=0;j<nc;j++) aDatosByte[i][j]=(byte) dataInteger[i][j];
         if (localMetaData.getProperty("[Format]").equalsIgnoreCase("Float"))
-            for (int i=0;i<localMetaData.getNumRows();i++) for(int j=0;j<localMetaData.getNumCols();j++) aDatosByte[i][j]=(byte) dataFloat[i][j];
+            for (int i=0;i<nr;i++) for(int j=0;j<nc;j++) aDatosByte[i][j]=(byte) dataFloat[i][j];
         if (localMetaData.getProperty("[Format]").equalsIgnoreCase("Double"))
-            for (int i=0;i<localMetaData.getNumRows();i++) for(int j=0;j<localMetaData.getNumCols();j++) aDatosByte[i][j]=(byte) dataDouble[i][j];
+            for (int i=0;i<nr;i++) for(int j=0;j<nc;j++) aDatosByte[i][j]=(byte) dataDouble[i][j];
 
         return aDatosByte;
     }
@@ -107,14 +112,14 @@ public class DataRaster extends Object {
     public int[][] getInt(){
         if (dataInteger != null) return dataInteger;
         
-        int[][] aDatosInteger=new int[localMetaData.getNumRows()][localMetaData.getNumCols()];
+        int[][] aDatosInteger=new int[nr][nc];
         
         if (localMetaData.getProperty("[Format]").equalsIgnoreCase("Byte"))
-            for (int i=0;i<localMetaData.getNumRows();i++) for(int j=0;j<localMetaData.getNumCols();j++) aDatosInteger[i][j]=(int) dataByte[i][j];
+            for (int i=0;i<nr;i++) for(int j=0;j<nc;j++) aDatosInteger[i][j]=(int) dataByte[i][j];
         if (localMetaData.getProperty("[Format]").equalsIgnoreCase("Float"))
-            for (int i=0;i<localMetaData.getNumRows();i++) for(int j=0;j<localMetaData.getNumCols();j++) aDatosInteger[i][j]=(int) dataFloat[i][j];
+            for (int i=0;i<nr;i++) for(int j=0;j<nc;j++) aDatosInteger[i][j]=(int) dataFloat[i][j];
         if (localMetaData.getProperty("[Format]").equalsIgnoreCase("Double"))
-            for (int i=0;i<localMetaData.getNumRows();i++) for(int j=0;j<localMetaData.getNumCols();j++) aDatosInteger[i][j]=(int) dataDouble[i][j];
+            for (int i=0;i<nr;i++) for(int j=0;j<nc;j++) aDatosInteger[i][j]=(int) dataDouble[i][j];
         
         return aDatosInteger;
     }
@@ -126,14 +131,33 @@ public class DataRaster extends Object {
     public float[][] getFloat(){
         if (dataFloat!=null) return dataFloat;
         
-        float[][] aDatosFloat=new float[localMetaData.getNumRows()][localMetaData.getNumCols()];;
+        float[][] aDatosFloat=new float[nr][nc];;
 
         if (localMetaData.getProperty("[Format]").equalsIgnoreCase("Byte"))
-            for (int i=0;i<localMetaData.getNumRows();i++) for(int j=0;j<localMetaData.getNumCols();j++) aDatosFloat[i][j]=(float) dataByte[i][j];
+            for (int i=0;i<nr;i++) for(int j=0;j<nc;j++) aDatosFloat[i][j]=(float) dataByte[i][j];
         if (localMetaData.getProperty("[Format]").equalsIgnoreCase("Integer"))
-            for (int i=0;i<localMetaData.getNumRows();i++) for(int j=0;j<localMetaData.getNumCols();j++) aDatosFloat[i][j]=(float) dataInteger[i][j];
+            for (int i=0;i<nr;i++) for(int j=0;j<nc;j++) aDatosFloat[i][j]=(float) dataInteger[i][j];
         if (localMetaData.getProperty("[Format]").equalsIgnoreCase("Double"))
-            for (int i=0;i<localMetaData.getNumRows();i++) for(int j=0;j<localMetaData.getNumCols();j++) aDatosFloat[i][j]=(float) dataDouble[i][j];
+            for (int i=0;i<nr;i++) for(int j=0;j<nc;j++) aDatosFloat[i][j]=(float) dataDouble[i][j];
+
+        return aDatosFloat;
+    }
+    
+    /**
+     * Casts data into Float Format and returns a Matrix.
+     * @return Returns an Matrix (Array[n][m]) of Floats.
+     */
+    public float[][] getFloatResampled(int factor){
+        float[][] aDatosFloat=new float[nr/factor][nc/factor];;
+
+        if (localMetaData.getProperty("[Format]").equalsIgnoreCase("Byte"))
+            for (int i=0;i<nr/factor;i++) for(int j=0;j<nc/factor;j++) aDatosFloat[i][j]=(float) dataByte[i*factor][j*factor];
+        if (localMetaData.getProperty("[Format]").equalsIgnoreCase("Integer"))
+            for (int i=0;i<nr/factor;i++) for(int j=0;j<nc/factor;j++) aDatosFloat[i][j]=(float) dataInteger[i*factor][j*factor];
+        if (localMetaData.getProperty("[Format]").equalsIgnoreCase("Float"))
+            for (int i=0;i<nr/factor;i++) for(int j=0;j<nc/factor;j++) aDatosFloat[i][j]=(int) dataFloat[i*factor][j*factor];
+        if (localMetaData.getProperty("[Format]").equalsIgnoreCase("Double"))
+            for (int i=0;i<nr/factor;i++) for(int j=0;j<nc/factor;j++) aDatosFloat[i][j]=(float) dataDouble[i*factor][j*factor];
 
         return aDatosFloat;
     }
@@ -145,16 +169,16 @@ public class DataRaster extends Object {
      */
     public float[][] getFloatLine(){
         
-        float[][] aDatosFloat=new float[1][localMetaData.getNumRows()*localMetaData.getNumCols()];
+        float[][] aDatosFloat=new float[1][nr*nc];
         
         if (localMetaData.getProperty("[Format]").equalsIgnoreCase("Byte"))
-            for (int i=0;i<localMetaData.getNumRows();i++) for(int j=0;j<localMetaData.getNumCols();j++) aDatosFloat[0][i*localMetaData.getNumCols()+j]=(float) dataByte[i][j];
+            for (int i=0;i<nr;i++) for(int j=0;j<nc;j++) aDatosFloat[0][i*nc+j]=(float) dataByte[i][j];
         if (localMetaData.getProperty("[Format]").equalsIgnoreCase("Integer"))
-            for (int i=0;i<localMetaData.getNumRows();i++) for(int j=0;j<localMetaData.getNumCols();j++) aDatosFloat[0][i*localMetaData.getNumCols()+j]=(float) dataInteger[i][j];
+            for (int i=0;i<nr;i++) for(int j=0;j<nc;j++) aDatosFloat[0][i*nc+j]=(float) dataInteger[i][j];
         if (localMetaData.getProperty("[Format]").equalsIgnoreCase("Float"))
-            for (int i=0;i<localMetaData.getNumRows();i++) for(int j=0;j<localMetaData.getNumCols();j++) aDatosFloat[0][i*localMetaData.getNumCols()+j]=(float) dataFloat[i][j];
+            for (int i=0;i<nr;i++) for(int j=0;j<nc;j++) aDatosFloat[0][i*nc+j]=(float) dataFloat[i][j];
         if (localMetaData.getProperty("[Format]").equalsIgnoreCase("Double"))
-            for (int i=0;i<localMetaData.getNumRows();i++) for(int j=0;j<localMetaData.getNumCols();j++) aDatosFloat[0][i*localMetaData.getNumCols()+j]=(float) dataDouble[i][j];
+            for (int i=0;i<nr;i++) for(int j=0;j<nc;j++) aDatosFloat[0][i*nc+j]=(float) dataDouble[i][j];
 
         return aDatosFloat;
     }
@@ -169,6 +193,61 @@ public class DataRaster extends Object {
     public float[][] getFloatLineEqualized(){
         
         float[][] aDatosFloat=getFloatLine();
+        
+        float faltante=new Float(localMetaData.getProperty("[Missing]")).floatValue();
+        hydroScalingAPI.util.statistics.Stats statDatos= new hydroScalingAPI.util.statistics.Stats(aDatosFloat,faltante);
+        noFaltantes = statDatos.dataCount;
+        FDA=new float[statDatos.dataCount];
+        int conDat=0;
+        
+        for (int j=0;j<aDatosFloat[0].length;j++) 
+            if (aDatosFloat[0][j] != faltante){ 
+                FDA[conDat]=aDatosFloat[0][j];
+                conDat++;
+            }
+
+        java.util.Arrays.sort(FDA);
+        for (int j=0;j<aDatosFloat[0].length;j++){
+            if (aDatosFloat[0][j] != faltante){
+                aDatosFloat[0][j]=(float) (1+java.util.Arrays.binarySearch(FDA,aDatosFloat[0][j])/(float) (statDatos.dataCount-1)*254);
+            } else {
+                aDatosFloat[0][j]=Float.NaN;
+            }
+        }
+
+        return aDatosFloat;
+    }
+    
+    /**
+     * Casts data into Float Format and returns a matrix (Array[n][m]).  In addition
+     * data is mapped in the range [0,1] using the cumulative probability distribution
+     * function.  This arrangement is useful for Visad Flatfields and is used to create
+     * a coloring scheeme that better represents data variability.
+     * @return Returns an single column Vector (Array[1][n*m]) of histogram equalized Floats.
+     */
+    public float[][] getFloatLineResampled(int factor){
+        
+        float[][] fullLine=getFloatResampled(factor);
+        float[][] aDatosFloat=new float[1][fullLine.length*fullLine[0].length];
+
+        for (int i = 0; i < fullLine.length; i++) for (int j = 0; j < fullLine[0].length; j++) {
+            aDatosFloat[0][i*fullLine[0].length+j]=fullLine[i][j];
+        }
+        
+        return aDatosFloat;
+    }
+    
+    
+    /**
+     * Casts data into Float Format and returns a single column Vector.  In addition
+     * data is mapped in the range [0,1] using the cumulative probability distribution
+     * function.  This arrangement is useful for Visad Flatfields and is used to create
+     * a coloring scheeme that better represents data variability.
+     * @return Returns an single column Vector (Array[1][n*m]) of histogram equalized Floats.
+     */
+    public float[][] getFloatLineEqualizedResampled(int factor){
+        
+        float[][] aDatosFloat=getFloatLineResampled(factor);
         
         float faltante=new Float(localMetaData.getProperty("[Missing]")).floatValue();
         hydroScalingAPI.util.statistics.Stats statDatos= new hydroScalingAPI.util.statistics.Stats(aDatosFloat,faltante);
@@ -285,16 +364,34 @@ public class DataRaster extends Object {
     public double[][] getDouble(){
         if (dataDouble != null) return dataDouble;
         
-        double[][] aDatosDouble=new double[localMetaData.getNumRows()][localMetaData.getNumCols()];;
+        double[][] aDatosDouble=new double[nr][nc];;
         
         if (localMetaData.getProperty("[Format]").equalsIgnoreCase("Byte"))
-            for (int i=0;i<localMetaData.getNumRows();i++) for(int j=0;j<localMetaData.getNumCols();j++) aDatosDouble[i][j]=(double) dataByte[i][j];
+            for (int i=0;i<nr;i++) for(int j=0;j<nc;j++) aDatosDouble[i][j]=(double) dataByte[i][j];
         if (localMetaData.getProperty("[Format]").equalsIgnoreCase("Integer"))
-            for (int i=0;i<localMetaData.getNumRows();i++) for(int j=0;j<localMetaData.getNumCols();j++) aDatosDouble[i][j]=(double) dataInteger[i][j];
+            for (int i=0;i<nr;i++) for(int j=0;j<nc;j++) aDatosDouble[i][j]=(double) dataInteger[i][j];
         if (localMetaData.getProperty("[Format]").equalsIgnoreCase("Float"))
-            for (int i=0;i<localMetaData.getNumRows();i++) for(int j=0;j<localMetaData.getNumCols();j++) aDatosDouble[i][j]=(double) dataFloat[i][j];
+            for (int i=0;i<nr;i++) for(int j=0;j<nc;j++) aDatosDouble[i][j]=(double) dataFloat[i][j];
         
         return aDatosDouble;
+    }
+    
+    /**
+     * Reads one value from the File.
+     * @return Returns the read value in double format.
+     */
+    public double getDouble(int i,int j){
+        if (dataDouble != null) return dataDouble[i][j];
+        
+        if (localMetaData.getProperty("[Format]").equalsIgnoreCase("Byte"))
+            return (double) dataByte[i][j];
+        if (localMetaData.getProperty("[Format]").equalsIgnoreCase("Integer"))
+            return (double) dataInteger[i][j];
+        if (localMetaData.getProperty("[Format]").equalsIgnoreCase("Float"))
+            return (double) dataFloat[i][j];
+        
+        return 0.0;
+        
     }
     
     /*public float getEqualized(double f){

@@ -38,7 +38,7 @@ public abstract class GetGeomorphologyRAM extends Object {
      */
     public static void getMaxPend(hydroScalingAPI.modules.networkExtraction.objects.NetworkExtractionModule Proc){
         if (Proc.printDebug) System.out.println(">>> Calculating Slopes");
-        Proc.MaxPend = new double[Proc.DIR.length][Proc.DIR[0].length];
+        if (Proc.MaxPend == null) Proc.MaxPend = new double[Proc.DIR.length][Proc.DIR[0].length];
         for (int i=1; i <= Proc.DIR.length-2 ; i++){
             double[] dist = {Proc.dxy[i],Proc.dy,Proc.dxy[i],Proc.dx[i],1,Proc.dx[i],Proc.dxy[i],Proc.dy,Proc.dxy[i]};
             for (int j=1 ; j <= Proc.DIR[0].length-2; j++){
@@ -471,7 +471,12 @@ public abstract class GetGeomorphologyRAM extends Object {
                 buffOuts[k]=new java.io.BufferedOutputStream(new java.io.FileOutputStream(destinations[k]));
                 outs[k] = new java.io.DataOutputStream(buffOuts[k]);
             }
-            for (int i=1; i <= Proc.metaDEM.getNumRows(); i++) for (int j=1; j <= Proc.metaDEM.getNumCols() ;j++){
+            
+            int nr=Proc.metaDEM.getNumRows();
+            int nc=Proc.metaDEM.getNumCols();
+            
+            
+            for (int i=1; i <= nr; i++) for (int j=1; j <= nc ;j++){
 //                if (Proc.RedRas[i][j]!=1){
 //                    outs[0].writeFloat(-10);
 //                    outs[1].writeInt(-10);
@@ -573,7 +578,7 @@ public abstract class GetGeomorphologyRAM extends Object {
         if (Proc.printDebug) System.out.println(">>> Writing Vectorial Network Representation");
         //primero pongo ceros donde no hay red en la matriz de direcciones (me ahorra preguntas)
         
-        for(int i=0; i<Proc.metaDEM.getNumRows()+2; i++) for (int j=0; j<Proc.metaDEM.getNumCols()+2; j++){
+        for(int i=0; i<nrows+2; i++) for (int j=0; j<ncol+2; j++){
             Proc.DIR[i][j]*=Math.abs((Proc.RedRas[i][j]==-10)?0:Proc.RedRas[i][j]);
         }
         
@@ -598,6 +603,11 @@ public abstract class GetGeomorphologyRAM extends Object {
             int [][] magn=new hydroScalingAPI.io.DataRaster(Proc.metaDEM).getInt();
             Proc.metaDEM.setFormat(formatoOriginal);
             
+            for(int i=0; i<nrows; i++) for (int j=0; j<ncol; j++){
+                orden[i][j]*=Math.abs((Proc.RedRas[i+1][j+1]==-10)?0:Proc.RedRas[i+1][j+1]);
+                magn[i][j]*=Math.abs((Proc.RedRas[i+1][j+1]==-10)?0:Proc.RedRas[i+1][j+1]);
+            }
+            
             java.io.BufferedOutputStream Bstream = new java.io.BufferedOutputStream(new java.io.FileOutputStream(ruta.substring(0, ruta.lastIndexOf(".")) + ".stream"));
             Dstream = new java.io.DataOutputStream(Bstream);
             java.io.BufferedOutputStream Blink = new java.io.BufferedOutputStream(new java.io.FileOutputStream(ruta.substring(0, ruta.lastIndexOf(".")) + ".link"));
@@ -610,6 +620,10 @@ public abstract class GetGeomorphologyRAM extends Object {
             int PointerPoints=0;
             int PointerLinks=0;
             boolean changeLink,changeDir;
+            
+            int nr=Proc.metaDEM.getNumRows();
+            int nc=Proc.metaDEM.getNumCols();
+        
             int ia, ja, iaN, jaN, arroundI, arroundJ;
             for(int i=2; i<nrows; i++){
                 for (int j=2; j<ncol; j++){
@@ -666,7 +680,7 @@ public abstract class GetGeomorphologyRAM extends Object {
                                 for (int k=0; k <= 8; k++){
                                     arroundI=iaN+(k/3)-1;
                                     arroundJ=jaN+(k%3)-1;
-                                    if (arroundI>0 && arroundI < Proc.metaDEM.getNumRows() && arroundJ>0 && arroundJ < Proc.metaDEM.getNumCols()){
+                                    if (arroundI>0 && arroundI < nr && arroundJ>0 && arroundJ < nc){
                                         if (Proc.DIR[iaN+(k/3)-1][jaN+(k%3)-1]==9-k){
                                             lleganAca++;
                                         }

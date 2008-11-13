@@ -183,7 +183,7 @@ public class WorkRectangle extends Object  {
      * @param c The elevation over which to search for sinks
      * @return A list of sinks
      */
-    public java.util.Vector findPits(double c){
+    public java.util.Vector findPits0(double c){
         corrigeUnipit();
         if (Proc.printDebug) {
             System.out.print("    >>> Calculating Directions on "); print_M();
@@ -210,10 +210,13 @@ public class WorkRectangle extends Object  {
                     contgrupos++;
                     estePit.orden=Proc.sinkOrder; Proc.sinkOrder++;
                     estePit.salida=false;
+                    System.out.println(">>>>>> Locating pit "+(contgrupos-1)+" "+i+" "+j);
                     marquePit(i,j,estePit);
                 }
             }
         }
+        
+        System.exit(0);
         
         Pits.remove(P0);
 
@@ -235,13 +238,29 @@ public class WorkRectangle extends Object  {
         return FindP;
     }//Metodo findPits
     
+    private void marquePit(int i, int j, Pit P){
+        System.out.println(">>>>>>> Marking point "+i+" "+j);
+        //System.out.println("en "+i+" "+j);
+        P.Mp.act_WorkRectangle(i,j);
+        Proc.DIR[i][j] = 100*P.grupo + Proc.DIR[i][j];
+        
+        for (int k=0; k <= 8; k++){
+            if (!P.salida && Proc.DIR[i+(k/3)-1][j+(k%3)-1] < 10 && Proc.DEM[i+(k/3)-1][j+(k%3)-1] == Proc.DEM[i][j])
+                P.salida = true;
+            if (Proc.DIR[i+(k/3)-1][j+(k%3)-1] >=10 && Proc.DIR[i+(k/3)-1][j+(k%3)-1]<100 && Proc.DEM[i+(k/3)-1][j+(k%3)-1]==P.cota){
+                marquePit(i+(k/3)-1,j+(k%3)-1,P);
+            }
+        }
+        
+    }
+    
     /**
      * A non-recursive implementation of findPits().  This method is called when there
      * is insufisient memory to use findPits().
      * @param c The elevation over which to search for sinks
      * @return A list of sinks
      */
-    public java.util.Vector findPits2(double c){
+    public java.util.Vector findPits1(double c){
         corrigeUnipit();
         if (Proc.printDebug) {
             System.out.print("    >>> Calculating Directions on "); print_M();
@@ -325,22 +344,6 @@ public class WorkRectangle extends Object  {
         return FindP;
     }//Metodo findPits2
     
-    private void marquePit(int i, int j, Pit P){
-        
-        //System.out.println("en "+i+" "+j);
-        P.Mp.act_WorkRectangle(i,j);
-        Proc.DIR[i][j] = 100*P.grupo + Proc.DIR[i][j];
-        
-        for (int k=0; k <= 8; k++){
-            if (!P.salida && Proc.DIR[i+(k/3)-1][j+(k%3)-1] < 10 && Proc.DEM[i+(k/3)-1][j+(k%3)-1] == Proc.DEM[i][j])
-                P.salida = true;
-            if (Proc.DIR[i+(k/3)-1][j+(k%3)-1] >=10 && Proc.DIR[i+(k/3)-1][j+(k%3)-1]<100 && Proc.DEM[i+(k/3)-1][j+(k%3)-1]==P.cota){
-                marquePit(i+(k/3)-1,j+(k%3)-1,P);
-            }
-        }
-        
-    }
-    
     private int findCell(int id,Pit P, int ncols){
         int j= id%ncols;
         int i = id/ncols;
@@ -352,6 +355,105 @@ public class WorkRectangle extends Object  {
             }
         }
         return 0;
+    }
+    
+    private int[][] toMark;
+    
+    /**
+     * Finds pits in the current WorkRectangle above a given elevation (c)
+     * @param c The elevation over which to search for sinks
+     * @return A list of sinks
+     */
+    public java.util.Vector findPits2(double c){
+        corrigeUnipit();
+        if (Proc.printDebug) {
+            System.out.print("    >>> Calculating Directions on "); print_M();
+            System.out.println("    --------------");
+        }
+        direcciones(c);
+        
+        java.util.Vector Pits = new java.util.Vector();
+        java.util.Vector Flats = new java.util.Vector();
+        java.util.Vector Sinks = new java.util.Vector();
+        
+        WorkRectangle M = this;
+        int contgrupos=1;
+        
+        Pit P0 = new Pit(0, 0.0,new WorkRectangle(0,0,0,0,Proc)); 
+        Pits.addElement(P0);
+        P0.corregido=true;
+        
+        for (int i=M.ini_row; i<=M.end_row; i++){
+            for (int j=M.ini_col; j<=M.end_col; j++){
+                if (Proc.DEM[i][j]>=c && Proc.DIR[i][j]>=10 && Proc.DIR[i][j]<100){
+                    Pit estePit = new Pit(contgrupos,Proc.DEM[i][j],new WorkRectangle(i,i,j,j,Proc));
+                    Pits.addElement(estePit);
+                    contgrupos++;
+                    estePit.orden=Proc.sinkOrder; Proc.sinkOrder++;
+                    estePit.salida=false;
+                    
+                    estePit.Mp.act_WorkRectangle(i,j);
+                    Proc.DIR[i][j] = 100*estePit.grupo + Proc.DIR[i][j];
+                    
+                    toMark=new int[1][]; toMark[0]=new int[] {i,j};
+                    while(toMark != null){
+                        marquePit(estePit,toMark);
+                    }
+                }
+            }
+        }
+        
+        Pits.remove(P0);
+
+        for (int n=0; n<Pits.size(); n++){
+            Pit Pn = (Pit)Pits.get(n);
+            if (Pn.salida)
+                Flats.addElement(Pn);
+            else
+                Sinks.addElement(Pn);
+        }
+        
+        if (Proc.printDebug) System.out.println("    >>> There are  " + Flats.size() + " FLAT ZONES AND " + Sinks.size() + " SINKS" );
+        
+        java.util.Vector FindP = new java.util.Vector();
+        FindP.addElement(Flats);
+        FindP.addElement(Sinks);
+        FindP.addElement(new Double(c));
+
+        return FindP;
+    }//Metodo findPits
+    
+    private void marquePit(Pit P,int[][] ijs){
+        
+        java.util.Vector<int[]> tribsVector=new java.util.Vector();
+        
+        for(int incoming=0;incoming<ijs.length;incoming++){
+            int j=ijs[incoming][1];
+            int i=ijs[incoming][0];
+            for (int k=0; k <= 8; k++){
+                if (!P.salida && Proc.DIR[i+(k/3)-1][j+(k%3)-1] < 10 && Proc.DEM[i+(k/3)-1][j+(k%3)-1] == Proc.DEM[i][j])
+                    P.salida = true;
+                if (Proc.DIR[i+(k/3)-1][j+(k%3)-1] >=10 && Proc.DIR[i+(k/3)-1][j+(k%3)-1]<100 && Proc.DEM[i+(k/3)-1][j+(k%3)-1]==P.cota){
+                    P.Mp.act_WorkRectangle(i+(k/3)-1,j+(k%3)-1);
+                    Proc.DIR[i+(k/3)-1][j+(k%3)-1] = 100*P.grupo + Proc.DIR[i+(k/3)-1][j+(k%3)-1];
+                    tribsVector.add(new int[] {i+(k/3)-1,j+(k%3)-1});
+                    //marquePit(i+(k/3)-1,j+(k%3)-1,P);
+                }
+            }
+        }
+        int countTribs=tribsVector.size();
+        
+        if(countTribs != 0){
+            toMark=new int[countTribs][2];
+            for(int k=0;k<countTribs;k++){
+                toMark[k]=(int[])tribsVector.get(k);
+            }
+        } else {
+            toMark=null;
+        }
+        
+        //System.out.println("en "+i+" "+j);
+        
     }
     
     

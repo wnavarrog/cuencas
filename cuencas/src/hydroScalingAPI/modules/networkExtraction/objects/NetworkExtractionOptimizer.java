@@ -30,7 +30,6 @@ package hydroScalingAPI.modules.networkExtraction.objects;
  * This was a rough attempt to optimize the network extraction code.  However it
  * was a failure because it leaves traces of the DEM partition.
  * @author Ricardo Mantilla
- * @deprecated 
  */
 public class NetworkExtractionOptimizer implements Runnable {
     
@@ -39,7 +38,8 @@ public class NetworkExtractionOptimizer implements Runnable {
     private int[] xChunks,yChunks;
     private int maxXIndex,maxYIndex;
     
-    private ExternalNetworkExtraction ExtractorNo1, ExtractorNo2;
+    private ExternalNetworkExtraction[] localExtractors;
+//    private ExternalNetworkExtraction ExtractorNo1, ExtractorNo2;
     
     /**
      * Creates a new instance of NetworkExtractionOptimizer
@@ -50,11 +50,14 @@ public class NetworkExtractionOptimizer implements Runnable {
         extractOptions=exOp;
         Proc=extractOptions.Proc;
         
-        xChunks=new int[(int)Math.ceil(Proc.metaDEM.getNumCols()/100.)];
-        yChunks=new int[(int)Math.ceil(Proc.metaDEM.getNumRows()/100.)];
+        int nr=Proc.metaDEM.getNumRows();
+        int nc=Proc.metaDEM.getNumCols();
+            
+        xChunks=new int[(int)Math.ceil(nc/100.)];
+        yChunks=new int[(int)Math.ceil(nr/100.)];
         
-        for (int i=0;i<xChunks.length;i++) xChunks[i]=Math.min(100,Proc.metaDEM.getNumCols()-100*(i));
-        for (int i=0;i<yChunks.length;i++) yChunks[i]=Math.min(100,Proc.metaDEM.getNumRows()-100*(i));
+        for (int i=0;i<xChunks.length;i++) xChunks[i]=Math.min(100,nc-100*(i));
+        for (int i=0;i<yChunks.length;i++) yChunks[i]=Math.min(100,nr-100*(i));
         
         maxXIndex=Proc.metaDEM.getNumCols()-1;
         maxYIndex=Proc.metaDEM.getNumRows()-1;
@@ -65,16 +68,23 @@ public class NetworkExtractionOptimizer implements Runnable {
     
     public void optimize(){
         
-        /*if(Proc.taskDIR){
+        if(Proc.taskDIR && xChunks.length*yChunks.length > 1000){
+            
+            int numProcessors=4;
         
             System.out.println("Otimization starts here !!!");
+            
+            localExtractors=new ExternalNetworkExtraction[numProcessors];
+            for(int i=0;i<numProcessors;i++) localExtractors[i]=new ExternalNetworkExtraction("null");
 
-            ExtractorNo1=new ExternalNetworkExtraction("null");
-            ExtractorNo2=new ExternalNetworkExtraction("null");
+            //ExtractorNo1=new ExternalNetworkExtraction("null");
+            //ExtractorNo2=new ExternalNetworkExtraction("null");
 
             String metaName=Proc.metaDEM.getLocationMeta().getName();
             java.io.File tempDirectory=new java.io.File(System.getProperty("java.io.tmpdir")+System.getProperty("file.separator")+"pandoraOptimizer"+System.getProperty("file.separator")+metaName.substring(0,metaName.lastIndexOf("."))+System.getProperty("file.separator"));
             tempDirectory.mkdirs();
+            
+            boolean availTest=true;
 
             for (int i=0;i<xChunks.length;i++){
                 for (int j=0;j<yChunks.length;j++){
@@ -122,29 +132,34 @@ public class NetworkExtractionOptimizer implements Runnable {
 
                         dataWriter.close();
                         
-                        extractOptions.increaseValueExtractionBar();
-
+                        extractOptions.increaseValueOptimizerBar();
+                        
                         //new hydroScalingAPI.modules.networkExtraction.objects.NetworkExtractionModule(theMeta,new hydroScalingAPI.io.DataRaster(theMeta),true);
-                        System.out.println(ExtractorNo1.isBusy()+" "+ExtractorNo2.isBusy());
-                        while(ExtractorNo1.isBusy() & ExtractorNo2.isBusy()){
-                            System.out.println("All Processors are Busy "+ExtractorNo1.isBusy()+" "+ExtractorNo2.isBusy());
+                        availTest=true;
+                        for (int k = 0; k < numProcessors; k++) {
+                            availTest&=localExtractors[k].isBusy();
+                            System.out.print(localExtractors[k].isBusy()+" ");
+                        }
+                        
+                        System.out.println("\nAvailability Test: "+availTest);
+                        
+                        while(availTest){
+                            System.out.println("All Processors are Busy");
                             new visad.util.Delay(1000);
+                            availTest=true;
+                            for (int k = 0; k < numProcessors; k++) availTest&=localExtractors[k].isBusy();
                         }
 
-                        if(!ExtractorNo1.isBusy()) {
-                            ExtractorNo1=new ExternalNetworkExtraction("ExtractorNo1");
-                            ExtractorNo1.setPriority(ExtractorNo1.MAX_PRIORITY);
-                            ExtractorNo1.setTargetFiles(theMeta.getLocationMeta().getPath(), theMeta.getLocationBinaryFile().getPath());
-                            ExtractorNo1.start();
-                        } else {
-                            if(!ExtractorNo2.isBusy()) {
-                                ExtractorNo2=new ExternalNetworkExtraction("ExtractorNo2");
-                                ExtractorNo2.setPriority(ExtractorNo2.MAX_PRIORITY);
-                                ExtractorNo2.setTargetFiles(theMeta.getLocationMeta().getPath(), theMeta.getLocationBinaryFile().getPath());
-                                ExtractorNo2.start();
+                        for (int k = 0; k < numProcessors; k++) {
+                            if(!localExtractors[k].isBusy()) {
+                                localExtractors[k]=new ExternalNetworkExtraction("ExtractorNo"+k);
+                                localExtractors[k].setPriority(ExternalNetworkExtraction.MAX_PRIORITY);
+                                localExtractors[k].setTargetFiles(theMeta.getLocationMeta().getPath(), theMeta.getLocationBinaryFile().getPath());
+                                localExtractors[k].start();
+                                break;
                             }
                         }
-
+                        
                         System.out.println("Done with "+demChunkData);
 
                     } catch (java.io.IOException ioe){
@@ -154,10 +169,21 @@ public class NetworkExtractionOptimizer implements Runnable {
                 }
             }
             
-            while(ExtractorNo1.isBusy() || ExtractorNo2.isBusy()){
-                System.out.println("Somebody is busy "+ExtractorNo1.isBusy()+" "+ExtractorNo2.isBusy());
-                new visad.util.Delay(1000);
+            availTest=false;
+            for (int k = 0; k < numProcessors; k++) {
+                availTest|=localExtractors[k].isBusy();
+                System.out.print(localExtractors[k].isBusy()+" ");
             }
+            System.out.println("\nAvailability Test: "+availTest);
+            
+            while(availTest){
+                System.out.println("Some Processors are Busy");
+                new visad.util.Delay(1000);
+                availTest=false;
+                for (int k = 0; k < numProcessors; k++) availTest|=localExtractors[k].isBusy();
+            }
+            
+            extractOptions.setValueOptimizerBar(2*xChunks.length*yChunks.length);
 
             for (int i=0;i<xChunks.length;i++){
                 for (int j=0;j<yChunks.length;j++){
@@ -183,7 +209,7 @@ public class NetworkExtractionOptimizer implements Runnable {
 
                         System.out.println("Done with "+demChunkData);
                         
-                        extractOptions.increaseValueExtractionBar();
+                        extractOptions.increaseValueOptimizerBar();
 
                     } catch (java.io.IOException ioe){
                         System.err.println("Failed reading corrDEM file");
@@ -191,7 +217,9 @@ public class NetworkExtractionOptimizer implements Runnable {
                     }
                 }
             }
-        }*/
+        }
+        
+        extractOptions.setValueOptimizerBar(2*xChunks.length*yChunks.length);
         
         Thread t = new Thread(Proc);
         t.setPriority(t.MAX_PRIORITY);
@@ -206,15 +234,14 @@ public class NetworkExtractionOptimizer implements Runnable {
     public static void main(java.lang.String[] args) {
         
         try{
-            //hydroScalingAPI.io.MetaRaster metaRaster1= new hydroScalingAPI.io.MetaRaster(new java.io.File("/hidrosigDataBases/Demo_database/Rasters/Topography/3_ArcSec/TestCases/NewHS/testdem.metaDEM"));
-            //metaRaster1.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Demo_database/Rasters/Topography/3_ArcSec/TestCases/NewHS/testdem.dem"));
+            hydroScalingAPI.io.MetaRaster metaRaster1= new hydroScalingAPI.io.MetaRaster(new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Topography/1_ArcSec_USGS/walnutGulchUpdated.metaDEM"));
+            metaRaster1.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Topography/1_ArcSec_USGS/walnutGulchUpdated.dem"));
             
             //hydroScalingAPI.io.MetaRaster metaRaster1= new hydroScalingAPI.io.MetaRaster(new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS/Whitewaters.metaDEM"));
             //metaRaster1.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS/Whitewaters.dem"));
             
-            
-            hydroScalingAPI.io.MetaRaster metaRaster1= new hydroScalingAPI.io.MetaRaster(new java.io.File("/hidrosigDataBases/Continental_US_database/Rasters/Topography/Dd_Basins_30_ArcSec/B_11/08975896.metaDEM"));
-            metaRaster1.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Continental_US_database/Rasters/Topography/Dd_Basins_30_ArcSec/B_11/08975896.dem"));
+            //hydroScalingAPI.io.MetaRaster metaRaster1= new hydroScalingAPI.io.MetaRaster(new java.io.File("/hidrosigDataBases/Continental_US_database/Rasters/Topography/Dd_Basins_30_ArcSec/B_11/08975896.metaDEM"));
+            //metaRaster1.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Continental_US_database/Rasters/Topography/Dd_Basins_30_ArcSec/B_11/08975896.dem"));
             
             System.out.println(metaRaster1.getLocationBinaryFile());
             hydroScalingAPI.io.DataRaster datosRaster = new hydroScalingAPI.io.DataRaster(metaRaster1);

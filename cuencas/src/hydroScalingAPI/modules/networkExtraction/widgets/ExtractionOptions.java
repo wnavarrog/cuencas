@@ -316,8 +316,15 @@ public class ExtractionOptions extends javax.swing.JDialog {
     /**
      * Updates the status of the Optimizer status bar
      */
-    public void increaseValueExtractionBar(){
+    public void increaseValueOptimizerBar(){
         optimizationProgressBar.setValue(optimizationProgressBar.getValue()+1);
+    }
+    
+    /**
+     * Updates the value of the Optimizer status bar
+     */
+    public void setValueOptimizerBar(int value){
+        optimizationProgressBar.setValue(value);
     }
     
     /**
@@ -328,6 +335,7 @@ public class ExtractionOptions extends javax.swing.JDialog {
     public void setMaxMinExtractionBar(int min, int max){
         extractionProgressBar.setMinimum(min);
         extractionProgressBar.setMaximum(max);
+        extractionProgressBar.setValue(0);
     }
     
     /**
@@ -336,6 +344,25 @@ public class ExtractionOptions extends javax.swing.JDialog {
      */
     public void setValueExtractionBar(int value){
         extractionProgressBar.setValue(extractionProgressBar.getMaximum()-value+extractionProgressBar.getMinimum());
+    }
+    
+    /**
+     * Sets bounds for the Extraction status bar
+     * @param min The minimum elevation of the terrain
+     * @param max The maximum elevation of the terrain
+     */
+    public void setMaxMinGeomorphBar(int min, int max){
+        geomorphProgressBar.setMinimum(min);
+        geomorphProgressBar.setMaximum(max);
+        geomorphProgressBar.setValue(0);
+    }
+    
+    /**
+     * Updates the status of the Extraction status bar
+     * @param value The current elevation
+     */
+    public void setValueGeomorphBar(int value){
+        geomorphProgressBar.setValue(value);
     }
     
     /**
@@ -349,7 +376,7 @@ public class ExtractionOptions extends javax.swing.JDialog {
     }
     
     
-    // <editor-fold defaultstate="collapsed" desc=" Generated Code ">//GEN-BEGIN:initComponents
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
@@ -442,6 +469,9 @@ public class ExtractionOptions extends javax.swing.JDialog {
         jPanel5 = new javax.swing.JPanel();
         jLabelBarra = new javax.swing.JLabel();
         extractionProgressBar = new javax.swing.JProgressBar();
+        jPanel11 = new javax.swing.JPanel();
+        jLabelBarra2 = new javax.swing.JLabel();
+        geomorphProgressBar = new javax.swing.JProgressBar();
         jPanelBotones = new javax.swing.JPanel();
         jButtonAplicar = new javax.swing.JButton();
         jButtonIniciar = new javax.swing.JButton();
@@ -454,12 +484,12 @@ public class ExtractionOptions extends javax.swing.JDialog {
             }
         });
 
+        jPanelTareas.setPreferredSize(new java.awt.Dimension(507, 78));
         jPanelTareas.setLayout(new java.awt.BorderLayout());
 
-        jPanelTareas.setPreferredSize(new java.awt.Dimension(507, 78));
+        jPanelTerasInt.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
         jPanelTerasInt.setLayout(new java.awt.GridLayout(4, 1));
 
-        jPanelTerasInt.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
         jCheckBoxDIR.setFont(new java.awt.Font("Arial", 0, 12));
         jCheckBoxDIR.setText("Get the directions matrix");
         jCheckBoxDIR.addActionListener(new java.awt.event.ActionListener() {
@@ -467,7 +497,6 @@ public class ExtractionOptions extends javax.swing.JDialog {
                 jCheckBoxDIRActionPerformed(evt);
             }
         });
-
         jPanelTerasInt.add(jCheckBoxDIR);
 
         jCheckBoxRED.setFont(new java.awt.Font("Arial", 0, 12));
@@ -477,17 +506,15 @@ public class ExtractionOptions extends javax.swing.JDialog {
                 jCheckBoxREDActionPerformed(evt);
             }
         });
-
         jPanelTerasInt.add(jCheckBoxRED);
 
-        jCheckBoxGEO.setFont(new java.awt.Font("Arial", 0, 12));
+        jCheckBoxGEO.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jCheckBoxGEO.setText("Calculate Geomorphic Properties");
         jCheckBoxGEO.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jCheckBoxGEOActionPerformed(evt);
             }
         });
-
         jPanelTerasInt.add(jCheckBoxGEO);
 
         jCheckBoxVECT.setFont(new java.awt.Font("Arial", 0, 12));
@@ -496,9 +523,9 @@ public class ExtractionOptions extends javax.swing.JDialog {
 
         jPanelTareas.add(jPanelTerasInt, java.awt.BorderLayout.CENTER);
 
+        jPanelGetGeo.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Geomophology Algorithm", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Dialog", 0, 12))); // NOI18N
         jPanelGetGeo.setLayout(new java.awt.GridLayout(2, 1));
 
-        jPanelGetGeo.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Geomophology Algorithm", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Dialog", 0, 12)));
         jRadioButton14.setFont(new java.awt.Font("Arial", 0, 12));
         jRadioButton14.setText("Hard Disk Based Algorithm");
         jRadioButton14.addActionListener(new java.awt.event.ActionListener() {
@@ -506,7 +533,6 @@ public class ExtractionOptions extends javax.swing.JDialog {
                 jRadioButton14ActionPerformed(evt);
             }
         });
-
         jPanelGetGeo.add(jRadioButton14);
 
         jRadioButton16.setFont(new java.awt.Font("Arial", 0, 12));
@@ -517,7 +543,6 @@ public class ExtractionOptions extends javax.swing.JDialog {
                 jRadioButton16ActionPerformed(evt);
             }
         });
-
         jPanelGetGeo.add(jRadioButton16);
 
         jPanelTareas.add(jPanelGetGeo, java.awt.BorderLayout.SOUTH);
@@ -526,13 +551,13 @@ public class ExtractionOptions extends javax.swing.JDialog {
 
         jPanelSinks.setLayout(new java.awt.GridLayout(2, 1));
 
+        jPanel18.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Human Intervention on Sinks :", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Dialog", 0, 12))); // NOI18N
+        jPanel18.setPreferredSize(new java.awt.Dimension(507, 118));
         jPanel18.setLayout(new java.awt.GridBagLayout());
 
-        jPanel18.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Human Intervention on Sinks :", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Dialog", 0, 12)));
-        jPanel18.setPreferredSize(new java.awt.Dimension(507, 118));
+        jPanel19.setPreferredSize(new java.awt.Dimension(300, 15));
         jPanel19.setLayout(new java.awt.GridBagLayout());
 
-        jPanel19.setPreferredSize(new java.awt.Dimension(300, 15));
         jTextField10.setFont(new java.awt.Font("SansSerif", 0, 12));
         jTextField10.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         jTextField10.setMinimumSize(new java.awt.Dimension(40, 15));
@@ -558,7 +583,6 @@ public class ExtractionOptions extends javax.swing.JDialog {
                 jCheckBox4ActionPerformed(evt);
             }
         });
-
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -599,7 +623,6 @@ public class ExtractionOptions extends javax.swing.JDialog {
                 jCheckBox6ActionPerformed(evt);
             }
         });
-
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -637,7 +660,6 @@ public class ExtractionOptions extends javax.swing.JDialog {
                 jCheckBox7ActionPerformed(evt);
             }
         });
-
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -680,7 +702,6 @@ public class ExtractionOptions extends javax.swing.JDialog {
                 jButton4ActionPerformed(evt);
             }
         });
-
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
@@ -688,9 +709,9 @@ public class ExtractionOptions extends javax.swing.JDialog {
 
         jPanelSinks.add(jPanel18);
 
+        jPanel13.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Cut Sinks Every Time That :", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Dialog", 0, 12))); // NOI18N
         jPanel13.setLayout(new java.awt.GridBagLayout());
 
-        jPanel13.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Cut Sinks Every Time That :", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Dialog", 0, 12)));
         jPanel16.setLayout(new java.awt.GridBagLayout());
 
         jLabel11.setFont(new java.awt.Font("Arial", 0, 12));
@@ -710,7 +731,6 @@ public class ExtractionOptions extends javax.swing.JDialog {
                 jTextField6ActionPerformed(evt);
             }
         });
-
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
@@ -730,7 +750,6 @@ public class ExtractionOptions extends javax.swing.JDialog {
                 jCheckBox1ActionPerformed(evt);
             }
         });
-
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -779,7 +798,6 @@ public class ExtractionOptions extends javax.swing.JDialog {
                 jCheckBox3ActionPerformed(evt);
             }
         });
-
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -795,12 +813,12 @@ public class ExtractionOptions extends javax.swing.JDialog {
 
         jTabbedPane1.addTab("Sinks", null, jPanelSinks, "");
 
+        jPanelRedRas.setPreferredSize(new java.awt.Dimension(507, 78));
         jPanelRedRas.setLayout(new java.awt.GridBagLayout());
 
-        jPanelRedRas.setPreferredSize(new java.awt.Dimension(507, 78));
+        jPanelIniCanales.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
         jPanelIniCanales.setLayout(new java.awt.GridLayout(7, 0));
 
-        jPanelIniCanales.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
         jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
         jCheckBoxTodoRed.setFont(new java.awt.Font("Dialog", 0, 12));
@@ -828,7 +846,6 @@ public class ExtractionOptions extends javax.swing.JDialog {
                 jCheckBox2ActionPerformed(evt);
             }
         });
-
         jPanel3.add(jCheckBox2);
 
         jTextField1.setFont(new java.awt.Font("SansSerif", 0, 12));
@@ -854,7 +871,6 @@ public class ExtractionOptions extends javax.swing.JDialog {
                 jCheckBox5ActionPerformed(evt);
             }
         });
-
         jPanel4.add(jCheckBox5);
 
         jTextField2.setFont(new java.awt.Font("SansSerif", 0, 12));
@@ -875,7 +891,6 @@ public class ExtractionOptions extends javax.swing.JDialog {
                 jCheckBoxUmbralAPActionPerformed(evt);
             }
         });
-
         jPanel7.add(jCheckBoxUmbralAP);
 
         jLabel4.setText("a =");
@@ -913,7 +928,6 @@ public class ExtractionOptions extends javax.swing.JDialog {
                 jCheckBoxLaplaceActionPerformed(evt);
             }
         });
-
         jPanelTopoConv.add(jCheckBoxLaplace);
 
         jTextFieldCeldasConv.setFont(new java.awt.Font("SansSerif", 0, 12));
@@ -932,9 +946,9 @@ public class ExtractionOptions extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         jPanelRedRas.add(jPanelIniCanales, gridBagConstraints);
 
+        jPaneLAzules.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
         jPaneLAzules.setLayout(new java.awt.GridBagLayout());
 
-        jPaneLAzules.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
         jCheckBoxLAzules.setFont(new java.awt.Font("Dialog", 0, 12));
         jCheckBoxLAzules.setText("Use a Blue Lines Map to Guide Network Extraction");
         jCheckBoxLAzules.addActionListener(new java.awt.event.ActionListener() {
@@ -942,7 +956,6 @@ public class ExtractionOptions extends javax.swing.JDialog {
                 jCheckBoxLAzulesActionPerformed(evt);
             }
         });
-
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -957,7 +970,6 @@ public class ExtractionOptions extends javax.swing.JDialog {
                 jButtonBuscarLAActionPerformed(evt);
             }
         });
-
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
@@ -970,7 +982,6 @@ public class ExtractionOptions extends javax.swing.JDialog {
                 jCheckBoxAP_LAActionPerformed(evt);
             }
         });
-
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -985,10 +996,10 @@ public class ExtractionOptions extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         jPanelRedRas.add(jPaneLAzules, gridBagConstraints);
 
-        jPanelOp_AreaPend.setLayout(new java.awt.GridLayout(2, 1));
-
         jPanelOp_AreaPend.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
         jPanelOp_AreaPend.setMinimumSize(new java.awt.Dimension(200, 62));
+        jPanelOp_AreaPend.setLayout(new java.awt.GridLayout(2, 1));
+
         jCheckBoxAreaPend_c.setFont(new java.awt.Font("Dialog", 0, 12));
         jCheckBoxAreaPend_c.setText("Load pre-existing Area-Slope Analysis");
         jCheckBoxAreaPend_c.setActionCommand("areaPendiente");
@@ -997,7 +1008,6 @@ public class ExtractionOptions extends javax.swing.JDialog {
                 jCheckBoxAreaPend_cActionPerformed(evt);
             }
         });
-
         jPanelOp_AreaPend.add(jCheckBoxAreaPend_c);
 
         jPanel1.setLayout(new java.awt.GridBagLayout());
@@ -1029,7 +1039,6 @@ public class ExtractionOptions extends javax.swing.JDialog {
                 jCheckBoxAreaPend_nActionPerformed(evt);
             }
         });
-
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -1048,9 +1057,9 @@ public class ExtractionOptions extends javax.swing.JDialog {
 
         jTabbedPane1.addTab("Drainage Network Pruning", null, jPanelRedRas, "");
 
+        jPanelArea_Pend.setEnabled(false);
         jPanelArea_Pend.setLayout(new java.awt.BorderLayout());
 
-        jPanelArea_Pend.setEnabled(false);
         jLabel1.setFont(new java.awt.Font("Arial", 0, 11));
         jLabel1.setText("# Points =");
         jPanel6.add(jLabel1);
@@ -1062,7 +1071,6 @@ public class ExtractionOptions extends javax.swing.JDialog {
                 jTextFieldNPuntosAPActionPerformed(evt);
             }
         });
-
         jPanel6.add(jTextFieldNPuntosAP);
 
         jLabel2.setFont(new java.awt.Font("Arial", 0, 11));
@@ -1087,7 +1095,6 @@ public class ExtractionOptions extends javax.swing.JDialog {
                 jButtonActualizarAPActionPerformed(evt);
             }
         });
-
         jPanel6.add(jButtonActualizarAP);
 
         jPanelArea_Pend.add(jPanel6, java.awt.BorderLayout.SOUTH);
@@ -1096,7 +1103,7 @@ public class ExtractionOptions extends javax.swing.JDialog {
 
         getContentPane().add(jTabbedPane1, java.awt.BorderLayout.CENTER);
 
-        jPanel28.setLayout(new java.awt.GridLayout(3, 1));
+        jPanel28.setLayout(new java.awt.GridLayout(4, 1));
 
         jPanel8.setLayout(new java.awt.BorderLayout());
 
@@ -1120,13 +1127,23 @@ public class ExtractionOptions extends javax.swing.JDialog {
 
         jPanel28.add(jPanel5);
 
+        jPanel11.setLayout(new java.awt.BorderLayout());
+
+        jLabelBarra2.setFont(new java.awt.Font("Arial", 0, 11)); // NOI18N
+        jLabelBarra2.setText("Calculating Geomorphology");
+        jPanel11.add(jLabelBarra2, java.awt.BorderLayout.NORTH);
+
+        geomorphProgressBar.setStringPainted(true);
+        jPanel11.add(geomorphProgressBar, java.awt.BorderLayout.CENTER);
+
+        jPanel28.add(jPanel11);
+
         jButtonAplicar.setText("Apply Conditions");
         jButtonAplicar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonAplicarActionPerformed(evt);
             }
         });
-
         jPanelBotones.add(jButtonAplicar);
 
         jButtonIniciar.setText("Start");
@@ -1136,7 +1153,6 @@ public class ExtractionOptions extends javax.swing.JDialog {
                 jButtonIniciarActionPerformed(evt);
             }
         });
-
         jPanelBotones.add(jButtonIniciar);
 
         jButtonCanc_Salir.setText("Cancel");
@@ -1145,13 +1161,11 @@ public class ExtractionOptions extends javax.swing.JDialog {
                 jButtonCanc_SalirActionPerformed(evt);
             }
         });
-
         jPanelBotones.add(jButtonCanc_Salir);
 
         jPanel28.add(jPanelBotones);
 
         getContentPane().add(jPanel28, java.awt.BorderLayout.SOUTH);
-
     }// </editor-fold>//GEN-END:initComponents
     
   private void jTextFieldCeldasConvActionPerformed (java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldCeldasConvActionPerformed
@@ -1249,9 +1263,9 @@ public class ExtractionOptions extends javax.swing.JDialog {
       jButtonAplicar.setEnabled(false);
       jButtonIniciar.setEnabled(false);
       
-      //hydroScalingAPI.modules.networkExtraction.objects.NetworkExtractionOptimizer localOptimizer=new hydroScalingAPI.modules.networkExtraction.objects.NetworkExtractionOptimizer(this);
-      //Thread t1 = new Thread(localOptimizer);
-      Thread t1 = new Thread(Proc);
+      hydroScalingAPI.modules.networkExtraction.objects.NetworkExtractionOptimizer localOptimizer=new hydroScalingAPI.modules.networkExtraction.objects.NetworkExtractionOptimizer(this);
+      Thread t1 = new Thread(localOptimizer);
+      //Thread t1 = new Thread(Proc);
       t1.start();
       
   }//GEN-LAST:event_jButtonIniciarActionPerformed
@@ -1313,7 +1327,7 @@ public class ExtractionOptions extends javax.swing.JDialog {
   private void jButton4ActionPerformed (java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
       if(cheqManual()){
           int nPits=0;
-          java.util.Vector Sums = (java.util.Vector) Proc.MT.findPits(-2.0).get(1);
+          java.util.Vector Sums = (java.util.Vector) Proc.MT.findPits2(-2.0).get(1);
           for(int n=0; n<Sums.size(); n++){
               hydroScalingAPI.modules.networkExtraction.objects.Pit Sn = (hydroScalingAPI.modules.networkExtraction.objects.Pit)Sums.get(n);
               int cantPit = Sn.getCantPit(Proc.DIR);
@@ -1543,6 +1557,7 @@ public class ExtractionOptions extends javax.swing.JDialog {
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JProgressBar extractionProgressBar;
+    private javax.swing.JProgressBar geomorphProgressBar;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButtonActualizarAP;
     private javax.swing.JButton jButtonAplicar;
@@ -1587,9 +1602,11 @@ public class ExtractionOptions extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabelBarra;
     private javax.swing.JLabel jLabelBarra1;
+    private javax.swing.JLabel jLabelBarra2;
     private javax.swing.JPanel jPaneLAzules;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel16;
     private javax.swing.JPanel jPanel17;

@@ -20,6 +20,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 package hydroScalingAPI.modules.networkExtraction.objects;
 
+import hydroScalingAPI.modules.networkExtraction.widgets.ExtractionOptions;
+
 /**
  * This class controls the procedures associated to River Network Extraction from
  * DEMs.  It comunicates with the GUI and the methods needed to achieve this task
@@ -340,15 +342,15 @@ public class NetworkExtractionModule implements Runnable {
      * @param dataDEM1 The DataRaster associated to the data
      */
     public NetworkExtractionModule(hydroScalingAPI.io.MetaRaster metaDEM1, hydroScalingAPI.io.DataRaster dataDEM1) {
-        //printDebug=false;
-        printDebug=true;
+        printDebug=false;
+        //printDebug=true;
         metaDEM=metaDEM1;
         inicio(dataDEM1);
         OpProc = new hydroScalingAPI.modules.networkExtraction.widgets.ExtractionOptions(this);
-        //taskDIR=true; taskRED=true; taskGEO=false; taskVECT=false;
+        taskDIR=true; taskRED=true; taskGEO=false; taskVECT=false;
         
-//        taskDIR=false; taskRED=true; taskGEO=true; taskVECT=true;
-        taskDIR=true; taskRED=true; taskGEO=true; taskVECT=true;
+        //taskDIR=false; taskRED=true; taskGEO=true; taskVECT=true;
+        //taskDIR=true; taskRED=true; taskGEO=true; taskVECT=true;
         
         pixPodado = 0.05f/(float)dy/(float)dxm;
         
@@ -361,13 +363,11 @@ public class NetworkExtractionModule implements Runnable {
      * @param dataDEM The DataRaster associated to the data
      */
     public void inicio(hydroScalingAPI.io.DataRaster dataDEM){
-        int ncol = metaDEM.getNumCols();
-        int nfila = metaDEM.getNumRows();
-        
+        int nfila=metaDEM.getNumRows();
+        int ncol=metaDEM.getNumCols();
+            
         /*Se dimensiona las matrices maxpend[][], MD[][] y DEMC[][] con el numero de filas
          y columnas del DEM original sumandole una fila y una columna para la mascara.*/
-        
-        double[][] tempDEM = dataDEM.getDouble();
         
         DEM = new double[nfila+2][ncol+2];
         DIR = new int[nfila+2][ncol+2];
@@ -384,14 +384,13 @@ public class NetworkExtractionModule implements Runnable {
         
         for (int i=1; i<=nfila; i++){
             for (int j=1; j<=ncol ;j++){
-                if (tempDEM[i-1][j-1] == new Double(metaDEM.getMissing()).doubleValue() || tempDEM[i-1][j-1]<=0)
+                double valueDEM=dataDEM.getDouble(i-1,j-1);
+                if (valueDEM == new Double(metaDEM.getMissing()).doubleValue() || valueDEM<=0)
                     DEM[i][j] = -1;
                 else
-                    DEM[i][j] = tempDEM[i-1][j-1];
+                    DEM[i][j] = valueDEM;
             }
         }
-        
-        tempDEM = null;
         
         DEMstats=new hydroScalingAPI.util.statistics.Stats(DEM,-1.0);
 
@@ -414,7 +413,10 @@ public class NetworkExtractionModule implements Runnable {
      * The DEM correction algorithm
      */
     public void corrigeDEM(){
-
+        
+        int nr=metaDEM.getNumRows();
+        int nc=metaDEM.getNumCols();
+        
         java.util.Calendar iniTime=java.util.Calendar.getInstance();
         if (printDebug) System.out.println(">>> Running fixDEM()"+" - Initial Time: "+iniTime.getTime());
         if(!firstCorrection){ leeDEM(); if (printDebug) System.out.println(">>> Running readDEM()");}
@@ -431,7 +433,7 @@ public class NetworkExtractionModule implements Runnable {
                 MT.corrigeWorkRectangle(OpProc.myFSc);
                 corrigeSink_t();
 
-                MT = new WorkRectangle(2,metaDEM.getNumRows()-1,2,metaDEM.getNumCols()-1,this);
+                MT = new WorkRectangle(2,nr-1,2,nc-1,this);
 
                 convergenceAlarmCounter++;
                 
@@ -543,7 +545,6 @@ public class NetworkExtractionModule implements Runnable {
             }
             
             if(cleanShorts) GetRasterNetwork.cleanShorts(this);
-            
             GetRasterNetwork.fixIntersections(this);
             
             GetGeomorphologyRAM.getAreas(this);
@@ -558,23 +559,37 @@ public class NetworkExtractionModule implements Runnable {
         
         if(!taskRED) leeRED();
         
+        OpProc.setMaxMinGeomorphBar(0, 5);
+        OpProc.setValueGeomorphBar(1);
+        
         if(taskGEO){
+            
             if(!archPro){
                 GetGeomorphologyRAM.getDistanceToBorder(this);
+                OpProc.setValueGeomorphBar(2);
                 System.gc();
                 GetGeomorphologyRAM.getGEO(this);
+                OpProc.setValueGeomorphBar(3);
                 writeGEO(metaDEM.getLocationBinaryFile());
+                OpProc.setValueGeomorphBar(4);
                 GetGeomorphologyRAM.getRedVect(this);
+                OpProc.setValueGeomorphBar(5);
             }else{
                 if (printDebug) System.out.println(">>> Calculating Geormorphology - ROM based Algorithm");
+
                 GetGeomorphologyRAM.getDistanceToBorder(this);
+                OpProc.setValueGeomorphBar(2);
                 System.gc();
                 
                 new hydroScalingAPI.modules.networkExtraction.objects.GetGeomorphologyROM(metaDEM);
+                OpProc.setValueGeomorphBar(3);
                 
                 
                 if (printDebug) System.out.println(">>> Geormorphology Completed");
+                OpProc.setValueGeomorphBar(4);
+                
                 GetGeomorphologyRAM.getRedVect(this);
+                OpProc.setValueGeomorphBar(5);
             }
         }
         
@@ -582,7 +597,7 @@ public class NetworkExtractionModule implements Runnable {
         if (printDebug) {
             System.out.println(">>> DONE <<<"+" - Final Time: "+finalTime.getTime());
             System.out.println(">>> DEM Characteristics : ");
-            System.out.println(">>> DEM Size : Ncols : "+metaDEM.getNumCols()+", Nrows : "+metaDEM.getNumRows());
+            System.out.println(">>> DEM Size : Ncols : "+nc+", Nrows : "+nr);
             System.out.println(">>> Min Height : "+DEMstats.minValue+", Max Height : "+DEMstats.maxValue);
             System.out.println(">>> Heights Average : "+DEMstats.meanValue+", Height Std. Deviation : "+DEMstats.standardDeviation);
             System.out.println(">>> Running Time is "+(finalTime.getTimeInMillis()-iniTime.getTimeInMillis())/1000.);
@@ -645,8 +660,8 @@ public class NetworkExtractionModule implements Runnable {
         
         if (printDebug) System.out.println("    >>> General UniPit Method" );
         
-        int ncol = metaDEM.getNumCols();
-        int nfila = metaDEM.getNumRows();
+        int nfila=metaDEM.getNumRows();
+        int ncol=metaDEM.getNumCols();
 
         double min_ady = Double.MAX_VALUE;
         int contAltas = 0;
@@ -759,7 +774,11 @@ public class NetworkExtractionModule implements Runnable {
                 buffOuts[k]=new java.io.BufferedOutputStream(new java.io.FileOutputStream(destinations[k]));
                 outs[k] = new java.io.DataOutputStream(buffOuts[k]);
             }
-            for (int i=1; i <= metaDEM.getNumRows(); i++) for (int j=1; j <= metaDEM.getNumCols() ;j++){
+            
+            int nr=metaDEM.getNumRows();
+            int nc=metaDEM.getNumCols();
+            
+            for (int i=1; i <= nr; i++) for (int j=1; j <= nc ;j++){
                 if(DEM[i][j]==-1.0){
                     outs[0].writeFloat(new Float(metaDEM.getMissing()).floatValue());
                     outs[1].writeDouble(new Double(metaDEM.getMissing()).doubleValue());
@@ -785,6 +804,10 @@ public class NetworkExtractionModule implements Runnable {
      * @param arch The path where the files will be stored
      */
     public void writeCorrDem(java.io.File arch){
+        int nr=metaDEM.getNumRows();
+        int nc=metaDEM.getNumCols();
+            
+            
         String path = arch.getPath();
         if (printDebug) System.out.println(">>> Writing To :"+arch.getParent());
         String[] destinations ={ path.substring(0, path.lastIndexOf(".")) + ".corrDEM"};
@@ -796,7 +819,7 @@ public class NetworkExtractionModule implements Runnable {
                 buffOuts[k]=new java.io.BufferedOutputStream(new java.io.FileOutputStream(destinations[k]));
                 outs[k] = new java.io.DataOutputStream(buffOuts[k]);
             }
-            for (int i=1; i <= metaDEM.getNumRows(); i++) for (int j=1; j <= metaDEM.getNumCols() ;j++){
+            for (int i=1; i <= nr; i++) for (int j=1; j <= nc ;j++){
                 if(DEM[i][j]==-1.0){
                     outs[0].writeDouble(new Double(metaDEM.getMissing()).doubleValue());
                 }
@@ -817,6 +840,9 @@ public class NetworkExtractionModule implements Runnable {
      */
     public void writeRED(java.io.File arch){
         if (printDebug) System.out.println(">>> Writing Raster Network");
+        int nr=metaDEM.getNumRows();
+        int nc=metaDEM.getNumCols();
+            
         String path = arch.getPath();
         String[] destinations ={path.substring(0, path.lastIndexOf(".")) + ".redRas"};
         java.io.BufferedOutputStream buffOuts[] = new java.io.BufferedOutputStream[destinations.length];
@@ -826,7 +852,7 @@ public class NetworkExtractionModule implements Runnable {
                 buffOuts[k]=new java.io.BufferedOutputStream(new java.io.FileOutputStream(destinations[k]));
                 outs[k] = new java.io.DataOutputStream(buffOuts[k]);
             }
-            for (int i=1; i <= metaDEM.getNumRows(); i++) for (int j=1; j <= metaDEM.getNumCols() ;j++){
+            for (int i=1; i <= nr; i++) for (int j=1; j <= nc ;j++){
                 if (DIR[i][j]==0){
                     outs[0].writeByte(-10);
                 }
@@ -861,11 +887,15 @@ public class NetworkExtractionModule implements Runnable {
             java.io.DataOutputStream outs[] = new java.io.DataOutputStream[destinations.length] ;
             
             try{
+                int nr=metaDEM.getNumRows();
+                int nc=metaDEM.getNumCols();
+            
+            
                 for(int k=0 ; k<destinations.length ; k++){
                     buffOuts[k]=new java.io.BufferedOutputStream(new java.io.FileOutputStream(destinations[k]));
                     outs[k] = new java.io.DataOutputStream(buffOuts[k]);
                 }
-                for (int i=1; i <= metaDEM.getNumRows(); i++) for (int j=1; j <= metaDEM.getNumCols() ;j++){
+                for (int i=1; i <= nr; i++) for (int j=1; j <= nc ;j++){
                     if (DIR[i][j]==0){
                         outs[0].writeByte(-10);
                         outs[1].writeFloat(new Float(metaDEM.getMissing()).floatValue());
@@ -909,7 +939,10 @@ public class NetworkExtractionModule implements Runnable {
     public void leeDEM_DIR_AREA_PEND(){
         if (printDebug) System.out.println(">>> Reading DEM & DIR & AREA & SLOPES");
         Areas = new float[DIR.length][DIR[0].length];
-        MaxPend = new double[DIR.length][DIR[0].length];
+        //MaxPend = new double[DIR.length][DIR[0].length];
+        int nr=metaDEM.getNumRows();
+        int nc=metaDEM.getNumCols();
+
         try{
             java.io.FileInputStream files[] = new java.io.FileInputStream[4];
             java.io.BufferedInputStream buffs[] = new java.io.BufferedInputStream[4];
@@ -921,12 +954,12 @@ public class NetworkExtractionModule implements Runnable {
                 buffs[k] = new java.io.BufferedInputStream(files[k]);
                 datas[k] = new java.io.DataInputStream(buffs[k]);
             }
-            for (int i=1; i <= metaDEM.getNumRows(); i++){
-                for (int j=1; j <= metaDEM.getNumCols() ;j++){
+            for (int i=1; i <= nr; i++){
+                for (int j=1; j <= nc ;j++){
                     DEM[i][j] = datas[0].readDouble();
                     DIR[i][j] = (int) datas[1].readByte();
                     Areas[i][j] = datas[2].readFloat();
-                    MaxPend[i][j] = datas[3].readDouble();
+                    //MaxPend[i][j] = datas[3].readDouble();
                 }
             }
             for(int k=0; k<4; k++){
@@ -943,6 +976,9 @@ public class NetworkExtractionModule implements Runnable {
         if (printDebug) System.out.println(">>> Reading Raster Network");
         
         try{
+            int nr=metaDEM.getNumRows();
+            int nc=metaDEM.getNumCols();
+            
             java.io.FileInputStream files[] = new java.io.FileInputStream[1];
             java.io.BufferedInputStream buffs[] = new java.io.BufferedInputStream[1];
             java.io.DataInputStream datas[] = new java.io.DataInputStream[1];
@@ -953,8 +989,8 @@ public class NetworkExtractionModule implements Runnable {
                 buffs[k] = new java.io.BufferedInputStream(files[k]);
                 datas[k] = new java.io.DataInputStream(buffs[k]);
             }
-            for (int i=1; i <= metaDEM.getNumRows(); i++){
-                for (int j=1; j <= metaDEM.getNumCols() ;j++){
+            for (int i=1; i <= nr; i++){
+                for (int j=1; j <= nc ;j++){
                     RedRas[i][j] = datas[0].readByte();
                     if(RedRas[i][j] != 1) RedRas[i][j]=0;
                 }
@@ -979,29 +1015,34 @@ public class NetworkExtractionModule implements Runnable {
             java.io.DataInputStream datas[] = new java.io.DataInputStream[1];
             String exts[] = {".dem"};
             String path = metaDEM.getLocationBinaryFile().getPath();
+            
+            
+            int nr=metaDEM.getNumRows();
+            int nc=metaDEM.getNumCols();
+            
             for(int k=0; k<1; k++){
                 files[k] = new java.io.FileInputStream(path.substring(0, path.lastIndexOf(".")) + exts[k]);
                 buffs[k] = new java.io.BufferedInputStream(files[k]);
                 datas[k] = new java.io.DataInputStream(buffs[k]);
             }
             if(metaDEM.getFormat().equalsIgnoreCase("Integer")){
-                for (int i=1; i <= metaDEM.getNumRows(); i++){
-                    for (int j=1; j <= metaDEM.getNumCols() ;j++){
+                for (int i=1; i <= nr; i++){
+                    for (int j=1; j <= nc ;j++){
                         DEM[i][j] = (double) datas[0].readInt();
                     }
                 }
             }
             if(metaDEM.getFormat().equalsIgnoreCase("Double")){
-                for (int i=1; i <= metaDEM.getNumRows(); i++){
-                    for (int j=1; j <= metaDEM.getNumCols() ;j++){
+                for (int i=1; i <= nr; i++){
+                    for (int j=1; j <= nc ;j++){
                         DEM[i][j] = (double) datas[0].readDouble();
                     }
                 }
             }
             
             if(metaDEM.getFormat().equalsIgnoreCase("Float")){
-                for (int i=1; i <= metaDEM.getNumRows(); i++){
-                    for (int j=1; j <= metaDEM.getNumCols() ;j++){
+                for (int i=1; i <= nr; i++){
+                    for (int j=1; j <= nc ;j++){
                         DEM[i][j] = (double) datas[0].readFloat();
                     }
                 }

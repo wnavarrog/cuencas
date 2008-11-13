@@ -31,7 +31,6 @@ package hydroScalingAPI.modules.networkExtraction.objects;
  * hydroScalingAPI.modules.networkExtraction.objects.NetworkExtractionOptimizer} to
  * call external procedures that process pieces of the original DEM
  * @author Ricardo Mantilla
- * @deprecated 
  */
 public class ExternalNetworkExtraction extends Thread{
     

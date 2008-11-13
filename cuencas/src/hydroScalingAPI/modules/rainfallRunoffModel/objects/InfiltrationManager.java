@@ -123,7 +123,8 @@ public class InfiltrationManager {
             dx = new double[metaDatos.getNumRows()];
             /*Se calcula para cada fila del DEMC el valor de la distancia horizontal del pixel 
               y la diagonal, dependiendo de la latitud.*/
-            for (int i=0 ; i<metaDatos.getNumRows() ; i++){
+            int nr=metaDatos.getNumRows();
+            for (int i=0 ; i<nr ; i++){
               dx[i] = 6378.0*Math.cos(((i+1)*metaDatos.getResLat()/3600.0 + metaDatos.getMinLat())*Math.PI/180.0)*metaDatos.getResLat()*Math.PI/(3600.0*180.0);
             }
             float[][] upAreaValues=linksStructure.getVarValues(0);

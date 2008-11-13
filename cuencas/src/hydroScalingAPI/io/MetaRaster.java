@@ -548,25 +548,56 @@ public class MetaRaster{
         hydroScalingAPI.io.DataRaster theData = new hydroScalingAPI.io.DataRaster(this);
         
         float[][] valueAndColor=new float[2][];
-        valueAndColor[0]=(theData.getFloatLine())[0];
-        if(locationBinaryFile.getName().lastIndexOf(".horton") == -1){
-            valueAndColor[1]=(theData.getFloatLineEqualized())[0];
+        
+        if(getNumCols()*getNumRows() < 1e6){
+            valueAndColor[0]=(theData.getFloatLine())[0];
+            if(locationBinaryFile.getName().lastIndexOf(".horton") == -1){
+                valueAndColor[1]=(theData.getFloatLineEqualized())[0];
+            } else {
+                valueAndColor[1]=(theData.getFloatLine())[0];
+                hydroScalingAPI.util.statistics.Stats statColors=new hydroScalingAPI.util.statistics.Stats(valueAndColor[1]);
+                for (int i=0;i<valueAndColor[1].length;i++) 
+                    valueAndColor[1][i]=240*(valueAndColor[1][i]-statColors.minValue)/(statColors.maxValue-statColors.minValue)+1;
+            }
+
+            visad.RealTupleType domain=new visad.RealTupleType(visad.RealType.Longitude,visad.RealType.Latitude);
+            visad.RealTupleType range=new visad.RealTupleType(visad.RealType.Altitude,visad.RealType.getRealType("varColor"));
+            visad.FunctionType  domainToRangeFunction = new visad.FunctionType( domain, range);
+            visad.Linear2DSet   domainExtent = new visad.Linear2DSet(domain,getMinLon()+getResLon()/3600.0/2.0,getMinLon()+getNumCols()*getResLon()/3600.0-getResLon()/3600.0/2.0,getNumCols(),
+                                                                            getMinLat()+getResLat()/3600.0/2.0,getMinLat()+getNumRows()*getResLat()/3600.0-getResLat()/3600.0/2.0,getNumRows());
+            visad.FlatField theField = new visad.FlatField( domainToRangeFunction, domainExtent);
+            theField.setSamples( valueAndColor, false );
+
+            return theField;
         } else {
-            valueAndColor[1]=(theData.getFloatLine())[0];
-            hydroScalingAPI.util.statistics.Stats statColors=new hydroScalingAPI.util.statistics.Stats(valueAndColor[1]);
-            for (int i=0;i<valueAndColor[1].length;i++) 
-                valueAndColor[1][i]=240*(valueAndColor[1][i]-statColors.minValue)/(statColors.maxValue-statColors.minValue)+1;
+            
+            int xfactor=(int)(getNumCols()/1000.0f);
+            int yfactor=(int)(getNumRows()/1000.0f);
+            int factor = Math.max(xfactor, yfactor);
+            
+            System.out.println(">>>>> IS GOING TO RESAMPLE: "+factor);
+            
+            valueAndColor[0]=(theData.getFloatLineResampled(factor))[0];
+            if(locationBinaryFile.getName().lastIndexOf(".horton") == -1){
+                valueAndColor[1]=(theData.getFloatLineEqualizedResampled(factor))[0];
+            } else {
+                valueAndColor[1]=(theData.getFloatLineResampled(factor))[0];
+                hydroScalingAPI.util.statistics.Stats statColors=new hydroScalingAPI.util.statistics.Stats(valueAndColor[1]);
+                for (int i=0;i<valueAndColor[1].length;i++) 
+                    valueAndColor[1][i]=240*(valueAndColor[1][i]-statColors.minValue)/(statColors.maxValue-statColors.minValue)+1;
+            }
+
+            visad.RealTupleType domain=new visad.RealTupleType(visad.RealType.Longitude,visad.RealType.Latitude);
+            visad.RealTupleType range=new visad.RealTupleType(visad.RealType.Altitude,visad.RealType.getRealType("varColor"));
+            visad.FunctionType  domainToRangeFunction = new visad.FunctionType( domain, range);
+            visad.Linear2DSet   domainExtent = new visad.Linear2DSet(domain,getMinLon()+getResLon()/3600.0/2.0,getMinLon()+getNumCols()*getResLon()/3600.0-getResLon()/3600.0/2.0,getNumCols()/factor,
+                                                                            getMinLat()+getResLat()/3600.0/2.0,getMinLat()+getNumRows()*getResLat()/3600.0-getResLat()/3600.0/2.0,getNumRows()/factor);
+            visad.FlatField theField = new visad.FlatField( domainToRangeFunction, domainExtent);
+            theField.setSamples( valueAndColor, false );
+
+            return theField;
         }
         
-        visad.RealTupleType domain=new visad.RealTupleType(visad.RealType.Longitude,visad.RealType.Latitude);
-        visad.RealTupleType range=new visad.RealTupleType(visad.RealType.Altitude,visad.RealType.getRealType("varColor"));
-        visad.FunctionType  domainToRangeFunction = new visad.FunctionType( domain, range);
-        visad.Linear2DSet   domainExtent = new visad.Linear2DSet(domain,getMinLon()+getResLon()/3600.0/2.0,getMinLon()+getNumCols()*getResLon()/3600.0-getResLon()/3600.0/2.0,getNumCols(),
-                                                                        getMinLat()+getResLat()/3600.0/2.0,getMinLat()+getNumRows()*getResLat()/3600.0-getResLat()/3600.0/2.0,getNumRows());
-        visad.FlatField theField = new visad.FlatField( domainToRangeFunction, domainExtent);
-        theField.setSamples( valueAndColor, false );
-        
-        return theField;    
     }
     
     /**

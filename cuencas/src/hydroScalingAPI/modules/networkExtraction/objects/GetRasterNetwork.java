@@ -173,27 +173,45 @@ public abstract class GetRasterNetwork extends Object {
     public static void cleanShorts(NetworkExtractionModule Proc){
         if (Proc.printDebug) System.out.println(">>> Cleaning short streams");
         
-        GetGeomorphologyRAM.getORD(Proc);
-        byte[][] cleanRedRas=new byte[Proc.DIR.length][Proc.DIR[0].length];
+        //GetGeomorphologyRAM.getORD(Proc);
+        byte[][] cleanRedRas=Proc.RedRas.clone();
         for (int i=1; i<Proc.DIR.length-1; i++){
             for (int j=1; j<Proc.DIR[0].length-1; j++){
                 if(Proc.RedRas[i][j]==1){
+                    
                     int llegan=0;
                     for (int k=0; k <= 8; k++){
                         if (Proc.RedRas[i+(k/3)-1][j+(k%3)-1]==1 && Proc.DIR[i+(k/3)-1][j+(k%3)-1]==9-k) llegan++;
                     }
-                    int iPn = i-1+(Proc.DIR[i][j]-1)/3;
-                    int jPn = j-1+(Proc.DIR[i][j]-1)%3;
-                    
-                    if(Proc.DIR[iPn][jPn] > 0){
-                        int iPm = iPn-1+(Proc.DIR[iPn][jPn]-1)/3;
-                        int jPm = jPn-1+(Proc.DIR[iPn][jPn]-1)%3;
-                        
-                        if(llegan == 0 && Proc.GEO[iPm][jPm].orden > 1){
-                            cleanRedRas[i][j]=0;
-                            if(Proc.GEO[iPn][jPn].orden == 1)  cleanRedRas[iPn][jPn]=0;
-                        } else {
-                            cleanRedRas[i][j]=1;
+                    if(llegan == 0){
+                        int iPn = i-1+(Proc.DIR[i][j]-1)/3;
+                        int jPn = j-1+(Proc.DIR[i][j]-1)%3;
+
+                        if(Proc.DIR[iPn][jPn] > 0){
+                            int llegan2=0;
+                            for (int k=0; k <= 8; k++){
+                                if (Proc.RedRas[iPn+(k/3)-1][jPn+(k%3)-1]==1 && Proc.DIR[iPn+(k/3)-1][jPn+(k%3)-1]==9-k) llegan2++;
+                            }
+                            
+                            if(llegan2 > 1){
+                                cleanRedRas[i][j]=0;
+                            }else{
+                            
+                                int iPm = iPn-1+(Proc.DIR[iPn][jPn]-1)/3;
+                                int jPm = jPn-1+(Proc.DIR[iPn][jPn]-1)%3;
+
+                                if(Proc.DIR[iPm][jPm] > 0){
+                                    int llegan3=0;
+                                    for (int k=0; k <= 8; k++){
+                                        if (Proc.RedRas[iPm+(k/3)-1][jPm+(k%3)-1]==1 && Proc.DIR[iPm+(k/3)-1][jPm+(k%3)-1]==9-k) llegan3++;
+                                    }
+                                    //if(llegan == 0 && Proc.GEO[iPm][jPm].orden > 1){
+                                    if(llegan3 > 1){
+                                        cleanRedRas[i][j]=0;
+                                        cleanRedRas[iPn][jPn]=0;
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -292,7 +310,7 @@ public abstract class GetRasterNetwork extends Object {
     public static void getArea_Pend(NetworkExtractionModule Proc){
         if (Proc.printDebug) System.out.println(">>> Calculating Area-Slope");
         //primero pongo ceros donde no hay red en la matriz de direcciones (me ahorra preguntas)
-        /*for(int i=0; i<Proc.metaDEM.getNumRows()+2; i++) for (int j=0; j<Proc.metaDEM.getNumCols()+2; j++){
+        /*for(int i=0; i<nr+2; i++) for (int j=0; j<nc+2; j++){
             Proc.DIR[i][j]*=Math.abs((Proc.RedRas[i][j]==-10)?0:Proc.RedRas[i][j]);
         } */
         try{
@@ -301,8 +319,12 @@ public abstract class GetRasterNetwork extends Object {
             java.io.DataOutputStream DataAP = new java.io.DataOutputStream(BufAP);
             boolean changeLink,changeDir;
             int ia, ja, iaN, jaN, arroundI, arroundJ;
-            for(int i=2; i<Proc.metaDEM.getNumRows()-2 ; i++){
-                for (int j=2; j<Proc.metaDEM.getNumCols()-2; j++){
+            
+            int nr=Proc.metaDEM.getNumRows();
+            int nc=Proc.metaDEM.getNumCols();
+            
+            for(int i=2; i<nr-2 ; i++){
+                for (int j=2; j<nc-2; j++){
                     if (Proc.RedRas[i][j]==1){
                         //informacion sobre el punto especifico
                         int myOrder=Proc.GEO[i][j].orden;
@@ -335,7 +357,7 @@ public abstract class GetRasterNetwork extends Object {
                                 for (int k=0; k <= 8; k++){
                                     arroundI=iaN+(k/3)-1;
                                     arroundJ=jaN+(k%3)-1;
-                                    if (arroundI>0 && arroundI < Proc.metaDEM.getNumRows() && arroundJ>0 && arroundJ < Proc.metaDEM.getNumCols()){
+                                    if (arroundI>0 && arroundI < nr && arroundJ>0 && arroundJ < nc){
                                         if (Proc.DIR[iaN+(k/3)-1][jaN+(k%3)-1]==9-k && Proc.RedRas[i+(k/3)-1][j+(k%3)-1]==1){
                                             lleganAca++;
                                         }
@@ -470,14 +492,16 @@ public abstract class GetRasterNetwork extends Object {
      */
     public static void getArea_Pend_Dif(NetworkExtractionModule Proc){
         if (Proc.printDebug) System.out.println(">>> Calculating Area-Slope Relation over Blue Lines");
+        int nr=Proc.metaDEM.getNumRows();
+        int nc=Proc.metaDEM.getNumCols();
         try{
             String ruta=(Proc.metaDEM.getLocationBinaryFile()).getPath();
             java.io.BufferedOutputStream BufAP = new java.io.BufferedOutputStream(new java.io.FileOutputStream(ruta.substring(0, ruta.lastIndexOf(".")) + ".ap"));
             java.io.DataOutputStream DataAP = new java.io.DataOutputStream(BufAP);
             boolean changeLink,changeDir;
             int ia, ja, iaN, jaN, arroundI, arroundJ;
-            for(int i=2; i<Proc.metaDEM.getNumRows()-2 ; i++){
-                for (int j=2; j<Proc.metaDEM.getNumCols()-2; j++){
+            for(int i=2; i<nr-2 ; i++){
+                for (int j=2; j<nc-2; j++){
                     if (Proc.DIR[i][j]>0){
                         //informacion sobre el punto especifico
                         int myOrder=Proc.GEO[i][j].orden;
@@ -510,7 +534,7 @@ public abstract class GetRasterNetwork extends Object {
                                 for (int k=0; k <= 8; k++){
                                     arroundI=iaN+(k/3)-1;
                                     arroundJ=jaN+(k%3)-1;
-                                    if (arroundI>0 && arroundI < Proc.metaDEM.getNumRows() && arroundJ>0 && arroundJ < Proc.metaDEM.getNumCols()){
+                                    if (arroundI>0 && arroundI < nr && arroundJ>0 && arroundJ < nc){
                                         if (Proc.DIR[iaN+(k/3)-1][jaN+(k%3)-1]==9-k){
                                             lleganAca++;
                                         }
@@ -543,9 +567,11 @@ public abstract class GetRasterNetwork extends Object {
     
     
     private static double[][] getAP_Puntos(NetworkExtractionModule Proc, int c){
+        int nr=Proc.metaDEM.getNumRows();
+        int nc=Proc.metaDEM.getNumCols();
         java.util.Vector vectorAP = new java.util.Vector();
-        for(int i=0; i<Proc.metaDEM.getNumRows(); i++){
-            for(int j=0; j<Proc.metaDEM.getNumCols(); j++){
+        for(int i=0; i<nr; i++){
+            for(int j=0; j<nc; j++){
                 if (Proc.RedRas[i][j]>0 && Proc.DIR[i][j]>0){
                     boolean llegan=false;
                     int llenos =0;
@@ -579,11 +605,11 @@ public abstract class GetRasterNetwork extends Object {
                                         jPn = jPv-1+(Proc.DIR[iPv][jPv]-1)%3;
                                         cont++;
                                         iPv=iPn; jPv=jPn;
-                                        if(!(iPv>1 && iPv<Proc.metaDEM.getNumRows() && jPv>1 && jPv<Proc.metaDEM.getNumCols()))
+                                        if(!(iPv>1 && iPv<nr && jPv>1 && jPv<nc))
                                             cont = c;
                                     }while(cont < c);
                                     //System.exit(0);
-                                    if(iPv>1 && iPv<Proc.metaDEM.getNumRows() && jPv>1 && jPv<Proc.metaDEM.getNumCols()){
+                                    if(iPv>1 && iPv<nr && jPv>1 && jPv<nc){
                                         //if(Proc.Areas[iPv][jPv]>0 && Proc.MaxPend[iPv][jPv]>0){
                                         vectorAP.add(new Valor((double) 1000000*Proc.Areas[iPv][jPv],Proc.MaxPend[iPv][jPv]));
                                     }
@@ -603,9 +629,11 @@ public abstract class GetRasterNetwork extends Object {
     
     
     private static double[][] getAP_Fuentes(NetworkExtractionModule Proc){
+        int nr=Proc.metaDEM.getNumRows();
+        int nc=Proc.metaDEM.getNumCols();
         java.util.Vector vectorAP = new java.util.Vector();
-        for(int i=0; i<Proc.metaDEM.getNumRows(); i++){
-            for(int j=0; j<Proc.metaDEM.getNumCols(); j++){
+        for(int i=0; i<nr; i++){
+            for(int j=0; j<nc; j++){
                 if (Proc.RedRas[i][j]>0 && Proc.DIR[i][j]>0){
                     boolean llegan=false;
                     int llenos =0;
@@ -658,12 +686,12 @@ public abstract class GetRasterNetwork extends Object {
                                                 contlleganRed++;
                                             }
                                         }
-                                        if(!(iPn>1 && iPn<Proc.metaDEM.getNumRows() && jPn>1 && jPn<Proc.metaDEM.getNumCols()))
+                                        if(!(iPn>1 && iPn<nr && jPn>1 && jPn<nc))
                                             salio=true;
                                         iPv=iPn; jPv=jPn;
                                     }while(contlleganRed<=1 && !salio);
                                     if(iConv < 0){ iConv=i; jConv=j; distFuenteConv = distFuente; }
-                                    if(iPv>1 && iPv<Proc.metaDEM.getNumRows() && jPv>1 && jPv<Proc.metaDEM.getNumCols()){
+                                    if(iPv>1 && iPv<nr && jPv>1 && jPv<nc){
                                         vectorAP.add(new Valor((double) 1000000*Proc.Areas[iConv][jConv],(Proc.DEM[iConv][jConv]-Proc.DEM[iPn][jPn])/distFuenteConv));
                                     }
                                 }
@@ -686,16 +714,18 @@ public abstract class GetRasterNetwork extends Object {
      */
     public static void umbralASalfa(NetworkExtractionModule Proc){
         if (Proc.printDebug) System.out.println("UMBRAL ASalfa>C");
+        int nr=Proc.metaDEM.getNumRows();
+        int nc=Proc.metaDEM.getNumCols();
         //primero pongo ceros donde no hay red en la matriz de direcciones (me ahorra preguntas)
-        for(int i=0; i<Proc.metaDEM.getNumRows()+2; i++) for (int j=0; j<Proc.metaDEM.getNumCols()+2; j++){
+        for(int i=0; i<nr+2; i++) for (int j=0; j<nc+2; j++){
             Proc.DIR[i][j]*=Math.abs((Proc.RedRas[i][j]==-10)?0:Proc.RedRas[i][j]);
         }
         boolean changeLink,changeDir;
         int ia, ja, iaN, jaN, arroundI, arroundJ;
         double areaPodado =0;
         java.util.Vector fuentes = new java.util.Vector();
-        for(int i=2; i<Proc.metaDEM.getNumRows()-2 ; i++){
-            for (int j=2; j<Proc.metaDEM.getNumCols()-2; j++){
+        for(int i=2; i<nr-2 ; i++){
+            for (int j=2; j<nc-2; j++){
                 if (Proc.RedRas[i][j]==1){
                     //informacion sobre el punto especifico
                     int myOrder=Proc.GEO[i][j].orden;
@@ -727,7 +757,7 @@ public abstract class GetRasterNetwork extends Object {
                             for (int k=0; k <= 8; k++){
                                 arroundI=iaN+(k/3)-1;
                                 arroundJ=jaN+(k%3)-1;
-                                if (arroundI>0 && arroundI < Proc.metaDEM.getNumRows() && arroundJ>0 && arroundJ < Proc.metaDEM.getNumCols()){
+                                if (arroundI>0 && arroundI < nr && arroundJ>0 && arroundJ < nc){
                                     if (Proc.DIR[iaN+(k/3)-1][jaN+(k%3)-1]==9-k){
                                         lleganAca++;
                                     }
@@ -741,7 +771,7 @@ public abstract class GetRasterNetwork extends Object {
                                 areaPodado = Proc.pixPodado*Proc.dy*Proc.dx[iaN]*1000000;
                                 //CRITERIO ASalfa >= C :
                                 if(areaLink >= areaPodado && areaLink*Math.pow((-cotafin+cotaini)/distLink,(double)Proc.alfa) >= (double)Proc.C){
-                                    fuentes.add(new Integer(ia*Proc.metaDEM.getNumCols() + ja));
+                                    fuentes.add(new Integer(ia*nc + ja));
                                     //persiga(Proc,ia,ja,iaN,jaN);
                                 }
                                 cambieLink=true;
@@ -756,7 +786,7 @@ public abstract class GetRasterNetwork extends Object {
         if(fuentes.size()>0){
             for(int k=0; k<fuentes.size(); k++){
                 int valor = new Integer(fuentes.get(k).toString()).intValue();
-                persiga(Proc,valor/Proc.metaDEM.getNumCols(),valor%Proc.metaDEM.getNumCols());
+                persiga(Proc,valor/nc,valor%nc);
             }
         }
         
@@ -773,12 +803,12 @@ public abstract class GetRasterNetwork extends Object {
         double na_min = 0.015, na_max = 0.1;
         double d50_media = 2, d50_de = 0.48;
         double tao_c, nb, d50, r, na;
-        //double C[][] = new double[Proc.metaDEM.getNumRows()][Proc.metaDEM.getNumCols()];
+        //double C[][] = new double[nr][nc];
         java.util.Random random_r = new java.util.Random(10001313);
         java.util.Random random_na = new java.util.Random(10401313);
         java.util.Random random_d50 = new java.util.Random(10601313);
-        //for(int i=1; i<=Proc.metaDEM.getNumRows() ; i++){
-        //for (int j=1; j<=Proc.metaDEM.getNumCols(); j++){
+        //for(int i=1; i<=nr ; i++){
+        //for (int j=1; j<=nc; j++){
         for(int i=50; i<=55; i++){
             for (int j=50; j<=55; j++){
                 r = (1d/(1000*24*3600d))*((random_r.nextDouble()*(r_max-r_min))+r_min);

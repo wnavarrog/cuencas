@@ -72,7 +72,7 @@ public class SimulationToFile extends java.lang.Object {
         float lam1=((Float)routingParams.get("lambda1")).floatValue();
         float lam2=((Float)routingParams.get("lambda2")).floatValue();
 
-        float v_o=(float)(2.5/Math.pow(200,lam1)/Math.pow(1100,lam2));
+        float v_o=(float)(0.5/Math.pow(200,lam1)/Math.pow(1100,lam2));
 
         thisNetworkGeom.setVqParams(v_o,0.0f,lam1,lam2);
 
@@ -196,12 +196,12 @@ public class SimulationToFile extends java.lang.Object {
                         break;
         }
         
-        java.io.File theFile=new java.io.File(Directory+demName+"-"+storm.stormName()+"-IR_"+infiltRate+"-Routing_"+routingString+".dat");
+        java.io.File theFile=new java.io.File(Directory+demName+"_"+x+"_"+y+"-"+storm.stormName()+"-IR_"+infiltRate+"-Routing_"+routingString+".dat");
         
         if(infiltMetaRaster == null)
-            theFile=new java.io.File(Directory+demName+"-"+storm.stormName()+"-IR_"+infiltRate+"-Routing_"+routingString+"_params_"+lam1+"_"+lam2+".dat");//theFile=new java.io.File(Directory+demName+"-"+storm.stormName()+"-IR_"+infiltRate+"-Routing_"+routingString+"_params_"+widthCoeff+"_"+widthExponent+"_"+widthStdDev+"_"+chezyCoeff+"_"+chezyExponent+".dat");
+            theFile=new java.io.File(Directory+demName+"_"+x+"_"+y+"-"+storm.stormName()+"-IR_"+infiltRate+"-Routing_"+routingString+"_params_"+lam1+"_"+lam2+".dat");//theFile=new java.io.File(Directory+demName+"_"+x+"_"+y++"-"+storm.stormName()+"-IR_"+infiltRate+"-Routing_"+routingString+"_params_"+widthCoeff+"_"+widthExponent+"_"+widthStdDev+"_"+chezyCoeff+"_"+chezyExponent+".dat");
         else
-            theFile=new java.io.File(Directory+demName+"-"+storm.stormName()+"-IR_"+infiltMetaRaster.getLocationMeta().getName().substring(0,infiltMetaRaster.getLocationMeta().getName().lastIndexOf(".metaVHC"))+"-Routing_"+routingString+"_params_"+widthCoeff+"_"+widthExponent+"_"+widthStdDev+"_"+chezyCoeff+"_"+chezyExponent+".dat");
+            theFile=new java.io.File(Directory+demName+"_"+x+"_"+y+"-"+storm.stormName()+"-IR_"+infiltMetaRaster.getLocationMeta().getName().substring(0,infiltMetaRaster.getLocationMeta().getName().lastIndexOf(".metaVHC"))+"-Routing_"+routingString+"_params_"+widthCoeff+"_"+widthExponent+"_"+widthStdDev+"_"+chezyCoeff+"_"+chezyExponent+".dat");
         System.out.println(theFile);
         
         java.io.FileOutputStream salida = new java.io.FileOutputStream(theFile);
@@ -312,23 +312,6 @@ public class SimulationToFile extends java.lang.Object {
         System.out.println("Number of Links on this simulation: "+(initialCondition.length/2.0));
         System.out.println("Inicia simulacion RKF");
         
-        /*javaSIH.util.DiffEqSolver.RKF rainRunoffRaining1=new javaSIH.util.DiffEqSolver.RKF(thisBasinEqSys,1e-5,1.0e-3);
-        double[][] thisStep=rainRunoffRaining1.step(storm.stormInitialTimeInMinutes(), initialCondition, 1e-3, false);
-         
-        int nLi=linksStructure.headsArray.length;
-         
-        for (int i=0;i<nLi;i++){
-            double V_l= Math.pow(initialCondition[i],1/3.)
-         *Math.pow(thisNetworkGeom.Chezi(i),2/3.)
-         *Math.pow(thisNetworkGeom.Width(i),-1/3.)
-         *Math.pow(thisNetworkGeom.Slope(i),1/3.);
-            System.out.println(V_l+" "+thisNetworkGeom.Chezi(i)+" "+initialCondition[i]+" "+thisNetworkGeom.Width(i)+" "+thisNetworkGeom.Length(i)+" "+thisNetworkGeom.upStreamArea(i));
-        }
-        System.out.println();
-         
-        System.exit(0);*/
-        
-        
         hydroScalingAPI.util.ordDiffEqSolver.RKF rainRunoffRaining=new hydroScalingAPI.util.ordDiffEqSolver.RKF(thisBasinEqSys,1e-3,10/60.);
         
         int numPeriods = (int) ((storm.stormFinalTimeInMinutes()-storm.stormInitialTimeInMinutes())/storm.stormRecordResolutionInMinutes());
@@ -338,17 +321,20 @@ public class SimulationToFile extends java.lang.Object {
         thisDate.setTimeInMillis((long)(storm.stormInitialTimeInMinutes()*60.*1000.0));
         System.out.println(thisDate.getTime());
         
+        int basinOrder=linksStructure.getBasinOrder();
+        
         for (int k=0;k<numPeriods;k++) {
             System.out.println("Period "+(k+1)+" of "+numPeriods);
-            rainRunoffRaining.jumpsRunToFile(storm.stormInitialTimeInMinutes()+k*storm.stormRecordResolutionInMinutes(),storm.stormInitialTimeInMinutes()+(k+1)*storm.stormRecordResolutionInMinutes(),storm.stormRecordResolutionInMinutes()/1.0f,initialCondition,newfile);
+            int timeStepOutput=(int)Math.min(Math.pow(2,(basinOrder-1)),storm.stormRecordResolutionInMinutes());
+            rainRunoffRaining.jumpsRunToFile(storm.stormInitialTimeInMinutes()+k*storm.stormRecordResolutionInMinutes(),storm.stormInitialTimeInMinutes()+(k+1)*storm.stormRecordResolutionInMinutes(),timeStepOutput,initialCondition,newfile);
             initialCondition=rainRunoffRaining.finalCond;
             rainRunoffRaining.setBasicTimeStep(30/60.);
         }
         java.util.Date interTime=new java.util.Date();
         System.out.println("Intermedia Time:"+interTime.toString());
         System.out.println("Running Time:"+(.001*(interTime.getTime()-startTime.getTime()))+" seconds");
-        
-        rainRunoffRaining.jumpsRunToFile(storm.stormInitialTimeInMinutes()+numPeriods*storm.stormRecordResolutionInMinutes(),(storm.stormInitialTimeInMinutes()+(numPeriods+1)*storm.stormRecordResolutionInMinutes())+3000,10,initialCondition,newfile);
+        int timeStepOutput=(int)Math.min(Math.pow(2,(basinOrder-1)),storm.stormRecordResolutionInMinutes());
+        rainRunoffRaining.jumpsRunToFile(storm.stormInitialTimeInMinutes()+numPeriods*storm.stormRecordResolutionInMinutes(),(storm.stormInitialTimeInMinutes()+(numPeriods+1)*storm.stormRecordResolutionInMinutes())+3000,timeStepOutput,initialCondition,newfile);
         
         System.out.println("Termina simulacion RKF");
         java.util.Date endTime=new java.util.Date();
@@ -401,7 +387,7 @@ public class SimulationToFile extends java.lang.Object {
         try{
             
             //Uniform Rain
-            subMain1(args);  //The test case for Whitewater
+            //subMain1(args);  //The test case for Whitewater
             //subMain3(args);  //The test case for Walnut Gulch 30m
             //subMain4(args);   //The test case for TestDem
             //subMain5(args);   //The Man-Vis Tree
@@ -415,6 +401,7 @@ public class SimulationToFile extends java.lang.Object {
             //subMain7(args);   //using a map to set infiltration values
             //subMain10(args);     //Simulations for Upper Rio Puerco Using Nexrad
             //subMain11(args);     //Simulations for Mogollon Basin Using Nexrad
+            subMain12(args);     //Simulations for Iowa Floods 2008
         } catch (java.io.IOException IOE){
             System.out.print(IOE);
             System.exit(0);
@@ -879,6 +866,104 @@ public class SimulationToFile extends java.lang.Object {
 //            new SimulationToFile(282, 298,matDirs,magnitudes,metaModif,stormFile,0.0f,5,routingParams);
 //            //new SimulationToFile(1139,1948,matDirs,magnitudes,metaModif,stormFile,0.0f,2,routingParams);
 //        }
+    }
+    
+    public static void subMain12(String args[]) throws java.io.IOException, VisADException {
+        
+        java.io.File stormFile;
+        java.util.Hashtable routingParams=new java.util.Hashtable();
+        routingParams.put("widthCoeff",1.0f);
+        routingParams.put("widthExponent",0.4f);
+        routingParams.put("widthStdDev",0.0f);
+        
+        routingParams.put("chezyCoeff",14.2f);
+        routingParams.put("chezyExponent",-1/3.0f);
+        
+        routingParams.put("lambda1",0.3f);
+        routingParams.put("lambda2",-0.1f);
+        
+        stormFile=new java.io.File("/hidrosigDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/observed_events/EventIowaJuneMPE/May29toJune26/hydroNexrad.metaVHC");
+        
+        //05464942 - Hoover Cr at Hoover Nat Hist Site, West Branch, IA
+        java.io.File theFile=new java.io.File("/hidrosigDataBases/Iowa_Rivers_DB/Rasters/Topography/1_arcSec/05464942/NED_34760848.metaDEM");
+        hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
+        metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Iowa_Rivers_DB/Rasters/Topography/1_arcSec/05464942/NED_34760848.dir"));
+        
+        metaModif.setFormat("Byte");
+        byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
+        
+        metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".magn"));
+        metaModif.setFormat("Integer");
+        int [][] magnitudes=new hydroScalingAPI.io.DataRaster(metaModif).getInt();
+        
+        
+        new SimulationToFile(205, 38,matDirs,magnitudes,metaModif,stormFile,2.0f,2,routingParams);
+        new SimulationToFile(205, 38,matDirs,magnitudes,metaModif,stormFile,2.0f,5,routingParams);
+        
+        //?05454090 - Muddy Creek at Coralville, IA
+        theFile=new java.io.File("/hidrosigDataBases/Iowa_Rivers_DB/Rasters/Topography/1_arcSec/05454090/NED_02171564.metaDEM");
+        metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
+        metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Iowa_Rivers_DB/Rasters/Topography/1_arcSec/05454090/NED_02171564.dir"));
+        
+        metaModif.setFormat("Byte");
+        matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
+        
+        metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".magn"));
+        metaModif.setFormat("Integer");
+        magnitudes=new hydroScalingAPI.io.DataRaster(metaModif).getInt();
+        
+        new SimulationToFile(264, 50,matDirs,magnitudes,metaModif,stormFile,2.0f,2,routingParams);
+        new SimulationToFile(264, 50,matDirs,magnitudes,metaModif,stormFile,2.0f,5,routingParams);
+        
+        //?05451900 - Richland Creek near Haven, IA
+        //05452200 - Walnut Creek near Hartwick, IA
+        theFile=new java.io.File("/hidrosigDataBases/Iowa_Rivers_DB/Rasters/Topography/1_arcSec/05451900-05452200/NED_44295798.metaDEM");
+        metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
+        metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Iowa_Rivers_DB/Rasters/Topography/1_arcSec/05451900-05452200/NED_44295798.dir"));
+        
+        metaModif.setFormat("Byte");
+        matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
+        
+        metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".magn"));
+        metaModif.setFormat("Integer");
+        magnitudes=new hydroScalingAPI.io.DataRaster(metaModif).getInt();
+
+        new SimulationToFile(1083, 469,matDirs,magnitudes,metaModif,stormFile,2.0f,2,routingParams);
+        new SimulationToFile(1397, 235,matDirs,magnitudes,metaModif,stormFile,2.0f,2,routingParams);
+        new SimulationToFile(1083, 469,matDirs,magnitudes,metaModif,stormFile,2.0f,5,routingParams);
+        new SimulationToFile(1397, 235,matDirs,magnitudes,metaModif,stormFile,2.0f,5,routingParams);
+
+        //?05451700 - Timber Creek near Marshalltown, IA
+        theFile=new java.io.File("/hidrosigDataBases/Iowa_Rivers_DB/Rasters/Topography/1_arcSec/05451700/NED_44544152.metaDEM");
+        metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
+        metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Iowa_Rivers_DB/Rasters/Topography/1_arcSec/05451700/NED_44544152.dir"));
+        
+        metaModif.setFormat("Byte");
+        matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
+        
+        metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".magn"));
+        metaModif.setFormat("Integer");
+        magnitudes=new hydroScalingAPI.io.DataRaster(metaModif).getInt();
+
+        new SimulationToFile(1805, 737,matDirs,magnitudes,metaModif,stormFile,2.0f,2,routingParams);
+        new SimulationToFile(1805, 737,matDirs,magnitudes,metaModif,stormFile,2.0f,5,routingParams);
+        
+        //?05451210 - South Fork Iowa River NE of New Providence, IA
+        theFile=new java.io.File("/hidrosigDataBases/Iowa_Rivers_DB/Rasters/Topography/1_arcSec/?05451210/NED_11954655.metaDEM");
+        metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
+        metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Iowa_Rivers_DB/Rasters/Topography/1_arcSec/?05451210/NED_11954655.dir"));
+        
+        metaModif.setFormat("Byte");
+        matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
+        
+        metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".magn"));
+        metaModif.setFormat("Integer");
+        magnitudes=new hydroScalingAPI.io.DataRaster(metaModif).getInt();
+
+        new SimulationToFile(2151, 372,matDirs,magnitudes,metaModif,stormFile,2.0f,2,routingParams);
+        new SimulationToFile(2151, 372,matDirs,magnitudes,metaModif,stormFile,2.0f,5,routingParams);
+        
+        
     }
     
 }

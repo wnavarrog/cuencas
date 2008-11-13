@@ -44,12 +44,16 @@ public class GetGeomorphologyROM extends Object {
     private java.io.RandomAccessFile Magn;
     private java.io.RandomAccessFile Dtopo;
     private java.io.RandomAccessFile Red;
+    private java.io.RandomAccessFile Tcd;
+    private java.io.RandomAccessFile Mcd;
     private int NPoints; //para rayos4
     private int NLinks; //para rayos4
     private java.io.DataOutputStream Dstream; //para rayos4
     private java.io.DataOutputStream Dlink; //para rayos4
     private java.io.DataOutputStream Dpoint; //para rayos4
     private WorkRectangle M;
+    
+    int nr,nc;
     
     
     /**
@@ -75,48 +79,74 @@ public class GetGeomorphologyROM extends Object {
     private void inicio(){
         
         try{
+            System.out.println(">>> Initializtion Process Starts <<<");
+            
             String rutaMR = MR.getLocationBinaryFile().getPath();
             String rutaDatos = rutaMR.substring(0,rutaMR.lastIndexOf("."));
+            
+            String[] destinations ={".horton",".magn",".ltc",".lcp",".dtopo",".tcd",".mcd"};
+                                
+            java.io.BufferedOutputStream buffOuts[] = new java.io.BufferedOutputStream[destinations.length];
+            java.io.DataOutputStream outs[] = new java.io.DataOutputStream[destinations.length] ;
+
+            for(int k=0 ; k<destinations.length ; k++){
+                buffOuts[k]=new java.io.BufferedOutputStream(new java.io.FileOutputStream(rutaDatos+destinations[k]));
+                outs[k] = new java.io.DataOutputStream(buffOuts[k]);
+            }
+
+            float missF=new Float(MR.getMissing()).floatValue();
+            int   missI=new Integer(MR.getMissing()).intValue();
+
             Dir=new  java.io.RandomAccessFile(rutaDatos + ".dir","r");
             Red = new java.io.RandomAccessFile(rutaDatos + ".redRas","r");
+            MD = new int[nr][nc];
+            GEO= new int[nr][nc];
+            RedRas = new byte[nr][nc];
+            llegan= new int[nr][nc];
+            dy = 6378.0*MR.getResLon()*Math.PI/(3600.0*180.0);
+            dx = new double[nr+1];
+            dxy = new double[nr+1];
+            M = new WorkRectangle(0,nr-1,0,nc-1);
+            
+            for(int i=0; i<nr; i++){
+                for(int j=0; j<nc; j++){
+                    MD[i][j]=Dir.readByte();
+                    RedRas[i][j]=Red.readByte();
+                    if(MD[i][j]==0){
+                        outs[0].writeByte((byte)-10);
+                        outs[1].writeInt(missI);
+                        outs[2].writeFloat(missF);
+                        outs[3].writeFloat(missF);
+                        outs[4].writeInt(missI);
+                        outs[5].writeFloat(missF);
+                        outs[6].writeFloat(missF);
+                    }
+                    else{
+                        outs[0].writeByte((byte)-1);
+                        outs[1].writeInt(-1);
+                        outs[2].writeFloat(0.0f);
+                        outs[3].writeFloat(0.0f);
+                        outs[4].writeInt(0);
+                        outs[5].writeFloat(0.0f);
+                        outs[6].writeFloat(0.0f);
+                    }
+                }
+            }
+            
+            for(int k=0 ; k<destinations.length ; k++) buffOuts[k].close() ;
+
             Orden = new java.io.RandomAccessFile(rutaDatos + ".horton","rw");
             Magn = new java.io.RandomAccessFile(rutaDatos + ".magn","rw");
             Ltc = new java.io.RandomAccessFile(rutaDatos + ".ltc","rw");
             Lcp = new java.io.RandomAccessFile(rutaDatos + ".lcp","rw");
             Dtopo = new java.io.RandomAccessFile(rutaDatos + ".dtopo","rw");
-            MD = new int[MR.getNumRows()][MR.getNumCols()];
-            GEO= new int[MR.getNumRows()][MR.getNumCols()];
-            RedRas = new byte[MR.getNumRows()][MR.getNumCols()];
-            llegan= new int[MR.getNumRows()][MR.getNumCols()];
-            dy = 6378.0*MR.getResLon()*Math.PI/(3600.0*180.0);
-            dx = new double[MR.getNumRows()+1];
-            dxy = new double[MR.getNumRows()+1];
-            M = new WorkRectangle(0,MR.getNumRows()-1,0,MR.getNumCols()-1);
-            for(int i=0; i<MR.getNumRows(); i++){
-                for(int j=0; j<MR.getNumCols(); j++){
-                    MD[i][j]=Dir.readByte();
-                    RedRas[i][j]=Red.readByte();
-                    if(MD[i][j]==0){
-                        esc("Ltc",i,j,false,new Float(MR.getMissing()).floatValue());
-                        esc("Lcp",i,j,false,new Float(MR.getMissing()).floatValue());
-                        esc("Orden",i,j,false,(byte)-10);
-                        esc("Magn",i,j,false,new Integer(MR.getMissing()).intValue());
-                        esc("Dtopo",i,j,false,new Integer(MR.getMissing()).intValue());
-                    }
-                    else{
-                        esc("Magn",i,j,false,(int)-1);
-                        esc("Orden",i,j,false,(byte)-1);
-                        esc("Dtopo",i,j,false,(int)0);
-                        esc("Ltc",i,j,false,(float)0.0);
-                        esc("Lcp",i,j,false,(float)0.0);
-                    }
-                }
-            }
+            Tcd = new java.io.RandomAccessFile(rutaDatos + ".tcd","rw");
+            Mcd = new java.io.RandomAccessFile(rutaDatos + ".mcd","rw");
             
-            for(int i=0; i<MR.getNumRows(); i++){
+            for(int i=0; i<nr; i++){
                 dx[i] = 6378*Math.cos((i*MR.getResLat()/3600.0 + MR.getMinLat())*Math.PI/180.0)*MR.getResLat()*Math.PI/(3600.0*180.0);
                 dxy[i] = Math.sqrt(dx[i]*dx[i] + dy*dy);
-                for(int j=0; j<MR.getNumCols(); j++){
+                for(int j=0; j<nc; j++){
                     int nllegan = 0;
                     for (int k=0; k <= 8; k++){
                         if(M.is_on(i+(k/3)-1,j+(k%3)-1)){
@@ -149,13 +179,17 @@ public class GetGeomorphologyROM extends Object {
      */
     public GetGeomorphologyROM(hydroScalingAPI.io.MetaRaster MR1) {
         MR=MR1;
+
+        nr=MR.getNumRows();
+        nc=MR.getNumCols();
+
         inicio();
         int contn;
+            
         do{
             contn = 0;
-            for(int i=0; i<MR.getNumRows() ; i++){
-                double[] dist = {dxy[i],dy,dxy[i],dx[i],1,dx[i],dxy[i],dy,dxy[i]};
-                for (int j=0; j<MR.getNumCols(); j++){
+            for(int i=0; i<nr ; i++){
+                for (int j=0; j<nc; j++){
                     if (GEO[i][j] < 0)
                         contn++;
                     if (GEO[i][j] == 0){
@@ -183,10 +217,10 @@ public class GetGeomorphologyROM extends Object {
             int x1=i-1+(MD[i][j]-1)/3 ; int y1=j-1+(MD[i][j]-1)%3;
             if (GEO[x1][y1] >= 0 ){
                 GEO[x1][y1]--  ;
-                Magn.seek((long)4*(i*MR.getNumCols()+j)); int m2=Magn.readInt();
-                Ltc.seek((long)4*(i*MR.getNumCols()+j)); float lt2=Ltc.readFloat();
-                Lcp.seek((long)4*(i*MR.getNumCols()+j)); float lc2=Lcp.readFloat();
-                Lcp.seek((long)4*(x1*MR.getNumCols()+y1)); float lc3=Lcp.readFloat();
+                Magn.seek((long)4*(i*nc+j)); int m2=Magn.readInt();
+                Ltc.seek((long)4*(i*nc+j)); float lt2=Ltc.readFloat();
+                Lcp.seek((long)4*(i*nc+j)); float lc2=Lcp.readFloat();
+                Lcp.seek((long)4*(x1*nc+y1)); float lc3=Lcp.readFloat();
                 if (llegan[i][j]== 0)
                     esc("Magn", x1,y1,true,1);
                 else esc("Magn",x1,y1,true,m2);
@@ -198,8 +232,8 @@ public class GetGeomorphologyROM extends Object {
                 java.util.Vector ord = new java.util.Vector(0,1);
                 for (int k=0; k <= 8; k++){
                     if (MD[i+(k/3)-1][j+(k%3)-1]==9-k && RedRas[i+(k/3)-1][j+(k%3)-1]!=0){
-                        Orden.seek((i+(k/3)-1)*MR.getNumCols()+(j+(k%3)-1));
-                        Dtopo.seek(4*((i+(k/3)-1)*MR.getNumCols()+(j+(k%3)-1)));
+                        Orden.seek((i+(k/3)-1)*nc+(j+(k%3)-1));
+                        Dtopo.seek(4*((i+(k/3)-1)*nc+(j+(k%3)-1)));
                         ord.addElement(new Byte(Orden.readByte()));
                         diamt.addElement(new Integer(Dtopo.readInt()));
                     }
@@ -233,10 +267,10 @@ public class GetGeomorphologyROM extends Object {
     private void esc(String s, int i,int j, boolean m, byte v){
         try{
             if (s.equals("Orden")){
-                Orden.seek((long)(i*MR.getNumCols()+j));
+                Orden.seek((long)(i*nc+j));
                 if (m){
                     byte d=Orden.readByte();
-                    Orden.seek((long)(i*MR.getNumCols()+j));
+                    Orden.seek((long)(i*nc+j));
                     Orden.writeByte(v+d);
                 }
                 else  Orden.writeByte(v);
@@ -248,19 +282,19 @@ public class GetGeomorphologyROM extends Object {
     private void esc(String s, int i,int j, boolean m, float v){
         try{
             if (s.equals("Ltc")){
-                Ltc.seek((long)4*(i*MR.getNumCols()+j));
+                Ltc.seek((long)4*(i*nc+j));
                 if (m){
                     float d=Ltc.readFloat();
-                    Ltc.seek((long)4*(i*MR.getNumCols()+j));
+                    Ltc.seek((long)4*(i*nc+j));
                     Ltc.writeFloat(v+d);
                 }
                 else  Ltc.writeFloat(v);
             }
             if (s.equals("Lcp")){
-                Lcp.seek((long)4*(i*MR.getNumCols()+j));
+                Lcp.seek((long)4*(i*nc+j));
                 if (m){
                     float d=Lcp.readFloat();
-                    Lcp.seek((long)4*(i*MR.getNumCols()+j));
+                    Lcp.seek((long)4*(i*nc+j));
                     Lcp.writeFloat(v+d);
                 }
                 else  Lcp.writeFloat(v);
@@ -272,19 +306,19 @@ public class GetGeomorphologyROM extends Object {
     private void esc(String s, int i,int j, boolean m, int v){
         try{
             if (s.equals("Dtopo")){
-                Dtopo.seek((long)4*(i*MR.getNumCols()+j));
+                Dtopo.seek((long)4*(i*nc+j));
                 if (m){
                     int d=Dtopo.readInt();
-                    Dtopo.seek((long)4*(i*MR.getNumCols()+j));
+                    Dtopo.seek((long)4*(i*nc+j));
                     Dtopo.writeInt(v+d);
                 }
                 else  Dtopo.writeInt(v);
             }
             if (s.equals("Magn")){
-                Magn.seek((long)4*(i*MR.getNumCols()+j));
+                Magn.seek((long)4*(i*nc+j));
                 if (m){
                     int d=Magn.readInt();
-                    Magn.seek((long)4*(i*MR.getNumCols()+j));
+                    Magn.seek((long)4*(i*nc+j));
                     Magn.writeInt(v+d);
                 }
                 else  Magn.writeInt(v);
