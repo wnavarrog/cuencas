@@ -30,8 +30,8 @@ package hydroScalingAPI.modules.networkExtraction.objects;
 public class GetGeomorphologyROM extends Object {
     
     private int GEO[][];
-    private int MD[][];
-    private byte RedRas[][];
+    //private int MD[][];
+    //private byte RedRas[][];
     private int llegan[][];
     private double dy;
     private double dx[];
@@ -46,36 +46,17 @@ public class GetGeomorphologyROM extends Object {
     private java.io.RandomAccessFile Red;
     private java.io.RandomAccessFile Tcd;
     private java.io.RandomAccessFile Mcd;
-    private int NPoints; //para rayos4
-    private int NLinks; //para rayos4
-    private java.io.DataOutputStream Dstream; //para rayos4
-    private java.io.DataOutputStream Dlink; //para rayos4
-    private java.io.DataOutputStream Dpoint; //para rayos4
     private WorkRectangle M;
     
     int nr,nc;
+    
+    private hydroScalingAPI.modules.networkExtraction.objects.NetworkExtractionModule Proc;
     
     
     /**
      * Tests for the class
      * @param arguments the command line arguments
      */
-    public static void main(String[] arguments){
-        try{
-            
-            hydroScalingAPI.io.MetaRaster metaRaster1= new hydroScalingAPI.io.MetaRaster(new java.io.File("/hidrosigDataBases/Demo_database/Rasters/Topography/3_ArcSec/TestCases/NewHS/testdem.metaDEM"));
-            metaRaster1.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Demo_database/Rasters/Topography/3_ArcSec/TestCases/NewHS/testdem.dem"));
-            
-            System.out.println(metaRaster1.getLocationBinaryFile());
-            
-            new GetGeomorphologyROM(metaRaster1);
-        } catch (java.io.IOException e1){
-            System.err.println("ERROR** "+e1.getMessage());
-        }
-        
-        System.out.println(">>> DONE <<<");
-    }
-    
     private void inicio(){
         
         try{
@@ -97,11 +78,7 @@ public class GetGeomorphologyROM extends Object {
             float missF=new Float(MR.getMissing()).floatValue();
             int   missI=new Integer(MR.getMissing()).intValue();
 
-            Dir=new  java.io.RandomAccessFile(rutaDatos + ".dir","r");
-            Red = new java.io.RandomAccessFile(rutaDatos + ".redRas","r");
-            MD = new int[nr][nc];
             GEO= new int[nr][nc];
-            RedRas = new byte[nr][nc];
             llegan= new int[nr][nc];
             dy = 6378.0*MR.getResLon()*Math.PI/(3600.0*180.0);
             dx = new double[nr+1];
@@ -110,9 +87,7 @@ public class GetGeomorphologyROM extends Object {
             
             for(int i=0; i<nr; i++){
                 for(int j=0; j<nc; j++){
-                    MD[i][j]=Dir.readByte();
-                    RedRas[i][j]=Red.readByte();
-                    if(MD[i][j]==0){
+                    if(Proc.DIR[i+1][j+1]==0){
                         outs[0].writeByte((byte)-10);
                         outs[1].writeInt(missI);
                         outs[2].writeFloat(missF);
@@ -150,13 +125,13 @@ public class GetGeomorphologyROM extends Object {
                     int nllegan = 0;
                     for (int k=0; k <= 8; k++){
                         if(M.is_on(i+(k/3)-1,j+(k%3)-1)){
-                            if (MD[i+(k/3)-1][j+(k%3)-1]==9-k && RedRas[i+(k/3)-1][j+(k%3)-1]>0)
+                            if (Proc.DIR[1+i+(k/3)-1][1+j+(k%3)-1]==9-k && Proc.RedRas[1+i+(k/3)-1][1+j+(k%3)-1]>0)
                                 nllegan++;
                         }
                     }
-                    if(RedRas[i][j]<=0)
+                    if(Proc.RedRas[i+1][j+1]<=0)
                         GEO[i][j]= -2;
-                    else if (MD[i][j]>0){
+                    else if (Proc.DIR[i+1][j+1]>0){
                         GEO[i][j] = nllegan;
                     }
                     else{
@@ -177,9 +152,12 @@ public class GetGeomorphologyROM extends Object {
      * Creates and instance of the ROM based geomorphology class
      * @param MR1 The MetaRaster of the DEM to be processed
      */
-    public GetGeomorphologyROM(hydroScalingAPI.io.MetaRaster MR1) {
+    public GetGeomorphologyROM(hydroScalingAPI.io.MetaRaster MR1, hydroScalingAPI.modules.networkExtraction.objects.NetworkExtractionModule pr) {
+        
         MR=MR1;
 
+        Proc=pr;
+        
         nr=MR.getNumRows();
         nc=MR.getNumCols();
 
@@ -197,7 +175,7 @@ public class GetGeomorphologyROM extends Object {
                     }//en cada cero
                 }//for j
             }//for i
-        }while(contn < (MD.length)*(MD[0].length) );
+        }while(contn < (GEO.length)*(GEO[0].length) );
         
     }
     
@@ -207,14 +185,14 @@ public class GetGeomorphologyROM extends Object {
         try{
             double[] dist = {dxy[i],dy,dxy[i],dx[i],1,dx[i],dxy[i],dy,dxy[i]};
             GEO[i][j] = -1;
-            esc("Ltc",i,j,true,(float)dist[MD[i][j]-1]);
-            esc("Lcp",i,j,true,(float)dist[MD[i][j]-1]);
+            esc("Ltc",i,j,true,(float)dist[Proc.DIR[i+1][j+1]-1]);
+            esc("Lcp",i,j,true,(float)dist[Proc.DIR[i+1][j+1]-1]);
             if (llegan[i][j] == 0){
                 esc("Magn",i,j,false,(int)1);
                 esc("Orden",i,j,false,(byte)1);
                 esc("Dtopo",i,j,false,(int)1);
             }
-            int x1=i-1+(MD[i][j]-1)/3 ; int y1=j-1+(MD[i][j]-1)%3;
+            int x1=i-1+(Proc.DIR[i+1][j+1]-1)/3 ; int y1=j-1+(Proc.DIR[i+1][j+1]-1)%3;
             if (GEO[x1][y1] >= 0 ){
                 GEO[x1][y1]--  ;
                 Magn.seek((long)4*(i*nc+j)); int m2=Magn.readInt();
@@ -231,7 +209,7 @@ public class GetGeomorphologyROM extends Object {
                 java.util.Vector diamt = new java.util.Vector(0,1);
                 java.util.Vector ord = new java.util.Vector(0,1);
                 for (int k=0; k <= 8; k++){
-                    if (MD[i+(k/3)-1][j+(k%3)-1]==9-k && RedRas[i+(k/3)-1][j+(k%3)-1]!=0){
+                    if (Proc.DIR[1+i+(k/3)-1][1+j+(k%3)-1]==9-k && Proc.RedRas[1+i+(k/3)-1][1+j+(k%3)-1]!=0){
                         Orden.seek((i+(k/3)-1)*nc+(j+(k%3)-1));
                         Dtopo.seek(4*((i+(k/3)-1)*nc+(j+(k%3)-1)));
                         ord.addElement(new Byte(Orden.readByte()));
@@ -247,7 +225,7 @@ public class GetGeomorphologyROM extends Object {
                 if (ord.size()>1){
                     if (ord.get(ord.size()-1).equals(ord.get(ord.size()-2))){
                         esc("Orden",i,j,false,(byte)(1 + new Byte(ord.get(ord.size()-1).toString()).byteValue()));
-                        RedRas[i][j]=-1;
+                        Proc.RedRas[i+1][j+1]=-1;
                     }
                     else{ esc("Orden",i,j,false,new Byte(ord.get(ord.size()-1).toString()).byteValue());
                     }
@@ -256,7 +234,7 @@ public class GetGeomorphologyROM extends Object {
                     esc("Orden",i,j,false,new Byte(ord.get(0).toString()).byteValue());
                 }
             }
-            if (llegan[x1][y1]==1 && MD[x1][y1]>0){
+            if (llegan[x1][y1]==1 && Proc.DIR[x1+1][y1+1]>0){
                 GEOcero(x1,y1,contn);
             }
         }catch (java.io.IOException e1){

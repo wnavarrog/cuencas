@@ -577,21 +577,29 @@ public class NetworkExtractionModule implements Runnable {
             }else{
                 if (printDebug) System.out.println(">>> Calculating Geormorphology - ROM based Algorithm");
 
-                GetGeomorphologyRAM.getDistanceToBorder(this);
-                OpProc.setValueGeomorphBar(2);
+                MaxPend=null;
                 System.gc();
                 
-                new hydroScalingAPI.modules.networkExtraction.objects.GetGeomorphologyROM(metaDEM);
-                OpProc.setValueGeomorphBar(3);
+                GetGeomorphologyRAM.getDistanceToBorder(this);
+                OpProc.setValueGeomorphBar(2);
                 
+                
+                new hydroScalingAPI.modules.networkExtraction.objects.GetGeomorphologyROM(metaDEM,this);
+                OpProc.setValueGeomorphBar(3);
+                leeRED();
                 
                 if (printDebug) System.out.println(">>> Geormorphology Completed");
                 OpProc.setValueGeomorphBar(4);
                 
-                GetGeomorphologyRAM.getRedVect(this);
-                OpProc.setValueGeomorphBar(5);
+                
             }
         }
+        
+        if(taskVECT){
+            
+            GetGeomorphologyRAM.getRedVect(this);
+        }
+        OpProc.setValueGeomorphBar(5);
         
         java.util.Calendar finalTime=java.util.Calendar.getInstance();
         if (printDebug) {
