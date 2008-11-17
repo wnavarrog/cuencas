@@ -562,7 +562,7 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
         displayW.addMap( disMap );
         displayW.addMap( numLinkMap );
         
-        plotWidthFunction(1);
+        plotWidthFunction(0);
 
         jPanel1.add("Center",displayW.getComponent());
         
@@ -621,6 +621,13 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
         binSizeSlider.setMaximum(10);
         
         if (metric == 0) {
+            disMap.setScalarName("Topologic Distance [# Links]");
+            binSizeTextField.setText(binsizeWidth+" Links");
+            binSizeSlider.setValue(1);
+            plotWidthFunction(metric,binsizeWidth);
+        }
+        
+        if (metric == 1) {
             float[][] varValues=myLinksStructure.getVarValues(1);
             binsizeWidth=new hydroScalingAPI.util.statistics.Stats(varValues).meanValue;
             disMap.setScalarName("Distance [km]");
@@ -628,13 +635,6 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
             binSizeSlider.setValue(5);
             plotWidthFunction(metric,binsizeWidth);
             binsizeWidth/=5.0f;
-        }
-        
-        if (metric == 1) {
-            disMap.setScalarName("Topologic Distance [# Links]");
-            binSizeTextField.setText(binsizeWidth+" Links");
-            binSizeSlider.setValue(1);
-            plotWidthFunction(metric,binsizeWidth);
         }
         
         if (metric == 2) {
@@ -1572,8 +1572,8 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
         panelOpciones = new javax.swing.JTabbedPane();
         jPanel1 = new javax.swing.JPanel();
         jPanel8 = new javax.swing.JPanel();
-        widthGeom = new javax.swing.JRadioButton();
-        widthTopol = new javax.swing.JRadioButton();
+        widthTopolR = new javax.swing.JRadioButton();
+        widthGeomR = new javax.swing.JRadioButton();
         widthElev = new javax.swing.JRadioButton();
         jPanel9 = new javax.swing.JPanel();
         jPanel10 = new javax.swing.JPanel();
@@ -1726,26 +1726,28 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
 
         jPanel8.setLayout(new java.awt.GridLayout(1, 3));
 
-        buttonGroup1.add(widthGeom);
-        widthGeom.setFont(new java.awt.Font("Dialog", 0, 10));
-        widthGeom.setText("Gemetric Width Function");
-        widthGeom.addActionListener(new java.awt.event.ActionListener() {
+        buttonGroup1.add(widthTopolR);
+        widthTopolR.setFont(new java.awt.Font("Dialog", 0, 10)); // NOI18N
+        widthTopolR.setSelected(true);
+        widthTopolR.setText("Topologic Width Function");
+        widthTopolR.setActionCommand("Topologic Width Function");
+        widthTopolR.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                widthGeomActionPerformed(evt);
+                widthTopolRActionPerformed(evt);
             }
         });
-        jPanel8.add(widthGeom);
+        jPanel8.add(widthTopolR);
 
-        buttonGroup1.add(widthTopol);
-        widthTopol.setFont(new java.awt.Font("Dialog", 0, 10));
-        widthTopol.setSelected(true);
-        widthTopol.setText("Topologic Width Function");
-        widthTopol.addActionListener(new java.awt.event.ActionListener() {
+        buttonGroup1.add(widthGeomR);
+        widthGeomR.setFont(new java.awt.Font("Dialog", 0, 10)); // NOI18N
+        widthGeomR.setText("Geometric Width Function");
+        widthGeomR.setActionCommand("Geometric Width Function");
+        widthGeomR.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                widthTopolActionPerformed(evt);
+                widthGeomRActionPerformed(evt);
             }
         });
-        jPanel8.add(widthTopol);
+        jPanel8.add(widthGeomR);
 
         buttonGroup1.add(widthElev);
         widthElev.setFont(new java.awt.Font("Dialog", 0, 10));
@@ -2786,10 +2788,10 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
     private void binSizeSliderMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_binSizeSliderMouseReleased
         // Add your handling code here:
         
-        float binsize=binSizeSlider .getValue()*((widthGeom.isSelected())?binsizeWidth:1);
-        int metric=(widthGeom.isSelected())?0:(widthTopol.isSelected())?1:2;
+        float binsize=binSizeSlider.getValue()*((widthTopolR.isSelected())?1:binsizeWidth);
+        int metric=(widthTopolR.isSelected())?0:(widthGeomR.isSelected())?1:2;
         
-        binSizeTextField.setText(binsize+" "+((widthGeom.isSelected())?"km":(widthTopol.isSelected())?"Links":"meters"));
+        binSizeTextField.setText(binsize+" "+((widthTopolR.isSelected())?"Links":(widthGeomR.isSelected())?"km":"meters"));
         
         try{
             plotWidthFunction(metric,binsize);
@@ -3195,7 +3197,7 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
       updateHortonPlots();
   }//GEN-LAST:event_jRadioButtonBranchingActionPerformed
   
-  private void widthTopolActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_widthTopolActionPerformed
+  private void widthGeomRActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_widthGeomRActionPerformed
       
       try{
           plotWidthFunction(1);
@@ -3204,9 +3206,9 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
       } catch (VisADException v){
           System.err.println(v);
       }
-  }//GEN-LAST:event_widthTopolActionPerformed
+}//GEN-LAST:event_widthGeomRActionPerformed
   
-  private void widthGeomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_widthGeomActionPerformed
+  private void widthTopolRActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_widthTopolRActionPerformed
       
       try{
           plotWidthFunction(0);
@@ -3215,7 +3217,7 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
       } catch (VisADException v){
           System.err.println(v);
       }
-  }//GEN-LAST:event_widthGeomActionPerformed
+}//GEN-LAST:event_widthTopolRActionPerformed
   
   /** Closes the dialog */
     private void closeDialog(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_closeDialog
@@ -3420,8 +3422,8 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
     private javax.swing.JPopupMenu varOptionsPopUp;
     private javax.swing.JScrollPane variableScrollPane;
     private javax.swing.JRadioButton widthElev;
-    private javax.swing.JRadioButton widthGeom;
-    private javax.swing.JRadioButton widthTopol;
+    private javax.swing.JRadioButton widthGeomR;
+    private javax.swing.JRadioButton widthTopolR;
     private javax.swing.JLabel xAxisListLabel;
     private javax.swing.JCheckBox xLog;
     private javax.swing.JList xvarList;
