@@ -54,7 +54,7 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
         this(x,y,direcc,magnitudes,md,rainIntensity,rainDuration,null,null,infiltRate,routingType,outputDirectory,routingParams);
     }
     public SimulationToAsciiFile(int x, int y, byte[][] direcc, int[][] magnitudes, hydroScalingAPI.io.MetaRaster md, java.io.File stormFile, float infiltRate,int routingType, java.io.File outputDirectory,java.util.Hashtable routingParams) throws java.io.IOException, VisADException{
-        this(x,y,direcc,magnitudes,md,0.0f,0.0f,stormFile,null,0.0f,routingType,outputDirectory,routingParams);
+        this(x,y,direcc,magnitudes,md,0.0f,0.0f,stormFile,null,infiltRate,routingType,outputDirectory,routingParams);
     }
     public SimulationToAsciiFile(int x, int y, byte[][] direcc, int[][] magnitudes, hydroScalingAPI.io.MetaRaster md, java.io.File stormFile, hydroScalingAPI.io.MetaRaster infiltMetaRaster, int routingType, java.io.File outputDirectory,java.util.Hashtable routingParams) throws java.io.IOException, VisADException{
         this(x,y,direcc,magnitudes,md,0.0f,0.0f,stormFile,infiltMetaRaster,0.0f,routingType,outputDirectory,routingParams);
@@ -102,7 +102,7 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
         float lam1=((Float)routingParams.get("lambda1")).floatValue();
         float lam2=((Float)routingParams.get("lambda2")).floatValue();
 
-        float v_o=(float)(1.5/Math.pow(200,lam1)/Math.pow(1100,lam2));
+        float v_o=((Float)routingParams.get("v_o")).floatValue();
 
         thisNetworkGeom.setVqParams(v_o,0.0f,lam1,lam2);
         
@@ -161,7 +161,7 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
         
         java.io.File theFile;
         
-        theFile=new java.io.File(outputDirectory.getAbsolutePath()+"/"+demName+"-SN_"+infiltRate+".wfs.csv");
+        theFile=new java.io.File(outputDirectory.getAbsolutePath()+"/"+demName+"-SN.wfs.csv");
         System.out.println("Writing Width Functions - "+theFile);
         java.io.FileOutputStream salida = new java.io.FileOutputStream(theFile);
         java.io.BufferedOutputStream bufferout = new java.io.BufferedOutputStream(salida);
@@ -180,11 +180,10 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
         newfile.close();
         bufferout.close();
         
-        if(stormFile == null)
-            theFile=new java.io.File(outputDirectory.getAbsolutePath()+"/"+demName+"-INT_"+rainIntensity+"-DUR_"+rainDuration+"-IR_"+infiltRate+"-Routing_"+routingString+".csv");
+        if(infiltMetaRaster == null)
+            theFile=new java.io.File(outputDirectory.getAbsolutePath()+"/"+demName+"_"+x+"_"+y+"-"+storm.stormName()+"-IR_"+infiltRate+"-Routing_"+routingString+"_params_"+lam1+"_"+lam2+"_"+v_o+".csv");//theFile=new java.io.File(Directory+demName+"_"+x+"_"+y++"-"+storm.stormName()+"-IR_"+infiltRate+"-Routing_"+routingString+"_params_"+widthCoeff+"_"+widthExponent+"_"+widthStdDev+"_"+chezyCoeff+"_"+chezyExponent+".dat");
         else
-            theFile=new java.io.File(outputDirectory.getAbsolutePath()+"/"+demName+"-"+stormFile.getName()+"-IR_"+infiltRate+"-Routing_"+routingString+".csv");
-        
+            theFile=new java.io.File(outputDirectory.getAbsolutePath()+"/"+demName+"_"+x+"_"+y+"-"+storm.stormName()+"-IR_"+infiltMetaRaster.getLocationMeta().getName().substring(0,infiltMetaRaster.getLocationMeta().getName().lastIndexOf(".metaVHC"))+"-Routing_"+routingString+"_params_"+lam1+"_"+lam2+".csv");
         System.out.println(theFile);
         
         salida = new java.io.FileOutputStream(theFile);
@@ -236,23 +235,13 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
                 newfile.write("Link-"+linksStructure.completeStreamLinksArray[i]+",");
         }
         
-        hydroScalingAPI.modules.rainfallRunoffModel.objects.NetworkEquations_ChannelLosses thisBasinEqSys=new hydroScalingAPI.modules.rainfallRunoffModel.objects.NetworkEquations_ChannelLosses(linksStructure,thisHillsInfo,thisNetworkGeom,routingType);
+        hydroScalingAPI.modules.rainfallRunoffModel.objects.NetworkEquations_HillDelay thisBasinEqSys=new hydroScalingAPI.modules.rainfallRunoffModel.objects.NetworkEquations_HillDelay(linksStructure,thisHillsInfo,thisNetworkGeom,routingType);
         double[] initialCondition=new double[linksStructure.contactsArray.length*2];
-        
-        float[][] areasHillArray=thisHillsInfo.getAreasArray();
-        float[][] linkLengths=linksStructure.getVarValues(1);   // [1][n]
-        //double ic_sum = 0.0f;
         
         for (int i=0;i<linksStructure.contactsArray.length;i++){
             initialCondition[i]=0.0;
-            //initialCondition[i]=( areasHillArray[0][i]*1.*1e3 ) / ( linkLengths[0][i] *1e3 )  ;//0.0;
-            //initialCondition[i]=0.07*thisNetworkGeom.upStreamArea(i);//0.0;//
-            //System.out.println(areasHillArray[0][i]);
-            initialCondition[i+linksStructure.contactsArray.length]=1;
-            //System.out.println{"Sum of initial " + ic_sum};
-            //ic_sum = ic_sum + initialCondition[i] ;
+            initialCondition[i+linksStructure.contactsArray.length]=0.0;
         }
-        //System.out.println("Sum of initial q = " + ic_sum);
         
         java.util.Date startTime=new java.util.Date();
         System.out.println("Start Time:"+startTime.toString());
@@ -290,7 +279,7 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
         } else {
             for (int k=0;k<numPeriods;k++) {
                 System.out.println("Period "+(k+1)+" of "+numPeriods);
-                rainRunoffRaining.jumpsRunToAsciiFile(storm.stormInitialTimeInMinutes()+k*storm.stormRecordResolutionInMinutes(),storm.stormInitialTimeInMinutes()+(k+1)*storm.stormRecordResolutionInMinutes(),storm.stormRecordResolutionInMinutes(),initialCondition,newfile,linksStructure,thisNetworkGeom);
+                rainRunoffRaining.jumpsRunToAsciiFile(storm.stormInitialTimeInMinutes()+k*storm.stormRecordResolutionInMinutes(),storm.stormInitialTimeInMinutes()+(k+1)*storm.stormRecordResolutionInMinutes(),15,initialCondition,newfile,linksStructure,thisNetworkGeom);
                 initialCondition=rainRunoffRaining.finalCond;
                 rainRunoffRaining.setBasicTimeStep(10/60.);
             }
@@ -299,7 +288,7 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
             System.out.println("Intermedia Time:"+interTime.toString());
             System.out.println("Running Time:"+(.001*(interTime.getTime()-startTime.getTime()))+" seconds");
             
-            rainRunoffRaining.jumpsRunToAsciiFile(storm.stormInitialTimeInMinutes()+numPeriods*storm.stormRecordResolutionInMinutes(),(storm.stormInitialTimeInMinutes()+(numPeriods+1)*storm.stormRecordResolutionInMinutes())+8000,15,initialCondition,newfile,linksStructure,thisNetworkGeom);
+            rainRunoffRaining.jumpsRunToAsciiFile(storm.stormInitialTimeInMinutes()+numPeriods*storm.stormRecordResolutionInMinutes(),(storm.stormInitialTimeInMinutes()+(numPeriods+1)*storm.stormRecordResolutionInMinutes())+300,15,initialCondition,newfile,linksStructure,thisNetworkGeom);
         }
         
         System.out.println("Termina simulacion RKF");
@@ -350,8 +339,9 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
             //subMain0(args);   //To Run as a external program from shell
             //subMain1(args);   //The test case for TestDem
             //subMain2(args);   //Case for Walnut Gulch
-            //subMain3(args);     //Case Upper Rio Puerco
-            subMain4(args);     //Case Whitewater
+            //subMain3(args);   //Case Upper Rio Puerco
+            //subMain4(args);   //Case Whitewater
+            subMain5(args);   //Case Clear Creek June 3 to 7
             
         } catch (java.io.IOException IOE){
             System.out.print(IOE);
@@ -379,7 +369,6 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
         hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
         metaModif.setLocationBinaryFile(new java.io.File(filename + ".dir"));
         
-        String formatoOriginal=metaModif.getFormat();
         metaModif.setFormat("Byte");
         byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
         
@@ -422,7 +411,6 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
         //hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
         //metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Goodwin_Creek_MS_database/Rasters/Topography/1_ArcSec_USGS/newDEM/goodwinCreek-nov03.dir"));
         
-        String formatoOriginal=metaModif.getFormat();
         metaModif.setFormat("Byte");
         byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
         
@@ -441,7 +429,6 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
         routingParams.put("lambda1",0.5f);
         routingParams.put("lambda2",-0.1f);
         
-        hydroScalingAPI.mainGUI.ParentGUI tempFrame=new hydroScalingAPI.mainGUI.ParentGUI();
         
         //new SimulationToAsciiFile(44,111,matDirs,magnitudes,metaModif,0,1,0.0f,0,new java.io.File("/tmp/"));
         new SimulationToAsciiFile(32,32,matDirs,magnitudes,metaModif,6,10,0.0f,2,new java.io.File("/tmp/"),routingParams).executeSimulation();
@@ -485,15 +472,12 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
         hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
         metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Topography/1_ArcSec_USGS/walnutGulchUpdated.dir"));
         
-        String formatoOriginal=metaModif.getFormat();
         metaModif.setFormat("Byte");
         byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
         
         metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".magn"));
         metaModif.setFormat("Integer");
         int [][] magnitudes=new hydroScalingAPI.io.DataRaster(metaModif).getInt();
-        
-        hydroScalingAPI.mainGUI.ParentGUI tempFrame=new hydroScalingAPI.mainGUI.ParentGUI();
         
         //new SimulationToAsciiFile(420,303,matDirs,magnitudes,metaModif,150, 2,3.0f,2,new java.io.File("/home/ricardo/simulationResults/walnutGulch/")).executeSimulation();
         //new SimulationToAsciiFile(194,281,matDirs,magnitudes,metaModif, 50, 6,3.0f,2,new java.io.File("/home/ricardo/simulationResults/walnutGulch/")).executeSimulation();
@@ -509,7 +493,6 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
         hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
         metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Upper Rio Puerco DB/Rasters/Topography/1_ArcSec/NED_54212683.dir"));
         
-        String formatoOriginal=metaModif.getFormat();
         metaModif.setFormat("Byte");
         byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
         
@@ -540,15 +523,12 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
         hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
         metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS_2005/Whitewaters.dir"));
         
-        String formatoOriginal=metaModif.getFormat();
         metaModif.setFormat("Byte");
         byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
         
         metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".magn"));
         metaModif.setFormat("Integer");
         int [][] magnitudes=new hydroScalingAPI.io.DataRaster(metaModif).getInt();
-        
-        hydroScalingAPI.mainGUI.ParentGUI tempFrame=new hydroScalingAPI.mainGUI.ParentGUI();
         
         //new SimulationToAsciiFile(194,281,matDirs,magnitudes,metaModif,  5,60,3.0f,2,new java.io.File("/home/ricardo/simulationResults/walnutGulch/")).executeSimulation();
         
@@ -573,4 +553,51 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
         new SimulationToAsciiFile(1063,496,matDirs,magnitudes,metaModif,stormFile,0.0f,2,new java.io.File("/home/ricardo/simulationResults/walnutGulch/"),routingParams).executeSimulation();
     }
     
+    public static void subMain5(String args[]) throws java.io.IOException, VisADException {
+        
+        java.io.File theFile=new java.io.File("/hidrosigDataBases/Iowa_Rivers_DB/Rasters/Topography/1_arcSec/05454300/NED_00159011.metaDEM");
+        hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
+        metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Iowa_Rivers_DB/Rasters/Topography/1_arcSec/05454300/NED_00159011.dir"));
+        
+        metaModif.setFormat("Byte");
+        byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
+        
+        metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".magn"));
+        metaModif.setFormat("Integer");
+        int [][] magnitudes=new hydroScalingAPI.io.DataRaster(metaModif).getInt();
+        
+        java.util.Hashtable routingParams=new java.util.Hashtable();
+        routingParams.put("widthCoeff",1.0f);
+        routingParams.put("widthExponent",0.4f);
+        routingParams.put("widthStdDev",0.0f);
+        
+        routingParams.put("chezyCoeff",14.2f);
+        routingParams.put("chezyExponent",-1/3.0f);
+        
+        routingParams.put("lambda1",0.0f);
+        routingParams.put("lambda2",0.0f);
+        routingParams.put("v_o", 0.4f);
+        
+        java.io.File stormFile;
+        stormFile=new java.io.File("/hidrosigDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/observed_events/EventIowaJuneMPE/June3toJune5/hydroNexrad.metaVHC");
+        
+        float infil=0.0f;
+
+        //new SimulationToAsciiFile(1570, 127, matDirs, magnitudes, metaModif, stormFile, infil, 2, new java.io.File("/home/ricardo/simulationResults/ClearCreek/"), routingParams).executeSimulation();
+        
+        for (double lam1 = 1; lam1 <= 4; lam1 += 1) {
+            routingParams.put("lambda1", (float)(lam1/10.0));
+            for (double lam2 = -3; lam2 <= -1; lam2 += 1.0) {
+
+                routingParams.put("lambda2", (float)(lam2/10.0));
+                
+                for (float intV = 2; intV <= 4; intV += 0.5) {
+                    float v_o=(float)(intV/10.0f/Math.pow(10,lam1/10.0)/Math.pow(254,lam2/10.0));
+                    routingParams.put("v_o", v_o);
+                    System.out.println(lam1/10.0+" "+lam2/10.0+" "+v_o);
+                    //new SimulationToAsciiFile(1570, 127, matDirs, magnitudes, metaModif, stormFile, infil, 5, new java.io.File("/home/ricardo/simulationResults/ClearCreek/"), routingParams).executeSimulation();
+                }
+            }
+        }
+    }
 }

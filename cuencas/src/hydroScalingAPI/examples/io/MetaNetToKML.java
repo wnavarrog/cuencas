@@ -161,21 +161,34 @@ public class MetaNetToKML {
     public static void main(String[] args) {
         
         try{
-            java.io.File theFile=new java.io.File("/hidrosigDataBases/Iowa_Rivers_DB/Rasters/Topography/3_arcSec/AveragedIowaRiverAtColumbusJunctions.metaDEM");
+            
+//            String fileName="/hidrosigDataBases/Iowa_Rivers_DB/Rasters/Topography/3_arcSec/AveragedIowaRiverAtColumbusJunctions";
+//            int x=1570,y=127;
+//            String uniqueIdentifier="IowaRiverAtWapoello90";
+            
+            String fileName="/hidrosigDataBases/Iowa_Rivers_DB/Rasters/Topography/1_arcSec/05454300/NED_00159011";
+            int x=1570, y= 127;
+            String uniqueIdentifier="ClearCreekAtCoralville";
+            
+//            String fileName="/hidrosigDataBases/Iowa_Rivers_DB/Rasters/Topography/1_arcSec/CedarRiver";
+//            int x=7875, y= 1361;
+//            String uniqueIdentifier="CedarRiverAtCedarRapids";
+            
+//            String fileName="/hidrosigDataBases/Iowa_Rivers_DB/Rasters/Topography/1_arcSec/IowaRiverAtIowaCity";
+//            int x=6602, y= 1539;
+//            String uniqueIdentifier="IowaRiverAtIowaCity";
+            
+            java.io.File theFile=new java.io.File(fileName+".metaDEM");
             hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
-            metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Iowa_Rivers_DB/Rasters/Topography/3_arcSec/AveragedIowaRiverAtColumbusJunctions.dir"));
+            metaModif.setLocationBinaryFile(new java.io.File(fileName+".dir"));
         
-            String formatoOriginal=metaModif.getFormat();
             metaModif.setFormat("Byte");
             byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
             
-            hydroScalingAPI.util.geomorphology.objects.Basin laCuenca=new hydroScalingAPI.util.geomorphology.objects.Basin(3316,116,matDirs,metaModif);
+            hydroScalingAPI.util.geomorphology.objects.Basin laCuenca=new hydroScalingAPI.util.geomorphology.objects.Basin(x, y,matDirs,metaModif);
             
-            MetaNetToKML exporter=new MetaNetToKML(metaModif,new java.io.File("/home/ricardo/temp/"),laCuenca,matDirs,"Outlet");
+            MetaNetToKML exporter=new MetaNetToKML(metaModif,new java.io.File("/Users/ricardo/temp/"),laCuenca,matDirs,uniqueIdentifier);
             
-            /*new GrassToHSJ(new java.io.File("/home/ricardo/garbage/testsGrass/1630327a.grass"),
-                           new java.io.File("/home/ricardo/garbage/testsGrass/"));*/
-           
         } catch (Exception IOE){
             System.out.print(IOE);
             IOE.printStackTrace();
