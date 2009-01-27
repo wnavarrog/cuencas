@@ -38,7 +38,7 @@ public class ParallelSimulationToFile extends java.lang.Object {
     private hydroScalingAPI.io.MetaRaster metaDatos;
     private byte[][] matDir;
     
-    final int simulProcess=2;
+    final int simulProcess=8;
     public int threadsRunning=0;
     
     /** Creates new ParallelSimulationToFile */

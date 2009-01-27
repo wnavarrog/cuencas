@@ -529,6 +529,7 @@ public class Rainfall_Runoff_Model extends javax.swing.JDialog implements Displa
         rainButton = new javax.swing.JButton();
         simButton = new javax.swing.JButton();
         sim2Button = new javax.swing.JButton();
+        sim3Button = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jPanel18 = new javax.swing.JPanel();
 
@@ -663,7 +664,6 @@ public class Rainfall_Runoff_Model extends javax.swing.JDialog implements Displa
         jLabel10.setText("Flow Velocity");
         jPanel15.add(jLabel10);
 
-        flowVelocity.setEditable(false);
         flowVelocity.setText("0.5");
         jPanel15.add(flowVelocity);
 
@@ -686,6 +686,8 @@ public class Rainfall_Runoff_Model extends javax.swing.JDialog implements Displa
         jPanel14.add(jPanel15);
 
         jPanel17.setLayout(new java.awt.BorderLayout());
+
+        jPanel16.setLayout(new java.awt.GridLayout());
 
         rainButton.setText("Variable Rainfall Simulation");
         rainButton.addActionListener(new java.awt.event.ActionListener() {
@@ -710,6 +712,14 @@ public class Rainfall_Runoff_Model extends javax.swing.JDialog implements Displa
             }
         });
         jPanel16.add(sim2Button);
+
+        sim3Button.setText("Parallel Simulation");
+        sim3Button.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                sim3ButtonActionPerformed(evt);
+            }
+        });
+        jPanel16.add(sim3Button);
 
         jPanel17.add(jPanel16, java.awt.BorderLayout.NORTH);
 
@@ -847,10 +857,12 @@ public class Rainfall_Runoff_Model extends javax.swing.JDialog implements Displa
         
         float rainIntensityValue=10.0f;
         float rainDurationValue=1.0f;
+        float flowVel=0.5f;
         
         try{
             rainIntensityValue=new Float(rainIntensity.getText()).floatValue();
             rainDurationValue=new Float(rainDuration.getText()).floatValue();
+            flowVel=new Float(flowVelocity.getText()).floatValue();
         } catch(NumberFormatException nfe){
             System.err.println(nfe);
             return;
@@ -873,6 +885,8 @@ public class Rainfall_Runoff_Model extends javax.swing.JDialog implements Displa
 
             routingParams.put("lambda1",0.5f);
             routingParams.put("lambda2",-0.1f);
+            
+            routingParams.put("v_o",flowVel);
         
             Thread t1 = new Thread(new hydroScalingAPI.modules.rainfallRunoffModel.objects.SimulationToAsciiFile(xOulet,yOulet,matDir,magnitudes,metaDatos,rainIntensityValue,rainDurationValue,0.0f,2,selectedFile,routingParams));
             t1.start();
@@ -1021,6 +1035,60 @@ public class Rainfall_Runoff_Model extends javax.swing.JDialog implements Displa
         dispose();
     }//GEN-LAST:event_closeDialog
 
+private void sim3ButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sim3ButtonActionPerformed
+        javax.swing.JFileChooser fc=new javax.swing.JFileChooser("/");
+        fc.setFileSelectionMode(javax.swing.JFileChooser.DIRECTORIES_ONLY);
+        fc.setDialogTitle("Output directory");
+        int result = fc.showDialog(this,"Select");
+        java.io.File selectedFile = fc.getSelectedFile();
+        
+        if (result == javax.swing.JFileChooser.CANCEL_OPTION) return;
+        
+        float rainIntensityValue=10.0f;
+        float rainDurationValue=1.0f;
+        float flowVel=0.5f;
+        
+        try{
+            rainIntensityValue=new Float(rainIntensity.getText()).floatValue();
+            rainDurationValue=new Float(rainDuration.getText()).floatValue();
+            flowVel=new Float(flowVelocity.getText()).floatValue();
+        } catch(NumberFormatException nfe){
+            System.err.println(nfe);
+            return;
+        }
+        
+        int xOulet,yOulet;
+        xOulet=myCuenca.getOutletID()%metaDatos.getNumCols();
+        yOulet=myCuenca.getOutletID()/metaDatos.getNumCols();
+        
+        try{
+            java.util.Hashtable routingParams=new java.util.Hashtable();
+            routingParams.put("widthCoeff",1.0f);
+            routingParams.put("widthExponent",0.4f);
+            routingParams.put("widthStdDev",0.0f);
+
+            routingParams.put("chezyCoeff",14.2f);
+            routingParams.put("chezyExponent",-1/3.0f);
+
+            routingParams.put("lambda1",0.5f);
+            routingParams.put("lambda2",-0.1f);
+            
+            routingParams.put("v_o",flowVel);
+            
+            java.io.File theFile=new java.io.File(metaDatos.getLocationMeta().getAbsolutePath());
+            
+            metaDatos.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".horton"));
+            metaDatos.setFormat("Byte");
+            byte [][] horOrders=new hydroScalingAPI.io.DataRaster(metaDatos).getByte();
+        
+            new hydroScalingAPI.examples.rainRunoffSimulations.ParallelSimulationToFile(xOulet,yOulet,matDir,magnitudes,horOrders,metaDatos,rainIntensityValue,rainDurationValue,0.0f,2,routingParams,selectedFile);
+        } catch(java.io.IOException ioe){
+            System.err.println(ioe);
+        } catch(visad.VisADException vie){
+            System.err.println(vie);
+        }
+}//GEN-LAST:event_sim3ButtonActionPerformed
+
     /**
      * Tests for the module
      * @param args the command line arguments
@@ -1126,6 +1194,7 @@ public class Rainfall_Runoff_Model extends javax.swing.JDialog implements Displa
     private javax.swing.JTextField rainDuration;
     private javax.swing.JTextField rainIntensity;
     private javax.swing.JButton sim2Button;
+    private javax.swing.JButton sim3Button;
     private javax.swing.JButton simButton;
     private javax.swing.JComboBox stormFilesList;
     private javax.swing.JTextField totalVolume;
