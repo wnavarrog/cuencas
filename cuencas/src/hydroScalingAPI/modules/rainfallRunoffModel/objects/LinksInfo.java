@@ -239,6 +239,10 @@ public class LinksInfo extends java.lang.Object {
         return (double) (lengthArray[0][LinkNumber]*1000.0);
     }
     
+    public void setLength(int LinkNumber,float newLength){
+        lengthArray[0][LinkNumber]=newLength;
+    }
+    
     /**
      * Returns the link average slope for a given link
      * @param LinkNumber The index of the desired link

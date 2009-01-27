@@ -62,7 +62,15 @@ public class HillSlopesInfo extends java.lang.Object {
      */
     public double Area(int HillNumber){
         return (double) areasArray[0][HillNumber];
-        //return (double) 2.0; //false Geometry
+    }
+    
+    /**
+     * The total area of the hillslopes draining to the HillNumber-th link
+     * @param HillNumber The index of the desired hillslope
+     * @return The area in km^2
+     */
+    public void setArea(int HillNumber,float newArea){
+        areasArray[0][HillNumber]=newArea;
     }
     
     /**

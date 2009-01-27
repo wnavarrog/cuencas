@@ -96,6 +96,65 @@ public class Generator {
     }
     
     /**
+     * Creates a new instance of Generator
+     * @param extInt A flag indicating if this is an exterior (0) or an interior generator
+     * @param generation The level of the generation of this Generator.  Note: Generation = 0 indicates
+     * that the members of this Generator have no descendents
+     * @param myIntDis An object describing the probability distribution of the size of the descendency
+     * for interior pseudo-links
+     * @param myExtDis An object describing the probability distribution of the size of the descendency
+     * for exterior pseudo-links
+     * @param familyID An ID for the parent family
+     */
+    public Generator(   int extInt,
+                        int generation,
+                        hydroScalingAPI.util.probability.ScaleDependentDiscreteDistribution myIntDis,
+                        hydroScalingAPI.util.probability.ScaleDependentDiscreteDistribution myExtDis,
+                        String familyID) {
+                            
+        java.text.NumberFormat labelFormat = java.text.NumberFormat.getNumberInstance();
+        labelFormat.setGroupingUsed(false);
+        labelFormat.setMinimumIntegerDigits(4);
+                            
+        genID=familyID;
+        
+        String labelSubTree;
+        
+        if(generation>0){
+            int numMembers;
+            String GenClass="";
+            if(extInt==0){
+                numMembers=myExtDis.sample(generation);
+                GenClass=",E";
+            } else{
+                numMembers=myIntDis.sample(generation);
+                GenClass=",I";
+            }
+            
+            subTree=new Generator[2*numMembers+1];
+            if(numMembers>0){
+                for(int i=0;i<2*numMembers;i++){
+                    String LinkClass=",I";
+                    if(1-i%2==0) LinkClass=",E";
+                    
+                    if (generation == 1) 
+                        labelSubTree=""+labelFormat.format(i)+LinkClass;
+                    else
+                        labelSubTree=""+labelFormat.format(i);
+                        
+                    
+                    subTree[i]=new Generator(1-i%2,generation-1, myIntDis,myExtDis, familyID+","+labelSubTree);
+                }
+            }
+            if (generation == 1) 
+                labelSubTree=""+labelFormat.format(2*numMembers)+GenClass;
+            else
+                labelSubTree=""+labelFormat.format(2*numMembers);
+            subTree[2*numMembers]=new Generator(extInt, generation-1, myIntDis,myExtDis, familyID+","+labelSubTree);
+        }
+    }
+    
+    /**
      * Returns a String with the tree id (family name)
      * @return The id (family name) of the tree
      */

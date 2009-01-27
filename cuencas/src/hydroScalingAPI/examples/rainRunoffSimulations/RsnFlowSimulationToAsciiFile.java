@@ -272,7 +272,7 @@ public class RsnFlowSimulationToAsciiFile extends java.lang.Object {
         
         try{
             
-            subMain1(args);   //Geometrically Distributed generators, constant link-length
+            //subMain1(args);   //Geometrically Distributed generators, constant link-length
             //subMain2(args);   //Geometrically Distributed generators, random link-length
             //subMain3(args);   //Geometrically Distributed generators, random link-length, random link-area
             //subMain4(args);   //Uniformly Distributed generators, constant link-length
@@ -281,6 +281,9 @@ public class RsnFlowSimulationToAsciiFile extends java.lang.Object {
             //subMain6(args);   //Geometrically Distributed generators, constant link-length, HG and Non-Linear Velocities
             
             //subMain7(args);   //E1I1 different lambda1 and lambda2
+            
+            subMain8(args);   //Non-Self similar Trees
+            
         } catch (java.io.IOException IOE){
             System.out.print(IOE);
             System.exit(0);
@@ -514,6 +517,25 @@ public class RsnFlowSimulationToAsciiFile extends java.lang.Object {
                 }
             }
         }
+    }
+    
+    public static void subMain8(String args[]) throws java.io.IOException, VisADException {
+        
+        int TreeScale=3;
+        String outDir="/home/ricardo/simulationResults/nonSST/constantV/ord"+TreeScale;
+        new java.io.File(outDir).mkdir();
+        
+        int[] sequence={1,3,1,3,1,3,1,3,1,3,1,3,1,3};
+        
+        java.text.NumberFormat labelFormat = java.text.NumberFormat.getNumberInstance();
+        labelFormat.setGroupingUsed(false);
+        labelFormat.setMinimumFractionDigits(2);
+        
+        hydroScalingAPI.util.probability.ScaleDependentDiscreteDistribution myUD_I=new hydroScalingAPI.util.probability.ScaleDependentSequenceDistribution(sequence);
+        hydroScalingAPI.util.probability.ScaleDependentDiscreteDistribution myUD_E=new hydroScalingAPI.util.probability.ScaleDependentSequenceDistribution(sequence);
+        hydroScalingAPI.util.randomSelfSimilarNetworks.RsnStructure myRSN=new hydroScalingAPI.util.randomSelfSimilarNetworks.RsnStructure(TreeScale,myUD_I,myUD_E);
+        new RsnFlowSimulationToAsciiFile(myRSN,0,1,0,2,new java.io.File(outDir)).executeSimulation();
+
     }
         
 }

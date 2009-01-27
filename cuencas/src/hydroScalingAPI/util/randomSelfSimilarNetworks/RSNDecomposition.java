@@ -197,13 +197,46 @@ public class RSNDecomposition {
      */
     public int[][] getConnectionStructure(int scale){
             
-        int ncols=mylinksAnalysis.localMetaRaster.getNumCols();
-
         int[][] connections=new int[metaLinks[scale-1].size()][];
         for(int i=0;i<connections.length;i++){
             java.util.Vector Stream=(java.util.Vector)metaLinks[scale-1].get(i);
-            int thisLinkIndex=((int[])Stream.firstElement())[0];
-            if(i>=numFullLinks[scale-1]) connections[i]=usIndexes[((int[])Stream.lastElement())[0]]; else connections[i]=new int[0];
+            if(i>=numFullLinks[scale-1]) {
+                connections[i]=usIndexes[((int[])Stream.lastElement())[0]];
+            } else {
+                 connections[i]=new int[0];
+            }
+        }
+        return connections;
+
+    }
+    
+    /**
+     * Returns the pruned connection structure for the river network at the requested scale. 
+     * The array returned is an int[numLinks][numConnected]
+     * @param scale The scale at which the network structure is required.  Note that scale 1
+     * corresponds to the original river network.
+     * @return An int[numLinks][numConnected] array
+     */
+    public int[][] getPrunedConnectionStructure(int scale){
+            
+        int[][] connections=new int[metaLinks[scale-1].size()][];
+        for(int i=0;i<connections.length;i++){
+            java.util.Vector Stream=(java.util.Vector)metaLinks[scale-1].get(i);
+            if(i>=numFullLinks[scale-1]) {
+                int[] possibleConnections=usIndexes[((int[])Stream.lastElement())[0]];
+                java.util.Vector<Integer> connToKeep=new java.util.Vector();
+                for (int j = 0; j < possibleConnections.length; j++) {
+                    if(linksOrders[0][possibleConnections[j]] >= scale) connToKeep.add(possibleConnections[j]);
+                    
+                }
+                connections[i]=new int[connToKeep.size()];
+                for (int j = 0; j < connections[i].length; j++) {
+                    connections[i][j]=connToKeep.get(j);
+                }
+                
+            } else {
+                 connections[i]=new int[0];
+            }
         }
         return connections;
 
@@ -234,6 +267,17 @@ public class RSNDecomposition {
             
         }
         return HAndT;
+    }
+    
+    public int[] getConnectingLinks(int scale){
+        
+        int[] connections=new int[metaLinks[scale-1].size()];
+        for(int i=0;i<connections.length;i++){
+            java.util.Vector Stream=(java.util.Vector)metaLinks[scale-1].get(i);
+            connections[i]=((int[])Stream.firstElement())[0];
+            
+        }
+        return connections;
     }
     
     /**

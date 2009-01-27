@@ -26,6 +26,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 package hydroScalingAPI.util.randomSelfSimilarNetworks;
 
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  *
  * @author Ricardo Mantilla
@@ -149,6 +153,13 @@ public class RsnLinksAnalysis extends hydroScalingAPI.util.geomorphology.objects
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+        //main0(args);
+        main1(args);
+    }
+    /**
+     * @param args the command line arguments
+     */
+    public static void main0(String[] args) {
         
         
         float prevLevel_PWF=1;
@@ -384,6 +395,95 @@ public class RsnLinksAnalysis extends hydroScalingAPI.util.geomorphology.objects
         
         
         System.exit(0);
+    }
+    
+    public static void main1(String[] args) {
+        
+        int TreeScale=7;
+        
+        int[] sequenceI={2,1,0,0,5,3,1,0};
+        int[] sequenceE={3,1,2,1,1,2,3,1};
+        
+        
+        hydroScalingAPI.util.probability.ScaleDependentDiscreteDistribution myUD_I=new hydroScalingAPI.util.probability.ScaleDependentSequenceDistribution(sequenceI);
+        hydroScalingAPI.util.probability.ScaleDependentDiscreteDistribution myUD_E=new hydroScalingAPI.util.probability.ScaleDependentSequenceDistribution(sequenceE);
+//        hydroScalingAPI.util.probability.ScaleDependentDiscreteDistribution myUD_I=new hydroScalingAPI.util.probability.ScaleDependentBinaryDistribution(1,1,0.5,TreeScale+1);
+//        hydroScalingAPI.util.probability.ScaleDependentDiscreteDistribution myUD_E=new hydroScalingAPI.util.probability.ScaleDependentBinaryDistribution(1,1,0.5,TreeScale+1);
+//        hydroScalingAPI.util.probability.DiscreteDistribution myUD_I=new hydroScalingAPI.util.probability.BinaryDistribution(2,2,0.5f);
+//        hydroScalingAPI.util.probability.DiscreteDistribution myUD_E=new hydroScalingAPI.util.probability.BinaryDistribution(2,2,0.5f);
+        RsnStructure myRSN=new RsnStructure(TreeScale,myUD_I,myUD_E);
+        RsnLinksAnalysis myResults=new RsnLinksAnalysis(myRSN);
+        
+        java.io.File theFile=new java.io.File("/Users/ricardo/temp/testRSNdecode.rsn");
+        try {
+
+            myRSN.writeRsnTreeDecoding(theFile);
+        } catch (IOException ex) {
+            Logger.getLogger(RsnLinksAnalysis.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        float[] meanAreas=new float[myResults.getBasinOrder()];
+        float[] meanLength=new float[myResults.getBasinOrder()];
+        float[] meanBifur=new float[myResults.getBasinOrder()];
+        float[] meanPeakWF=new float[myResults.getBasinOrder()];
+        float[] meanDtoPeakWF=new float[myResults.getBasinOrder()];
+        int[] counterOrders=new int[myResults.getBasinOrder()];
+
+
+        float[][] linkAreas=myResults.getVarValues(2);
+        float[][] hsorderLinks=myResults.getVarValues(4);
+        double[][] distances=myResults.getWidthFunctions(myResults.completeStreamLinksArray,0);
+        System.out.println(java.util.Arrays.toString(distances[0]));
+        for(int j=0;j<distances.length;j++){
+            int maxLinks=Integer.MIN_VALUE;
+            int DtoMax=0;
+            for(int i=0;i<distances[j].length;i++){
+                if(distances[j][i] >= maxLinks){
+                    maxLinks=(int)distances[j][i];
+                    DtoMax=i;
+                }
+            }
+            DtoMax++;
+            meanAreas[(int)hsorderLinks[0][myResults.completeStreamLinksArray[j]]-1]+=linkAreas[0][myResults.completeStreamLinksArray[j]];
+            meanPeakWF[(int)hsorderLinks[0][myResults.completeStreamLinksArray[j]]-1]+=maxLinks;
+            meanDtoPeakWF[(int)hsorderLinks[0][myResults.completeStreamLinksArray[j]]-1]+=DtoMax;
+            meanLength[(int)hsorderLinks[0][myResults.completeStreamLinksArray[j]]-1]+=distances[j].length;
+            counterOrders[(int)hsorderLinks[0][myResults.completeStreamLinksArray[j]]-1]++;
+        }
+        for(int j=0;j<meanPeakWF.length;j++){
+            meanPeakWF[j]/=(float)counterOrders[j];
+            meanAreas[j]/=(float)counterOrders[j];
+            meanDtoPeakWF[j]/=(float)counterOrders[j];
+            meanLength[j]/=(float)counterOrders[j];
+            meanBifur[j]=(float)counterOrders[j];
+            
+            System.out.println( meanPeakWF[j]+":"+meanAreas[j]+":"+meanBifur[j]+":"+meanLength[j]+":"+meanDtoPeakWF[j]);
+            
+        }
+
+        System.exit(0);
+        
+        double meanPWFS=0,meanAS=0,meanBif=0;
+        double mean_R_PWFS=0,mean_R_AS=0,mean_R_B=0;
+
+        for(int j=3;j<meanPeakWF.length-2;j++){
+            mean_R_PWFS+=meanPeakWF[j]/meanPeakWF[j-1];
+            mean_R_AS+=meanAreas[j]/meanAreas[j-1];
+            mean_R_B+=meanBifur[meanPeakWF.length-j-1]/meanBifur[meanPeakWF.length-j];
+            meanPWFS+=Math.log(meanPeakWF[j]/meanPeakWF[j-1]);
+            meanAS+=Math.log(meanAreas[j]/meanAreas[j-1]);
+            meanBif+=Math.log(meanBifur[j-1]/meanBifur[j]);
+        }
+
+        System.out.print("Done with experiment "
+                            +" Beta: "+meanPWFS/meanAS
+                            +" Rpwf: ");
+
+        for(int j=1;j<meanPeakWF.length;j++) System.out.print(meanPeakWF[j]/meanPeakWF[j-1]+" ");
+
+        System.out.print(" Ra: "+mean_R_AS/(float)(meanPeakWF.length-5)
+                            +" Rb: "+mean_R_B/(float)(meanPeakWF.length-5));
+        System.out.println();
     }
     
 }

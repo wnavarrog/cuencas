@@ -51,11 +51,11 @@ public class HillSlopeTimeSeries {
      * Creates new HillSlopeTimeSeries
      * @param regIn Register interval in milliseconds
      */
-    public HillSlopeTimeSeries(int regIn) {
+    public HillSlopeTimeSeries(int regIn, int numElem) {
 //        recordValue=new java.util.Vector();
 //        recordTime=new java.util.Vector();
         
-        recordTimeValue=new java.util.Hashtable<java.util.Calendar, Float>();
+        recordTimeValue=new java.util.Hashtable<java.util.Calendar, Float>(numElem);
         
         regInterval=regIn;
     }

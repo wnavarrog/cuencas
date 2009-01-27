@@ -426,8 +426,6 @@ public class LinksAnalysis extends java.lang.Object {
         java.io.File rutaQuantity=new java.io.File(localMetaRaster.getLocationBinaryFile().getPath().substring(0,localMetaRaster.getLocationBinaryFile().getPath().lastIndexOf("."))+extenciones[varIndex]);
         java.io.RandomAccessFile fileQuantity=new java.io.RandomAccessFile(rutaQuantity,"r");
        
-        double[][] dToO;
-        
         switch(varIndex){
             case 0:
                 //Link's Hillslope Area.  This is done by subtraction of area at head and area at incoming links head
@@ -633,6 +631,15 @@ public class LinksAnalysis extends java.lang.Object {
         for (int i=0;i<contactsArray.length;i++){
             if (contactsArray[i]==contactsID) ressimID=i+1;
             //Add 1 to ressimID because link ids in resSimul array in idl code start at 1.        
+        }
+        return ressimID;
+    }
+    
+    public int getLinkIDbyHead(int x, int y){       
+        int contactsID = x+(y*localMetaRaster.getNumCols());     
+        ressimID=-1;
+        for (int i=0;i<headsArray.length;i++){
+            if (headsArray[i]==contactsID) ressimID=i;
         }
         return ressimID;
     }

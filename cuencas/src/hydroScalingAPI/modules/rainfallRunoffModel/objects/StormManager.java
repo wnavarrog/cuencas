@@ -68,7 +68,7 @@ public class StormManager {
         
         precOnBasin=new hydroScalingAPI.modules.rainfallRunoffModel.objects.HillSlopeTimeSeries[linksStructure.connectionsArray.length];
         for (int i=0;i<precOnBasin.length;i++){
-            precOnBasin[i]=new hydroScalingAPI.modules.rainfallRunoffModel.objects.HillSlopeTimeSeries((int)(rainDuration*60*1000));
+            precOnBasin[i]=new hydroScalingAPI.modules.rainfallRunoffModel.objects.HillSlopeTimeSeries((int)(rainDuration*60*1000),1);
             precOnBasin[i].addDateAndValue(date,new Float(rainIntensity));
         }
         
@@ -133,11 +133,13 @@ public class StormManager {
             
             matrizPintada=new int[myCuenca.getMaxY()-myCuenca.getMinY()+3][myCuenca.getMaxX()-myCuenca.getMinX()+3];
             
+            int nc=metaDatos.getNumCols();
+            
             for (int i=0;i<linksStructure.contactsArray.length;i++){
                 if (linksStructure.magnitudeArray[i] < linksStructure.basinMagnitude){
 
-                    xOulet=linksStructure.contactsArray[i]%metaDatos.getNumCols();
-                    yOulet=linksStructure.contactsArray[i]/metaDatos.getNumCols();
+                    xOulet=linksStructure.contactsArray[i]%nc;
+                    yOulet=linksStructure.contactsArray[i]/nc;
 
                     myHillActual=new hydroScalingAPI.util.geomorphology.objects.HillSlope(xOulet,yOulet,matDir,magnitudes,metaDatos);
                     for (int j=0;j<myHillActual.getXYHillSlope()[0].length;j++){
@@ -164,7 +166,7 @@ public class StormManager {
             totalHillBasedPrec=new float[precOnBasin.length];
             
             for (int i=0;i<precOnBasin.length;i++){
-                precOnBasin[i]=new hydroScalingAPI.modules.rainfallRunoffModel.objects.HillSlopeTimeSeries(regInterval);
+                precOnBasin[i]=new hydroScalingAPI.modules.rainfallRunoffModel.objects.HillSlopeTimeSeries(regInterval,arCron.length);
             }
 
             double[] evalSpot;

@@ -67,7 +67,7 @@ public class HillslopeRainAndNetworkToFile {
         System.out.println("Writing Distance to Outlet");
         float[][] dToOutlet=linksStructure.getDistancesToOutlet();
         for (int i=0;i<linksStructure.contactsArray.length;i++){
-            newfile.writeDouble(dToOutlet[0][i]);
+            newfile.writeDouble(dToOutlet[1][i]);
         }
         
         System.out.println("Writing Precipitations");
@@ -139,7 +139,6 @@ public class HillslopeRainAndNetworkToFile {
             hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
             metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS_2005/Whitewaters.dir"));
 
-            String formatoOriginal=metaModif.getFormat();
             metaModif.setFormat("Byte");
             byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
 
@@ -170,7 +169,6 @@ public class HillslopeRainAndNetworkToFile {
             hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
             metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS_2005/Whitewaters.dir"));
 
-            String formatoOriginal=metaModif.getFormat();
             metaModif.setFormat("Byte");
             byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
 
@@ -197,26 +195,24 @@ public class HillslopeRainAndNetworkToFile {
     public static void main3(String args[]) {
         
         
-//        x: 2646, y: 762 ; Basin Code 05454220 Clear Creek near Oxford, IA
-//        x: 2817, y: 713 ; Basin Code 05454300 Clear Creek near Coralville, IA
-//        x: 2949, y: 741 ; Basin Code 05454000 Rapid Creek near Iowa City, IA
-//        x: 2256, y: 876 ; Basin Code 05453100 Iowa River at Marengo, IA
-//        x: 1312, y: 1112 ; Basin Code 05451700 Timber Creek near Marshalltown, IA
-//        x: 2858, y: 742 ; Basin Code 05454090 Muddy Creek at Coralville, IA
-//        x: 2115, y: 801 ; Basin Code 05453000 Big Bear Creek at Ladora, IA
-//        x: 1765, y: 981 ; Basin Code 05451900 Richland Creek near Haven, IA
-//        x: 1871, y: 903 ; Basin Code 05452200 Walnut Creek near Hartwick, IA
-//        x: 2885, y: 690 ; Basin Code 05454500 Iowa River at Iowa City, IA
-//        x: 2796, y: 629 ; Basin Code 05455100 Old Mans Creek near Iowa City, IA
-//        x: 2958, y: 410 ; Basin Code 05455700 Iowa River near Lone Tree, IA
-//        x: 3186, y: 392 ; Basin Code 05465000 Cedar River near Conesville, IA
-//        x: 3316, y: 116 ; Basin Code 05465500 Iowa River at Wapello, IA
-//        x: 2734, y: 1069 ; Basin Code 05464500 Cedar River at Cedar Rapids, IA
-//        x: 1770, y: 1987 ; Basin Code 05458300 Cedar River at Waverly, IA
-
+//x: 2817, y: 713 ; Basin Code 05454300 Clear Creek near Coralville, IA
+//x: 2646, y: 762 ; Basin Code 05454220 Clear Creek near Oxford, IA
+//x: 2949, y: 741 ; Basin Code 05454000 Rapid Creek near Iowa City, IA
+//x: 2256, y: 876 ; Basin Code 05453100 Iowa River at Marengo, IA
+//x: 1312, y: 1112 ; Basin Code 05451700 Timber Creek near Marshalltown, IA
+//x: 2858, y: 742 ; Basin Code 05454090 Muddy Creek at Coralville, IA
+//x: 2115, y: 801 ; Basin Code 05453000 Big Bear Creek at Ladora, IA
+//x: 1765, y: 981 ; Basin Code 05451900 Richland Creek near Haven, IA
+//x: 1871, y: 903 ; Basin Code 05452200 Walnut Creek near Hartwick, IA
+//x: 2885, y: 690 ; Basin Code 05454500 Iowa River at Iowa City, IA
+//x: 2796, y: 629 ; Basin Code 05455100 Old Mans Creek near Iowa City, IA
+//x: 2958, y: 410 ; Basin Code 05455700 Iowa River near Lone Tree, IA
+//x: 3186, y: 392 ; Basin Code 05465000 Cedar River near Conesville, IA
+//x: 3316, y: 116 ; Basin Code 05465500 Iowa River at Wapello, IA
+//x: 2734, y: 1069 ; Basin Code 05464500 Cedar River at Cedar Rapids, IA
+//x: 1770, y: 1987 ; Basin Code 05458300 Cedar River at Waverly, IA
 //x: 2676, y: 465 ; Basin Code 05455500 English River at Kalona, IA
 //x: 2900, y: 768 ; Basin Code 05453520 Iowa River below Coralville Dam nr Coralville, IA
-//x: 1765, y: 981 ; Basin Code 05451900 Richland Creek near Haven, IA
 //x: 1245, y: 1181 ; Basin Code 05451500 Iowa River at Marshalltown, IA
 //x: 951, y: 1479 ; Basin Code 05451210 South Fork Iowa River NE of New Providence, IA
 //x: 3113, y: 705 ; Basin Code 05464942 Hoover Cr at Hoover Nat Hist Site, West Branch, IA
@@ -240,7 +236,6 @@ public class HillslopeRainAndNetworkToFile {
             hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
             metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Iowa_Rivers_DB/Rasters/Topography/3_arcSec/AveragedIowaRiverAtColumbusJunctions.dir"));
 
-            String formatoOriginal=metaModif.getFormat();
             metaModif.setFormat("Byte");
             byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
 
@@ -249,34 +244,34 @@ public class HillslopeRainAndNetworkToFile {
             int [][] magnitudes=new hydroScalingAPI.io.DataRaster(metaModif).getInt();
 
             java.io.File stormFile;
-            stormFile=new java.io.File("/hidrosigDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/observed_events/EventIowaJuneMPE/hydroNexrad.metaVHC");
+            //stormFile=new java.io.File("/hidrosigDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/observed_events/EventIowaJuneMPE/hydroNexrad.metaVHC");
+            stormFile=new java.io.File("/hidrosigDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/observed_events/EventIowaJuneHydroNEXRAD/hydroNexrad.metaVHC");
         
-            //new HillslopeRainAndNetworkToFile(2646, 762,matDirs,magnitudes,metaModif,stormFile);
-            //new HillslopeRainAndNetworkToFile(2817, 713,matDirs,magnitudes,metaModif,stormFile);
-            //new HillslopeRainAndNetworkToFile(2949, 741,matDirs,magnitudes,metaModif,stormFile);
-//            new HillslopeRainAndNetworkToFile(2256, 876,matDirs,magnitudes,metaModif,stormFile);
+//            new HillslopeRainAndNetworkToFile(2885, 690,matDirs,magnitudes,metaModif,stormFile);
+//            new HillslopeRainAndNetworkToFile(2817, 713,matDirs,magnitudes,metaModif,stormFile);
+//            new HillslopeRainAndNetworkToFile(2646, 762,matDirs,magnitudes,metaModif,stormFile);
+//            new HillslopeRainAndNetworkToFile(2949, 741,matDirs,magnitudes,metaModif,stormFile);
 //            new HillslopeRainAndNetworkToFile(1312, 1112,matDirs,magnitudes,metaModif,stormFile);
 //            new HillslopeRainAndNetworkToFile(2858, 742,matDirs,magnitudes,metaModif,stormFile);
 //            new HillslopeRainAndNetworkToFile(2115, 801,matDirs,magnitudes,metaModif,stormFile);
 //            new HillslopeRainAndNetworkToFile(1765, 981,matDirs,magnitudes,metaModif,stormFile);
 //            new HillslopeRainAndNetworkToFile(1871, 903,matDirs,magnitudes,metaModif,stormFile);
-//            new HillslopeRainAndNetworkToFile(2885, 690,matDirs,magnitudes,metaModif,stormFile);
 //            new HillslopeRainAndNetworkToFile(2796, 629,matDirs,magnitudes,metaModif,stormFile);
 //            new HillslopeRainAndNetworkToFile(2958, 410,matDirs,magnitudes,metaModif,stormFile);
-//            new HillslopeRainAndNetworkToFile(3186, 392,matDirs,magnitudes,metaModif,stormFile);
-//            new HillslopeRainAndNetworkToFile(3316, 116,matDirs,magnitudes,metaModif,stormFile);
-//            new HillslopeRainAndNetworkToFile(2734, 1069,matDirs,magnitudes,metaModif,stormFile);
-//            new HillslopeRainAndNetworkToFile(1770, 1987,matDirs,magnitudes,metaModif,stormFile);
+            new HillslopeRainAndNetworkToFile(2734, 1069,matDirs,magnitudes,metaModif,stormFile);
+            new HillslopeRainAndNetworkToFile(1770, 1987,matDirs,magnitudes,metaModif,stormFile);
+            new HillslopeRainAndNetworkToFile(2256, 876,matDirs,magnitudes,metaModif,stormFile);
+            new HillslopeRainAndNetworkToFile(3186, 392,matDirs,magnitudes,metaModif,stormFile);
+            new HillslopeRainAndNetworkToFile(3316, 116,matDirs,magnitudes,metaModif,stormFile);
             
             
-//            new HillslopeRainAndNetworkToFile(2676, 465,matDirs,magnitudes,metaModif,stormFile);
-//            new HillslopeRainAndNetworkToFile(2900, 768,matDirs,magnitudes,metaModif,stormFile);
-//            new HillslopeRainAndNetworkToFile(1765, 981,matDirs,magnitudes,metaModif,stormFile);
-//            new HillslopeRainAndNetworkToFile(1245, 1181,matDirs,magnitudes,metaModif,stormFile);
-//            new HillslopeRainAndNetworkToFile(951, 1479,matDirs,magnitudes,metaModif,stormFile);
-//            new HillslopeRainAndNetworkToFile(3113, 705,matDirs,magnitudes,metaModif,stormFile);
-//            new HillslopeRainAndNetworkToFile(1978, 1403,matDirs,magnitudes,metaModif,stormFile);
-//            new HillslopeRainAndNetworkToFile(1779, 1591,matDirs,magnitudes,metaModif,stormFile);
+            new HillslopeRainAndNetworkToFile(2676, 465,matDirs,magnitudes,metaModif,stormFile);
+            new HillslopeRainAndNetworkToFile(2900, 768,matDirs,magnitudes,metaModif,stormFile);
+            new HillslopeRainAndNetworkToFile(1245, 1181,matDirs,magnitudes,metaModif,stormFile);
+            new HillslopeRainAndNetworkToFile(951, 1479,matDirs,magnitudes,metaModif,stormFile);
+            new HillslopeRainAndNetworkToFile(3113, 705,matDirs,magnitudes,metaModif,stormFile);
+            new HillslopeRainAndNetworkToFile(1978, 1403,matDirs,magnitudes,metaModif,stormFile);
+            new HillslopeRainAndNetworkToFile(1779, 1591,matDirs,magnitudes,metaModif,stormFile);
             new HillslopeRainAndNetworkToFile(1932, 1695,matDirs,magnitudes,metaModif,stormFile);
             new HillslopeRainAndNetworkToFile(1590, 1789,matDirs,magnitudes,metaModif,stormFile);
             new HillslopeRainAndNetworkToFile(1682, 1858,matDirs,magnitudes,metaModif,stormFile);

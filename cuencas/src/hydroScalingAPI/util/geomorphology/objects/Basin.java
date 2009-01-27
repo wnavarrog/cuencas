@@ -134,10 +134,15 @@ public class Basin extends Object{
     public float[][] getLonLatBasin(){
         
         float[][] LonLatBasin=new float[2][xyBasin[0].length];
+        
+        double resLon=localMetaRaster.getResLon();
+        double resLat=localMetaRaster.getResLat();
+        double minLon=localMetaRaster.getMinLon();
+        double minLat=localMetaRaster.getMinLat();
     
         for (int k=0; k < xyBasin[0].length; k++){
-            LonLatBasin[0][k]=(float) (xyBasin[0][k]*localMetaRaster.getResLon()/3600.0f+localMetaRaster.getMinLon());
-            LonLatBasin[1][k]=(float) (xyBasin[1][k]*localMetaRaster.getResLat()/3600.0f+localMetaRaster.getMinLat());
+            LonLatBasin[0][k]=(float) (xyBasin[0][k]*resLon/3600.0f+minLon);
+            LonLatBasin[1][k]=(float) (xyBasin[1][k]*resLat/3600.0f+minLat);
         }
         return LonLatBasin;
     }
@@ -149,6 +154,28 @@ public class Basin extends Object{
      */
     public int[][] getXYBasin(){
         return xyBasin;
+    }
+    
+    /**
+     * Returns an array of integers int[2][numPointsInBasin] with the column number (int[0])
+     * and the row number (int[1]) for the points that belong to the basin
+     * @return An array of i,j position of points that belong to the basin
+     */
+    public void setXYBasin(int[][] newXY){
+        
+        xyBasin=newXY;
+        
+        minX=localMetaRaster.getNumCols()-1;
+        maxX=0;
+        minY=localMetaRaster.getNumRows()-1;
+        maxY=0;
+        
+        for (int k=0; k < xyBasin[0].length; k++){
+            minX=Math.min(minX,xyBasin[0][k]); maxX=Math.max(maxX,xyBasin[0][k]); 
+            minY=Math.min(minY,xyBasin[1][k]); maxY=Math.max(maxY,xyBasin[1][k]); 
+        }
+        
+        findBasinDivide();
     }
     
     /**
@@ -326,12 +353,19 @@ public class Basin extends Object{
         
         lonLatCountour=new float[2][idsContorno.size()];
         xyContour=new int[2][idsContorno.size()];
+        
+        
+        double resLon=localMetaRaster.getResLon();
+        double resLat=localMetaRaster.getResLat();
+        double minLon=localMetaRaster.getMinLon();
+        double minLat=localMetaRaster.getMinLat();
+    
         for (int k=0; k <idsContorno.size(); k++){
             int[] xys=(int[]) idsContorno.elementAt(k);
             xyContour[0][k]=xys[0]+minX-2;
             xyContour[1][k]=xys[1]+minY-2;
-            lonLatCountour[0][k]=(float) ((xys[0]+minX-2)*localMetaRaster.getResLon()/3600.0f+localMetaRaster.getMinLon());
-            lonLatCountour[1][k]=(float) ((xys[1]+minY-2)*localMetaRaster.getResLat()/3600.0f+localMetaRaster.getMinLat());
+            lonLatCountour[0][k]=(float) ((xys[0]+minX-2)*resLon/3600.0f+minLon);
+            lonLatCountour[1][k]=(float) ((xys[1]+minY-2)*resLat/3600.0f+minLat);
         }
     }
     

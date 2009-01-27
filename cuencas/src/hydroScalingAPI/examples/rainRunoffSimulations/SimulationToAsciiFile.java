@@ -338,10 +338,10 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
             
             //subMain0(args);   //To Run as a external program from shell
             //subMain1(args);   //The test case for TestDem
-            //subMain2(args);   //Case for Walnut Gulch
+            subMain2(args);   //Case for Walnut Gulch
             //subMain3(args);   //Case Upper Rio Puerco
             //subMain4(args);   //Case Whitewater
-            subMain5(args);   //Case Clear Creek June 3 to 7
+            //subMain5(args);   //Case Clear Creek June 3 to 7
             
         } catch (java.io.IOException IOE){
             System.out.print(IOE);
@@ -467,6 +467,8 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
         routingParams.put("lambda1",0.3f);
         routingParams.put("lambda2",-0.1f);
         
+        routingParams.put("v_o",0.5f);
+        
         
         java.io.File theFile=new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Topography/1_ArcSec_USGS/walnutGulchUpdated.metaDEM");
         hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
@@ -484,7 +486,7 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
         //new SimulationToAsciiFile(194,281,matDirs,magnitudes,metaModif, 10,30,3.0f,2,new java.io.File("/home/ricardo/simulationResults/walnutGulch/")).executeSimulation();
         //new SimulationToAsciiFile(194,281,matDirs,magnitudes,metaModif,  5,60,3.0f,2,new java.io.File("/home/ricardo/simulationResults/walnutGulch/")).executeSimulation();
 
-        new SimulationToAsciiFile(88,245,matDirs,magnitudes,metaModif,  50,5,0.0f,2,new java.io.File("/home/ricardo/simulationResults/walnutGulch/"),routingParams).executeSimulation();
+        new SimulationToAsciiFile(194,281,matDirs,magnitudes,metaModif,  20,5,0.0f,2,new java.io.File("/home/ricardo/simulationResults/walnutGulch/"),routingParams).executeSimulation();
     }
     
     public static void subMain3(String args[]) throws java.io.IOException, VisADException {
@@ -579,23 +581,26 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
         routingParams.put("v_o", 0.4f);
         
         java.io.File stormFile;
-        stormFile=new java.io.File("/hidrosigDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/observed_events/EventIowaJuneMPE/June3toJune5/hydroNexrad.metaVHC");
+        stormFile=new java.io.File("/hidrosigDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/observed_events/EventIowaJuneMPE/May29toJune26/hydroNexrad.metaVHC");
+        //stormFile=new java.io.File("/hidrosigDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/observed_events/EventIowaJuneMPE/June3toJune5/hydroNexrad.metaVHC");
+        //stormFile=new java.io.File("/hidrosigDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/observed_events/EventIowaJuneHydroNEXRAD/June3toJune5/hydroNexrad.metaVHC");
         
         float infil=0.0f;
 
-        //new SimulationToAsciiFile(1570, 127, matDirs, magnitudes, metaModif, stormFile, infil, 2, new java.io.File("/home/ricardo/simulationResults/ClearCreek/"), routingParams).executeSimulation();
+        new SimulationToAsciiFile(1570, 127, matDirs, magnitudes, metaModif, stormFile, infil, 2, new java.io.File("/home/ricardo/simulationResults/ClearCreek/"), routingParams).executeSimulation();
         
-        for (double lam1 = 1; lam1 <= 4; lam1 += 1) {
+        System.exit(0);
+        
+        for (double lam1 = 3; lam1 <= 3; lam1 += 1) {
             routingParams.put("lambda1", (float)(lam1/10.0));
-            for (double lam2 = -3; lam2 <= -1; lam2 += 1.0) {
+            for (double lam2 = -1; lam2 <= -1; lam2 += 1.0) {
 
                 routingParams.put("lambda2", (float)(lam2/10.0));
                 
-                for (float intV = 2; intV <= 4; intV += 0.5) {
+                for (float intV = 3.5f; intV <= 3.5f; intV += 1.0) {
                     float v_o=(float)(intV/10.0f/Math.pow(10,lam1/10.0)/Math.pow(254,lam2/10.0));
                     routingParams.put("v_o", v_o);
-                    System.out.println(lam1/10.0+" "+lam2/10.0+" "+v_o);
-                    //new SimulationToAsciiFile(1570, 127, matDirs, magnitudes, metaModif, stormFile, infil, 5, new java.io.File("/home/ricardo/simulationResults/ClearCreek/"), routingParams).executeSimulation();
+                    new SimulationToAsciiFile(1570, 127, matDirs, magnitudes, metaModif, stormFile, infil, 5, new java.io.File("/home/ricardo/simulationResults/ClearCreek/"), routingParams).executeSimulation();
                 }
             }
         }

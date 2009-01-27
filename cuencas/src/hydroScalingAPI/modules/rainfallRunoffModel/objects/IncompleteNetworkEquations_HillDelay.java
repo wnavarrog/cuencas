@@ -26,6 +26,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 package hydroScalingAPI.modules.rainfallRunoffModel.objects;
 
+import java.io.File;
+
 /**
  * This calss implements the set of non-linear ordinary differential equations used
  * to simulate flows along the river network.  The function is writen as a 
@@ -34,7 +36,7 @@ package hydroScalingAPI.modules.rainfallRunoffModel.objects;
  * {@link hydroScalingAPI.util.ordDiffEqSolver.RKF}
  * @author Ricardo Mantilla 
  */
-public class NetworkEquations_HillDelay implements hydroScalingAPI.util.ordDiffEqSolver.BasicFunction {
+public class IncompleteNetworkEquations_HillDelay implements hydroScalingAPI.util.ordDiffEqSolver.BasicFunction {
     private hydroScalingAPI.util.geomorphology.objects.LinksAnalysis linksConectionStruct;
     private hydroScalingAPI.modules.rainfallRunoffModel.objects.HillSlopesInfo basinHillSlopesInfo;
     private hydroScalingAPI.modules.rainfallRunoffModel.objects.LinksInfo linksHydraulicInfo;
@@ -49,6 +51,9 @@ public class NetworkEquations_HillDelay implements hydroScalingAPI.util.ordDiffE
     
     private double lamda1,lamda2;
     
+    private int connectingLink;
+    private hydroScalingAPI.modules.rainfallRunoffModel.objects.StreamFlowTimeSeries[] upFlows;
+    
     /**
      * Creates new NetworkEquations_Simple
      * @param links The topologic structure of the river network
@@ -62,7 +67,7 @@ public class NetworkEquations_HillDelay implements hydroScalingAPI.util.ordDiffE
      * <p>4: Spatially variable Manning coefficient</p>
      * <p>5: Velocity based on parametrization v=Ck*q^lambda1*A^lambda2</p>
      */
-    public NetworkEquations_HillDelay(hydroScalingAPI.util.geomorphology.objects.LinksAnalysis links, hydroScalingAPI.modules.rainfallRunoffModel.objects.HillSlopesInfo hillinf, hydroScalingAPI.modules.rainfallRunoffModel.objects.LinksInfo linkIn, int rt){
+    public IncompleteNetworkEquations_HillDelay(hydroScalingAPI.util.geomorphology.objects.LinksAnalysis links, hydroScalingAPI.modules.rainfallRunoffModel.objects.HillSlopesInfo hillinf, hydroScalingAPI.modules.rainfallRunoffModel.objects.LinksInfo linkIn, int rt, int connLink, java.io.File[] inputFiles){
         linksConectionStruct=links;
         basinHillSlopesInfo=hillinf;
         linksHydraulicInfo=linkIn;
@@ -86,6 +91,13 @@ public class NetworkEquations_HillDelay implements hydroScalingAPI.util.ordDiffE
         CkArray=linksHydraulicInfo.getCkArray();
         
         vh=0.1;
+        
+        connectingLink=connLink;
+        
+        upFlows = new hydroScalingAPI.modules.rainfallRunoffModel.objects.StreamFlowTimeSeries[inputFiles.length];
+        for (int i = 0; i < inputFiles.length; i++) {
+            upFlows[i]=new hydroScalingAPI.modules.rainfallRunoffModel.objects.StreamFlowTimeSeries(inputFiles[i]);
+        }
         
     }
     
@@ -220,6 +232,49 @@ public class NetworkEquations_HillDelay implements hydroScalingAPI.util.ordDiffE
             //the hillslopes
             output[i+linksConectionStruct.connectionsArray.length]=1/60.*(effPrecip-qs);
             
+        }
+        
+        for(int k=0;k<upFlows.length;k++){
+            int i=connectingLink;
+            
+            switch (routingType) {
+                
+                case 0:     K_Q=3/2.*Math.pow(input[i],1/3.)
+                                *Math.pow(cheziArray[0][i],2/3.)
+                                *Math.pow(widthArray[0][i],-1/3.)
+                                *Math.pow(lengthArray[0][i],-1)
+                                *Math.pow(slopeArray[0][i],1/3.);
+
+                            break;    
+
+                case 1:     K_Q=3/2.*Math.pow(input[i],1/3.)
+                                *Math.pow(200.0,2/3.)
+                                *Math.pow(widthArray[0][i],-1/3.)
+                                *Math.pow(lengthArray[0][i],-1)
+                                *Math.pow(slopeArray[0][i],1/3.);
+
+                            break;    
+
+                case 2:     K_Q=CkArray[0][i]/lengthArray[0][i];
+                            break;
+                
+                case 3:     K_Q=5/3.*Math.pow(input[i],2/5.)
+                                *Math.pow(0.03,-3/5.)
+                                *Math.pow(widthArray[0][i],-2/5.)
+                                *Math.pow(lengthArray[0][i],-1)
+                                *Math.pow(slopeArray[0][i],3/10.);
+                            break;
+                
+                case 4:     K_Q=5/3.*Math.pow(input[i],2/5.)
+                                *Math.pow(manningArray[0][i],-3/5.)
+                                *Math.pow(widthArray[0][i],-2/5.)
+                                *Math.pow(lengthArray[0][i],-1)
+                                *Math.pow(slopeArray[0][i],3/10.);
+                            break;
+                case 5:     K_Q=CkArray[0][i]*Math.pow(input[i],lamda1)*Math.pow(upAreasArray[0][i],lamda2)*Math.pow(lengthArray[0][i],-1);
+            }
+            
+            output[i]+=60*K_Q*(upFlows[k].evaluate(time));
         }
         
         //if (Math.random() > 0.99) if (maxInt>0) System.out.println("      --> The Max precipitation intensity is: "+maxInt);
