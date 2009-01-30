@@ -52,7 +52,8 @@ public class TileSimulationToAsciiFile extends java.lang.Object implements Runna
     int[] usConnections;
     int basinOrder;
     float[] corrections;
-    
+
+    public boolean executing=false;
     public boolean completed=false;
     
     hydroScalingAPI.examples.rainRunoffSimulations.ParallelSimulationToFile coordinatorProc;
@@ -139,7 +140,7 @@ public class TileSimulationToAsciiFile extends java.lang.Object implements Runna
         
         hydroScalingAPI.modules.rainfallRunoffModel.objects.HillSlopesInfo thisHillsInfo=new hydroScalingAPI.modules.rainfallRunoffModel.objects.HillSlopesInfo(linksStructure);
         
-        System.out.println("Loading Storm ...");
+        //System.out.println("Loading Storm ...");
         
         hydroScalingAPI.modules.rainfallRunoffModel.objects.StormManager storm;
         
@@ -203,7 +204,7 @@ public class TileSimulationToAsciiFile extends java.lang.Object implements Runna
         else
             theFile=new java.io.File(outputDirectory.getAbsolutePath()+"/"+demName+"_"+x+"_"+y+"-"+storm.stormName()+"-IR_"+infiltMetaRaster.getLocationMeta().getName().substring(0,infiltMetaRaster.getLocationMeta().getName().lastIndexOf(".metaVHC"))+"-Routing_"+routingString+"_params_"+lam1+"_"+lam2+".csv");
         
-        System.out.println(theFile);
+        //System.out.println(theFile);
         
         java.io.FileOutputStream salida = new java.io.FileOutputStream(theFile);
         java.io.BufferedOutputStream bufferout = new java.io.BufferedOutputStream(salida);
@@ -258,7 +259,7 @@ public class TileSimulationToAsciiFile extends java.lang.Object implements Runna
         
         java.io.File[] filesToAdd=new java.io.File[usConnections.length];
         for (int i = 0; i < filesToAdd.length; i++) {
-            String[] file1=theFile.getAbsolutePath().split(outputDirectory.getAbsolutePath()+"/"+demName+"_"+x+"_"+y+"-");
+            String[] file1=theFile.getAbsolutePath().split(demName+"_"+x+"_"+y+"-");
             int xCon=usConnections[i]%metaDatos.getNumCols();
             int yCon=usConnections[i]/metaDatos.getNumCols();
             filesToAdd[i]=new java.io.File(outputDirectory.getAbsolutePath()+"/"+demName+"_"+xCon+"_"+yCon+"-"+file1[1]+".Outlet");
@@ -273,9 +274,9 @@ public class TileSimulationToAsciiFile extends java.lang.Object implements Runna
         }
         
         java.util.Date startTime=new java.util.Date();
-        System.out.println("Start Time:"+startTime.toString());
-        System.out.println("Number of Links on this simulation: "+(initialCondition.length/2.0));
-        System.out.println("Inicia simulacion RKF");
+        //System.out.println("Start Time:"+startTime.toString());
+        //System.out.println("Number of Links on this simulation: "+(initialCondition.length/2.0));
+        //System.out.println("Inicia simulacion RKF");
         
         hydroScalingAPI.util.ordDiffEqSolver.RKF rainRunoffRaining=new hydroScalingAPI.util.ordDiffEqSolver.RKF(thisBasinEqSys,1e-3,10/60.);
         
@@ -283,7 +284,7 @@ public class TileSimulationToAsciiFile extends java.lang.Object implements Runna
         
         java.util.Calendar thisDate=java.util.Calendar.getInstance();
         thisDate.setTimeInMillis((long)(storm.stormInitialTimeInMinutes()*60.*1000.0));
-        System.out.println(thisDate.getTime());
+        //System.out.println(thisDate.getTime());
         
         double outputTimeStep=Math.min(Math.pow(2.0D,(basinOrder-1)),storm.stormRecordResolutionInMinutes());
         double extraSimTime=120D*Math.pow(2.0D,(basinOrder-1));
@@ -293,22 +294,25 @@ public class TileSimulationToAsciiFile extends java.lang.Object implements Runna
         
         
         for (int k=0;k<numPeriods;k++) {
-            System.out.println("Period "+(k+1)+" of "+numPeriods);
+            //System.out.println("Period "+(k+1)+" of "+numPeriods);
             rainRunoffRaining.jumpsRunCompleteToAsciiFile(storm.stormInitialTimeInMinutes()+k*storm.stormRecordResolutionInMinutes(),storm.stormInitialTimeInMinutes()+(k+1)*storm.stormRecordResolutionInMinutes(),outputTimeStep,initialCondition,newfile,linksStructure,thisNetworkGeom,newfile1);
             initialCondition=rainRunoffRaining.finalCond;
             rainRunoffRaining.setBasicTimeStep(10/60.);
         }
 
         java.util.Date interTime=new java.util.Date();
-        System.out.println("Intermedia Time:"+interTime.toString());
-        System.out.println("Running Time:"+(.001*(interTime.getTime()-startTime.getTime()))+" seconds");
+        //System.out.println("Intermedia Time:"+interTime.toString());
+        //System.out.println("Running Time:"+(.001*(interTime.getTime()-startTime.getTime()))+" seconds");
 
         rainRunoffRaining.jumpsRunCompleteToAsciiFile(storm.stormInitialTimeInMinutes()+numPeriods*storm.stormRecordResolutionInMinutes(),(storm.stormInitialTimeInMinutes()+(numPeriods+1)*storm.stormRecordResolutionInMinutes())+extraSimTime,outputTimeStep,initialCondition,newfile,linksStructure,thisNetworkGeom,newfile1);
         
-        System.out.println("Termina simulacion RKF");
+        newfile1.close();
+        bufferout1.close();
+
+        //System.out.println("Termina simulacion RKF");
         java.util.Date endTime=new java.util.Date();
-        System.out.println("End Time:"+endTime.toString());
-        System.out.println("Running Time:"+(.001*(endTime.getTime()-startTime.getTime()))+" seconds");
+        //System.out.println("End Time:"+endTime.toString());
+        //System.out.println("Running Time:"+(.001*(endTime.getTime()-startTime.getTime()))+" seconds");
         
         
         double[] maximumsAchieved=rainRunoffRaining.getMaximumAchieved();
@@ -320,22 +324,18 @@ public class TileSimulationToAsciiFile extends java.lang.Object implements Runna
                 newfile.write(maximumsAchieved[i]+",");
         }
         
-        System.out.println("Inicia escritura de Resultados");
+        //System.out.println("Inicia escritura de Resultados");
         newfile.write("\n");
-        
-        newfile1.close();
-        bufferout1.close();
         
         newfile.close();
         bufferout.close();
         
-        System.out.println("Termina escritura de Resultados");
-        
-        new visad.util.Delay(1000);
+        //System.out.println("Termina escritura de Resultados");
         
         completed=true;
+        executing=false;
         coordinatorProc.threadsRunning--;
-        
+
     }
     
     public void run(){

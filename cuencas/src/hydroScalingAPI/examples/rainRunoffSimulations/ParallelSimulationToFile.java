@@ -38,7 +38,7 @@ public class ParallelSimulationToFile extends java.lang.Object {
     private hydroScalingAPI.io.MetaRaster metaDatos;
     private byte[][] matDir;
     
-    final int simulProcess=8;
+    final int simulProcess=4;
     public int threadsRunning=0;
     
     /** Creates new ParallelSimulationToFile */
@@ -96,7 +96,8 @@ public class ParallelSimulationToFile extends java.lang.Object {
             Integer val = (Integer)processList.get(key);
             System.out.println("Key: " + key + "     Val: " + val);
         }
-        
+
+        Thread[] activeThreads=new Thread[connectionTopology.length];
         hydroScalingAPI.examples.rainRunoffSimulations.TileSimulationToAsciiFile[] simThreads=new hydroScalingAPI.examples.rainRunoffSimulations.TileSimulationToAsciiFile[connectionTopology.length];
         
         for(int i=0;i<headsTails[0].length;i++){
@@ -147,7 +148,7 @@ public class ParallelSimulationToFile extends java.lang.Object {
             for (int i = 0; i < simThreads.length; i++) {
                 int indexProc=processList.get((String)v.get(i));
                 
-                if(simThreads[indexProc].completed == false){
+                if(simThreads[indexProc].completed == false && simThreads[indexProc].executing == false){
                     System.out.println(">> Checking Process "+indexProc+" depends on");
                     for (int j = 0; j < connectionTopology[indexProc].length; j++) {
                         System.out.println(">> Process "+((Integer)topoMapping.get(connectionTopology[indexProc][j])).intValue());
@@ -158,14 +159,15 @@ public class ParallelSimulationToFile extends java.lang.Object {
                     }
                     if (required) {
                         System.out.println(">> Process "+indexProc+" is being launched");
-                        Thread t = new Thread(simThreads[indexProc]);
-                        t.start();
+                        activeThreads[indexProc] = new Thread(simThreads[indexProc]);
+                        simThreads[indexProc].executing=true;
+                        activeThreads[indexProc].start();
                         threadsRunning++;
                         if(threadsRunning == simulProcess) break;
                     } else {
                         System.out.println(">> Process "+indexProc+" is on hold");
                     }
-                }
+                } else activeThreads[indexProc]=null;
             }
             
             while(threadsRunning == simulProcess){
@@ -212,9 +214,9 @@ public class ParallelSimulationToFile extends java.lang.Object {
     
     public static void subMain0(String args[]) throws java.io.IOException, VisADException {
         
-        java.io.File theFile=new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Topography/1_ArcSec_USGS/walnutGulchUpdated.metaDEM");
+        java.io.File theFile=new java.io.File("C:/Documents and Settings/gciach/Desktop/Test_DB/Rasters/Topography/1_ArcSec_USGS/Whitewaters.metaDEM");
         hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
-        metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Topography/1_ArcSec_USGS/walnutGulchUpdated.dir"));
+        metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".dir"));
         metaModif.setFormat("Byte");
         byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
         
@@ -242,9 +244,9 @@ public class ParallelSimulationToFile extends java.lang.Object {
         
         stormFile=new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Hydrology/storms/simulated_events/uniform_020_01.metaVHC");
         
-        java.io.File outputDirectory=new java.io.File("/Users/ricardo/simulationResults/Parallel/Walnut_Gulch/");
+        java.io.File outputDirectory=new java.io.File("C:/TEMP/Parallel/Whitewaters/");
         
-        new ParallelSimulationToFile(194,281,matDirs,magnitudes,horOrders,metaModif,20.0f,5.0f,0.0f,2,routingParams,outputDirectory);
+        new ParallelSimulationToFile(1064, 496,matDirs,magnitudes,horOrders,metaModif,20.0f,5.0f,0.0f,2,routingParams,outputDirectory);
             
     }
     
