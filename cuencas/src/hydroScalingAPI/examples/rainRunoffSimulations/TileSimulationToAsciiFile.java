@@ -234,7 +234,7 @@ public class TileSimulationToAsciiFile extends java.lang.Object implements Runna
         newfile.write("Upstream Area [km^2],");
         
         for (int i=0;i<linksStructure.contactsArray.length;i++){
-                newfile.write(thisNetworkGeom.Length(i)+",");
+                newfile.write(thisNetworkGeom.upStreamArea(i)+",");
         }
         
         newfile.write("\n");
