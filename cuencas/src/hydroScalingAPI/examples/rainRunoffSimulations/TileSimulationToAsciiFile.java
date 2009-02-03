@@ -404,15 +404,15 @@ public class TileSimulationToAsciiFile extends java.lang.Object implements Runna
         int[] connO=new int[0];
         float[] corrO=new float[0];
         
-        if(!args[11].equalsIgnoreCase("\"[]\"")){
+        if(!args[11].equalsIgnoreCase("[]")){
             
             System.out.println(args[11]);
             System.out.println(args[12]);
 
-            args[11]= args[11].substring(2);
+            args[11]= args[11].substring(1);
             args[11]= args[11].split("]")[0];
             
-            args[12]= args[12].substring(2);
+            args[12]= args[12].substring(1);
             args[12]= args[12].split("]")[0];
             
             String[] conn=args[11].split(",");

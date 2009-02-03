@@ -61,7 +61,7 @@ public class ExternalTileToFile extends Thread{
                                         
         procName=pn;
         
-        command=new String[] {  System.getProperty("java.home")+"/bin/java",
+        command=new String[] {  System.getProperty("java.home")+System.getProperty("file.separator")+"bin"+System.getProperty("file.separator")+"java",
                                 "-Xmx1500m",
                                 "-Xrs",
                                 "-cp",
@@ -78,8 +78,8 @@ public class ExternalTileToFile extends Thread{
                                 ""+v_o,
                                 stormFile,
                                 outputDirectory,
-                                "\""+connectionsO+"\"",
-                                "\""+correctionsO+"\""};
+                                connectionsO,
+                                correctionsO};
         coordinatorProc=coordinator;
         
     }
@@ -87,7 +87,8 @@ public class ExternalTileToFile extends Thread{
     public void run(){
         
         try{
-            localProcess=java.lang.Runtime.getRuntime().exec(command);            
+            System.out.println(java.util.Arrays.toString(command));
+            localProcess=java.lang.Runtime.getRuntime().exec(command);
             localProcess.getOutputStream().flush();
             localProcess.waitFor();
             localProcess.destroy();

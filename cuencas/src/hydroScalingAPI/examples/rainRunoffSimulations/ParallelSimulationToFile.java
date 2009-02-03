@@ -38,7 +38,7 @@ public class ParallelSimulationToFile extends java.lang.Object {
     private hydroScalingAPI.io.MetaRaster metaDatos;
     private byte[][] matDir;
     
-    final int simulProcess=2;
+    final int simulProcess=8;
     public int threadsRunning=0;
     
     /** Creates new ParallelSimulationToFile */
@@ -71,7 +71,7 @@ public class ParallelSimulationToFile extends java.lang.Object {
         float[][] linkAreas=mylinksAnalysis.getVarValues(0);
         float[][] linkLenghts=mylinksAnalysis.getVarValues(1);
         
-        int decompScale=4;
+        int decompScale=7;
         
         int[][] headsTails=myRsnGen.getHeadsAndTails(decompScale);
         int[][] connectionTopology=myRsnGen.getPrunedConnectionStructure(decompScale);
@@ -143,7 +143,7 @@ public class ParallelSimulationToFile extends java.lang.Object {
             //This line if for native threads
             //simThreads[i]=new hydroScalingAPI.examples.rainRunoffSimulations.TileSimulationToAsciiFile(xOutlet, yOutlet,xSource, ySource,decompScale, direcc, magnitudes, horOrders, md, rainIntensity, rainDuration, stormFile, infiltMetaRaster, infiltRate, routingType, routingParams, outputDirectory,connectionIDs,this,corrections);
             //This line if for external threads
-            externalExecutors[i]=new hydroScalingAPI.examples.rainRunoffSimulations.ExternalTileToFile("Element "+i,md.getLocationMeta().getAbsolutePath(),xOutlet, yOutlet,xSource, ySource,decompScale,0.3f,-0.1f,0.5f,stormFile.getAbsolutePath(),outputDirectory.getAbsolutePath(),java.util.Arrays.toString(connectionIDs),java.util.Arrays.toString(corrections),this);
+            externalExecutors[i]=new hydroScalingAPI.examples.rainRunoffSimulations.ExternalTileToFile("Element "+i,md.getLocationMeta().getAbsolutePath(),xOutlet, yOutlet,xSource, ySource,decompScale,0.3f,-0.1f,0.5f,stormFile.getAbsolutePath(),outputDirectory.getAbsolutePath(),java.util.Arrays.toString(connectionIDs).trim(),java.util.Arrays.toString(corrections).trim(),this);
         }
         
         boolean allNodesDone=true;
@@ -254,45 +254,41 @@ public class ParallelSimulationToFile extends java.lang.Object {
     }
     
     public static void subMain0(String args[]) throws java.io.IOException, VisADException {
-        
-        java.io.File theFile=new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Topography/1_ArcSec_USGS/walnutGulchUpdated.metaDEM");
+
+        java.io.File theFile=new java.io.File("C:/Documents and Settings/gciach/Desktop/Test_DB/Rasters/Topography/1_ArcSec_USGS/Whitewaters.metaDEM");
         hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
         metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".dir"));
         metaModif.setFormat("Byte");
         byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
-        
+
         metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".magn"));
         metaModif.setFormat("Integer");
         int [][] magnitudes=new hydroScalingAPI.io.DataRaster(metaModif).getInt();
-        
+
         metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".horton"));
         metaModif.setFormat("Byte");
         byte [][] horOrders=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
-        
+
         java.io.File stormFile;
         java.util.Hashtable routingParams=new java.util.Hashtable();
         routingParams.put("widthCoeff",1.0f);
         routingParams.put("widthExponent",0.4f);
         routingParams.put("widthStdDev",0.0f);
-        
+
         routingParams.put("chezyCoeff",14.2f);
         routingParams.put("chezyExponent",-1/3.0f);
-        
+
         routingParams.put("lambda1",0.3f);
         routingParams.put("lambda2",-0.1f);
-        
-        routingParams.put("v_o",0.5f);
-        
-        stormFile=new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Hydrology/storms/precipitation_events/event_02/precipitation_interpolated_ev02.metaVHC");
-        
-        java.io.File outputDirectory=new java.io.File("/Users/ricardo/simulationResults/Parallel/Walnut_Gulch/");
-        
-        //new ParallelSimulationToFile(194,281,matDirs,magnitudes,horOrders,metaModif,20.0f,5.0f,0.0f,2,routingParams,outputDirectory);
-        //new ParallelSimulationToFile(194,281,matDirs,magnitudes,horOrders,metaModif,20.0f,5.0f,0.0f,2,routingParams,outputDirectory);
-        new ParallelSimulationToFile(194,281,matDirs,magnitudes,horOrders,metaModif,stormFile,0.0f,2,routingParams,outputDirectory);
-            
-    }
-    
 
-    
+        routingParams.put("v_o",0.5f);
+
+        stormFile=new java.io.File("C:/Documents and Settings/gciach/Desktop/Test_DB/Rasters/Hydrology/storm/simulated/random_100_10.metaVHC");
+
+        java.io.File outputDirectory=new java.io.File("C:/TEMP/Parallel/Whitewaters/");
+
+        new ParallelSimulationToFile(1064, 496,matDirs,magnitudes,horOrders,metaModif,stormFile,0.0f,2,routingParams,outputDirectory);
+
+    }
+        
 }
