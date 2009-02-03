@@ -17,7 +17,10 @@ public class StreamFlowTimeSeries {
     private float regInterval;
     private java.util.Hashtable recordTimeValue;
     
+    private double firstTime;
     private double lastTime;
+    
+    private double[] timesRecorded;
     
     public StreamFlowTimeSeries(java.io.File theFile) {
         
@@ -34,6 +37,11 @@ public class StreamFlowTimeSeries {
             
             String[] data={"",""};
             
+            if(fullLine != null) {
+                data=fullLine.split(",");
+                firstTime=Double.parseDouble(data[0]);
+            }
+            
             while (fullLine != null) {
                 data=fullLine.split(",");
                 recordTimeValue.put(data[0],new Double(data[1]));
@@ -45,6 +53,13 @@ public class StreamFlowTimeSeries {
 
             fileMeta.close();
             
+            Object[] timesSet=recordTimeValue.keySet().toArray();
+            timesRecorded=new double[timesSet.length];
+            for (int i = 0; i < timesSet.length; i++) {
+                timesRecorded[i]=Double.parseDouble(timesSet[i].toString());
+            }
+            java.util.Arrays.sort(timesRecorded);
+            
         } catch (java.io.IOException ex) {
             System.out.println("<<<<<<<>>>>>>> !!!!!!! Failed While Reading "+theFile);
             Logger.getLogger(StreamFlowTimeSeries.class.getName()).log(Level.SEVERE, null, ex);
@@ -54,12 +69,24 @@ public class StreamFlowTimeSeries {
     
     public double evaluate(double time){
         
-        if(time > lastTime) return 0.0;
+//        System.out.println("Evaluating, Limits: "+firstTime+" "+lastTime);
+//        System.out.println("Desired Time: "+time+" Test "+(time <= timesRecorded[0]));
+
+        int k=0;
+        while(time > timesRecorded[k] && k < timesRecorded.length-1){
+            k++;
+        }
         
-        double leftT=Math.floor(time/regInterval)*regInterval;
-        double rightT=Math.ceil(time/regInterval)*regInterval;
+        if(time < firstTime) return 0.0;
+        if(time >= lastTime) return 0.0;
+        if(k == timesRecorded.length-1) return 0.0;
+        
+        double leftT=timesRecorded[k];
+        double rightT=timesRecorded[k+1];
         
         Double leftF=(Double)recordTimeValue.get(""+leftT);
+        
+        //System.out.println("Indexes "+time+" "+leftT+" "+rightT);
         
         while(leftF == null){
             leftT-=1; rightT-=1;
@@ -67,6 +94,8 @@ public class StreamFlowTimeSeries {
         }
 
         Double rightF=(Double)recordTimeValue.get(""+rightT);
+        
+        //System.out.println("Ready "+leftT+" "+rightT);
         
         if(leftT == rightT) return leftF; 
 

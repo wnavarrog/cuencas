@@ -77,9 +77,6 @@ public class NetworkExtractionOptimizer implements Runnable {
             localExtractors=new ExternalNetworkExtraction[numProcessors];
             for(int i=0;i<numProcessors;i++) localExtractors[i]=new ExternalNetworkExtraction("null");
 
-            //ExtractorNo1=new ExternalNetworkExtraction("null");
-            //ExtractorNo2=new ExternalNetworkExtraction("null");
-
             String metaName=Proc.metaDEM.getLocationMeta().getName();
             java.io.File tempDirectory=new java.io.File(System.getProperty("java.io.tmpdir")+System.getProperty("file.separator")+"pandoraOptimizer"+System.getProperty("file.separator")+metaName.substring(0,metaName.lastIndexOf("."))+System.getProperty("file.separator"));
             tempDirectory.mkdirs();

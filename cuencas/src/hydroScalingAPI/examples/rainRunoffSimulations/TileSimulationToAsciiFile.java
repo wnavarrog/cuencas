@@ -26,7 +26,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 package hydroScalingAPI.examples.rainRunoffSimulations;
 
-import java.io.File;
 import visad.*;
 
 /**
@@ -204,7 +203,7 @@ public class TileSimulationToAsciiFile extends java.lang.Object implements Runna
         else
             theFile=new java.io.File(outputDirectory.getAbsolutePath()+"/"+demName+"_"+x+"_"+y+"-"+storm.stormName()+"-IR_"+infiltMetaRaster.getLocationMeta().getName().substring(0,infiltMetaRaster.getLocationMeta().getName().lastIndexOf(".metaVHC"))+"-Routing_"+routingString+"_params_"+lam1+"_"+lam2+".csv");
         
-        //System.out.println(theFile);
+        System.out.println(theFile);
         
         java.io.FileOutputStream salida = new java.io.FileOutputStream(theFile);
         java.io.BufferedOutputStream bufferout = new java.io.BufferedOutputStream(salida);
@@ -349,5 +348,126 @@ public class TileSimulationToAsciiFile extends java.lang.Object implements Runna
         }
     }
     
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        
+        try{
+            
+            subMain0(args);
+            //subMain1(args);  //The test case for Walnut Gulch 30m
+        } catch (java.io.IOException IOE){
+            System.out.print(IOE);
+            System.exit(0);
+        } catch (VisADException v){
+            System.out.print(v);
+            System.exit(0);
+        }
+        
+    }
+    
+    public static void subMain0(String args[]) throws java.io.IOException, VisADException {
+        
+        java.io.File theFile=new java.io.File(args[0]);
+        hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
+        metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".dir"));
+        metaModif.setFormat("Byte");
+        byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
+        
+        metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".magn"));
+        metaModif.setFormat("Integer");
+        int [][] magnitudes=new hydroScalingAPI.io.DataRaster(metaModif).getInt();
+        
+        metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".horton"));
+        metaModif.setFormat("Byte");
+        byte [][] horOrders=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
+        
+        java.io.File stormFile;
+        java.util.Hashtable routingParams=new java.util.Hashtable();
+        routingParams.put("widthCoeff",1.0f);
+        routingParams.put("widthExponent",0.4f);
+        routingParams.put("widthStdDev",0.0f);
+        
+        routingParams.put("chezyCoeff",14.2f);
+        routingParams.put("chezyExponent",-1/3.0f);
+        
+        routingParams.put("lambda1",Float.parseFloat(args[6]));
+        routingParams.put("lambda2",Float.parseFloat(args[7]));
+        
+        routingParams.put("v_o",Float.parseFloat(args[8]));
+        
+        stormFile=new java.io.File(args[9]);
+        
+        java.io.File outputDirectory=new java.io.File(args[10]);
+        
+        int[] connO=new int[0];
+        float[] corrO=new float[0];
+        
+        if(!args[11].equalsIgnoreCase("\"[]\"")){
+            
+            System.out.println(args[11]);
+            System.out.println(args[12]);
+
+            args[11]= args[11].substring(2);
+            args[11]= args[11].split("]")[0];
+            
+            args[12]= args[12].substring(2);
+            args[12]= args[12].split("]")[0];
+            
+            String[] conn=args[11].split(",");
+            String[] corr=args[12].split(",");
+            
+            System.out.println(java.util.Arrays.toString(conn));
+            System.out.println(java.util.Arrays.toString(corr));
+
+            connO=new int[conn.length]; for (int i = 0; i < connO.length; i++) connO[i]=Integer.parseInt(conn[i].trim());
+            corrO=new float[corr.length]; for (int i = 0; i < corrO.length; i++) corrO[i]=Float.parseFloat(corr[i].trim());
+        }
+        
+        ParallelSimulationToFile monitor=new ParallelSimulationToFile();
+        new TileSimulationToAsciiFile(Integer.parseInt(args[1]),Integer.parseInt(args[2]),Integer.parseInt(args[3]),Integer.parseInt(args[4]),Integer.parseInt(args[5]),matDirs,magnitudes,horOrders,metaModif,20.0f,5.0f,stormFile,null,0.0f,2,routingParams,outputDirectory,connO,monitor,corrO).executeSimulation();
+        System.exit(0);
+    }
+    
+    public static void subMain1(String args[]) throws java.io.IOException, VisADException {
+        
+        java.io.File theFile=new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Topography/1_ArcSec_USGS/walnutGulchUpdated.metaDEM");
+        hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
+        metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".dir"));
+        metaModif.setFormat("Byte");
+        byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
+        
+        metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".magn"));
+        metaModif.setFormat("Integer");
+        int [][] magnitudes=new hydroScalingAPI.io.DataRaster(metaModif).getInt();
+        
+        metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".horton"));
+        metaModif.setFormat("Byte");
+        byte [][] horOrders=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
+        
+        java.io.File stormFile;
+        java.util.Hashtable routingParams=new java.util.Hashtable();
+        routingParams.put("widthCoeff",1.0f);
+        routingParams.put("widthExponent",0.4f);
+        routingParams.put("widthStdDev",0.0f);
+        
+        routingParams.put("chezyCoeff",14.2f);
+        routingParams.put("chezyExponent",-1/3.0f);
+        
+        routingParams.put("lambda1",0.3f);
+        routingParams.put("lambda2",-0.1f);
+        
+        routingParams.put("v_o",0.5f);
+        
+        stormFile=new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Hydrology/storms/precipitation_events/event_02/precipitation_interpolated_ev02.metaVHC");
+        
+        java.io.File outputDirectory=new java.io.File("/Users/ricardo/simulationResults/Parallel/Walnut_Gulch/");
+        
+        ParallelSimulationToFile monitor=new ParallelSimulationToFile();
+        new TileSimulationToAsciiFile(229,286,-1,-1,3,matDirs,magnitudes,horOrders,metaModif,20.0f,5.0f,stormFile,null,0.0f,2,routingParams,outputDirectory,new int[] {},monitor,new float[] {}).executeSimulation();
+        //new TileSimulationToAsciiFile(229,286,-1,-1,3,matDirs,magnitudes,horOrders,metaModif,20.0f,5.0f,stormFile,null,0.0f,2,routingParams,outputDirectory,new int[] {314711, 315971},monitor,new float[] {0.027654171f, 0.20069313f}).executeSimulation();
+            
+    }
 
 }

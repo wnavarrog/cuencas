@@ -253,6 +253,15 @@ public class StormManager {
             
             recordResolutionInMinutes=metaStorm.getTemporalScale()/1000.0/60.0;
             
+            if(lastWaterDrop == null){
+                firstWaterDrop=arCron[0].getDate();
+                lastWaterDrop=arCron[0].getDate();
+                for (int j=0;j<linksStructure.contactsArray.length;j++){
+                    precOnBasin[j].addDateAndValue(arCron[0].getDate(),0.0f); //
+                    totalHillBasedPrec[j]=0;
+                }
+            }
+            
         } catch (java.io.IOException IOE){
             System.out.print(IOE);
         }
