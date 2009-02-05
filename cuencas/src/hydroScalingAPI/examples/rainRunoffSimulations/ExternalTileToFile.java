@@ -89,19 +89,29 @@ public class ExternalTileToFile extends Thread{
         try{
             System.out.println(java.util.Arrays.toString(command));
             localProcess=java.lang.Runtime.getRuntime().exec(command);
-            localProcess.getOutputStream().flush();
-            localProcess.waitFor();
+            System.out.println(">> The command was sent");
+
+            boolean monitor = true;
+            String concat="";
+            while(monitor){
+                String s=new String(new byte[] {Byte.parseByte(""+localProcess.getInputStream().read())});
+                concat+=s;
+                if(s.equalsIgnoreCase("\n")) {
+                    //System.out.print(concat);
+                    if(concat.substring(0, Math.min(31,concat.length())).equalsIgnoreCase("Termina escritura de Resultados")) break;
+                    concat="";
+                }
+            }
+            
             localProcess.destroy();
             System.out.println("Command completed for "+procName);
             completed=true;
             executing=false;
             coordinatorProc.threadsRunning--;
+
         }catch(java.io.IOException ioe){
             System.err.println("Failed launching external process");
             System.err.println(ioe);
-        }catch(java.lang.InterruptedException ie){
-            System.err.println("Failed waiting for external process");
-            System.err.println(ie);
         }
         
     }

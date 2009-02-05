@@ -173,7 +173,7 @@ public class StormManager {
             double [][] dataSnapShot, dataSection;
             int MatX,MatY;
             
-            //System.out.println("-----------------Start of Files Reading----------------");
+            System.out.println("-----------------Start of Files Reading----------------");
             
             totalPixelBasedPrec=new float[matDirBox.length][matDirBox[0].length];
             

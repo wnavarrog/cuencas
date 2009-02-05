@@ -52,11 +52,6 @@ public class TileSimulationToAsciiFile extends java.lang.Object implements Runna
     int basinOrder;
     float[] corrections;
 
-    public boolean executing=false;
-    public boolean completed=false;
-    
-    hydroScalingAPI.examples.rainRunoffSimulations.ParallelSimulationToFile coordinatorProc;
-    
     public TileSimulationToAsciiFile(   int xx, 
                                         int yy, 
                                         int xxHH, 
@@ -75,7 +70,6 @@ public class TileSimulationToAsciiFile extends java.lang.Object implements Runna
                                         java.util.Hashtable rP,
                                         java.io.File outputDirectoryOR,
                                         int[] connectionsO,
-                                        hydroScalingAPI.examples.rainRunoffSimulations.ParallelSimulationToFile coordinator,
                                         float[] correctionsO) throws java.io.IOException, VisADException{
         
         matDir=direcc;
@@ -98,8 +92,6 @@ public class TileSimulationToAsciiFile extends java.lang.Object implements Runna
         outputDirectory=outputDirectoryOR;
         routingParams=rP;
         usConnections=connectionsO;
-        
-        coordinatorProc=coordinator;
         
         corrections=correctionsO;
         
@@ -273,9 +265,9 @@ public class TileSimulationToAsciiFile extends java.lang.Object implements Runna
         }
         
         java.util.Date startTime=new java.util.Date();
-        //System.out.println("Start Time:"+startTime.toString());
-        //System.out.println("Number of Links on this simulation: "+(initialCondition.length/2.0));
-        //System.out.println("Inicia simulacion RKF");
+        System.out.println("Start Time:"+startTime.toString());
+        System.out.println("Number of Links on this simulation: "+(initialCondition.length/2.0));
+        System.out.println("Inicia simulacion RKF");
         
         hydroScalingAPI.util.ordDiffEqSolver.RKF rainRunoffRaining=new hydroScalingAPI.util.ordDiffEqSolver.RKF(thisBasinEqSys,1e-3,10/60.);
         
@@ -283,7 +275,7 @@ public class TileSimulationToAsciiFile extends java.lang.Object implements Runna
         
         java.util.Calendar thisDate=java.util.Calendar.getInstance();
         thisDate.setTimeInMillis((long)(storm.stormInitialTimeInMinutes()*60.*1000.0));
-        //System.out.println(thisDate.getTime());
+        System.out.println(thisDate.getTime());
         
         double outputTimeStep=Math.min(Math.pow(2.0D,(basinOrder-1)),storm.stormRecordResolutionInMinutes());
         double extraSimTime=120D*Math.pow(2.0D,(basinOrder-1));
@@ -293,25 +285,25 @@ public class TileSimulationToAsciiFile extends java.lang.Object implements Runna
         
         
         for (int k=0;k<numPeriods;k++) {
-            //System.out.println("Period "+(k+1)+" of "+numPeriods);
+            System.out.println("Period "+(k+1)+" of "+numPeriods);
             rainRunoffRaining.jumpsRunCompleteToAsciiFile(storm.stormInitialTimeInMinutes()+k*storm.stormRecordResolutionInMinutes(),storm.stormInitialTimeInMinutes()+(k+1)*storm.stormRecordResolutionInMinutes(),outputTimeStep,initialCondition,newfile,linksStructure,thisNetworkGeom,newfile1);
             initialCondition=rainRunoffRaining.finalCond;
             rainRunoffRaining.setBasicTimeStep(10/60.);
         }
 
         java.util.Date interTime=new java.util.Date();
-        //System.out.println("Intermedia Time:"+interTime.toString());
-        //System.out.println("Running Time:"+(.001*(interTime.getTime()-startTime.getTime()))+" seconds");
+        System.out.println("Intermedia Time:"+interTime.toString());
+        System.out.println("Running Time:"+(.001*(interTime.getTime()-startTime.getTime()))+" seconds");
 
         rainRunoffRaining.jumpsRunCompleteToAsciiFile(storm.stormInitialTimeInMinutes()+numPeriods*storm.stormRecordResolutionInMinutes(),(storm.stormInitialTimeInMinutes()+(numPeriods+1)*storm.stormRecordResolutionInMinutes())+extraSimTime,outputTimeStep,initialCondition,newfile,linksStructure,thisNetworkGeom,newfile1);
         
         newfile1.close();
         bufferout1.close();
 
-        //System.out.println("Termina simulacion RKF");
+        System.out.println("Termina simulacion RKF");
         java.util.Date endTime=new java.util.Date();
-        //System.out.println("End Time:"+endTime.toString());
-        //System.out.println("Running Time:"+(.001*(endTime.getTime()-startTime.getTime()))+" seconds");
+        System.out.println("End Time:"+endTime.toString());
+        System.out.println("Running Time:"+(.001*(endTime.getTime()-startTime.getTime()))+" seconds");
         
         
         double[] maximumsAchieved=rainRunoffRaining.getMaximumAchieved();
@@ -323,18 +315,18 @@ public class TileSimulationToAsciiFile extends java.lang.Object implements Runna
                 newfile.write(maximumsAchieved[i]+",");
         }
         
-        //System.out.println("Inicia escritura de Resultados");
+        System.out.println("Inicia escritura de Resultados");
         newfile.write("\n");
         
         newfile.close();
         bufferout.close();
         
-        //System.out.println("Termina escritura de Resultados");
+        //ATTENTION
+        //The followng print statement announces the completion of the program.
+        //DO NOT modify!  It tells the queue manager that the process can be
+        //safely killed.
+        System.out.println("Termina escritura de Resultados");
         
-        completed=true;
-        executing=false;
-        coordinatorProc.threadsRunning--;
-
     }
     
     public void run(){
@@ -425,9 +417,8 @@ public class TileSimulationToAsciiFile extends java.lang.Object implements Runna
             corrO=new float[corr.length]; for (int i = 0; i < corrO.length; i++) corrO[i]=Float.parseFloat(corr[i].trim());
         }
         
-        ParallelSimulationToFile monitor=new ParallelSimulationToFile();
-        new TileSimulationToAsciiFile(Integer.parseInt(args[1]),Integer.parseInt(args[2]),Integer.parseInt(args[3]),Integer.parseInt(args[4]),Integer.parseInt(args[5]),matDirs,magnitudes,horOrders,metaModif,20.0f,5.0f,stormFile,null,0.0f,2,routingParams,outputDirectory,connO,monitor,corrO).executeSimulation();
-        System.exit(0);
+        new TileSimulationToAsciiFile(Integer.parseInt(args[1]),Integer.parseInt(args[2]),Integer.parseInt(args[3]),Integer.parseInt(args[4]),Integer.parseInt(args[5]),matDirs,magnitudes,horOrders,metaModif,20.0f,5.0f,stormFile,null,0.0f,2,routingParams,outputDirectory,connO,corrO).executeSimulation();
+        
     }
     
     public static void subMain1(String args[]) throws java.io.IOException, VisADException {
@@ -464,8 +455,7 @@ public class TileSimulationToAsciiFile extends java.lang.Object implements Runna
         
         java.io.File outputDirectory=new java.io.File("/Users/ricardo/simulationResults/Parallel/Walnut_Gulch/");
         
-        ParallelSimulationToFile monitor=new ParallelSimulationToFile();
-        new TileSimulationToAsciiFile(229,286,-1,-1,3,matDirs,magnitudes,horOrders,metaModif,20.0f,5.0f,stormFile,null,0.0f,2,routingParams,outputDirectory,new int[] {},monitor,new float[] {}).executeSimulation();
+        new TileSimulationToAsciiFile(229,286,-1,-1,3,matDirs,magnitudes,horOrders,metaModif,20.0f,5.0f,stormFile,null,0.0f,2,routingParams,outputDirectory,new int[] {},new float[] {}).executeSimulation();
         //new TileSimulationToAsciiFile(229,286,-1,-1,3,matDirs,magnitudes,horOrders,metaModif,20.0f,5.0f,stormFile,null,0.0f,2,routingParams,outputDirectory,new int[] {314711, 315971},monitor,new float[] {0.027654171f, 0.20069313f}).executeSimulation();
             
     }

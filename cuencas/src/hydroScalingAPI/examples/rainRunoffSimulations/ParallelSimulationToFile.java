@@ -38,7 +38,7 @@ public class ParallelSimulationToFile extends java.lang.Object {
     private hydroScalingAPI.io.MetaRaster metaDatos;
     private byte[][] matDir;
     
-    final int simulProcess=8;
+    final int simulProcess=2;
     public int threadsRunning=0;
     
     /** Creates new ParallelSimulationToFile */
@@ -71,7 +71,7 @@ public class ParallelSimulationToFile extends java.lang.Object {
         float[][] linkAreas=mylinksAnalysis.getVarValues(0);
         float[][] linkLenghts=mylinksAnalysis.getVarValues(1);
         
-        int decompScale=7;
+        int decompScale=3;
         
         int[][] headsTails=myRsnGen.getHeadsAndTails(decompScale);
         int[][] connectionTopology=myRsnGen.getPrunedConnectionStructure(decompScale);
@@ -101,8 +101,6 @@ public class ParallelSimulationToFile extends java.lang.Object {
         }
 
         Thread[] activeThreads=new Thread[connectionTopology.length];
-        //hydroScalingAPI.examples.rainRunoffSimulations.TileSimulationToAsciiFile[] simThreads=new hydroScalingAPI.examples.rainRunoffSimulations.TileSimulationToAsciiFile[connectionTopology.length];
-        
         hydroScalingAPI.examples.rainRunoffSimulations.ExternalTileToFile[] externalExecutors=new hydroScalingAPI.examples.rainRunoffSimulations.ExternalTileToFile[connectionTopology.length];
         
         for(int i=0;i<headsTails[0].length;i++){
@@ -140,9 +138,6 @@ public class ParallelSimulationToFile extends java.lang.Object {
             System.out.println(java.util.Arrays.toString(connectionIDs));
             System.out.println(java.util.Arrays.toString(corrections));
 
-            //This line if for native threads
-            //simThreads[i]=new hydroScalingAPI.examples.rainRunoffSimulations.TileSimulationToAsciiFile(xOutlet, yOutlet,xSource, ySource,decompScale, direcc, magnitudes, horOrders, md, rainIntensity, rainDuration, stormFile, infiltMetaRaster, infiltRate, routingType, routingParams, outputDirectory,connectionIDs,this,corrections);
-            //This line if for external threads
             externalExecutors[i]=new hydroScalingAPI.examples.rainRunoffSimulations.ExternalTileToFile("Element "+i,md.getLocationMeta().getAbsolutePath(),xOutlet, yOutlet,xSource, ySource,decompScale,0.3f,-0.1f,0.5f,stormFile.getAbsolutePath(),outputDirectory.getAbsolutePath(),java.util.Arrays.toString(connectionIDs).trim(),java.util.Arrays.toString(corrections).trim(),this);
         }
         
@@ -156,30 +151,15 @@ public class ParallelSimulationToFile extends java.lang.Object {
             for (int i = 0; i < externalExecutors.length; i++) {
                 int indexProc=processList.get((String)v.get(i));
                 
-//                if(simThreads[indexProc].completed == false && simThreads[indexProc].executing == false){
-//                    boolean required=true;
-//                    for (int j = 0; j < connectionTopology[indexProc].length; j++) {
-//                        required&=simThreads[((Integer)topoMapping.get(connectionTopology[indexProc][j])).intValue()].completed;
-//                    }
-//                    if (required) {
-//                        System.out.println(">> Process "+indexProc+" is being launched");
-//                        activeThreads[indexProc] = new Thread(simThreads[indexProc]);
-//                        simThreads[indexProc].executing=true;
-//                        activeThreads[indexProc].start();
-//                        threadsRunning++;
-//                        if(threadsRunning == simulProcess) break;
-//                    } else {
-//                        System.out.println(">> Process "+indexProc+" is on hold");
-//                    }
-//                } else if(simThreads[indexProc].completed == true) activeThreads[indexProc]=null;
-                
-                
                 if(externalExecutors[indexProc].completed == false && externalExecutors[indexProc].executing == false){
                     boolean required=true;
                     for (int j = 0; j < connectionTopology[indexProc].length; j++) {
                         required&=externalExecutors[((Integer)topoMapping.get(connectionTopology[indexProc][j])).intValue()].completed;
                     }
                     if (required) {
+                        
+                        //simThreads[indexProc].executeSimulation();
+                        
                         System.out.println(">> Process "+indexProc+" is being launched");
                         activeThreads[indexProc] = new Thread(externalExecutors[indexProc]);
                         externalExecutors[indexProc].executing=true;
@@ -190,8 +170,6 @@ public class ParallelSimulationToFile extends java.lang.Object {
                         System.out.println(">> Process "+indexProc+" is on hold");
                     }
                 } else if(externalExecutors[indexProc].completed == true) activeThreads[indexProc]=null;
-                
-                
             }
             
             while(threadsRunning == simulProcess){
@@ -199,16 +177,6 @@ public class ParallelSimulationToFile extends java.lang.Object {
                 new visad.util.Delay(1000);
             }
             System.out.println(">> Current reported status "+threadsRunning+" "+simulProcess);
-//            for (int i = 0; i < simThreads.length; i++){
-//                if(simThreads[i].executing) {
-//                    System.out.println(">> Running "+i);
-//                    new visad.util.Delay(1000);
-//                }
-//            }
-//            
-//            allNodesDone=true;
-//            for (int i = 0; i < simThreads.length; i++) allNodesDone&=simThreads[i].completed;
-            
             
             for (int i = 0; i < externalExecutors.length; i++){
                 if(externalExecutors[i].executing) {
@@ -226,9 +194,6 @@ public class ParallelSimulationToFile extends java.lang.Object {
         java.util.Date endTime=new java.util.Date();
         System.out.println("End Time:"+endTime.toString());
         System.out.println("Running Time:"+(.001*(endTime.getTime()-startTime.getTime()))+" seconds");
-        
-        //Creating Hydrograph files
-        //Creating Peakflow files
         
     }
     
@@ -255,7 +220,7 @@ public class ParallelSimulationToFile extends java.lang.Object {
     
     public static void subMain0(String args[]) throws java.io.IOException, VisADException {
 
-        java.io.File theFile=new java.io.File("C:/Documents and Settings/gciach/Desktop/Test_DB/Rasters/Topography/1_ArcSec_USGS/Whitewaters.metaDEM");
+        java.io.File theFile=new java.io.File("/hidrosigDataBases/Iowa_Rivers_DB/Rasters/Topography/3_arcSec/AveragedIowaRiverAtColumbusJunctions.metaDEM");
         hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
         metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".dir"));
         metaModif.setFormat("Byte");
@@ -283,11 +248,11 @@ public class ParallelSimulationToFile extends java.lang.Object {
 
         routingParams.put("v_o",0.5f);
 
-        stormFile=new java.io.File("C:/Documents and Settings/gciach/Desktop/Test_DB/Rasters/Hydrology/storm/simulated/random_100_10.metaVHC");
+        stormFile=new java.io.File("/hidrosigDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/observed_events/EventIowaJuneMPE/May29toJune26/hydroNexrad.metaVHC");
 
-        java.io.File outputDirectory=new java.io.File("C:/TEMP/Parallel/Whitewaters/");
+        java.io.File outputDirectory=new java.io.File("/home/ricardo/simulationResults/Parallel/AveragedIowaRiver/");
 
-        new ParallelSimulationToFile(1064, 496,matDirs,magnitudes,horOrders,metaModif,stormFile,0.0f,2,routingParams,outputDirectory);
+        new ParallelSimulationToFile(2646,762,matDirs,magnitudes,horOrders,metaModif,stormFile,0.0f,2,routingParams,outputDirectory);
 
     }
         
