@@ -273,7 +273,7 @@ public class RsnFlowSimulationToAsciiFile extends java.lang.Object {
         try{
             
             //subMain1(args);   //Geometrically Distributed generators, constant link-length
-            //subMain2(args);   //Geometrically Distributed generators, random link-length
+            subMain2(args);   //Geometrically Distributed generators, random link-length
             //subMain3(args);   //Geometrically Distributed generators, random link-length, random link-area
             //subMain4(args);   //Uniformly Distributed generators, constant link-length
             //subMain5(args);   //Tokunaga Trees E(1,2,3,4)I(0,1,2,3,4)
@@ -300,8 +300,8 @@ public class RsnFlowSimulationToAsciiFile extends java.lang.Object {
         
         String outDir="/ResultsSimulations/flowSimulations/geometricRSNs/constantV/";
         
-        int iniExperiment=0;
-        int finExperiments=1;
+        int iniExperiment=775;
+        int finExperiments=999;
         
         java.text.NumberFormat labelFormat = java.text.NumberFormat.getNumberInstance();
         labelFormat.setGroupingUsed(false);
@@ -327,20 +327,19 @@ public class RsnFlowSimulationToAsciiFile extends java.lang.Object {
     
     public static void subMain2(String args[]) throws java.io.IOException, VisADException {
 
-        String outDir="/home/ricardo/workFiles/myWorkingStuff/MateriasDoctorado/PhD_Thesis/results/flowSimulations/geometricRSNs/variableL/";
+        String outDir="/ResultsSimulations/flowSimulations/geometricRSNs/variableL/";
         
-        int iniExperiment=100;
-        int finExperiments=199;
+        int iniExperiment=750;
+        int finExperiments=999;
         
         java.text.NumberFormat labelFormat = java.text.NumberFormat.getNumberInstance();
         labelFormat.setGroupingUsed(false);
         labelFormat.setMinimumFractionDigits(2);
         
-        for(double p_i=Float.parseFloat(args[0]);p_i<Float.parseFloat(args[0])+0.02;p_i+=0.02){
-        //for(double p_i=0.36;p_i<0.50;p_i+=0.02){
+        for(double p_i=0.36;p_i<0.50;p_i+=0.02){
             for(double p_e=0.45;p_e<0.55;p_e+=0.02){
                 new java.io.File(outDir+"p_i"+labelFormat.format(p_i)+"p_e"+labelFormat.format(p_e)).mkdir();
-                for(int sofi=2;sofi<=2;sofi++){
+                for(int sofi=2;sofi<=7;sofi++){
                     new java.io.File(outDir+"p_i"+labelFormat.format(p_i)+"p_e"+labelFormat.format(p_e)+"/ord_"+sofi).mkdir();
                     
                     for(int experiment=iniExperiment;experiment<=finExperiments;experiment++){
@@ -355,9 +354,8 @@ public class RsnFlowSimulationToAsciiFile extends java.lang.Object {
                         hydroScalingAPI.util.probability.ContinuousDistribution myLinkAreaDistro_I=new hydroScalingAPI.util.probability.LogGaussianDistribution(0.01f+0.88f*Elae,0.04f+0.85f*SDlae);
 
                         hydroScalingAPI.util.randomSelfSimilarNetworks.RsnStructure myRSN=new hydroScalingAPI.util.randomSelfSimilarNetworks.RsnStructure(sofi-1,myUD_I,myUD_E,myLinkAreaDistro_E,myLinkAreaDistro_I);
-                        RsnFlowSimulationToAsciiFile rsnfs=new RsnFlowSimulationToAsciiFile(myRSN,0,1,experiment,2,new java.io.File(outDir+"p_i"+labelFormat.format(p_i)+"p_e"+labelFormat.format(p_e)+"/ord_"+sofi));
-                        rsnfs.executeSimulation();
-
+                        new RsnFlowSimulationToAsciiFile(myRSN,0,1,experiment,2,new java.io.File(outDir+"p_i"+labelFormat.format(p_i)+"p_e"+labelFormat.format(p_e)+"/ord_"+sofi)).executeSimulation();
+                        
                     }
                 }
             }

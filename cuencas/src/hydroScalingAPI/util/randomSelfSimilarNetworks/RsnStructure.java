@@ -448,11 +448,11 @@ public class RsnStructure {
         if(randomGeometry){
             newfile.write("Random Geometry\n");
             newfile.write("Link Area [km^2]");
-            for(int i=0;i<rsnTreeDecoding.length-1;i++) newfile.write(linkAreas[i]+",");
-            newfile.write(linkAreas[rsnTreeDecoding.length-1]+"\n");
+            for(int i=0;i<rsnTreeDecoding.length-1;i++) newfile.write(linkAreas[0][i]+",");
+            newfile.write(linkAreas[0][rsnTreeDecoding.length-1]+"\n");
             newfile.write("Link Length [km]");
-            for(int i=0;i<rsnTreeDecoding.length-1;i++) newfile.write(linkLengths[i]+",");
-            newfile.write(linkLengths[rsnTreeDecoding.length-1]+"\n");
+            for(int i=0;i<rsnTreeDecoding.length-1;i++) newfile.write(linkLengths[0][i]+",");
+            newfile.write(linkLengths[0][rsnTreeDecoding.length-1]+"\n");
         }
         newfile.close();
         bufferout.close();
