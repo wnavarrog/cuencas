@@ -38,24 +38,27 @@ public class ParallelSimulationToFile extends java.lang.Object {
     private hydroScalingAPI.io.MetaRaster metaDatos;
     private byte[][] matDir;
     
-    final int simulProcess=2;
+    final int simulProcess=8;
     public int threadsRunning=0;
+
+    private java.util.Calendar zeroSimulationTime;
     
     /** Creates new ParallelSimulationToFile */
     public ParallelSimulationToFile(){
         
     }
-    public ParallelSimulationToFile(int x, int y, byte[][] direcc, int[][] magnitudes,byte[][] horOrders, hydroScalingAPI.io.MetaRaster md, float rainIntensity, float rainDuration, float infiltRate, int routingType,java.util.Hashtable routingParams,java.io.File outputDirectory) throws java.io.IOException, VisADException{
-        this(x,y,direcc,magnitudes,horOrders,md,rainIntensity,rainDuration,null,null,infiltRate,routingType,routingParams,outputDirectory);
+    public ParallelSimulationToFile(int x, int y, byte[][] direcc, int[][] magnitudes,byte[][] horOrders, hydroScalingAPI.io.MetaRaster md, float rainIntensity, float rainDuration, float infiltRate, int routingType,java.util.Hashtable routingParams,java.io.File outputDirectory, java.util.Calendar zST) throws java.io.IOException, VisADException{
+        this(x,y,direcc,magnitudes,horOrders,md,rainIntensity,rainDuration,null,null,infiltRate,routingType,routingParams,outputDirectory,zST);
     }
-    public ParallelSimulationToFile(int x, int y, byte[][] direcc, int[][] magnitudes,byte[][] horOrders, hydroScalingAPI.io.MetaRaster md, java.io.File stormFile, hydroScalingAPI.io.MetaRaster infiltMetaRaster, int routingType,java.util.Hashtable routingParams,java.io.File outputDirectory) throws java.io.IOException, VisADException{
-        this(x,y,direcc,magnitudes,horOrders,md,0.0f,0.0f,stormFile,infiltMetaRaster,0.0f,routingType,routingParams,outputDirectory);
+    public ParallelSimulationToFile(int x, int y, byte[][] direcc, int[][] magnitudes,byte[][] horOrders, hydroScalingAPI.io.MetaRaster md, java.io.File stormFile, hydroScalingAPI.io.MetaRaster infiltMetaRaster, int routingType,java.util.Hashtable routingParams,java.io.File outputDirectory, java.util.Calendar zST) throws java.io.IOException, VisADException{
+        this(x,y,direcc,magnitudes,horOrders,md,0.0f,0.0f,stormFile,infiltMetaRaster,0.0f,routingType,routingParams,outputDirectory,zST);
     }
-    public ParallelSimulationToFile(int x, int y, byte[][] direcc, int[][] magnitudes,byte[][] horOrders, hydroScalingAPI.io.MetaRaster md, java.io.File stormFile, float infiltRate, int routingType,java.util.Hashtable routingParams,java.io.File outputDirectory) throws java.io.IOException, VisADException{
-        this(x,y,direcc,magnitudes,horOrders,md,0.0f,0.0f,stormFile,null,infiltRate,routingType,routingParams,outputDirectory);
+    public ParallelSimulationToFile(int x, int y, byte[][] direcc, int[][] magnitudes,byte[][] horOrders, hydroScalingAPI.io.MetaRaster md, java.io.File stormFile, float infiltRate, int routingType,java.util.Hashtable routingParams,java.io.File outputDirectory, java.util.Calendar zST) throws java.io.IOException, VisADException{
+        this(x,y,direcc,magnitudes,horOrders,md,0.0f,0.0f,stormFile,null,infiltRate,routingType,routingParams,outputDirectory,zST);
     }
-    public ParallelSimulationToFile(int x, int y, byte[][] direcc, int[][] magnitudes,byte[][] horOrders, hydroScalingAPI.io.MetaRaster md, float rainIntensity, float rainDuration, java.io.File stormFile, hydroScalingAPI.io.MetaRaster infiltMetaRaster,float infiltRate, int routingType,java.util.Hashtable routingParams,java.io.File outputDirectory) throws java.io.IOException, VisADException{
-        
+    public ParallelSimulationToFile(int x, int y, byte[][] direcc, int[][] magnitudes,byte[][] horOrders, hydroScalingAPI.io.MetaRaster md, float rainIntensity, float rainDuration, java.io.File stormFile, hydroScalingAPI.io.MetaRaster infiltMetaRaster,float infiltRate, int routingType,java.util.Hashtable routingParams,java.io.File outputDirectory, java.util.Calendar zST) throws java.io.IOException, VisADException{
+
+        zeroSimulationTime=zST;
         matDir=direcc;
         metaDatos=md;
         
@@ -102,7 +105,9 @@ public class ParallelSimulationToFile extends java.lang.Object {
 
         Thread[] activeThreads=new Thread[connectionTopology.length];
         hydroScalingAPI.examples.rainRunoffSimulations.ExternalTileToFile[] externalExecutors=new hydroScalingAPI.examples.rainRunoffSimulations.ExternalTileToFile[connectionTopology.length];
-        
+
+        float maxDtoO=Float.parseFloat(((String)v.get(0)).substring(0, 9));
+
         for(int i=0;i<headsTails[0].length;i++){
             int xOutlet=headsTails[0][i]%ncols;
             int yOutlet=headsTails[0][i]/ncols;
@@ -138,18 +143,22 @@ public class ParallelSimulationToFile extends java.lang.Object {
             System.out.println(java.util.Arrays.toString(connectionIDs));
             System.out.println(java.util.Arrays.toString(corrections));
 
-            externalExecutors[i]=new hydroScalingAPI.examples.rainRunoffSimulations.ExternalTileToFile("Element "+i,md.getLocationMeta().getAbsolutePath(),xOutlet, yOutlet,xSource, ySource,decompScale,0.3f,-0.1f,0.5f,stormFile.getAbsolutePath(),outputDirectory.getAbsolutePath(),java.util.Arrays.toString(connectionIDs).trim(),java.util.Arrays.toString(corrections).trim(),this);
+            externalExecutors[i]=new hydroScalingAPI.examples.rainRunoffSimulations.ExternalTileToFile("Element "+i,md.getLocationMeta().getAbsolutePath(),xOutlet, yOutlet,xSource, ySource,decompScale,0.3f,-0.1f,0.5f,stormFile.getAbsolutePath(),outputDirectory.getAbsolutePath(),java.util.Arrays.toString(connectionIDs).trim(),java.util.Arrays.toString(corrections).trim(),this,zeroSimulationTime.getTimeInMillis());
         }
         
         boolean allNodesDone=true;
-        
+
         java.util.Date startTime=new java.util.Date();
         System.out.println("Start Time:"+startTime.toString());
         System.out.println("Parallel Code Begins");
+
+        float currentDtoO=maxDtoO;
         
         do{
             for (int i = 0; i < externalExecutors.length; i++) {
                 int indexProc=processList.get((String)v.get(i));
+
+                float thisDtoO=Float.parseFloat(((String)v.get(i)).substring(0, 9));
                 
                 if(externalExecutors[indexProc].completed == false && externalExecutors[indexProc].executing == false){
                     boolean required=true;
@@ -165,6 +174,7 @@ public class ParallelSimulationToFile extends java.lang.Object {
                         externalExecutors[indexProc].executing=true;
                         activeThreads[indexProc].start();
                         threadsRunning++;
+                        currentDtoO=Math.min(currentDtoO, thisDtoO);
                         if(threadsRunning == simulProcess) break;
                     } else {
                         System.out.println(">> Process "+indexProc+" is on hold");
@@ -173,10 +183,10 @@ public class ParallelSimulationToFile extends java.lang.Object {
             }
             
             while(threadsRunning == simulProcess){
-                System.out.println(">>>>>  CURRENTLY RUNNING "+threadsRunning+" THREADS");
+                System.out.println(">>>>>  CURRENTLY RUNNING "+threadsRunning+" THREADS. Percentage Completed: "+((1-currentDtoO/maxDtoO)*100)+"%");
                 new visad.util.Delay(1000);
             }
-            System.out.println(">> Current reported status "+threadsRunning+" "+simulProcess);
+            System.out.println(">> Current reported status "+threadsRunning+" "+simulProcess+" . Percentage Completed: "+((1-currentDtoO/maxDtoO)*100)+"%");
             
             for (int i = 0; i < externalExecutors.length; i++){
                 if(externalExecutors[i].executing) {
@@ -220,7 +230,7 @@ public class ParallelSimulationToFile extends java.lang.Object {
     
     public static void subMain0(String args[]) throws java.io.IOException, VisADException {
 
-        java.io.File theFile=new java.io.File("/hidrosigDataBases/Iowa_Rivers_DB/Rasters/Topography/3_arcSec/AveragedIowaRiverAtColumbusJunctions.metaDEM");
+        java.io.File theFile=new java.io.File("C:/Documents and Settings/gciach/Desktop/Test_DB/Rasters/Topography/3_ArcSec_USGS/AveragedIowaRiverAtColumbusJunctions.metaDEM");
         hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
         metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".dir"));
         metaModif.setFormat("Byte");
@@ -248,11 +258,14 @@ public class ParallelSimulationToFile extends java.lang.Object {
 
         routingParams.put("v_o",0.5f);
 
-        stormFile=new java.io.File("/hidrosigDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/observed_events/EventIowaJuneMPE/May29toJune26/hydroNexrad.metaVHC");
+        stormFile=new java.io.File("C:/Documents and Settings/gciach/Desktop/Test_DB/Rasters/Hydrology/storm/May29toJune11/hydroNexrad.metaVHC");
 
-        java.io.File outputDirectory=new java.io.File("/home/ricardo/simulationResults/Parallel/AveragedIowaRiver/");
+        java.io.File outputDirectory=new java.io.File("C:/TEMP/Parallel/AveragedIowaRiver/");
 
-        new ParallelSimulationToFile(2646,762,matDirs,magnitudes,horOrders,metaModif,stormFile,0.0f,2,routingParams,outputDirectory);
+        java.util.Calendar zeroSimulationTime=java.util.Calendar.getInstance();
+        zeroSimulationTime.set(2008,4, 29, 0, 0, 0);
+
+        new ParallelSimulationToFile(2734, 1069   ,matDirs,magnitudes,horOrders,metaModif,stormFile,0.0f,5,routingParams,outputDirectory,zeroSimulationTime);
 
     }
         

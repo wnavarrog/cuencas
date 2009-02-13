@@ -57,7 +57,8 @@ public class ExternalTileToFile extends Thread{
                                     String outputDirectory,
                                     String connectionsO,
                                     String correctionsO,
-                                    hydroScalingAPI.examples.rainRunoffSimulations.ParallelSimulationToFile coordinator){
+                                    hydroScalingAPI.examples.rainRunoffSimulations.ParallelSimulationToFile coordinator,
+                                    long iniTimeInMilliseconds){
                                         
         procName=pn;
         
@@ -79,7 +80,8 @@ public class ExternalTileToFile extends Thread{
                                 stormFile,
                                 outputDirectory,
                                 connectionsO,
-                                correctionsO};
+                                correctionsO,
+                                ""+iniTimeInMilliseconds};
         coordinatorProc=coordinator;
         
     }

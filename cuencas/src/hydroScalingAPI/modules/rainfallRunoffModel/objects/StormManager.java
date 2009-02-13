@@ -332,6 +332,16 @@ public class StormManager {
      * @return A {@link java.util.Calendar} object indicating when the first drop of water fell
      * on the basin
      */
+    public void setStormInitialTime(java.util.Calendar iniDate){
+
+        firstWaterDrop=iniDate;
+    }
+
+    /**
+     * The initial storm time as a {@link java.util.Calendar} object
+     * @return A {@link java.util.Calendar} object indicating when the first drop of water fell
+     * on the basin
+     */
     public java.util.Calendar stormInitialTime(){
         
         return firstWaterDrop;

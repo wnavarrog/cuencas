@@ -1036,57 +1036,7 @@ public class Rainfall_Runoff_Model extends javax.swing.JDialog implements Displa
     }//GEN-LAST:event_closeDialog
 
 private void sim3ButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sim3ButtonActionPerformed
-        javax.swing.JFileChooser fc=new javax.swing.JFileChooser("/");
-        fc.setFileSelectionMode(javax.swing.JFileChooser.DIRECTORIES_ONLY);
-        fc.setDialogTitle("Output directory");
-        int result = fc.showDialog(this,"Select");
-        java.io.File selectedFile = fc.getSelectedFile();
         
-        if (result == javax.swing.JFileChooser.CANCEL_OPTION) return;
-        
-        float rainIntensityValue=10.0f;
-        float rainDurationValue=1.0f;
-        float flowVel=0.5f;
-        
-        try{
-            rainIntensityValue=new Float(rainIntensity.getText()).floatValue();
-            rainDurationValue=new Float(rainDuration.getText()).floatValue();
-            flowVel=new Float(flowVelocity.getText()).floatValue();
-        } catch(NumberFormatException nfe){
-            System.err.println(nfe);
-            return;
-        }
-        
-        int xOulet,yOulet;
-        xOulet=myCuenca.getOutletID()%metaDatos.getNumCols();
-        yOulet=myCuenca.getOutletID()/metaDatos.getNumCols();
-        
-        try{
-            java.util.Hashtable routingParams=new java.util.Hashtable();
-            routingParams.put("widthCoeff",1.0f);
-            routingParams.put("widthExponent",0.4f);
-            routingParams.put("widthStdDev",0.0f);
-
-            routingParams.put("chezyCoeff",14.2f);
-            routingParams.put("chezyExponent",-1/3.0f);
-
-            routingParams.put("lambda1",0.5f);
-            routingParams.put("lambda2",-0.1f);
-            
-            routingParams.put("v_o",flowVel);
-            
-            java.io.File theFile=new java.io.File(metaDatos.getLocationMeta().getAbsolutePath());
-            
-            metaDatos.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".horton"));
-            metaDatos.setFormat("Byte");
-            byte [][] horOrders=new hydroScalingAPI.io.DataRaster(metaDatos).getByte();
-        
-            new hydroScalingAPI.examples.rainRunoffSimulations.ParallelSimulationToFile(xOulet,yOulet,matDir,magnitudes,horOrders,metaDatos,rainIntensityValue,rainDurationValue,0.0f,2,routingParams,selectedFile);
-        } catch(java.io.IOException ioe){
-            System.err.println(ioe);
-        } catch(visad.VisADException vie){
-            System.err.println(vie);
-        }
 }//GEN-LAST:event_sim3ButtonActionPerformed
 
     /**

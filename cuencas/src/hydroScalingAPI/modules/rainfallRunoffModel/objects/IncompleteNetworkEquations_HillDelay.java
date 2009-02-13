@@ -53,6 +53,8 @@ public class IncompleteNetworkEquations_HillDelay implements hydroScalingAPI.uti
     
     private int connectingLink;
     private hydroScalingAPI.modules.rainfallRunoffModel.objects.StreamFlowTimeSeries[] upFlows;
+
+    private double change=0.0;
     
     /**
      * Creates new NetworkEquations_Simple
@@ -98,7 +100,11 @@ public class IncompleteNetworkEquations_HillDelay implements hydroScalingAPI.uti
         for (int i = 0; i < inputFiles.length; i++) {
             upFlows[i]=new hydroScalingAPI.modules.rainfallRunoffModel.objects.StreamFlowTimeSeries(inputFiles[i]);
         }
-        
+
+        java.util.Calendar date=java.util.Calendar.getInstance();
+        date.set(2008,5, 4, 0, 0, 0);
+        change=date.getTimeInMillis()/1000.0/60.0;
+
     }
     
     /**
@@ -157,12 +163,14 @@ public class IncompleteNetworkEquations_HillDelay implements hydroScalingAPI.uti
         System.out.println("    "+thisDate.getTime()+" "+basinHillSlopesInfo.precipitation(0,time)+" "+input[287]);*/
         
         double maxInt=0;
-        
+
+        double rr=time>change?0.5:0.2;
+
         for (int i=0;i<nLi;i++){
             
             if (input[i] < 0) input[i]=0;
             
-            double hillPrecIntensity=basinHillSlopesInfo.precipitation(i,time);// for URP event apply this rule*0.143;
+            double hillPrecIntensity=rr*basinHillSlopesInfo.precipitation(i,time);// for URP event apply this rule*0.143;
             
             maxInt=Math.max(maxInt,hillPrecIntensity);
             
