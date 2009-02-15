@@ -416,8 +416,8 @@ public class TileSimulationToAsciiFile extends java.lang.Object implements Runna
             System.out.println(args[13]);
             System.out.println(args[14]);
 
-            String[] conn=args[11].split(",");
-            String[] corr=args[12].split(",");
+            String[] conn=args[13].split(",");
+            String[] corr=args[14].split(",");
             
             System.out.println(java.util.Arrays.toString(conn));
             System.out.println(java.util.Arrays.toString(corr));
