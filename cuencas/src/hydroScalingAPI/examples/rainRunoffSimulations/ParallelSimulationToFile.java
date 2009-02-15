@@ -61,6 +61,11 @@ public class ParallelSimulationToFile extends java.lang.Object {
         zeroSimulationTime=zST;
         matDir=direcc;
         metaDatos=md;
+
+        float lam1=((Float)routingParams.get("lambda1")).floatValue();
+        float lam2=((Float)routingParams.get("lambda2")).floatValue();
+
+        float v_o=((Float)routingParams.get("v_o")).floatValue();
         
         //Fractioning
         
@@ -74,7 +79,7 @@ public class ParallelSimulationToFile extends java.lang.Object {
         float[][] linkAreas=mylinksAnalysis.getVarValues(0);
         float[][] linkLenghts=mylinksAnalysis.getVarValues(1);
         
-        int decompScale=3;
+        int decompScale=4;
         
         int[][] headsTails=myRsnGen.getHeadsAndTails(decompScale);
         int[][] connectionTopology=myRsnGen.getPrunedConnectionStructure(decompScale);
@@ -122,12 +127,17 @@ public class ParallelSimulationToFile extends java.lang.Object {
             
             System.out.println("Process "+i+" "+xOutlet+" "+yOutlet+" "+xSource+" "+ySource);
             System.out.println(java.util.Arrays.toString(connectionTopology[i]));
+
+            String connectionString="C";
+            String correctionString="F";
+
             
             int[] connectionIDs=new int[connectionTopology[i].length];
             
             for (int j = 0; j < connectionTopology[i].length; j++) {
                 System.out.print(topoMapping.get(connectionTopology[i][j])+" ");
                 connectionIDs[j]=headsTails[0][topoMapping.get(connectionTopology[i][j])];
+                connectionString+=","+connectionIDs[j];
             }
             System.out.println();
             
@@ -139,11 +149,12 @@ public class ParallelSimulationToFile extends java.lang.Object {
             if(connectingLink != -1){
                 corrections[0]=linkAreas[0][connectingLink];
                 corrections[1]=linkLenghts[0][connectingLink];
+                correctionString+=","+corrections[0]+","+corrections[1];
             }
             System.out.println(java.util.Arrays.toString(connectionIDs));
             System.out.println(java.util.Arrays.toString(corrections));
 
-            externalExecutors[i]=new hydroScalingAPI.examples.rainRunoffSimulations.ExternalTileToFile("Element "+i,md.getLocationMeta().getAbsolutePath(),xOutlet, yOutlet,xSource, ySource,decompScale,0.3f,-0.1f,0.5f,stormFile.getAbsolutePath(),outputDirectory.getAbsolutePath(),java.util.Arrays.toString(connectionIDs).trim(),java.util.Arrays.toString(corrections).trim(),this,zeroSimulationTime.getTimeInMillis());
+            externalExecutors[i]=new hydroScalingAPI.examples.rainRunoffSimulations.ExternalTileToFile("Element "+i,md.getLocationMeta().getAbsolutePath(),xOutlet, yOutlet,xSource, ySource,decompScale,routingType,lam1,lam2,v_o,stormFile.getAbsolutePath(),infiltRate,outputDirectory.getAbsolutePath(),connectionString,correctionString,this,zeroSimulationTime.getTimeInMillis());
         }
         
         boolean allNodesDone=true;
@@ -230,7 +241,7 @@ public class ParallelSimulationToFile extends java.lang.Object {
     
     public static void subMain0(String args[]) throws java.io.IOException, VisADException {
 
-        java.io.File theFile=new java.io.File("C:/Documents and Settings/gciach/Desktop/Test_DB/Rasters/Topography/3_ArcSec_USGS/AveragedIowaRiverAtColumbusJunctions.metaDEM");
+        java.io.File theFile=new java.io.File("C:/Documents and Settings/rmantill/Desktop/Iowa_Rivers_DB/Rasters/Topography/3_arcSec/AveragedIowaRiverAtColumbusJunctions.metaDEM");
         hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
         metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".dir"));
         metaModif.setFormat("Byte");
@@ -258,14 +269,28 @@ public class ParallelSimulationToFile extends java.lang.Object {
 
         routingParams.put("v_o",0.5f);
 
-        stormFile=new java.io.File("C:/Documents and Settings/gciach/Desktop/Test_DB/Rasters/Hydrology/storm/May29toJune11/hydroNexrad.metaVHC");
-
-        java.io.File outputDirectory=new java.io.File("C:/TEMP/Parallel/AveragedIowaRiver/");
+        stormFile=new java.io.File("C:/Documents and Settings/rmantill/Desktop/Iowa_Rivers_DB/Rasters/Hydrology/storms/observed_events/EventIowaJuneMPE/May29toJune26/hydroNexrad.metaVHC");
 
         java.util.Calendar zeroSimulationTime=java.util.Calendar.getInstance();
         zeroSimulationTime.set(2008,4, 29, 0, 0, 0);
 
-        new ParallelSimulationToFile(2734, 1069   ,matDirs,magnitudes,horOrders,metaModif,stormFile,0.0f,5,routingParams,outputDirectory,zeroSimulationTime);
+        java.io.File outputDirectory;
+
+        for (float v0 = 0.5f; v0 <= 1.5f; v0+=0.5f) {
+
+            routingParams.put("v_o",v0);
+
+            for (float infil = 0.0f; infil <= 20.0f; infil+=5.0f) {
+                outputDirectory=new java.io.File("C:/Documents and Settings/rmantill/My Documents/temp/Parallel/AveragedIowaRiver_"+v0+"_"+infil+"/");
+                outputDirectory.mkdirs();
+
+                new ParallelSimulationToFile(2734, 1069 ,matDirs,magnitudes,horOrders,metaModif,stormFile,infil,2,routingParams,outputDirectory,zeroSimulationTime);
+            }
+
+        }
+        routingParams.put("v_o",0.5f);
+        outputDirectory=new java.io.File("C:/Documents and Settings/rmantill/My Documents/temp/Parallel/AveragedIowaRiver_NonLinear/");
+        new ParallelSimulationToFile(2734, 1069 ,matDirs,magnitudes,horOrders,metaModif,stormFile,0.0f,5,routingParams,outputDirectory,zeroSimulationTime);
 
     }
         

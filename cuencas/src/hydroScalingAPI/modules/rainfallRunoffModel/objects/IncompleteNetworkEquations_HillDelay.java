@@ -164,7 +164,7 @@ public class IncompleteNetworkEquations_HillDelay implements hydroScalingAPI.uti
         
         double maxInt=0;
 
-        double rr=time>change?0.5:0.2;
+        double rr=1.0;//time>change?0.5:0.2;
 
         for (int i=0;i<nLi;i++){
             

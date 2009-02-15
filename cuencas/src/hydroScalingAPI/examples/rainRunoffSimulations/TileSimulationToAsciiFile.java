@@ -100,7 +100,7 @@ public class TileSimulationToAsciiFile extends java.lang.Object implements Runna
         usConnections=connectionsO;
         
         corrections=correctionsO;
-        
+
     }
     
     public void executeSimulation() throws java.io.IOException, VisADException{
@@ -391,30 +391,31 @@ public class TileSimulationToAsciiFile extends java.lang.Object implements Runna
         
         routingParams.put("chezyCoeff",14.2f);
         routingParams.put("chezyExponent",-1/3.0f);
+
+        int routingType=Integer.parseInt(args[6]);
         
-        routingParams.put("lambda1",Float.parseFloat(args[6]));
-        routingParams.put("lambda2",Float.parseFloat(args[7]));
+        routingParams.put("lambda1",Float.parseFloat(args[7]));
+        routingParams.put("lambda2",Float.parseFloat(args[8]));
         
-        routingParams.put("v_o",Float.parseFloat(args[8]));
+        routingParams.put("v_o",Float.parseFloat(args[9]));
         
-        stormFile=new java.io.File(args[9]);
+        stormFile=new java.io.File(args[10]);
+
+        float infilRate=Float.parseFloat(args[11]);
         
-        java.io.File outputDirectory=new java.io.File(args[10]);
+        java.io.File outputDirectory=new java.io.File(args[12]);
         
         int[] connO=new int[0];
         float[] corrO=new float[0];
         
-        if(!args[11].equalsIgnoreCase("[]")){
-            
-            System.out.println(args[11]);
-            System.out.println(args[12]);
+        if(!args[13].equalsIgnoreCase("C")){
 
-            args[11]= args[11].substring(1);
-            args[11]= args[11].split("]")[0];
-            
-            args[12]= args[12].substring(1);
-            args[12]= args[12].split("]")[0];
-            
+            args[13]=args[13].substring(2);
+            args[14]=args[14].substring(2);
+
+            System.out.println(args[13]);
+            System.out.println(args[14]);
+
             String[] conn=args[11].split(",");
             String[] corr=args[12].split(",");
             
@@ -425,7 +426,7 @@ public class TileSimulationToAsciiFile extends java.lang.Object implements Runna
             corrO=new float[corr.length]; for (int i = 0; i < corrO.length; i++) corrO[i]=Float.parseFloat(corr[i].trim());
         }
         
-        new TileSimulationToAsciiFile(Integer.parseInt(args[1]),Integer.parseInt(args[2]),Integer.parseInt(args[3]),Integer.parseInt(args[4]),Integer.parseInt(args[5]),matDirs,magnitudes,horOrders,metaModif,20.0f,5.0f,stormFile,null,0.0f,2,routingParams,outputDirectory,connO,corrO,Long.parseLong(args[13])).executeSimulation();
+        new TileSimulationToAsciiFile(Integer.parseInt(args[1]),Integer.parseInt(args[2]),Integer.parseInt(args[3]),Integer.parseInt(args[4]),Integer.parseInt(args[5]),matDirs,magnitudes,horOrders,metaModif,0.0f,0.0f,stormFile,null,infilRate,routingType,routingParams,outputDirectory,connO,corrO,Long.parseLong(args[15])).executeSimulation();
         
     }
     
