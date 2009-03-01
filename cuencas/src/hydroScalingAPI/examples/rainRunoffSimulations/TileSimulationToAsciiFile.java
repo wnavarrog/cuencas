@@ -204,6 +204,15 @@ public class TileSimulationToAsciiFile extends java.lang.Object implements Runna
             theFile=new java.io.File(outputDirectory.getAbsolutePath()+"/"+demName+"_"+x+"_"+y+"-"+storm.stormName()+"-IR_"+infiltMetaRaster.getLocationMeta().getName().substring(0,infiltMetaRaster.getLocationMeta().getName().lastIndexOf(".metaVHC"))+"-Routing_"+routingString+"_params_"+lam1+"_"+lam2+".csv");
         
         System.out.println(theFile);
+
+        if(theFile.exists()){
+            //ATTENTION
+            //The followng print statement announces the completion of the program.
+            //DO NOT modify!  It tells the queue manager that the process can be
+            //safely killed.
+            System.out.println("Termina escritura de Resultados");
+            return;
+        }
         
         java.io.FileOutputStream salida = new java.io.FileOutputStream(theFile);
         java.io.BufferedOutputStream bufferout = new java.io.BufferedOutputStream(salida);

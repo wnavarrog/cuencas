@@ -276,22 +276,36 @@ public class ParallelSimulationToFile extends java.lang.Object {
 
         java.io.File outputDirectory;
 
-        for (float v0 = 0.5f; v0 <= 1.5f; v0+=0.5f) {
+//        for (float v0 = 0.75f; v0 <= 0.75f; v0+=0.25f) {
+//
+//            routingParams.put("v_o",v0);
+//
+//            for (float infil = 5.0f; infil <= 5.0f; infil+=5.0f) {
+//                outputDirectory=new java.io.File("C:/Documents and Settings/rmantill/My Documents/temp/Parallel/AveragedIowaRiver_"+v0+"_"+infil+"to11/");
+//                outputDirectory.mkdirs();
+//
+//                new ParallelSimulationToFile(2734, 1069 ,matDirs,magnitudes,horOrders,metaModif,stormFile,infil,2,routingParams,outputDirectory,zeroSimulationTime);
+//            }
+//
+//        }
+        
+        float v0=0.38f;
+        routingParams.put("v_o",v0);
+        float lam1 = 0.2f;
+        
+        //for (float lam1 = 0.2f; lam1 <= 0.5f; lam1+=0.1f) {
+            for (float lam2 = -0.1f; lam2 <= -0.1f; lam2+=0.05f) {
 
-            routingParams.put("v_o",v0);
+                routingParams.put("lambda1",lam1);
+                routingParams.put("lambda2",lam2);
 
-            for (float infil = 0.0f; infil <= 20.0f; infil+=5.0f) {
-                outputDirectory=new java.io.File("C:/Documents and Settings/rmantill/My Documents/temp/Parallel/AveragedIowaRiver_"+v0+"_"+infil+"/");
+                outputDirectory=new java.io.File("C:/Documents and Settings/rmantill/My Documents/temp/Parallel/CedarRapids/AveragedIowaRiver_"+v0+"_"+lam1+"_"+lam2+"/");
                 outputDirectory.mkdirs();
-
-                new ParallelSimulationToFile(2734, 1069 ,matDirs,magnitudes,horOrders,metaModif,stormFile,infil,2,routingParams,outputDirectory,zeroSimulationTime);
+                //new ParallelSimulationToFile(1768,1987,matDirs,magnitudes,horOrders,metaModif,stormFile,0.0f,5,routingParams,outputDirectory,zeroSimulationTime);
+                //new ParallelSimulationToFile(1637,1955,matDirs,magnitudes,horOrders,metaModif,stormFile,0.0f,5,routingParams,outputDirectory,zeroSimulationTime);
+                new ParallelSimulationToFile(2734, 1069,matDirs,magnitudes,horOrders,metaModif,stormFile,0.0f,5,routingParams,outputDirectory,zeroSimulationTime);
             }
-
-        }
-        routingParams.put("v_o",0.5f);
-        outputDirectory=new java.io.File("C:/Documents and Settings/rmantill/My Documents/temp/Parallel/AveragedIowaRiver_NonLinear/");
-        new ParallelSimulationToFile(2734, 1069 ,matDirs,magnitudes,horOrders,metaModif,stormFile,0.0f,5,routingParams,outputDirectory,zeroSimulationTime);
-
+        //}
     }
         
 }

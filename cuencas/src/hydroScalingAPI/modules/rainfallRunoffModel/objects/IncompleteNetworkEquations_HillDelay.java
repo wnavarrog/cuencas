@@ -102,7 +102,7 @@ public class IncompleteNetworkEquations_HillDelay implements hydroScalingAPI.uti
         }
 
         java.util.Calendar date=java.util.Calendar.getInstance();
-        date.set(2008,5, 4, 0, 0, 0);
+        date.set(2008,5, 7, 0, 0, 0);
         change=date.getTimeInMillis()/1000.0/60.0;
 
     }
@@ -164,7 +164,7 @@ public class IncompleteNetworkEquations_HillDelay implements hydroScalingAPI.uti
         
         double maxInt=0;
 
-        double rr=1.0;//time>change?0.5:0.2;
+        double rr=time>change?0.6:0.2;
 
         for (int i=0;i<nLi;i++){
             

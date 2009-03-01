@@ -87,7 +87,7 @@ public class ExternalTileToFile extends Thread{
                                 correctionsO,
                                 ""+iniTimeInMilliseconds};
         coordinatorProc=coordinator;
-        
+
     }
     
     public void run(){
