@@ -160,6 +160,7 @@ public class ImportUSGS_waterdataWeb {
             switch (record_type) {
                 case 'H' :      // Historical data checked for quality
                     java.net.URL remotePath2=new java.net.URL("http://waterdata.usgs.gov/"+state+"/nwis/discharge?site_no="+gaugeid+"&agency_cd=USGS&begin_date=1800-01-01&end_date=2100-01-01&set_logscale_y=1&format=rdb&date_format=YYYY.MM.DD&rdb_compression=&submitted_form=brief_list");
+                    System.out.println(remotePath2);
                     java.io.InputStream inputRemote2=remotePath2.openStream();
                     java.io.BufferedReader buff2 = new java.io.BufferedReader(new java.io.InputStreamReader(inputRemote2));
                     
@@ -239,11 +240,11 @@ public class ImportUSGS_waterdataWeb {
      */
     public static void main(String[ ] arguments) { //throws java.io.IOException IOE{
         
-        ImportUSGS_waterdataWeb data = new ImportUSGS_waterdataWeb("C:/Documents and Settings/ricardo/Desktop/databases/Gila River DB/Sites/Gauges/Streamflow/");
+        ImportUSGS_waterdataWeb data = new ImportUSGS_waterdataWeb("C:/temp/");
         data.StreamFlow("NM","09430500",'H'); //Gila River, Historical
-        data.StreamFlow("NM","09430600",'H'); //Mogollon Creek, Historical
+        //data.StreamFlow("NM","09430600",'H'); //Mogollon Creek, Historical
         
-        data.StreamFlow("NM","09442680",'H'); //San Francisco near Reserve, Historical
+        //data.StreamFlow("NM","09442680",'H'); //San Francisco near Reserve, Historical
         
         //data.StreamFlow("KS","07147070",'H'); //Towanda, Historical
         //data.StreamFlow("KS","07147070",'R'); //Towanda, Recent
