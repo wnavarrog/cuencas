@@ -32,8 +32,8 @@ public class AsciiToCRas extends Object {
         ruta = new FileReader(inputFile);
         buffer=new BufferedReader(ruta);         
         
-        columns = 40;
-        rows = 40;        
+        columns = 32;
+        rows = 32;        
         matrix = new float[rows][columns];
         
         for (int i=0;i<rows;i++) {
@@ -86,7 +86,7 @@ public class AsciiToCRas extends Object {
     public static void main(String[] args) throws java.io.IOException{
         
         java.io.File AsciiFile;
-        File folder = new File("C:/Documents and Settings/pmandapa/My Documents/Simulations/ForCuencas/Cuencas9_3");
+        File folder = new File("C:/Documents and Settings/pmandapa/My Documents/ForCuencas/KICT_2007_05_06t07_02_SDS05/");
         
  	try{
 	ArrayList<File> files = AsciiToCRas.getFileList(folder);
@@ -97,7 +97,7 @@ public class AsciiToCRas extends Object {
             String FileAscIn = folder.getPath()+"/"+temp.getName().substring(0,temp.getName().lastIndexOf("."))+".vhc";
             AsciiFile = new java.io.File(FileAscIn);
              try {  
-                 new AsciiToCRas(AsciiFile,new java.io.File("C:/Documents and Settings/pmandapa/My Documents/Simulations/ForCuencas/Bin1Cuencas9_3"));
+                 new AsciiToCRas(AsciiFile,new java.io.File("C:/Documents and Settings/pmandapa/My Documents/ForCuencas/BinKICT_2007_05_06t07_02_SDS05"));
              } catch (Exception IOE){
                  System.out.print(IOE);
                  System.exit(0);
