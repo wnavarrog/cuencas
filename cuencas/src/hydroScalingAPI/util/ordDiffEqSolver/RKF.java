@@ -152,7 +152,7 @@ public class RKF extends java.lang.Object {
             }
 
             //System.out.println("    --> "+timeStep+" "+epsilon+" "+Delta+" "+factor+" "+newTimeStep+" ("+java.util.Calendar.getInstance().getTime()+")");
-
+            if(newTimeStep < 1/60.) newTimeStep=1/60.;
             return step(currentTime, IC, newTimeStep, true);
         }
 
