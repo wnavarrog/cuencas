@@ -60,7 +60,7 @@ public class test_utm_gdc
         Utm_To_Gdc_Converter.Convert(utm,gdc);
 
         // print out the sample data
-        for (int j = 0; j < 5000; j++) {
+        for (int j = 0; j < 500000; j++) {
             for (i=0;i<gdc.length;i++)
                 {
                     System.out.println("\nUtm[" + i + "].x: " + utm[i].x);
