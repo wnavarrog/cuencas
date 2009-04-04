@@ -60,19 +60,21 @@ public class test_utm_gdc
         Utm_To_Gdc_Converter.Convert(utm,gdc);
 
         // print out the sample data
-        for (i=0;i<gdc.length;i++)
-        {
-            System.out.println("\nUtm[" + i + "].x: " + utm[i].x);
-            System.out.println("Utm[" + i +"].y: " + utm[i].y);
-            System.out.println("Utm[" + i + "].z: " + utm[i].z);
-            System.out.println("Utm[" +i + "].zone: " + utm[i].zone);
-            System.out.println("Utm[" + i + "].hemisphere_north: " + utm[i].hemisphere_north);
+        for (int j = 0; j < 5000; j++) {
+            for (i=0;i<gdc.length;i++)
+                {
+                    System.out.println("\nUtm[" + i + "].x: " + utm[i].x);
+                    System.out.println("Utm[" + i +"].y: " + utm[i].y);
+                    System.out.println("Utm[" + i + "].z: " + utm[i].z);
+                    System.out.println("Utm[" +i + "].zone: " + utm[i].zone);
+                    System.out.println("Utm[" + i + "].hemisphere_north: " + utm[i].hemisphere_north);
 
-            System.out.println("\nGdc[" + i + "].latitude: " + gdc[i].latitude);
-            System.out.println("Gdc[" + i + "].longitude: " + gdc[i].longitude);
-            System.out.println("Gdc[" + i + "].elevation: " + gdc[i].elevation);
+                    System.out.println("\nGdc[" + i + "].latitude: " + gdc[i].latitude);
+                    System.out.println("Gdc[" + i + "].longitude: " + gdc[i].longitude);
+                    System.out.println("Gdc[" + i + "].elevation: " + gdc[i].elevation);
 
 
-        } // end for
+                } // end for
+        }
     } // end main
 }// end test
