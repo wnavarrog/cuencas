@@ -24,7 +24,7 @@ import visad.*;
 
 /**
  *
- * @author Ricardo Mantilla
+ * @author Pradeep Mandapaka & Ricardo Mantilla
  */
 public class WidthFunctionPradeep extends java.lang.Object {
     
