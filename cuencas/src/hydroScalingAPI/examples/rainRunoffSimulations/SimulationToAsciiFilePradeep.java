@@ -139,8 +139,8 @@ public class SimulationToAsciiFilePradeep extends java.lang.Object implements Ru
         if(stormFile == null)
             theFile=new java.io.File(outputDirectory.getAbsolutePath()+"/"+demName+"-INT_"+rainIntensity+"-DUR_"+rainDuration+"-IR_"+infiltRate+"-Routing_"+routingString+chezLawExpon+".hydrographs");
         else
-            theFile=new java.io.File(outputDirectory.getAbsolutePath()+"/"+demName+"-KICT"+stormFile.getName()+"-IR_"+infiltRate+"-Routing_"+routingString+"_SDS_03_"+resolution+"_dat.hydrographs");
-            //theFile=new java.io.File(outputDirectory.getAbsolutePath()+"/"+demName+"UnifNoise"+stormFile.getName()+"-IR_"+infiltRate+"-Routing_"+routingString+"_params_60.0_10.0_dat.hydrographs");
+            //theFile=new java.io.File(outputDirectory.getAbsolutePath()+"/"+demName+"-KICT"+stormFile.getName()+"-IR_"+infiltRate+"-Routing_"+routingString+"_SDS_03_"+resolution+"_dat.hydrographs");
+            theFile=new java.io.File(outputDirectory.getAbsolutePath()+"/"+demName+"UnifNoise"+stormFile.getName()+"-IR_"+infiltRate+"-Routing_"+routingString+"_params_60.0_10.0_dat.hydrographs");
         
         System.out.println(theFile);
         
@@ -308,9 +308,9 @@ public class SimulationToAsciiFilePradeep extends java.lang.Object implements Ru
     
     public static void subMain2(String args[]) throws java.io.IOException, VisADException {
         
-        java.io.File theFile=new java.io.File("C:/Documents and Settings/pmandapa/My Documents/CuencasDatabases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS_2005/Whitewaters.metaDEM");
+        java.io.File theFile=new java.io.File("~/CuencasDatabases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS_2005/Whitewaters.metaDEM");
         hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
-        metaModif.setLocationBinaryFile(new java.io.File("C:/Documents and Settings/pmandapa/My Documents/CuencasDatabases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS_2005/Whitewaters.dir"));
+        metaModif.setLocationBinaryFile(new java.io.File("~/CuencasDatabases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS_2005/Whitewaters.dir"));
         
         String formatoOriginal=metaModif.getFormat();
         metaModif.setFormat("Byte");
@@ -327,10 +327,10 @@ public class SimulationToAsciiFilePradeep extends java.lang.Object implements Ru
         
         String m = "";
         String resStr = "";
-        for (int i=3;i<5;i++) 
+        for (int i=0;i<2;i++) 
         {
             int ii = i+1;            
-            if (ii < 10)
+            /*if (ii < 10)
             {
                 m = "0"+ii;
             }
@@ -352,11 +352,11 @@ public class SimulationToAsciiFilePradeep extends java.lang.Object implements Ru
                 java.io.File stormFile;
                 stormFile=new java.io.File("C:/Documents and Settings/pmandapa/My Documents/ForCuencas/BinKICT_2007_05_06t07_"+resStr+"_SDS"+m+"/prec.metaVHC");
                 new SimulationToAsciiFilePradeep(1063,496,matDirs,magnitudes,metaModif,  stormFile,res,0.0f,5,new java.io.File("E:/Documents and Settings/pmandapa/My Documents/Research/RainfallDownscaling/Venugopal/KICT_2007_05_06t07/SDS_"+m)).executeSimulation();
-            }
-            //java.io.File stormFile;
-            //stormFile=new java.io.File("C:/Documents and Settings/pmandapa/My Documents/ForCuencas/BinScUnifNoise_60.0/Case"+ii+"/prec.metaVHC");
+            }*/
+            java.io.File stormFile;
+            stormFile=new java.io.File("~/ForCuencas/AWR/BinScUnifNoise_60.0/Case"+ii+"/prec.metaVHC");
             //new SimulationToAsciiFilePradeep(1063,496,matDirs,magnitudes,metaModif,  stormFile,0.0f,2,new java.io.File("E:/Documents and Settings/pmandapa/My Documents/Research/Cuencas/CVRouting/KICT_2007_09_15t15")).executeSimulation();
-            //new SimulationToAsciiFilePradeep(1063,496,matDirs,magnitudes,metaModif,  stormFile,ii,0.0f,2,new java.io.File("E:/Documents and Settings/pmandapa/My Documents/Research/Cuencas/CVRouting/ScUnifNoise/Case"+ii)).executeSimulation();
+            new SimulationToAsciiFilePradeep(1063,496,matDirs,magnitudes,metaModif,  stormFile,ii,0.0f,2,new java.io.File("~/Results/Cuencas/CVRouting/ScUnifNoise/Case"+ii)).executeSimulation();
         }
     }    
 }
