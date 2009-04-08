@@ -80,9 +80,9 @@ public class WidthFunctionPradeep extends java.lang.Object {
     public static void main(String args[]) {
         
         try{ 
-        java.io.File theFile=new java.io.File("u/ac/pmandapa/CuencasDatabases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS_2005/Whitewaters.metaDEM");
+        java.io.File theFile=new java.io.File("/u/ac/pmandapa/CuencasDatabases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS_2005/Whitewaters.metaDEM");
         hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
-        metaModif.setLocationBinaryFile(new java.io.File("u/ac/pmandapa/CuencasDatabases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS_2005/Whitewaters.dir"));
+        metaModif.setLocationBinaryFile(new java.io.File("/u/ac/pmandapa/CuencasDatabases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS_2005/Whitewaters.dir"));
         
         metaModif.setFormat("Byte");
         byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
@@ -91,7 +91,7 @@ public class WidthFunctionPradeep extends java.lang.Object {
         metaModif.setFormat("Integer");
         int [][] magnitudes=new hydroScalingAPI.io.DataRaster(metaModif).getInt();
        
-        new WidthFunctionPradeep(1063,496,matDirs,magnitudes,metaModif,new java.io.File("u/ac/pmandapa/Results/Cuencas"));
+        new WidthFunctionPradeep(1063,496,matDirs,magnitudes,metaModif,new java.io.File("/u/ac/pmandapa/Results/Cuencas"));
         } catch (java.io.IOException IOE){
             System.out.print(IOE);
             System.exit(0);
