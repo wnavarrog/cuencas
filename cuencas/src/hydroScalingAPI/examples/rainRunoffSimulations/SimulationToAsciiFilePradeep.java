@@ -308,9 +308,9 @@ public class SimulationToAsciiFilePradeep extends java.lang.Object implements Ru
     
     public static void subMain2(String args[]) throws java.io.IOException, VisADException {
         
-        java.io.File theFile=new java.io.File("/u/ac/pmandapa/CuencasDatabases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS_2005/Whitewaters.metaDEM");
+        java.io.File theFile=new java.io.File("/u/ac/pmandapa/cuencasDatabases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS_2005/Whitewaters.metaDEM");
         hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
-        metaModif.setLocationBinaryFile(new java.io.File("/u/ac/pmandapa/CuencasDatabases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS_2005/Whitewaters.dir"));
+        metaModif.setLocationBinaryFile(new java.io.File("/u/ac/pmandapa/cuencasDatabases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS_2005/Whitewaters.dir"));
         
         String formatoOriginal=metaModif.getFormat();
         metaModif.setFormat("Byte");
