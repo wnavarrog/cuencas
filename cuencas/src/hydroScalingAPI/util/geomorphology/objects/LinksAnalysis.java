@@ -33,7 +33,7 @@ package hydroScalingAPI.util.geomorphology.objects;
  * @author Ricardo Mantilla
  */
 public class LinksAnalysis extends java.lang.Object {
-    
+
     /**
      * The MetaRaster that described the DEM in which the basin is embeded
      */
@@ -48,17 +48,17 @@ public class LinksAnalysis extends java.lang.Object {
      * The link number corresponding to the basin outlet
      */
     public int OuletLinkNum;
-    
+
     /**
      * Simulation ID for a given (x,y) coordinate
      */
     public int ressimID=0;
-    
+
     /**
      * The Shreve's magnitude associated to the river network
      */
     public int basinMagnitude=0;
-    
+
     /**
      * An array conaining the pixel ID where the link begins.  ID=i+j*numCols, where
      * i is the column number of the pixel and j is the row number of the pixel
@@ -74,12 +74,12 @@ public class LinksAnalysis extends java.lang.Object {
      * i is the column number of the pixel and j is the row number of the pixel
      */
     public int[] tailsArray;
-    
+
     /**
      * An array conaining the link's magnitude
      */
     public int[] magnitudeArray;
-    
+
     /**
      * An array with the ID of the links that drain into it.  It provides the backbone
      * of the system of differetial equations that describe flow along the river
@@ -96,14 +96,14 @@ public class LinksAnalysis extends java.lang.Object {
      * streams
      */
     public int[] completeStreamLinksArray;
-    
+
     /**
      * Creates new empty instance of LinksAnalysis. This constructor is only used by its
      * extension {@link hydroScalingAPI.util.randomSelfSimilarNetworks.RsnLinksAnalysis}
      */
     public LinksAnalysis(){
     }
-                                    
+
     /**
      * Creates new linksAnalysis
      * @param bas The {@link hydroScalingAPI.util.geomorphology.objects.Basin} associated to this
@@ -113,61 +113,61 @@ public class LinksAnalysis extends java.lang.Object {
      * @throws java.io.IOException Captures errors while reading network related information
      */
     public LinksAnalysis(hydroScalingAPI.util.geomorphology.objects.Basin bas,hydroScalingAPI.io.MetaRaster metaR, byte[][] DM) throws java.io.IOException{
-        
+
         localMetaRaster=metaR;
         basin=bas;
-        
+
         byte[][] basinMask=basin.getEncapsulatedNetworkMask();
-        
+
         //abrir los archivos .stream . link .point
-        
+
         hydroScalingAPI.io.MetaNetwork fullNetwork=new hydroScalingAPI.io.MetaNetwork(localMetaRaster);
-        
+
         java.util.Vector myMagnitude=new java.util.Vector();
         java.util.Vector myHeads=new java.util.Vector();
         java.util.Vector myContacts=new java.util.Vector();
         java.util.Vector myTails=new java.util.Vector();
-        
+
         for (int i=0;i<fullNetwork.getLinkRecord().length;i++){
-            
+
             int posX=fullNetwork.getLinkRecord()[i][1]%localMetaRaster.getNumCols()-basin.getMinX();
             int posY=fullNetwork.getLinkRecord()[i][1]/localMetaRaster.getNumCols()-basin.getMinY();
-            
+
             if (posY>=0 && posY<basinMask.length && posX>=0 && posX<basinMask[0].length){
                 if (basinMask[posY][posX] != 0){
-                    
+
                     myMagnitude.add(new int[] {fullNetwork.getLinkRecord()[i][0]});
-                    
+
                     myHeads.add(new int[] {fullNetwork.getLinkRecord()[i][1]});
-                    
+
                     myContacts.add(new int[] {fullNetwork.getLinkRecord()[i][2]});
-                    
+
                     myTails.add(new int[] {fullNetwork.getLinkRecord()[i][3]});
-                    
+
                 }
             }
-            
+
         }
-        
+
         magnitudeArray=new int[myTails.size()];
         headsArray=new int[myTails.size()];
         contactsArray=new int[myTails.size()];
         tailsArray=new int[myTails.size()];
-        
+
         for (int i=0;i<magnitudeArray.length;i++){
             int[] thisMagn=(int[]) myMagnitude.get(i);
             magnitudeArray[i]=thisMagn[0];
             basinMagnitude=Math.max(basinMagnitude,thisMagn[0]);
         }
-        
+
         for (int i=0;i<magnitudeArray.length;i++){
-            
+
             int[] thisHead=(int[]) myHeads.get(i);
             int[] thisContact=(int[]) myContacts.get(i);
             int[] thisTail=(int[]) myTails.get(i);
-            
+
             headsArray[i]=thisHead[0];
-            
+
             if (magnitudeArray[i] != basinMagnitude){
                 contactsArray[i]=thisContact[0];
                 tailsArray[i]=thisTail[0];
@@ -176,31 +176,31 @@ public class LinksAnalysis extends java.lang.Object {
                 contactsArray[i]=basin.getOutletID();
                 OuletLinkNum=i;
             }
-            
+
         }
-        
+
         //Here the conection's array is created
-        
+
         dirMatrix=new byte[basin.getMaxY()-basin.getMinY()+3][basin.getMaxX()-basin.getMinX()+3];
         for(int i=0;i<dirMatrix.length;i++){
             for(int j=0;j<dirMatrix[0].length;j++){
                 dirMatrix[i][j]=DM[i+basin.getMinY()-1][j+basin.getMinX()-1];
             }
         }
-        
+
         int xOulet,yOulet;
         int[][][] conectMask=new int[2][basin.getMaxY()-basin.getMinY()+3][basin.getMaxX()-basin.getMinX()+3];
-        
+
         for(int i=0;i<contactsArray.length;i++){
             xOulet=headsArray[i]%localMetaRaster.getNumCols();
             yOulet=headsArray[i]/localMetaRaster.getNumCols();
             conectMask[0][yOulet-basin.getMinY()+1][xOulet-basin.getMinX()+1]=i+1;
-            
+
             xOulet=contactsArray[i]%localMetaRaster.getNumCols();
             yOulet=contactsArray[i]/localMetaRaster.getNumCols();
             conectMask[1][yOulet-basin.getMinY()+1][xOulet-basin.getMinX()+1]=-i-1;
         }
-        
+
         connectionsArray=new int[contactsArray.length][];
         java.util.Vector llegadores;
         for(int i=0;i<conectMask[0].length;i++){
@@ -219,7 +219,7 @@ public class LinksAnalysis extends java.lang.Object {
                 }
             }
         }
-        
+
         nextLinkArray=new int[contactsArray.length];
         for(int i=0;i<conectMask[0].length;i++){
             for(int j=0;j<conectMask[0][0].length;j++){
@@ -228,14 +228,14 @@ public class LinksAnalysis extends java.lang.Object {
                 }
             }
         }
-        
+
         java.io.File rutaHorton=new java.io.File(localMetaRaster.getLocationBinaryFile().getPath().substring(0,localMetaRaster.getLocationBinaryFile().getPath().lastIndexOf("."))+".horton");
         java.io.RandomAccessFile fileHorton=new java.io.RandomAccessFile(rutaHorton,"r");
-        
+
         java.util.Vector linksCompletos=new java.util.Vector();
-        
+
         int myOrder,frontOrder;
-        
+
         for(int i=0;i<nextLinkArray.length;i++){
             fileHorton.seek(contactsArray[i]);
             myOrder=fileHorton.readByte();
@@ -248,20 +248,20 @@ public class LinksAnalysis extends java.lang.Object {
                 }
             } else {
                 linksCompletos.addElement(new int[] {i});
-                
+
             }
         }
-        
-        
+
+
         fileHorton.close();
-        
+
         completeStreamLinksArray=new int[linksCompletos.size()];
         for(int i=0;i<linksCompletos.size();i++){
             completeStreamLinksArray[i]=((int[]) linksCompletos.get(i))[0];
         }
-        
+
     }
-    
+
     /**
      * Returns the network Horton-Strahler order.
      * @return An integer with the basin order
@@ -269,7 +269,7 @@ public class LinksAnalysis extends java.lang.Object {
     public int getBasinOrder(){
         return basinOrder;
     }
-    
+
     /**
      * Returns the topologic and geometric distances of all links to the outlet link
      * @return A float[][] array. Where float[0] contains the array of topologic distances to
@@ -285,11 +285,11 @@ public class LinksAnalysis extends java.lang.Object {
             System.err.println("Failed reading lengths for width Function");
             System.err.println(IOE);
         }
-        
+
         return null;
-        
+
     }
-    
+
     /**
      * Returns the topologic and geometric distances of the upstream links to a
      * desired link in the basin
@@ -300,7 +300,7 @@ public class LinksAnalysis extends java.lang.Object {
      * desired link
      */
     public float[][] getDistancesToOutlet(float[][] dToOutlet,int outlet){
-            
+
         java.util.Vector distToInclue=new java.util.Vector();
         distToInclue.add(new float[] {dToOutlet[0][outlet],dToOutlet[1][outlet]});
         addIncoming(dToOutlet,distToInclue,outlet);
@@ -315,16 +315,55 @@ public class LinksAnalysis extends java.lang.Object {
         }
 
         return shortGroupDists;
-        
+
     }
-    
+
+        /**
+     * Returns the topologic and geometric distances of the upstream links to a
+     * desired link in the basin
+     * @param outlet A list of desired outlets
+     * @return A float[][] array. Where float[0] contains the array of topologic distances to
+     * the desired link and float[1] contains the array of geometric distances to the
+     * desired link
+     */
+    public float[][] getDistancesLandUseToOutlet(int outlet,hydroScalingAPI.modules.rainfallRunoffModel.objects.HillSlopesInfo thisHillsInfo){
+        try{
+            float[][] dToOutlet=new float[2][];
+            dToOutlet[0]=getVarValues(8)[0];
+            dToOutlet[1]=getVarValues(7)[0];
+
+            java.util.Vector distToInclue=new java.util.Vector();
+            distToInclue.add(new float[] {dToOutlet[0][outlet],dToOutlet[1][outlet]});
+            addIncoming(dToOutlet,distToInclue,outlet);
+
+
+            float[][] shortGroupDists=new float[3][distToInclue.size()];
+
+            for(int i=0;i<shortGroupDists[0].length;i++){
+                float[] myDists=(float[])distToInclue.get(i);
+
+                shortGroupDists[0][i]=myDists[0]-dToOutlet[0][outlet];
+                shortGroupDists[1][i]=myDists[1]-dToOutlet[1][outlet];
+                shortGroupDists[2][i]= (float)thisHillsInfo.LandUse(i);
+            }
+
+            return shortGroupDists;
+        } catch (java.io.IOException IOE){
+            System.err.println("Failed reading lengths for width Function");
+            System.err.println(IOE);
+        }
+
+        return null;
+
+    }
+
     private void addIncoming(float[][] dToOutlet,java.util.Vector distToInclue,int outlet){
         for(int i=0;i<connectionsArray[outlet].length;i++){
             distToInclue.add(new float[] {dToOutlet[0][connectionsArray[outlet][i]],dToOutlet[1][connectionsArray[outlet][i]]});
             addIncoming(dToOutlet,distToInclue,connectionsArray[outlet][i]);
         }
     }
-    
+
     /**
      * Returns the Topologic or Geometric Width Functions above a specified group of
      * outlets
@@ -333,15 +372,15 @@ public class LinksAnalysis extends java.lang.Object {
      * @return A double[numOutlets][numBins] array with the Width Functions
      */
     public double[][] getWidthFunctions(int[] outlets,int metric){
-        
+
         float binsize=1;
-            
+
         if(metric != 0){
             binsize=0.3f;
         }
         return getWidthFunctions(outlets,metric,binsize);
     }
-    
+
     /**
      * Returns the Topologic or Geometric Width Functions above a specified group of
      * outlets
@@ -362,7 +401,7 @@ public class LinksAnalysis extends java.lang.Object {
                 OuletLinkNum=outlets[k];
 
                 float[][] wFunc=getDistancesToOutlet(bigDtoO,outlets[k]);
-                
+
                 hydroScalingAPI.util.statistics.Stats distStats=new hydroScalingAPI.util.statistics.Stats(wFunc[metric]);
 
                 double[][] laWFunc=new double[1][1+(int)Math.ceil(distStats.maxValue/binsize)];
@@ -378,9 +417,138 @@ public class LinksAnalysis extends java.lang.Object {
         OuletLinkNum=OriginalBasinOutlet;
 
         return widthFunctions;
-        
+
     }
-    
+
+        /**
+     * Returns the Topologic or Geometric Width Functions above a specified group of
+     * outlets
+     * @param outlets The list of links where the width function is desired
+     * @param HillsInfo contain the land use information for each link
+     * @param metric 0 for topologic and 1 for geometric
+     * @return A double[numOutlets][numBins] array with the Width Functions
+     */
+
+       public double[][][] getLandUseWidthFunctions(int[] outlets,hydroScalingAPI.modules.rainfallRunoffModel.objects.HillSlopesInfo HillsInfo,int metric,float binsize){
+
+        int nclass=10;
+        int lu=-9;
+        // [link element number][link land use][number of elem for each binsize]
+        double[][][] widthFunctions=new double[outlets.length][nclass][];
+
+        int OriginalBasinOutlet=OuletLinkNum;
+
+        float[][] bigDtoO=getDistancesToOutlet();
+
+        for(int k=0;k<outlets.length;k++){
+            if(magnitudeArray[outlets[k]] > 1){
+                OuletLinkNum=outlets[k];
+
+                float[][] wFunc=getDistancesToOutlet(bigDtoO,outlets[k]);
+                float[][][] LUwFunc = new float[2][nclass][wFunc[metric].length];
+                for(int l=0;l<wFunc[metric].length;l++){
+                    lu=(int)HillsInfo.LandUse(l);
+                    LUwFunc[0][lu][l]=wFunc[0][l];
+                    LUwFunc[1][lu][l]=wFunc[1][l];
+                }
+
+                for(int c=0;c<nclass;c++){
+                    int LU=c+1;
+                hydroScalingAPI.util.statistics.Stats distStats=new hydroScalingAPI.util.statistics.Stats(LUwFunc[metric][c]);
+                double[][][] laWFunc=new double[1][nclass][1+(int)Math.ceil(distStats.maxValue/binsize)];
+                for(int i=0;i<LUwFunc[metric][c].length;i++) laWFunc[0][c][(int)Math.ceil(LUwFunc[metric][c][i]/binsize)]++;
+                widthFunctions[k][c]=laWFunc[0][c];
+                widthFunctions[k][c][0]=1;
+                }
+             }
+             else {
+                for(int c=0;c<nclass;c++) widthFunctions[k][c]=new double[] {1};
+             }
+       }
+
+        OuletLinkNum=OriginalBasinOutlet;
+
+        return widthFunctions;
+
+    }
+
+    public double[][][] getLandUseWidthFunctions(int[] outlets,hydroScalingAPI.modules.rainfallRunoffModel.objects.HillSlopesInfo HillsInfo,int metric){
+
+       float binsize=1;
+
+       if(metric != 0){
+           binsize=0.3f;
+       }
+
+        return getLandUseWidthFunctions(outlets,HillsInfo,metric,binsize);
+    }
+
+
+        /**
+     * Returns the Topologic or Geometric Width Functions above a specified group of
+     * outlets
+     * @param outlets The list of links where the width function is desired
+     * @param HillsInfo contain the land use information for each link
+     * @param metric 0 for topologic and 1 for geometric
+     * @return A double[numOutlets][numBins] array with the Width Functions
+     */
+
+       public double[][][] getCCWidthFunctions(int[] outlets,float [][] order,int metric,float binsize, int nclass){
+
+
+        // [link element number][link land use][number of elem for each binsize]
+        double[][][] widthFunctions=new double[outlets.length][nclass][];
+
+        int OriginalBasinOutlet=OuletLinkNum;
+
+        float[][] bigDtoO=getDistancesToOutlet();
+
+        for(int k=0;k<outlets.length;k++){
+            if(magnitudeArray[outlets[k]] > 1){
+                OuletLinkNum=outlets[k];
+
+                float[][] wFunc=getDistancesToOutlet(bigDtoO,outlets[k]);
+                float[][][] OrderwFunc = new float[2][nclass][wFunc[metric].length];
+                System.out.println("outlets" + k+ " order length = " + order[0].length + "wfunclength = "+wFunc[metric].length);
+                for(int l=0;l<wFunc[metric].length;l++){
+
+                    int or=(int)order[0][l];
+                    OrderwFunc[0][or][l]=wFunc[0][l];
+                    OrderwFunc[1][or][l]=wFunc[1][l];
+//if(OuletLinkNum==OriginalBasinOutlet) System.out.println(OuletLinkNum+" Order="+ or + " l="+l+ " topo="+wFunc[0][l]+" geom="+wFunc[1][l]);
+                }
+
+                for(int c=0;c<nclass;c++){
+                    int OR=c;
+                hydroScalingAPI.util.statistics.Stats distStats=new hydroScalingAPI.util.statistics.Stats(OrderwFunc[metric][c]);
+                double[][][] laWFunc=new double[1][nclass][1+(int)Math.ceil(distStats.maxValue/binsize)];
+                for(int i=0;i<OrderwFunc[metric][c].length;i++) laWFunc[0][c][(int)Math.ceil(OrderwFunc[metric][c][i]/binsize)]++;
+                widthFunctions[k][c]=laWFunc[0][c];
+                widthFunctions[k][c][0]=1;
+                }
+             }
+             else {
+                for(int c=0;c<nclass;c++) widthFunctions[k][c]=new double[] {1};
+             }
+       }
+
+        OuletLinkNum=OriginalBasinOutlet;
+
+        return widthFunctions;
+
+    }
+
+    public double[][][] getCCWidthFunctions(int[] outlets,float [][] order,int metric,int nclass){
+
+       float binsize=1;
+
+       if(metric != 0){
+           binsize=0.3f;
+       }
+
+        return getCCWidthFunctions(outlets,order,metric,binsize,nclass);
+    }
+
     /**
      * Returns and array with information about the link.  Available variables are:
      * <p>0: Link's Hillslope Area.  This is done by subtraction of area at head and area at incoming links head</p>
@@ -403,7 +571,7 @@ public class LinksAnalysis extends java.lang.Object {
      * @throws java.io.IOException Throws errors while reading information from raster files
      */
     public float[][] getVarValues(int varIndex) throws java.io.IOException {
-        
+
         String[] extenciones={  ".areas",       /*0*/
                                 ".ltc",         /*1*/
                                 ".areas",       /*2*/
@@ -420,12 +588,12 @@ public class LinksAnalysis extends java.lang.Object {
                                 ".tcd",         /*13*/
                                 ".areas"        /*14*/
                                 };
-    
+
         float[][] quantityArray=new float[1][tailsArray.length];
-        
+
         java.io.File rutaQuantity=new java.io.File(localMetaRaster.getLocationBinaryFile().getPath().substring(0,localMetaRaster.getLocationBinaryFile().getPath().lastIndexOf("."))+extenciones[varIndex]);
         java.io.RandomAccessFile fileQuantity=new java.io.RandomAccessFile(rutaQuantity,"r");
-       
+
         switch(varIndex){
             case 0:
                 //Link's Hillslope Area.  This is done by subtraction of area at head and area at incoming links head
@@ -437,11 +605,11 @@ public class LinksAnalysis extends java.lang.Object {
                         quantityArray[0][i]-=fileQuantity.readFloat();
                     }
                 }
-                
+
                 break;
             case 1:
                 //Link's Length.  This is done by subtraction of tcl at head and tcl at incoming links head
-                
+
                 for (int i=0;i<quantityArray[0].length;i++){
                     fileQuantity.seek(4*contactsArray[i]);
                     quantityArray[0][i]=fileQuantity.readFloat();
@@ -450,54 +618,54 @@ public class LinksAnalysis extends java.lang.Object {
                         quantityArray[0][i]-=fileQuantity.readFloat();
                     }
                 }
-                
+
                 break;
             case 2:
                 //Link's Upstream area.
-                
+
                 for (int i=0;i<quantityArray[0].length;i++){
                     fileQuantity.seek(4*contactsArray[i]);
                     quantityArray[0][i]=fileQuantity.readFloat();
                 }
-                
+
                 break;
             case 3:
                 //Link's drop
-                
+
                 for (int i=0;i<quantityArray[0].length;i++){
                     fileQuantity.seek(8*headsArray[i]);
                     double altUp=fileQuantity.readDouble();
                     fileQuantity.seek(8*tailsArray[i]);
                     quantityArray[0][i]=(float) (altUp-fileQuantity.readDouble());
                 }
-                
+
                 break;
             case 4:
                 //Link's order
-                
+
                 for (int i=0;i<quantityArray[0].length;i++){
                     fileQuantity.seek(headsArray[i]);
                     quantityArray[0][i]=(float) fileQuantity.readByte();
                 }
-                
+
                 break;
             case 5:
                 //Total Channel Length
-                
+
                 for (int i=0;i<quantityArray[0].length;i++){
                     fileQuantity.seek(4*contactsArray[i]);
                     quantityArray[0][i]=(float) fileQuantity.readFloat();
                 }
-                
+
                 break;
             case 6:
                 //Link's Magnitude
-                
+
                 for (int i=0;i<quantityArray[0].length;i++){
                     fileQuantity.seek(4*contactsArray[i]);
                     quantityArray[0][i]=fileQuantity.readInt();
                 }
-                
+
                 break;
             case 7:
                 //Link's Distance to Outlet
@@ -507,7 +675,7 @@ public class LinksAnalysis extends java.lang.Object {
                     fileQuantity.seek(4*headsArray[i]);
                     quantityArray[0][i]=fileQuantity.readFloat()-GoToB;
                 }
-                
+
                 break;
             case 8:
                 //Link's Topologic Distance to Outlet
@@ -517,56 +685,56 @@ public class LinksAnalysis extends java.lang.Object {
                     fileQuantity.seek(4*tailsArray[i]);
                     quantityArray[0][i]=fileQuantity.readInt()-ToToB+1;
                 }
-                
+
                 break;
             case 9:
                 //Link's Slope
-                
+
                 float[][] linkLengths=getVarValues(1);
-                
+
                 for (int i=0;i<quantityArray[0].length;i++){
                     fileQuantity.seek(8*headsArray[i]);
                     double altUp=fileQuantity.readDouble();
                     fileQuantity.seek(8*tailsArray[i]);
                     quantityArray[0][i]=(float) (altUp-fileQuantity.readDouble());
-                    
+
                     quantityArray[0][i]/=linkLengths[0][i]*1000;
                 }
-                
+
                 break;
             case 10:
                 //Link's Elevation
-                
+
                 for (int i=0;i<quantityArray[0].length;i++){
                     fileQuantity.seek(8*headsArray[i]);
                     quantityArray[0][i]=(float) (fileQuantity.readDouble());
                 }
-                
+
                 break;
             case 11:
                 //Longest Channel Length
-                
+
                 for (int i=0;i<quantityArray[0].length;i++){
                     fileQuantity.seek(4*contactsArray[i]);
                     quantityArray[0][i]=fileQuantity.readFloat();
                 }
-                
+
                 break;
             case 12:
                 //Binary Link Address
-                
+
                 quantityArray[0]=getBLA();
-                
+
                 break;
             case 13:
                 //Total Channel Drop
-                
+
                 for (int i=0;i<quantityArray[0].length;i++){
                     fileQuantity.seek(4*contactsArray[i]);
                     quantityArray[0][i]=fileQuantity.readFloat();
                     if(quantityArray[0][i] == 0) quantityArray[0][i]=1E-5f;
                 }
-                
+
                 break;
             case 14:
                 // Links Upstream Area at Head
@@ -574,14 +742,14 @@ public class LinksAnalysis extends java.lang.Object {
                     fileQuantity.seek(4*headsArray[i]);
                     quantityArray[0][i]=fileQuantity.readFloat();
                 }
-                break;            
+                break;
         }
-        
+
         fileQuantity.close();
-        
+
         return quantityArray;
     }
-    
+
     private float[] getBLA(){
         float[][] linkOrders=new float[0][0];
         try{
@@ -591,7 +759,7 @@ public class LinksAnalysis extends java.lang.Object {
             return null;
         }
         float[] BLAs= new float[connectionsArray.length];
-        
+
         for(int i=0;i<BLAs.length;i++){
             if(magnitudeArray[i]==1){
                 float currentOrder=1;
@@ -608,88 +776,88 @@ public class LinksAnalysis extends java.lang.Object {
                 }
                 //System.out.println(BLAs[i]);
             }
-            
+
         }
-        
+
         return BLAs;
     }
-    
+
     /**
      * Returns the ID of the link in the basin outlet
      * @return An integer with the position of the outlet links in the different arrays of the
      * class
      */
     public int getOutletID(){
-        
+
         return OuletLinkNum;
-        
+
     }
-    
-    public int getResSimID(int x, int y){       
-        int contactsID = x+(y*localMetaRaster.getNumCols());     
+
+    public int getResSimID(int x, int y){
+        int contactsID = x+(y*localMetaRaster.getNumCols());
         ressimID=-1;
         for (int i=0;i<contactsArray.length;i++){
             if (contactsArray[i]==contactsID) ressimID=i+1;
-            //Add 1 to ressimID because link ids in resSimul array in idl code start at 1.        
+            //Add 1 to ressimID because link ids in resSimul array in idl code start at 1.
         }
         return ressimID;
     }
-    
-    public int getLinkIDbyHead(int x, int y){       
-        int contactsID = x+(y*localMetaRaster.getNumCols());     
+
+    public int getLinkIDbyHead(int x, int y){
+        int contactsID = x+(y*localMetaRaster.getNumCols());
         ressimID=-1;
         for (int i=0;i<headsArray.length;i++){
             if (headsArray[i]==contactsID) ressimID=i;
         }
         return ressimID;
     }
-    
+
     /**
      * Tests for the class
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        
+
         //main0(args);  An anlysis of topography
         //main1(args);
         main2(args);
-        
+
     }
-        
+
     /**
      * Tests for the class
      * @param args the command line arguments
      */
     public static void main0(String args[]) {
-        
+
         java.text.NumberFormat number2 = java.text.NumberFormat.getNumberInstance();
         java.text.DecimalFormat dpoint2 = (java.text.DecimalFormat)number2;
-        dpoint2.applyPattern("0.00000000"); 
-        
+        dpoint2.applyPattern("0.00000000");
+
         try{
-            
+
             java.io.File theFile=new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Topography/0.3_ArcSecUSGS/89883214.metaDEM");
             hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
             metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Topography/0.3_ArcSecUSGS/89883214.dir"));
-        
+
             String formatoOriginal=metaModif.getFormat();
             metaModif.setFormat("Byte");
             byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
-            
+
             //hydroScalingAPI.util.geomorphology.objects.Basin laCuenca=new hydroScalingAPI.util.geomorphology.objects.Basin(3083,1688,matDirs,metaModif);
             //hydroScalingAPI.util.geomorphology.objects.Basin laCuenca=new hydroScalingAPI.util.geomorphology.objects.Basin(2256,3499,matDirs,metaModif);
             hydroScalingAPI.util.geomorphology.objects.Basin laCuenca=new hydroScalingAPI.util.geomorphology.objects.Basin(2220,4238,matDirs,metaModif);
-            
+
             LinksAnalysis myResults=new LinksAnalysis(laCuenca, metaModif, matDirs);
-            
+
             hydroScalingAPI.modules.rainfallRunoffModel.objects.LinksInfo thisNetworkGeom=new hydroScalingAPI.modules.rainfallRunoffModel.objects.LinksInfo(myResults);
-            
+
             metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Topography/0.3_ArcSecUSGS/89883214.dem"));
             metaModif.restoreOriginalFormat();
             float[][] myDEM=new hydroScalingAPI.io.DataRaster(metaModif).getFloat();
-            
+
             int[] countersOrderLink=new int[myResults.getBasinOrder()];
-            
+
             for (int i=0;i<myResults.completeStreamLinksArray.length;i++){
                 int LinkOrder=(int)thisNetworkGeom.linkOrder(myResults.completeStreamLinksArray[i]);
                 countersOrderLink[LinkOrder-1]++;
@@ -719,58 +887,58 @@ public class LinksAnalysis extends java.lang.Object {
                 }
                 System.out.println();
             }*/
-            
+
         } catch (java.io.IOException IOE){
             System.out.print(IOE);
             System.exit(0);
         }
-        
+
         System.exit(0);
-        
+
     }
-    
+
     /**
      * Tests for the class
      * @param args the command line arguments
      */
     public static void main1(String args[]) {
-        
+
         java.text.NumberFormat number2 = java.text.NumberFormat.getNumberInstance();
         java.text.DecimalFormat dpoint2 = (java.text.DecimalFormat)number2;
-        dpoint2.applyPattern("0.00000000"); 
-        
+        dpoint2.applyPattern("0.00000000");
+
         try{
-            
+
             java.io.File theFile=new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS/Whitewaters.metaDEM");
             hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
             metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS/Whitewaters.dir"));
-        
+
             String formatoOriginal=metaModif.getFormat();
             metaModif.setFormat("Byte");
             byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
-            
+
             hydroScalingAPI.util.geomorphology.objects.Basin laCuenca=new hydroScalingAPI.util.geomorphology.objects.Basin(1064, 494,matDirs,metaModif);
-            
+
             LinksAnalysis myResults=new LinksAnalysis(laCuenca, metaModif, matDirs);
-            
+
             hydroScalingAPI.modules.rainfallRunoffModel.objects.LinksInfo thisNetworkGeom=new hydroScalingAPI.modules.rainfallRunoffModel.objects.LinksInfo(myResults);
-            
+
             float[][] orders=myResults.getVarValues(4);
             int first5=0,first4=0;
             for (int i = 0; i < orders[0].length; i++) {
                 System.out.print(orders[0][i]+",");
                 if(first5==0 && orders[0][i] > 5) first5=i;
                 if(first4==0 && orders[0][i] > 4) first4=i;
-                
+
             }
             System.out.println();
-            
+
             float[][] dists=myResults.getDistancesToOutlet();
             for (int i = 0; i < dists[0].length; i++) {
                 System.out.print(dists[0][i]+",");
             }
             System.out.println();
-            
+
             double[][] wfs=myResults.getWidthFunctions(new int[]{myResults.getOutletID(),first5,first4},1);
             //double[][] wfs=myResults.getWidthFunctions(new int[]{first4},1);
             for (int i = 0; i < wfs.length; i++) {
@@ -779,42 +947,42 @@ public class LinksAnalysis extends java.lang.Object {
                 }
                 System.out.println();
             }
-            
+
         } catch (java.io.IOException IOE){
             System.out.print(IOE);
             System.exit(0);
         }
-        
+
         System.exit(0);
-        
+
     }
-    
+
     /**
      * Tests for the class
      * @param args the command line arguments
      */
     public static void main2(String args[]) {
-        
+
         java.text.NumberFormat number2 = java.text.NumberFormat.getNumberInstance();
         java.text.DecimalFormat dpoint2 = (java.text.DecimalFormat)number2;
-        dpoint2.applyPattern("0.00000000"); 
-        
+        dpoint2.applyPattern("0.00000000");
+
         try{
-            
+
             java.io.File theFile=new java.io.File("/hidrosigDataBases/Upper Rio Puerco DB/Rasters/Topography/1_ArcSec/NED_54212683.metaDEM");
             hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
             metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Upper Rio Puerco DB/Rasters/Topography/1_ArcSec/NED_54212683.dir"));
-        
+
             String formatoOriginal=metaModif.getFormat();
             metaModif.setFormat("Byte");
             byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
-            
+
             hydroScalingAPI.util.geomorphology.objects.Basin laCuenca=new hydroScalingAPI.util.geomorphology.objects.Basin(381,221,matDirs,metaModif);
-            
+
             LinksAnalysis myResults=new LinksAnalysis(laCuenca, metaModif, matDirs);
-            
+
             hydroScalingAPI.modules.rainfallRunoffModel.objects.LinksInfo thisNetworkGeom=new hydroScalingAPI.modules.rainfallRunoffModel.objects.LinksInfo(myResults);
-            
+
             double[][] wfs=myResults.getWidthFunctions(new int[]{myResults.getOutletID()},1);
             System.out.println("Distance to Outlet, Number of Links");
             for (int i = 0; i < wfs.length; i++) {
@@ -822,14 +990,14 @@ public class LinksAnalysis extends java.lang.Object {
                     System.out.println((j*0.3)+","+wfs[i][j]);
                 }
             }
-            
+
         } catch (java.io.IOException IOE){
             System.out.print(IOE);
             System.exit(0);
         }
-        
+
         System.exit(0);
-        
+
     }
-    
+
 }

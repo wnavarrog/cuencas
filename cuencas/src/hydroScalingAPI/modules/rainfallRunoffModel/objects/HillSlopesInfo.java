@@ -38,14 +38,16 @@ package hydroScalingAPI.modules.rainfallRunoffModel.objects;
  * @author Ricardo Mantilla
  */
 public class HillSlopesInfo extends java.lang.Object {
-    
 
-    
+
+
     private float[][] areasArray,infilRateArray, SoArray, TsArray, TeArray;
-    
+
     hydroScalingAPI.modules.rainfallRunoffModel.objects.StormManager thisStormEvent;
     hydroScalingAPI.modules.rainfallRunoffModel.objects.InfiltrationManager thisInfiltManager;
-    
+    hydroScalingAPI.modules.rainfallRunoffModel.objects.LandUseManager thisLandUse;
+    hydroScalingAPI.modules.rainfallRunoffModel.objects.SCSManager thisSCSData;
+
     /**
      * Creates new instnace of hillSlopesInfo
      * @param linksCon The object describing the topologic connectivity of the river network
@@ -54,7 +56,7 @@ public class HillSlopesInfo extends java.lang.Object {
     public HillSlopesInfo(hydroScalingAPI.util.geomorphology.objects.LinksAnalysis linksCon) throws java.io.IOException{
         areasArray=linksCon.getVarValues(0);
     }
-    
+
     /**
      * The total area of the hillslopes draining to the HillNumber-th link
      * @param HillNumber The index of the desired hillslope
@@ -63,7 +65,7 @@ public class HillSlopesInfo extends java.lang.Object {
     public double Area(int HillNumber){
         return (double) areasArray[0][HillNumber];
     }
-    
+
     /**
      * The total area of the hillslopes draining to the HillNumber-th link
      * @param HillNumber The index of the desired hillslope
@@ -72,7 +74,7 @@ public class HillSlopesInfo extends java.lang.Object {
     public void setArea(int HillNumber,float newArea){
         areasArray[0][HillNumber]=newArea;
     }
-    
+
     /**
      * The array of total area of the hillslopes draining corresponding link
      * @return An array with the hillslopes areas
@@ -80,7 +82,7 @@ public class HillSlopesInfo extends java.lang.Object {
     public float[][] getAreasArray(){
         return areasArray;
     }
-    
+
     /**
      * Returns the value of precipitation intensity in mm/h for a given moment of time
      * @param HillNumber The index of the desired hillslope
@@ -88,12 +90,20 @@ public class HillSlopesInfo extends java.lang.Object {
      * @return The value of rainfall intensity
      */
     public double precipitation(int HillNumber,double timeInMinutes){
-        java.util.Calendar dateRequested =java.util.Calendar.getInstance(); 
+        java.util.Calendar dateRequested =java.util.Calendar.getInstance();
         dateRequested.clear();
         dateRequested.setTimeInMillis((long) (timeInMinutes*60*1000));
+//        System.out.println("HillNumber="+HillNumber+"    dateRequested)="+dateRequested);
         return thisStormEvent.getPrecOnHillslope(HillNumber,dateRequested);
     }
-    
+
+       public double precipitationacum(int HillNumber,double timeInMinutes){
+        java.util.Calendar dateRequested =java.util.Calendar.getInstance();
+        dateRequested.clear();
+        dateRequested.setTimeInMillis((long) (timeInMinutes*60*1000));
+//        System.out.println("HillNumber="+HillNumber+"    dateRequested)="+dateRequested);
+        return thisStormEvent.getAcumPrecOnHillslope(HillNumber,dateRequested);
+    }
     /**
      * The maximum precipitatation intesity recorded over the hillslope
      * @param HillNumber The index of the desired hillslope
@@ -102,7 +112,7 @@ public class HillSlopesInfo extends java.lang.Object {
     public float maxPrecipitation(int HillNumber){
         return thisStormEvent.getMaxPrecOnHillslope(HillNumber);
     }
-    
+
     /**
      * The mean precipitatation intesity recorded over the hillslope
      * @param HillNumber The index of the desired hillslope
@@ -111,7 +121,7 @@ public class HillSlopesInfo extends java.lang.Object {
     public float meanPrecipitation(int HillNumber){
         return thisStormEvent.getMeanPrecOnHillslope(HillNumber);
     }
-    
+
     /**
      * Returns the value of infiltration rate in mm/h for a given moment of time
      * @param HillNumber The index of the desired hillslope
@@ -121,7 +131,7 @@ public class HillSlopesInfo extends java.lang.Object {
     public double infiltRate(int HillNumber,double timeInMinutes){
         return thisInfiltManager.getInfiltrationOnHillslope(HillNumber);
     }
-    
+
     /**
      * The Storage capacity of the hillslope
      * @param HillNumber The index of the desired hillslope
@@ -130,16 +140,16 @@ public class HillSlopesInfo extends java.lang.Object {
     public double So(int HillNumber){
         return 1.0;          //So is max storage in the hillslope and i is the i-th link
     }
-    
+
     /**
      * The recesion rate in the hillslope
      * @param HillNumber The index of the desired hillslope
      * @return The value of the recesion constant in 1/s
      */
     public double Ts(int HillNumber){
-        return 10.0;         
+        return 10.0;
     }
-    
+
     /**
      * The evaporation rate in the hillslope
      * @param HillNumber The index of the desired hillslope
@@ -148,7 +158,7 @@ public class HillSlopesInfo extends java.lang.Object {
     public double Te(int HillNumber){
         return 1e20;
     }
-    
+
     /**
      * Assigns a {@link hydroScalingAPI.modules.rainfallRunoffModel.objects.StormManager}
      * to handle precipitation for the group of hillslopes
@@ -157,10 +167,10 @@ public class HillSlopesInfo extends java.lang.Object {
     public void setStormManager(hydroScalingAPI.modules.rainfallRunoffModel.objects.StormManager storm){
         thisStormEvent=storm;
     }
-    
+
     /**
-     * 
-     * @param infiltation 
+     *
+     * @param infiltation
      */
     /**
      * Assigns a {@link hydroScalingAPI.modules.rainfallRunoffModel.objects.InfiltrationManager}
@@ -170,11 +180,17 @@ public class HillSlopesInfo extends java.lang.Object {
     public void setInfManager(hydroScalingAPI.modules.rainfallRunoffModel.objects.InfiltrationManager infiltation){
         thisInfiltManager=infiltation;
     }
-    
-    
+
+    public void setLandUseManager(hydroScalingAPI.modules.rainfallRunoffModel.objects.LandUseManager LandUse){
+        thisLandUse=LandUse;
+    }
+
+    public void setSCSManager(hydroScalingAPI.modules.rainfallRunoffModel.objects.SCSManager SCSData){
+        thisSCSData=SCSData;
+    }
     /* PF ADDITION - START ... */
     /* Working units are m, hr, .... */
-    
+
     /**
      * By Peter Furey:  MEAN SATURATED DEPTH = the depth of s2 zone averaged from hillslope
      * ridge to stream. It is assumed constant in time to make qs a linear function of s2.
@@ -186,7 +202,7 @@ public class HillSlopesInfo extends java.lang.Object {
         double depth_m = 2.5;  // meters
         return depth_m;
     }
-    
+
     /**
      * By Peter Furey:  Soil Hydraulic condictivity
      * @param HillNumber The index of the desired hillslope
@@ -197,7 +213,7 @@ public class HillSlopesInfo extends java.lang.Object {
         double ks_mphr = ks_mpd*(1./24.);
         return ks_mphr;
     }
-    
+
     /**
      * By Peter Furey:  undocumented
      * @param HillNumber The index of the desired hillslope
@@ -206,7 +222,7 @@ public class HillSlopesInfo extends java.lang.Object {
     public double MstExp(int HillNumber){
         return 11.0;  // this value dimensionless
     }
-    
+
     /**
      * By Peter Furey:  In NetworkEquations, qs = (RecParam(i)*s2) . In this expression,
      * we can divide s2 by area (in denom of RecParam(i)). Given that s2 = head * area,
@@ -221,7 +237,7 @@ public class HillSlopesInfo extends java.lang.Object {
         double d3_phr = (3.0*Ks(HillNumber)*DepthMnSat(HillNumber)) / (spec_yield*area_m2);
         return d3_phr; // [1/T]
     }
-    
+
     /**
      * By Peter Furey:  In NetworkEquations, satsurf = (S2Param(i)*s2). d4 comes from Duffy, via paper 3
      * @param HillNumber The index of the desired hillslope
@@ -234,7 +250,7 @@ public class HillSlopesInfo extends java.lang.Object {
         double d4_pm3 = 0.905*(1./(porosity*DepthMnSat(HillNumber)*area_m2));
         return d4_pm3; // [1/L^3]
     }
-    
+
     /**
      * By Peter Furey:  undocumented
      * @param HillNumber The index of the desired hillslope
@@ -244,7 +260,7 @@ public class HillSlopesInfo extends java.lang.Object {
         double s2max_m3 = ( 1.0/ S2Param(HillNumber) ) ;
         return s2max_m3;
     }
-    
+
     /**
      * By Peter Furey:  undocumented
      * @param HillNumber The index of the desired hillslope
@@ -256,5 +272,71 @@ public class HillSlopesInfo extends java.lang.Object {
         return etrate_mphr;
     }
     /* PF ADDITION - ... END */
-    
+     /* Returns the value of LanUse for a given moment of time
+     * @param HillNumber The index of the desired hillslope
+     * @param timeInMinutes The time in minutes
+     * @return The value of rainfall intensity
+     */
+    public double LandUse(int HillNumber){
+        return thisLandUse.getMaxHillSlopeLU(HillNumber);
+    }
+
+    public double LandUsePerc(int HillNumber){
+        return thisLandUse.getMaxHillSlopeLUPerc(HillNumber);
+    }
+
+   public double LandUseSCS(int HillNumber){
+        return thisSCSData.getMaxHillLU(HillNumber);
+    }
+
+    public double LandUsePercSCS(int HillNumber){
+        return thisSCSData.getMaxHillLUPerc(HillNumber);
+    }
+
+    public double Soil_SCS(int HillNumber){
+        return thisSCSData.getMaxHillSOIL(HillNumber);
+    }
+
+    public double Soil_PercSCS(int HillNumber){
+        return thisSCSData.getMaxHillSOILPerc(HillNumber);
+    }
+    public double SCS_CN2(int HillNumber){
+        return thisSCSData.getAverCN2(HillNumber);
+    }
+
+   public Double SCS_CN1(int HillNumber){
+        return thisSCSData.getAverCN1(HillNumber);
+    }
+   public Double SCS_CN3(int HillNumber){
+        return thisSCSData.getAverCN3(HillNumber);
+    }
+
+    public double SCS_S1(int HillNumber){
+     return ((25400/thisSCSData.getAverCN1(HillNumber))-254);
+    }
+     public double SCS_IA1(int HillNumber){
+     return (0.05*((25400/thisSCSData.getAverCN1(HillNumber))-254));
+    }
+
+   public double SCS_S2(int HillNumber){
+     return ((25400/thisSCSData.getAverCN2(HillNumber))-254);
+    }
+   public double SCS_IA2(int HillNumber){
+     return (0.05*((25400/thisSCSData.getAverCN2(HillNumber))-254));
+    }
+
+   public double SCS_S3(int HillNumber){
+        return ((25400/thisSCSData.getAverCN3(HillNumber))-254);
+    }
+
+   public double SCS_IA3(int HillNumber){
+        return (0.05*((25400/thisSCSData.getAverCN3(HillNumber))-254));
+    }
+    public double MinHillBasedCN(int HillNumber){
+        return thisSCSData.minHillBasedCN(HillNumber);
+    }
+
+     public double MaxHillBasedCN(int HillNumber){
+        return thisSCSData.maxHillBasedCN(HillNumber);
+    }
 }
