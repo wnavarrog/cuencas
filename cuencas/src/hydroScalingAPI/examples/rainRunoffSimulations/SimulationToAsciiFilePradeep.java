@@ -309,7 +309,7 @@ public class SimulationToAsciiFilePradeep extends java.lang.Object implements Ru
         metaModif.setFormat("Integer");
         int [][] magnitudes=new hydroScalingAPI.io.DataRaster(metaModif).getInt();
         
-       hydroScalingAPI.mainGUI.ParentGUI tempFrame=new hydroScalingAPI.mainGUI.ParentGUI();
+       //hydroScalingAPI.mainGUI.ParentGUI tempFrame=new hydroScalingAPI.mainGUI.ParentGUI();
         
         //new SimulationToAsciiFilePradeep(1063,496,matDirs,magnitudes,metaModif,  50,360,0.0f,5,new java.io.File("E:/Documents and Settings/pmandapa/My Documents/Research/Cuencas/GKRouting/Sc1IntensityORDuration")).executeSimulation();
         //new SimulationToAsciiFilePradeep(1063,496,matDirs,magnitudes,metaModif,  5,120,1,0.0f,2,new java.io.File("E:/Documents and Settings/pmandapa/My Documents/Research/Cuencas/CVRouting/Sc1IntensityORDuration")).executeSimulation();
