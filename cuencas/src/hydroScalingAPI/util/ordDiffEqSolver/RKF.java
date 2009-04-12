@@ -54,7 +54,7 @@ public class RKF extends java.lang.Object {
     double[] Derivs;
     double[] carrier, k0, k1, k2, k3, k4, k5, newY, newYstar, maxAchieved;
     double Delta, newTimeStep, factor;
-
+    
     /**
      * Creates new RKF
      * @param fu The differential equation to solve described by a {@link hydroScalingAPI.util.ordDiffEqSolver.BasicFunction}
@@ -581,14 +581,16 @@ public class RKF extends java.lang.Object {
         double currentTime = iniTime, targetTime;
 
         int ouletID = linksStructure.getOutletID();
-
+        // Indices corresponding to the maximum areas fo each Horton order
+        int[] ind = new int [10];
+        ind[0] = 1454; ind[1] = 1976; ind[2] = 4259; ind[3] = 4193; ind[4] = 87; ind[5] = 1788; ind[6] = 2397; ind[7] = 191;
+        
         outputStream.write("\n");
         outputStream.write(currentTime + "\t");
-        for (int i = 0; i < linksStructure.completeStreamLinksArray.length; i++) {
-            //if(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > 1)
-            outputStream.write(IC[linksStructure.completeStreamLinksArray[i]] + "\t");
-        }
-
+        for (int i = 0; i < 8; i++) {
+            outputStream.write(IC[linksStructure.completeStreamLinksArray[ind[i]]] + "\t");
+        }        
+        
         java.util.Calendar thisDate = java.util.Calendar.getInstance();
         thisDate.setTimeInMillis((long) (currentTime * 60. * 1000.0));
         System.out.println(thisDate.getTime() + " (" + java.util.Calendar.getInstance().getTime() + ")" + " Outlet Discharge: " + IC[ouletID]);
@@ -647,11 +649,10 @@ public class RKF extends java.lang.Object {
 
             outputStream.write("\n");
             outputStream.write(currentTime + "\t");
-            for (int i = 0; i < linksStructure.completeStreamLinksArray.length; i++) {
-                //if(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > 1)
-                outputStream.write(IC[linksStructure.completeStreamLinksArray[i]] + "\t");
-            }
-
+            for (int i = 0; i < 8; i++) {
+                outputStream.write(IC[linksStructure.completeStreamLinksArray[ind[i]]] + "\t");
+            }            
+            
             thisDate = java.util.Calendar.getInstance();
             thisDate.setTimeInMillis((long) (currentTime * 60. * 1000.0));
             System.out.println(thisDate.getTime() + " (" + java.util.Calendar.getInstance().getTime() + ")" + " Outlet Discharge: " + IC[ouletID]);
@@ -670,11 +671,10 @@ public class RKF extends java.lang.Object {
 
             outputStream.write("\n");
             outputStream.write(currentTime + "\t");
-            for (int i = 0; i < linksStructure.completeStreamLinksArray.length; i++) {
-                //if(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > 1)
-                outputStream.write(IC[linksStructure.completeStreamLinksArray[i]] + "\t");
+            for (int i = 0; i < 8; i++) {
+                outputStream.write(IC[linksStructure.completeStreamLinksArray[ind[i]]] + "\t");
             }
-
+            
             thisDate = java.util.Calendar.getInstance();
             thisDate.setTimeInMillis((long) (currentTime * 60. * 1000.0));
             System.out.println(thisDate.getTime() + " (" + java.util.Calendar.getInstance().getTime() + ")" + " Outlet Discharge: " + IC[ouletID]);
@@ -682,7 +682,6 @@ public class RKF extends java.lang.Object {
         //System.out.println();
 
         }
-
         finalCond = IC;
 
     }
