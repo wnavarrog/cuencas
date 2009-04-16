@@ -19,24 +19,26 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 /*
  * simulationsRep3.java
- * This funcion was modified by luciana to include land cover information
- * 02/12/2009 - it uses the LandUseManager
- * The runoff producion will be defined by the land use
- * Created on December 6, 2001, 10:34 AM
+ * This funcion was modified by luciana to include a different methods to estimate runoff
+ * and superficial velocity in the hillslope
+ * 02/12/2009 - it uses the SCSManager, that estimates Curve Number for each hillslope
+ * The runoff production method includes
+ * Hilltype
+        = 0 ; runoff = precipitation (wiht or without delay)
+        = 1 ; SCS Method - explicitly acount for soil moiusture condition
+        = 2 ; Mishra - Singh Method - modified SCS method that implicity accounts for for soil moiusture condition
+ * Created on April, 2009
  */
 
 package hydroScalingAPI.examples.rainRunoffSimulations;
 
-import hydroScalingAPI.io.MetaRaster;
 import visad.*;
 import java.io.*;
 import java.util.*;
-import java.text.DecimalFormat;
-
 
 /**
  *
- * @author Ricardo Mantilla
+ * @author Luciana Cunha
  */
 public class SimulationToFileLuciana extends java.lang.Object implements Runnable{
 
@@ -59,6 +61,7 @@ public class SimulationToFileLuciana extends java.lang.Object implements Runnabl
     float infiltRate;
     int routingType;
     int HillType;
+    float IniCondition;
     java.io.File outputDirectory;
     java.util.Hashtable routingParams;
 
@@ -106,8 +109,6 @@ public class SimulationToFileLuciana extends java.lang.Object implements Runnabl
         SoilFileFlag=SoilFileFlagOR;
         LandUseFile=LandUseFileOR;
         LandUseFileFlag=LandUseFileFlagOR;
-        System.out.println("Simulation to ask Luciana -infiltration"+infiltRate);
-
         outputDirectory=outputDirectoryOR;
         routingParams=rP;
 
@@ -134,19 +135,23 @@ public class SimulationToFileLuciana extends java.lang.Object implements Runnabl
 
         float lam1=((Float)routingParams.get("lambda1")).floatValue();
         float lam2=((Float)routingParams.get("lambda2")).floatValue();
-
         float v_o=((Float)routingParams.get("vo")).floatValue();
-         float vsub=((Float)routingParams.get("vssub")).floatValue();
+        float vconst=((Float)routingParams.get("Vconst")).floatValue();
+        float vsub=((Float)routingParams.get("vssub")).floatValue();
         float vrun=((Float)routingParams.get("vrunoff")).floatValue();
         float SM=((Float)routingParams.get("SoilMoisture")).floatValue();
         float rt=((Float)routingParams.get("Routing Type")).floatValue();
         float ht=((Float)routingParams.get("Hill Type")).floatValue();
-
+        float lambdaSCS=((Float)routingParams.get("lambdaSCSMethod")).floatValue();
+        IniCondition=((Float)routingParams.get("InitialCondition")).floatValue();
         routingType= (int)rt;
         HillType= (int)ht;
-        System.out.println("PARAMETERS v0="+v_o+" vsub=" + vsub +" vrun=" + vrun + " SM=" +SM);
 
+        System.out.println("SET PARAMETERS RoutingType="+rt+" Hill Type=" + ht +" vo=" + v_o +"lambda1=" +lam1 + " lambda2=" +lam2+ " lambda2=" +vconst);
+        System.out.println("SET PARAMETERS vssub="+vsub+"  vrun=" + vrun +" SM=" + SM +"lambda1=" +lam1 + " lambda2=" +lam2);
+        System.out.println("SET PARAMETERS Initial condition - SM="+IniCondition);
         thisNetworkGeom.setVqParams(v_o,0.0f,lam1,lam2);
+        thisNetworkGeom.setCteVel(vconst);
 
         hydroScalingAPI.modules.rainfallRunoffModel.objects.HillSlopesInfo thisHillsInfo=new hydroScalingAPI.modules.rainfallRunoffModel.objects.HillSlopesInfo(linksStructure);
         /////////////SET LAND USE INFORMATION AND GENERATE COLOR CODED WIDTH FUNCTION////////////////////////////
@@ -162,6 +167,8 @@ public class SimulationToFileLuciana extends java.lang.Object implements Runnabl
         //////////////////////////////////////
         System.out.println("Start to run Width function");
         java.io.File theFile;
+        java.io.File theFile_soil;
+        java.io.File theFile_surf;
         theFile=new java.io.File(outputDirectory.getAbsolutePath()+"/"+"LinksInfo"+".csv");
 
         System.out.println(theFile);
@@ -314,30 +321,35 @@ public class SimulationToFileLuciana extends java.lang.Object implements Runnabl
         }
 
 
- //       theFile=new java.io.File(outputDirectory.getAbsolutePath()+"/"+demName+"-SN.wfs.csv");
- //       System.out.println("Writing Width Functions - "+theFile);
- //       salida = new java.io.FileOutputStream(theFile);
- //       bufferout = new java.io.BufferedOutputStream(salida);
-//        newfile = new java.io.OutputStreamWriter(bufferout);
+        theFile=new java.io.File(outputDirectory.getAbsolutePath()+"/"+demName+"-SN.wfs.csv");
+        System.out.println("Writing Width Functions - "+theFile);
+        salida = new java.io.FileOutputStream(theFile);
+        bufferout = new java.io.BufferedOutputStream(salida);
+        newfile = new java.io.OutputStreamWriter(bufferout);
 
-  //      double[][] wfs=linksStructure.getWidthFunctions(linksStructure.completeStreamLinksArray,0);
+        double[][] wfs=linksStructure.getWidthFunctions(linksStructure.completeStreamLinksArray,0);
 
-  //      for (int i=0;i<linksStructure.completeStreamLinksArray.length;i++){
-  //          if(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > 1){
-  //              newfile.write("Link #"+linksStructure.completeStreamLinksArray[i]+",");
-  //              for (int j=0;j<wfs[i].length;j++) newfile.write(wfs[i][j]+",");
-  //              newfile.write("\n");
-  //          }
-  //      }
+        for (int i=0;i<linksStructure.completeStreamLinksArray.length;i++){
+            if(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > 1){
+                newfile.write(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i])+","+linksStructure.completeStreamLinksArray[i]+",");
+                for (int j=0;j<wfs[i].length;j++) newfile.write(wfs[i][j]+",");
+                newfile.write("\n");
+            }
+        }
 
-  //      newfile.close();
+        newfile.close();
   //      bufferout.close();
 
-        if(infiltMetaRaster == null)
-            theFile=new java.io.File(outputDirectory.getAbsolutePath()+"/"+"SCS"+demName+"_"+x+"_"+y+"-"+storm.stormName()+"-IR_"+infiltRate+"-Routing_"+routingString+"_params_"+lam1+"_"+lam2+"_"+v_o+".csv");//theFile=new java.io.File(Directory+demName+"_"+x+"_"+y++"-"+storm.stormName()+"-IR_"+infiltRate+"-Routing_"+routingString+"_params_"+widthCoeff+"_"+widthExponent+"_"+widthStdDev+"_"+chezyCoeff+"_"+chezyExponent+".dat");
+        if(rt == 2){
+            theFile=new java.io.File(outputDirectory.getAbsolutePath()+"/"+"SCS"+demName+"_"+x+"_"+y+"-"+"CV"+vconst+"-HillType_"+ht+"Rain"+rainIntensity+"mm/"+rainDuration+"min.csv");//
+            theFile_soil=new java.io.File(outputDirectory.getAbsolutePath()+"/"+"SCS"+demName+"_"+x+"_"+y+"-"+"CV"+vconst+"-HillType_"+ht+"Rain"+rainIntensity+"mm/"+rainDuration+"min.csv");
+            theFile_surf=new java.io.File(outputDirectory.getAbsolutePath()+"/"+"SCS"+demName+"_"+x+"_"+y+"-"+"CV"+vconst+"-HillType_"+ht+"Rain"+rainIntensity+"mm/"+rainDuration+"min.csv");}
         else
-            theFile=new java.io.File(outputDirectory.getAbsolutePath()+"/"+"SCS"+demName+"_"+x+"_"+y+"-"+storm.stormName()+"-IR_"+infiltMetaRaster.getLocationMeta().getName().substring(0,infiltMetaRaster.getLocationMeta().getName().lastIndexOf(".metaVHC"))+"-Routing_"+routingString+"_params_"+lam1+"_"+lam2+".csv");
-
+            {theFile=new java.io.File(outputDirectory.getAbsolutePath()+"/"+"SCS"+demName+"_"+x+"_"+y+"-"+routingString+"_params_"+v_o+"_"+lam1+"_"+lam2+".csv");
+             theFile_soil=new java.io.File(outputDirectory.getAbsolutePath()+"/"+"SCS"+demName+"_"+x+"_"+y+"-"+"CV"+vconst+"-HillType_"+ht+"Rain"+rainIntensity+"mm/"+rainDuration+"min.csv");
+             theFile_surf=new java.io.File(outputDirectory.getAbsolutePath()+"/"+"SCS"+demName+"_"+x+"_"+y+"-"+"CV"+vconst+"-HillType_"+ht+"Rain"+rainIntensity+"mm/"+rainDuration+"min.csv");}
+ 
+        //theFile=new java.io.File(outputDirectory.getAbsolutePath()+"/"+"SCS"+demName+"_"+x+"_"+y+"-"+storm.stormName()+"-IR_"+infiltMetaRaster.getLocationMeta().getName().substring(0,infiltMetaRaster.getLocationMeta().getName().lastIndexOf(".metaVHC"))+"-Routing_"+routingString+"_params_"+lam1+"_"+lam2+".csv");
         System.out.println(theFile);
         String DischargeFile=theFile.getAbsolutePath();
         salida = new java.io.FileOutputStream(theFile);
@@ -370,7 +382,7 @@ public class SimulationToFileLuciana extends java.lang.Object implements Runnabl
                 newfile.write(thisNetworkGeom.upStreamArea(linksStructure.completeStreamLinksArray[i])+",");
         }
 
-        newfile.write("\n");
+    
        // newfile.write("Slope,");
 //       newfile.write("4 ");
 //        for (int i=0;i<linksStructure.completeStreamLinksArray.length;i++){
@@ -390,31 +402,34 @@ public class SimulationToFileLuciana extends java.lang.Object implements Runnabl
  //               newfile.write("Link-"+linksStructure.completeStreamLinksArray[i]+",");
  //       }
 
-      hydroScalingAPI.modules.rainfallRunoffModel.objects.NetworkEquationsLuciana thisBasinEqSys=new hydroScalingAPI.modules.rainfallRunoffModel.objects.NetworkEquationsLuciana(linksStructure,thisHillsInfo,thisNetworkGeom,routingType,HillType,vrun,vsub,SM);
+      hydroScalingAPI.modules.rainfallRunoffModel.objects.NetworkEquationsLuciana thisBasinEqSys=
+              new hydroScalingAPI.modules.rainfallRunoffModel.objects.NetworkEquationsLuciana
+              (linksStructure,thisHillsInfo,thisNetworkGeom,routingType,HillType,vrun,vsub,SM,lambdaSCS);
   //      hydroScalingAPI.modules.rainfallRunoffModel.objects.NetworkEquations_HillDelay thisBasinEqSys=new hydroScalingAPI.modules.rainfallRunoffModel.objects.NetworkEquations_HillDelay(linksStructure,thisHillsInfo,thisNetworkGeom,routingType);
-      double[] initialCondition=new double[linksStructure.contactsArray.length*3];
-      double nummin=((((30*1000/1.0)/60)+(tim_run*60)+180)*0.20)*2.5;
-      if(SM==1.0f) nummin=2.5*24*60;
-      if(SM==2.0f) nummin=1.2*24*60;
-      if(SM==3.0f) nummin=1.0*24*60;
+      int nstates=linksStructure.contactsArray.length*2;
+
+      if(HillType==1 || HillType==2 || HillType==3 || HillType==4) nstates=linksStructure.contactsArray.length*3;
+      double[] initialCondition=new double[nstates];
+      double nummin=((((30*1000/1.0)/60)+(tim_run*60)+180))*2;
+
 
       if(HillType==0){for (int i=0;i<linksStructure.contactsArray.length;i++){
-            initialCondition[i]=0.01;
-            initialCondition[i+linksStructure.contactsArray.length]=0.01;
+            initialCondition[i]=0.0;
+            initialCondition[i+linksStructure.contactsArray.length]=0.0;
             }}
-      if(HillType==1){for (int i=0;i<linksStructure.contactsArray.length;i++){
-            initialCondition[i]=0.01;
-            initialCondition[i+linksStructure.contactsArray.length]=0.01;
-            initialCondition[i+2*linksStructure.contactsArray.length]=0.01;
+      if(HillType==1 || HillType==2 || HillType==3 || HillType==4){for (int i=0;i<linksStructure.contactsArray.length;i++){
+            initialCondition[i]=0.001;
+            initialCondition[i+linksStructure.contactsArray.length]=IniCondition*thisHillsInfo.SCS_S1(i);
+            initialCondition[i+2*linksStructure.contactsArray.length]=0.001;
             }}
 
         java.util.Date startTime=new java.util.Date();
         System.out.println("Start processing Time:"+startTime.toString());
         System.out.println("Number of Links on this simulation: "+(initialCondition.length/3.0));
         System.out.println("Inicia simulacion RKF");
-        System.out.println("Inicia simulacion RKF");
+        
         double rain_per=(numPeriods+1)*rainDuration;
-        System.out.println("Total running time = " + "Rain per = "+rain_per + "min + travel time runoff = "+ nummin + "min");
+        System.out.println("Total running time = " + "Rain per = "+rain_per + "min + simulation time = "+ nummin + "min");
         hydroScalingAPI.util.ordDiffEqSolver.RKF rainRunoffRaining=new hydroScalingAPI.util.ordDiffEqSolver.RKF(thisBasinEqSys,0.05,20/60.);
 
 
@@ -841,31 +856,6 @@ System.out.println("ic - "+ic+"  il - "+il);
 
     public static void subMain7(String args[]) throws java.io.IOException, VisADException {
 
-        java.util.Hashtable routingParams=new java.util.Hashtable();
-        routingParams.put("widthCoeff",1.0f);
-        routingParams.put("widthExponent",0.4f);
-        routingParams.put("widthStdDev",0.0f);
-
-        routingParams.put("chezyCoeff",14.2f);
-        routingParams.put("chezyExponent",-1/3.0f);
-
-        routingParams.put("lambda1",0.33f);
-        routingParams.put("lambda2",-0.17f);
-        routingParams.put("vo",0.74f);
-
-        float vrun=-9.9f;
-        float vsub=0.1f;
-        float vm=2.f;
-        float RoutType=5.f;
-        float HillType=1.f;
-        float Vchannel=0.5f;
-
-        routingParams.put("vrunoff",vrun);
-        routingParams.put("vssub",vsub);
-        routingParams.put("SoilMoisture",vm);
-        routingParams.put("Routing Type",RoutType);
-        routingParams.put("Hill Type",HillType);
-        routingParams.put("Vconst",Vchannel); // CHANGE IN THE NETWEORKEQUATION CLASS
         ///// DEM DATA /////
 
         String pathinput = "C:/CUENCAS/Charlote/Rasters/Topography/Charlotte_1AS/";
@@ -880,64 +870,88 @@ System.out.println("ic - "+ic+"  il - "+il);
         metaModif.setFormat("Integer");
         int [][] magnitudes=new hydroScalingAPI.io.DataRaster(metaModif).getInt();
 
-        hydroScalingAPI.mainGUI.ParentGUI tempFrame=new hydroScalingAPI.mainGUI.ParentGUI();
-
         // main basin
         int x= 764;
         int y= 168;
 
-      ///// LANDCOVERDATA /////
-         String LandCoverName="lc1992.metaVHC";
 
-        String Dir="C:/CUENCAS/Charlote/Rasters/Land_surface_Data/LandCover1992/";
-        new java.io.File(Dir+"/test/").mkdirs();
-        String OutputDir=Dir+"/test/";
-        String LandUse = Dir+LandCoverName;
-      ///// SOILDATA /////
-        String SoilName="soil_data.metaVHC";
-        Dir="C:/CUENCAS/Charlote/Rasters/Land_surface_Data/soil_nc119/";
-        String Soil = Dir+SoilName;
+        java.util.Hashtable routingParams=new java.util.Hashtable();
+        routingParams.put("widthCoeff",1.0f);
+        routingParams.put("widthExponent",0.4f);
+        routingParams.put("widthStdDev",0.0f);
+        routingParams.put("chezyCoeff",14.2f);
+        routingParams.put("chezyExponent",-1/3.0f);
+        routingParams.put("lambda1",0.33f);
+        routingParams.put("lambda2",-0.17f);
+        routingParams.put("vo",0.74f);
+        routingParams.put("Routing Type",5.f); // 2 - constante channel velocity, 5 - paramterized channel velocity
+        routingParams.put("Hill Type",4.f); // 0 - runoff=precipitaion, 1 SCSMethod, 2 - Mishra-Singh method
+        routingParams.put("vrunoff",250.f); // define a constant number or -9.9 for vel=f(land Cover)
+        routingParams.put("vssub",1.0f);
+        routingParams.put("SoilMoisture",2.f);
+        routingParams.put("lambdaSCSMethod",0.05f);
+        routingParams.put("Vconst",0.5f); // CHANGE IN THE NETWORKEQUATION CLASS
+        routingParams.put("InitialCondition",0.001f); // Porcentage of the soil filled up with water
 
-
-      ////RUNS PARAMETERS //////////////
-       float[] inten_array= {120,30};
+              ////RUNS PARAMETERS //////////////
+       int[] year_LC= {1992,2001};
+       float[] inten_array= {60,120,30};
        float vol=60.f;
-       float[] sm_array= {2.f,3.f,1.f}; // ANTECEDENT SOIL MOISTURE CONDICTION
-       float[] vr_array= {250.f,10.f,-9.9f}; // HILLSLOPE VELOCITY
-       float[] vs_array= {1.f}; // SUBSURFACE FLOW VELOCITY
+       float[] IC_array= {0.2f,0.5f,0.8f}; // ANTECEDENT SOIL MOISTURE CONDICTION
+       float[] vr_array= {100.f,500.f}; // HILLSLOPE VELOCITY
+       float[] vs_array= {10.f,1.0f}; // SUBSURFACE FLOW VELOCITY
        float infiltr=0.0f;
+       String LandCoverName = "error";
+       String Dir="error";
+       float vrun,vsub,IC;
 
-     for (float is : inten_array)
-        {
-        float intensity=is;
-        float duration=vol*60/intensity;
-          for (float it : sm_array)
-          {
-          vm=it;
-            for (float ir : vr_array)
-            {vrun=ir;
-               for (float iss : vs_array)
-               {vsub=iss;
-               if(vm==2.0f && vrun==250.0f)
+       for (float iss : vs_array)
+            {vsub=iss;
+          for (float ir : vr_array)
+           {vrun=ir;
+            for (int iy : year_LC)
+               {
+               int year=iy;
+                  for (float is : inten_array)
                   {
-                  System.out.println("already run");
-                  }else{
-                 routingParams.put("vrunoff",vrun);
-                 routingParams.put("vssub",vsub);
-                 routingParams.put("SoilMoisture",vm);
-
-                OutputDir="C:/CUENCAS/Charlote/results/1992/SM"+vm+"/delay/vr="+vrun+"/vs="+vsub+"/"+intensity+"/"+duration+"/";
-                 //OutputDir="C:/CUENCAS/Charlote/results/1992/Param_vel_Delay0/v=1.0"+"/SM"+vm+"/delay/vr="+vrun+"/vs="+vsub+"/"+intensity+"/"+duration+"/";
-                 new File(OutputDir).mkdirs();
-                 String path = OutputDir;
-                 //String rain = RaininputDir+"/bin/"+precname;
-                new SimulationToFileLuciana(x,y,matDirs,magnitudes,metaModif,intensity,duration,infiltr,new java.io.File(path),new java.io.File(LandUse),new java.io.File(Soil),routingParams).executeSimulation();
-                path = OutputDir+"/logfile.txt";
-                Gen_format(path);}//}
-               }
+                  float intensity=is;
+                  float duration=vol*60/intensity;
+                     for (float it : IC_array)
+                        {
+                        IC=it;
+                           routingParams.put("vrunoff",vrun);
+                           routingParams.put("vssub",vsub);
+                           routingParams.put("InitialCondition",IC);
+                           ///// LANDCOVERDATA /////
+                           if (year==2001){
+                               LandCoverName="raster_cliped.metaVHC";
+                               Dir="C:/CUENCAS/Charlote/Rasters/Land_surface_Data/LandCover2001/";}
+                           if (year==1992){
+                               LandCoverName="lc1992.metaVHC";
+                               Dir="C:/CUENCAS/Charlote/Rasters/Land_surface_Data/LandCover1992/";}
+                           new java.io.File(Dir+"/test/").mkdirs();
+                           String OutputDir=Dir+"/test/";
+                           String LandUse = Dir+LandCoverName;
+                           ///// SOILDATA /////
+                           String SoilName="soil_data.metaVHC";
+                           Dir="C:/CUENCAS/Charlote/Rasters/Land_surface_Data/soil_nc119/";
+                           String Soil = Dir+SoilName;
+                            //routingParams.put("SoilMoisture",vm);
+                           //OutputDir="C:/CUENCAS/Charlote/results/2001/test/Mishra/delay/vr="+vrun+"/vs="+vsub+"/"+intensity+"/"+duration+"/";
+                           OutputDir="C:/CUENCAS/Charlote/results/"+year+"/HT=4/"+intensity+"mm/"+duration+"min"+"/ASM="+IC+"/vrun="+vrun+"/vsub="+vsub+"/";
+                           System.out.println("OutputDir="+OutputDir);
+                           //OutputDir="C:/CUENCAS/Charlote/results/1992/Param_vel_Delay0/v=1.0"+"/SM"+vm+"/delay/vr="+vrun+"/vs="+vsub+"/"+intensity+"/"+duration+"/";
+                           new File(OutputDir).mkdirs();
+                           String path = OutputDir;
+                           //String rain = RaininputDir+"/bin/"+precname;
+                
+                            new SimulationToFileLuciana(x,y,matDirs,magnitudes,metaModif,intensity,duration,infiltr,new java.io.File(path),new java.io.File(LandUse),new java.io.File(Soil),routingParams).executeSimulation();
+                            path = OutputDir+"/logfile.txt";
+                            Gen_format(path);//}//}
+              }
             }
-         }
+        }
       }
     }
-
+    }
 }
