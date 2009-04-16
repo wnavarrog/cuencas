@@ -110,9 +110,9 @@ public class SCSManager {
 
         try{
             // Create the metaraster for land use
-            System.out.println("CREATE THE META RASTER _ LU \n");
+     //       System.out.println("CREATE THE META RASTER _ LU \n");
             metaLandUse=new hydroScalingAPI.io.MetaRaster(LandUse);
-            System.out.println("CREATE THE META RASTER _ SOIL DATA \n");
+     //       System.out.println("CREATE THE META RASTER _ SOIL DATA \n");
             metaSoilData=new hydroScalingAPI.io.MetaRaster(SoilData);
             /****** OJO QUE ACA PUEDE HABER UN ERROR (POR LA CUESTION DE LA COBERTURA DEL MAPA SOBRE LA CUENCA)*****************/
             if (metaLandUse.getMinLon() > metaDatos.getMinLon()+myCuenca.getMinX()*metaDatos.getResLon()/3600.0 ||
@@ -128,7 +128,7 @@ public class SCSManager {
                 metaSoilData.getResLat() != metaLandUse.getResLat() ||
                 metaSoilData.getMinLat() != metaLandUse.getMinLat() ||
                 metaSoilData.getMinLon() != metaLandUse.getMinLon()) {
-                    System.out.println("Soil and LC data information are different");
+                    System.out.println("Soil and LC data have different matrix size or data resolution");
                     return;
             }
 
@@ -206,17 +206,17 @@ public class SCSManager {
   //          System.out.println("arCron.length: "+arCron.length);
   //          for (int i=0;i<arCron.length;i++){
                 //Cargo cada uno
-                System.out.println("--> Loading data from LC = "+baseNameLC+"\n");
+  //              System.out.println("--> Loading data from LC = "+baseNameLC+"\n");
                 metaLandUse.setLocationBinaryFile(new java.io.File((baseNameLC)));
-                System.out.println("--> Loading data from LC = "+baseNameSOIL+"\n");
+ //               System.out.println("--> Loading data from LC = "+baseNameSOIL+"\n");
                 metaSoilData.setLocationBinaryFile(new java.io.File((baseNameSOIL)));
-                System.out.println("--> Start to load the data \n");
+ //               System.out.println("--> Start to load the data \n");
                 dataSnapShotSOIL=new hydroScalingAPI.io.DataRaster(metaSoilData).getDouble();
-                System.out.println("--> Start to load the data 2\n");
+ //               System.out.println("--> Start to load the data 2\n");
                 dataSnapShotLC=new hydroScalingAPI.io.DataRaster(metaLandUse).getDouble();
-                System.out.println("--> Start to load the data 2\n");
+ //               System.out.println("--> Start to load the data 2\n");
 
-                System.out.println("Finish load the data \n");
+ //               System.out.println("Finish load the data \n");
                 hydroScalingAPI.util.statistics.Stats rainStats=new hydroScalingAPI.util.statistics.Stats(dataSnapShotLC,new Double(metaLandUse.getMissing()).doubleValue());
                 System.out.println("    --> LC Stats of the File:  Max = "+rainStats.maxValue+" Min = "+rainStats.minValue+" Mean = "+rainStats.meanValue);
                 rainStats=new hydroScalingAPI.util.statistics.Stats(dataSnapShotSOIL,new Double(metaSoilData.getMissing()).doubleValue());
@@ -356,10 +356,10 @@ public class SCSManager {
                     }
 
                 }
-System.out.println("-----------------sTART TO CALCULATE THE FINAL VALUES----------------");
+//System.out.println("-----------------sTART TO CALCULATE THE FINAL VALUES----------------");
         java.io.File theFile;
         theFile=new java.io.File(LandUse.getParentFile()+"/"+"classes"+".csv");
-         System.out.println(theFile);
+//         System.out.println(theFile);
 
         java.io.FileOutputStream salida = new java.io.FileOutputStream(theFile);
         java.io.BufferedOutputStream bufferout = new java.io.BufferedOutputStream(salida);
@@ -415,12 +415,12 @@ for (int j=0;j<linksStructure.contactsArray.length;j++)
 
 
 
-            System.out.println(metaLandUse.getLocationBinaryFile().getName().lastIndexOf("."));
+  //          System.out.println(metaLandUse.getLocationBinaryFile().getName().lastIndexOf("."));
             thisLandUseName=metaLandUse.getLocationBinaryFile().getName().substring(0,metaLandUse.getLocationBinaryFile().getName().lastIndexOf("."));
             thisSoilData=metaLandUse.getLocationBinaryFile().getName().substring(0,metaSoilData.getLocationBinaryFile().getName().lastIndexOf("."));
             success=true;
 
-            System.out.println("-----------------Done with Files Reading----------------");
+  //          System.out.println("-----------------Done with Files Reading----------------");
 
             recordResolutionInMinutes=metaLandUse.getTemporalScale()/1000.0/60.0;
 
