@@ -567,12 +567,12 @@ public class RKF extends java.lang.Object {
 
         int ouletID = linksStructure.getOutletID();
 
-        outputStream.write("\n,currentTime" + ",");
-        outputStream2.write("\n,currentTime" + ",");
-        outputStream3.write("\n,currentTime" + ",");
-        outputStream4.write("\n,currentTime" + ",");
-        outputStream5.write("\n,currentTime" + ",");
-        outputStream6.write("\n,currentTime" + ",");
+        outputStream.write("\n"+currentTime + ",");
+        outputStream2.write("\n"+currentTime + ",");
+        outputStream3.write("\n"+currentTime + ",");
+        outputStream4.write("\n"+currentTime + ",");
+        outputStream5.write("\n"+currentTime + ",");
+        outputStream6.write("\n"+currentTime + ",");
         int nLi=linksStructure.completeStreamLinksArray.length;
         for (int i = 0; i < linksStructure.completeStreamLinksArray.length; i++) {
             if (thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) >= 1) {
@@ -641,12 +641,12 @@ public class RKF extends java.lang.Object {
             givenStep[0][0] = currentTime;
             IC = givenStep[1];
 
-            outputStream.write("\ncurrentTime" + ",");
-            outputStream2.write("\ncurrentTime" + ",");
-            outputStream3.write("\ncurrentTime" + ",");
-            outputStream4.write("\ncurrentTime" + ",");
-            outputStream5.write("\ncurrentTime" + ",");
-            outputStream6.write("\ncurrentTime" + ",");
+            outputStream.write("\n"+currentTime + ",");
+            outputStream2.write("\n"+currentTime + ",");
+            outputStream3.write("\n"+currentTime + ",");
+            outputStream4.write("\n"+currentTime + ",");
+            outputStream5.write("\n"+currentTime + ",");
+            outputStream6.write("\n"+currentTime + ",");
             for (int i = 0; i < linksStructure.completeStreamLinksArray.length; i++) {
                 if (thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) >= 1) {
                     outputStream.write(IC[linksStructure.completeStreamLinksArray[i]] + ",");
