@@ -303,7 +303,7 @@ public class NetworkEquationsLuciana implements hydroScalingAPI.util.ordDiffEqSo
                 if(qso<0) qso=0;
                 qs1=hillPrecIntensity-qso;
                 if(qs1<0) qs1=0;
-                System.out.println("qso"+qso+" S="+ S+" IA= "+IA+"M= "+M+ "DQ_DM="+DQ_DM+ " DM_DPe="+DM_DPe+ " DQ_DM*DM_DPe="+DQ_DM*DM_DPe+ "hillPrecIntensity="+hillPrecIntensity);
+                if (i==119) System.out.println("qso"+qso+" S="+ S+" IA= "+IA+"M= "+M+ "DQ_DM="+DQ_DM+ " DM_DPe="+DM_DPe+ " DQ_DM*DM_DPe="+DQ_DM*DM_DPe+ "hillPrecIntensity="+hillPrecIntensity);
             }
             else
             { // if qacum<IA - qd=0;
@@ -391,7 +391,8 @@ public class NetworkEquationsLuciana implements hydroScalingAPI.util.ordDiffEqSo
                   qso=C*hillPrecIntensity;    /// this would guarantee it is in mm/h
                   if(qso<0) qso=0;
                   qs1=hillPrecIntensity-qso;
-                  if(qs1<0) qs1=0;                
+                  if(qs1<0) qs1=0;
+                 // System.out.println("Link =" + i + "C= "+C+"hillAcumevent=" + hillAcumevent+" Pe ="+Pe+" S = "+S+" So = "+input[i+2*nLi]+" So/S = "+input[i+2*nLi]/S);
              }
             else
              { // if qacum<IA - qd=0;
@@ -401,6 +402,7 @@ public class NetworkEquationsLuciana implements hydroScalingAPI.util.ordDiffEqSo
                if(input[i+2*nLi]>=S) qso=hillPrecIntensity;
             }
 
+           // if (i==119)System.out.println("Link =" + i + "C= "+C+"hillAcumevent=" + hillAcumevent+" Pe ="+Pe+" S = "+S+" So = "+input[i+2*nLi]+" So/S = "+input[i+2*nLi]/S);
             double vr=1.0;
 
             if(vrunoff<0) // for different hillslope velocity according to Land cover type
@@ -443,8 +445,21 @@ public class NetworkEquationsLuciana implements hydroScalingAPI.util.ordDiffEqSo
             output[i]=60*K_Q*((1/3.6*areasHillArray[0][i]*(qcsup+qcsoil))+Q_trib-input[i]-chanLoss); //[m3/s]/min
             output[i+nLi]=(1/60.)*(qso-qcsup); //output[mm/min] qd and qs [mm/hour]
             output[i+2*nLi]=(1/60.)*(qs1-qcsoil); //output[mm/min] effPrecip and qss [mm/hour]
-
-        }
+            output[i+3*nLi]=(1/60.)*qcsup; // runoff rate mm/min
+            output[i+4*nLi]=(1/60.)*qcsoil; //subsurface flow mm/min
+            output[i+5*nLi]=(1/60.)*hillPrecIntensity; //accumulated precipitation mm/min
+            //           if (i==1462)
+ //          {try{
+ 
+//FileWriter fstream = new FileWriter("C:/CUENCAS/Charlote/results/variableTest4.txt",true);
+//BufferedWriter out = new BufferedWriter(fstream);
+//out.write(time + " "+ C +" "+ Pe +" "+ hillPrecIntensity+ " " + hillAcumevent+ " " + " " + input[i] + " " +  input[i+nLi] + " " + input[i+2*nLi]  + " " + qso+ " " + qs1+ " " + output[i] + " " + output[i+nLi]+ " " +output[i+2*nLi]  + " " + qso +  " " + qs1+  " " +qcsup +  " " + qcsoil+ " " + Q_trib+ " " +IA + " " + S + "\n");
+           //Close the output stream
+//out.close();
+//    }catch (Exception e){//Catch exception if any
+//    System.err.println("Error: " + e.getMessage());
+//    }}
+       }
             break ;
 
         }
