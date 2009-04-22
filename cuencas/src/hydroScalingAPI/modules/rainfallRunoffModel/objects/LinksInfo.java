@@ -42,7 +42,7 @@ public class LinksInfo extends java.lang.Object {
     private float basinArea;
 
     private float[][] Ck;
-    private float lambda1,lambda2;
+    private float lambda1,lambda2,ChanCteVel;
 
     /**
      * Creates new instnace of LinksInfo
@@ -174,6 +174,13 @@ public class LinksInfo extends java.lang.Object {
         lambda2=exponentA;
     }
 
+    public void setCteVel(float CteVel){
+        ChanCteVel=CteVel;
+    }
+
+    public float getCteVel(){
+        return ChanCteVel;
+    }
     /**
      * Returns the exponent for flow discharge in the parametrization
      *
