@@ -963,11 +963,11 @@ System.out.println("ic - "+ic+"  il - "+il);
 
               ////RUNS PARAMETERS //////////////
        int[] year_LC= {2001};
-       float[] inten_array= {60,120,30};
+       float[] inten_array= {60,120,30,150};
        float vol=60.f;
-       float[] IC_array= {0.0f,0.5f,0.2f,0.8f}; // ANTECEDENT SOIL MOISTURE CONDICTION
-       float[] vr_array= {100.f,500.f}; // HILLSLOPE VELOCITY
-       float[] vs_array= {10.f,1.0f}; // SUBSURFACE FLOW VELOCITY
+       float[] IC_array= {0.0f,0.5f,0.2f,0.8f,1.0f}; // ANTECEDENT SOIL MOISTURE CONDICTION
+       float[] vr_array= {100.f}; // HILLSLOPE VELOCITY
+       float[] vs_array= {1.f}; // SUBSURFACE FLOW VELOCITY
        float infiltr=0.0f;
        String LandCoverName = "error";
        String Dir="error";
@@ -988,12 +988,7 @@ System.out.println("ic - "+ic+"  il - "+il);
                         {
 
                         IC=it;
-                        if(intensity==120 &&  IC==0.5)
-                        {
-                            System.out.println("JUMP ");
-                        }
-                        else{
-
+                        
                         routingParams.put("vrunoff",vrun);
                            routingParams.put("vssub",vsub);
                            routingParams.put("InitialCondition",IC);
@@ -1013,7 +1008,7 @@ System.out.println("ic - "+ic+"  il - "+il);
                            String Soil = Dir+SoilName;
                             //routingParams.put("SoilMoisture",vm);
                            //OutputDir="C:/CUENCAS/Charlote/results/2001/test/Mishra/delay/vr="+vrun+"/vs="+vsub+"/"+intensity+"/"+duration+"/";
-                           OutputDir="C:/CUENCAS/Charlote/results/"+year+"/HT=4/"+intensity+"mm/"+duration+"min"+"/ASM="+IC+"/vrun="+vrun+"/vsub="+vsub+"/test/";
+                           OutputDir="C:/CUENCAS/Charlote/results/"+year+"/HT=4/"+intensity+"mm/"+duration+"min"+"/ASM="+IC+"/vrun="+vrun+"/vsub="+vsub+"/";
                            System.out.println("OutputDir="+OutputDir);
                            //OutputDir="C:/CUENCAS/Charlote/results/1992/Param_vel_Delay0/v=1.0"+"/SM"+vm+"/delay/vr="+vrun+"/vs="+vsub+"/"+intensity+"/"+duration+"/";
                            new File(OutputDir).mkdirs();
@@ -1022,7 +1017,7 @@ System.out.println("ic - "+ic+"  il - "+il);
                 
                             new SimulationToFileLuciana(x,y,matDirs,magnitudes,metaModif,intensity,duration,infiltr,new java.io.File(path),new java.io.File(LandUse),new java.io.File(Soil),routingParams).executeSimulation();
                             path = OutputDir+"/logfile.txt";
-                            Gen_format(path);}//}
+                            Gen_format(path);//}
               }
             }
         }
