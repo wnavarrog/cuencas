@@ -456,7 +456,7 @@ public class RKF extends java.lang.Object {
         outputStream.write("\n");
         outputStream.write(currentTime + ",");
         for (int i = 0; i < linksStructure.completeStreamLinksArray.length; i++) {
-            if (thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > 1) {
+            if (thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) >= 1) {
                 outputStream.write(IC[linksStructure.completeStreamLinksArray[i]] + ",");
             }
         }
@@ -520,7 +520,7 @@ public class RKF extends java.lang.Object {
             outputStream.write("\n");
             outputStream.write(currentTime + ",");
             for (int i = 0; i < linksStructure.completeStreamLinksArray.length; i++) {
-                if (thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > 1) {
+                if (thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) >= 1) {
                     outputStream.write(IC[linksStructure.completeStreamLinksArray[i]] + ",");
                 }
             }
@@ -544,8 +544,151 @@ public class RKF extends java.lang.Object {
             outputStream.write("\n");
             outputStream.write(currentTime + ",");
             for (int i = 0; i < linksStructure.completeStreamLinksArray.length; i++) {
-                if (thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > 1) {
+                if (thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) >= 1) {
                     outputStream.write(IC[linksStructure.completeStreamLinksArray[i]] + ",");
+                }
+            }
+
+            thisDate = java.util.Calendar.getInstance();
+            thisDate.setTimeInMillis((long) (currentTime * 60. * 1000.0));
+            System.out.println(thisDate.getTime() + " (" + java.util.Calendar.getInstance().getTime() + ")" + " Outlet Discharge: " + IC[ouletID]);
+        //for (int j=0;j<IC.length/2;j++) System.out.print(IC[j]+" ");
+        //System.out.println();
+
+        }
+
+        finalCond = IC;
+
+    }
+
+       public void jumpsRunToAsciiFileHilltype4(double iniTime, double finalTime, double incrementalTime, double[] IC, java.io.OutputStreamWriter outputStream, java.io.OutputStreamWriter outputStream2, java.io.OutputStreamWriter outputStream3, java.io.OutputStreamWriter outputStream4,  java.io.OutputStreamWriter outputStream5,  java.io.OutputStreamWriter outputStream6, hydroScalingAPI.util.geomorphology.objects.LinksAnalysis linksStructure, hydroScalingAPI.modules.rainfallRunoffModel.objects.LinksInfo thisNetworkGeom) throws java.io.IOException {
+
+        double currentTime = iniTime, targetTime;
+
+        int ouletID = linksStructure.getOutletID();
+
+        outputStream.write("\n,currentTime" + ",");
+        outputStream2.write("\n,currentTime" + ",");
+        outputStream3.write("\n,currentTime" + ",");
+        outputStream4.write("\n,currentTime" + ",");
+        outputStream5.write("\n,currentTime" + ",");
+        outputStream6.write("\n,currentTime" + ",");
+        int nLi=linksStructure.completeStreamLinksArray.length;
+        for (int i = 0; i < linksStructure.completeStreamLinksArray.length; i++) {
+            if (thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) >= 1) {
+                outputStream.write(IC[linksStructure.completeStreamLinksArray[i]] + ",");
+                outputStream2.write(IC[linksStructure.completeStreamLinksArray[i]+3*nLi] + ",");
+                outputStream3.write(IC[linksStructure.completeStreamLinksArray[i]+4*nLi] + ",");
+                outputStream4.write(IC[linksStructure.completeStreamLinksArray[i]+5*nLi] + ",");
+                outputStream5.write(IC[linksStructure.completeStreamLinksArray[i]+1*nLi] + ",");
+                outputStream6.write(IC[linksStructure.completeStreamLinksArray[i]+2*nLi] + ",");
+            }
+        }
+
+        java.util.Calendar thisDate = java.util.Calendar.getInstance();
+        thisDate.setTimeInMillis((long) (currentTime * 60. * 1000.0));
+        System.out.println(thisDate.getTime() + " (" + java.util.Calendar.getInstance().getTime() + ")" + " Outlet Discharge: " + IC[ouletID]);
+        //for (int j=0;j<IC.length/2;j++) System.out.print(IC[j]+" ");
+        //System.out.println();
+
+        double[][] givenStep;
+
+        while (currentTime < finalTime) {
+            targetTime = currentTime + incrementalTime;
+            while (currentTime < targetTime) {
+
+                /*thisDate=java.util.Calendar.getInstance();
+                thisDate.setTimeInMillis((long)(currentTime*60.*1000.0));
+                System.out.println("inLoop"+thisDate.getTime());*/
+
+                givenStep = step(currentTime, IC, basicTimeStep, false);
+
+                if (currentTime + givenStep[0][0] > targetTime) {
+                    //System.out.println("******** False Step ********");
+                    break;
+                }
+
+                basicTimeStep = givenStep[0][0];
+                currentTime += basicTimeStep;
+                givenStep[0][0] = currentTime;
+                IC = givenStep[1];
+
+
+            }
+            /*thisDate=java.util.Calendar.getInstance();
+            thisDate.setTimeInMillis((long)(currentTime*60.*1000.0));
+            System.out.println("outsideLoop"+thisDate.getTime());*/
+
+            if (targetTime == finalTime) {
+                //System.out.println("******** I'll go to End Of Step ********");
+                break;
+            }
+
+            givenStep = step(currentTime, IC, targetTime - currentTime, true);
+
+            if (currentTime + givenStep[0][0] >= finalTime) {
+                //System.out.println("******** False Step ********");
+                break;
+            }
+
+            if (IC[ouletID] < 1e-3) {
+                //System.out.println("******** False Step ********");
+                break;
+            }
+
+            basicTimeStep = givenStep[0][0];
+            currentTime += basicTimeStep;
+            givenStep[0][0] = currentTime;
+            IC = givenStep[1];
+
+            outputStream.write("\ncurrentTime" + ",");
+            outputStream2.write("\ncurrentTime" + ",");
+            outputStream3.write("\ncurrentTime" + ",");
+            outputStream4.write("\ncurrentTime" + ",");
+            outputStream5.write("\ncurrentTime" + ",");
+            outputStream6.write("\ncurrentTime" + ",");
+            for (int i = 0; i < linksStructure.completeStreamLinksArray.length; i++) {
+                if (thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) >= 1) {
+                    outputStream.write(IC[linksStructure.completeStreamLinksArray[i]] + ",");
+                    outputStream2.write(IC[linksStructure.completeStreamLinksArray[i]+3*nLi] + ",");
+                    outputStream3.write(IC[linksStructure.completeStreamLinksArray[i]+4*nLi] + ",");
+                    outputStream4.write(IC[linksStructure.completeStreamLinksArray[i]+5*nLi] + ",");
+                    outputStream5.write(IC[linksStructure.completeStreamLinksArray[i]+4*nLi] + ",");
+                    outputStream6.write(IC[linksStructure.completeStreamLinksArray[i]+5*nLi] + ",");
+                }
+            }
+
+            thisDate = java.util.Calendar.getInstance();
+            thisDate.setTimeInMillis((long) (currentTime * 60. * 1000.0));
+            System.out.println(thisDate.getTime() + " (" + java.util.Calendar.getInstance().getTime() + ")" + " Outlet Discharge: " + IC[ouletID]);
+
+        //for (int j=0;j<IC.length/2;j++) System.out.print(IC[j]+" ");
+        //System.out.println();
+
+        }
+
+        if (currentTime != finalTime && IC[ouletID] > 1e-3) {
+            givenStep = step(currentTime, IC, finalTime - currentTime - 1 / 60., true);
+            basicTimeStep = givenStep[0][0];
+            currentTime += basicTimeStep;
+            givenStep[0][0] = currentTime;
+            IC = givenStep[1];
+
+            outputStream.write("\n"+currentTime + ",");
+            outputStream2.write("\n"+currentTime + ",");
+            outputStream3.write("\n"+currentTime + ",");
+            outputStream4.write("\n"+currentTime + ",");
+            outputStream5.write("\n"+currentTime + ",");
+            outputStream6.write("\n"+currentTime + ",");
+
+            for (int i = 0; i < linksStructure.completeStreamLinksArray.length; i++) {
+                if (thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) >= 1) {
+                    outputStream.write(IC[linksStructure.completeStreamLinksArray[i]] + ",");
+                    outputStream2.write(IC[linksStructure.completeStreamLinksArray[i]+3*nLi] + ",");
+                    outputStream3.write(IC[linksStructure.completeStreamLinksArray[i]+4*nLi] + ",");
+                    outputStream4.write(IC[linksStructure.completeStreamLinksArray[i]+5*nLi] + ",");
+                    outputStream5.write(IC[linksStructure.completeStreamLinksArray[i]+4*nLi] + ",");
+                    outputStream6.write(IC[linksStructure.completeStreamLinksArray[i]+5*nLi] + ",");
                 }
             }
 
