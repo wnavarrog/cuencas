@@ -188,8 +188,13 @@ public class NetworkEquationsLuciana implements hydroScalingAPI.util.ordDiffEqSo
 
        break ;
 
-         case 1 :    /* SCS METHOD WITH DELAY FUNCTION*/
+         case 1 :    /* Luciana - Considering soil misture explicitly using AMCI, AMCII and AMCIII
+                * This is the SCS equation, where Qacum=(Pacum-IA)^2/(Pacum-IA+S)
+                * Pe=Pacum-IA
+                * S=f(land cover, soil properties, AMC)
+                * dQ/dt=(Pe*(Pe+2S)/(Pe+S)^2)*dPe/dt
 
+                */
          for (int i=0;i<input.length;i++){if (input[i] < 0.0) input[i]=0.0;}
 
          for (int i=0;i<nLi;i++){
@@ -362,8 +367,16 @@ public class NetworkEquationsLuciana implements hydroScalingAPI.util.ordDiffEqSo
 
             break ;
 
-            case 4 :    /* Luciana - Considering soil */
-
+            case 4 : 
+               /* Luciana - Considering soil and soil avaliability equal to
+                * Soil storage for AMC =1 - estimated using curve number
+                * This is the SCS equation, where Qacum=(Pacum-IA)^2/(Pacum-IA+St)
+                * Pe=Pacum-IA
+                * So=(SI-M)
+                * dQ/dt=(Pe*(Pe+2So)/(Pe+So)^2)*dPe/dt
+                * SI=maximum infiltration capacity = f(soil moisture, soil hydrologic group, dry soil)
+                * M=soil moisture at time t
+                */
                 for (int i=0;i<input.length;i++){if (input[i] < 0.0) input[i]=0.0;}
 
                 for (int i=0;i<nLi;i++){
@@ -385,7 +398,7 @@ public class NetworkEquationsLuciana implements hydroScalingAPI.util.ordDiffEqSo
            double C=0;
            double Pe=hillAcumevent-IA;
            if(hillPrecIntensity>0.0f && (Pe)>0)
-             { /// This is the SCS equation, where qd=(Pacum-IA)^2/(Pacum-IA-S)
+             { 
                 if(input[i+2*nLi]>=S) C=1;
                 if(input[i+2*nLi]<S)  C=Pe*(Pe+2*S-2*input[i+2*nLi])/Math.pow((Pe+S-input[i+2*nLi]),2);
                   qso=C*hillPrecIntensity;    /// this would guarantee it is in mm/h
@@ -461,6 +474,118 @@ public class NetworkEquationsLuciana implements hydroScalingAPI.util.ordDiffEqSo
 //    }}
        }
             break ;
+       case 5 :    /* Luciana - Considering soil and soil avaliability equal to
+                * STATSCO available water storage for depth =150cm
+                * This is the SCS equation, where Qacum=(Pacum-IA)^2/(Pacum-IA+St)
+                * Pe=Pacum-IA
+                * St=((S-M)/S)*SI
+                * dQ/dt=(Pe*(Pe+2St)/(Pe+St)^2)*dPe/dt
+                * SI=maximum infiltration capacity = f(soil moisture, soil hydrologic group, dry soil)
+                * S=soil potential storage = STATSCO database
+                * M=soil moisture at time t
+                */
+
+                for (int i=0;i<input.length;i++){if (input[i] < 0.0) input[i]=0.0;}
+
+                for (int i=0;i<nLi;i++){
+
+                double hillPrecIntensity=basinHillSlopesInfo.precipitation(i,time);// for URP event apply this rule*0.143;
+                double hillAcumevent=basinHillSlopesInfo.precipitationacum(i,time);
+                double hillAcum5days=0.0;
+                int iflag=-9;
+                double IA=-9.9;
+                double S=-9.9;
+                double SI=-9.9;
+                double lambda=0.05;
+                S=basinHillSlopesInfo.SCS_S2(i); // maximum storage - change to statsco value
+                SI=basinHillSlopesInfo.SCS_S1(i); // maximum infiltration when M=0
+                IA=lambda*S;
+                if(IA<0) IA=0;
+                if(S<0) S=0;
+
+                double ratio=0.0;
+            // indication that it is raining - hillAcumPreccurr>hillAcumPrecprev
+           double C=0;
+           double Pe=hillAcumevent-IA;
+           if(hillPrecIntensity>0.0f && (Pe)>0)
+             {
+               double St=((S-input[i+2*nLi])/S)*SI;
+                if(input[i+2*nLi]>=S) C=1;
+                if(input[i+2*nLi]<S)  C=Pe*(Pe+2*St)/Math.pow((Pe+St),2);
+                  qso=C*hillPrecIntensity;    /// this would guarantee it is in mm/h
+                  if(qso<0) qso=0;
+                  qs1=hillPrecIntensity-qso;
+                  if(qs1<0) qs1=0;
+                 // System.out.println("Link =" + i + "C= "+C+"hillAcumevent=" + hillAcumevent+" Pe ="+Pe+" S = "+S+" So = "+input[i+2*nLi]+" So/S = "+input[i+2*nLi]/S);
+             }
+            else
+             { // if qacum<IA - qd=0;
+               qso=0;
+               qs1=0;
+               if(input[i+2*nLi]<S) qs1=hillPrecIntensity;
+               if(input[i+2*nLi]>=S) qso=hillPrecIntensity;
+            }
+
+           // if (i==119)System.out.println("Link =" + i + "C= "+C+"hillAcumevent=" + hillAcumevent+" Pe ="+Pe+" S = "+S+" So = "+input[i+2*nLi]+" So/S = "+input[i+2*nLi]/S);
+            double vr=1.0;
+
+            if(vrunoff<0) // for different hillslope velocity according to Land cover type
+            {
+               if(basinHillSlopesInfo.LandUseSCS(i)==0) vr=500.0; // water
+               if(basinHillSlopesInfo.LandUseSCS(i)==1) vr=250.0; // urban area
+               if(basinHillSlopesInfo.LandUseSCS(i)==2) vr=100.0; // baren soil
+               if(basinHillSlopesInfo.LandUseSCS(i)==3) vr=10.0; // Forest
+               if(basinHillSlopesInfo.LandUseSCS(i)==4) vr=100.0; // Shrubland
+               if(basinHillSlopesInfo.LandUseSCS(i)==5) vr=20.0; // Non-natural woody/Orchards
+               if(basinHillSlopesInfo.LandUseSCS(i)==6) vr=100.0; // Grassland
+               if(basinHillSlopesInfo.LandUseSCS(i)==7) vr=20.0; // Row Crops
+               if(basinHillSlopesInfo.LandUseSCS(i)==8) vr=100.0; // Pasture/Small Grains
+               if(basinHillSlopesInfo.LandUseSCS(i)==9) vr=50.0; // Wetlands
+               }
+            else{vr=vrunoff;}
+            double dist=areasHillArray[0][i]*1000000/(4*lengthArray[0][i]); //(m)
+            double tim_run=dist/vr; //hour
+            double tim_sub=dist/vsub;     //hour
+            qcsup=(1/tim_run)*input[i+nLi]; //mm/hour//((input[i+nLi] > So)?1:0)*(1/Ts*(input[i+nLi]-So));
+            qcsoil=(1/tim_sub)*input[i+2*nLi];  //mm/hour
+
+            Q_trib=0.0;
+
+            for (int j=0;j<linksConectionStruct.connectionsArray[i].length;j++){
+                Q_trib+=input[linksConectionStruct.connectionsArray[i][j]];
+            }
+
+                switch (routingType) {
+                    case 2:     K_Q=1.0/lengthArray[0][i];
+                    break;
+                    case 5:     K_Q=CkArray[0][i]*Math.pow(input[i],lamda1)*Math.pow(upAreasArray[0][i],lamda2)*Math.pow(lengthArray[0][i],-1);
+                 }
+
+            if (input[i] == 0) K_Q=0.1/(lengthArray[0][i]);
+
+            double ks=0/3.6e6;
+            double chanLoss=lengthArray[0][i]*widthArray[0][i]*ks;
+
+            output[i]=60*K_Q*((1/3.6*areasHillArray[0][i]*(qcsup+qcsoil))+Q_trib-input[i]-chanLoss); //[m3/s]/min
+            output[i+nLi]=(1/60.)*(qso-qcsup); //output[mm/min] qd and qs [mm/hour]
+            output[i+2*nLi]=(1/60.)*(qs1-qcsoil); //output[mm/min] effPrecip and qss [mm/hour]
+            output[i+3*nLi]=(1/60.)*qcsup; // runoff rate mm/min
+            output[i+4*nLi]=(1/60.)*qcsoil; //subsurface flow mm/min
+            output[i+5*nLi]=(1/60.)*hillPrecIntensity; //accumulated precipitation mm/min
+            //           if (i==1462)
+ //          {try{
+
+//FileWriter fstream = new FileWriter("C:/CUENCAS/Charlote/results/variableTest4.txt",true);
+//BufferedWriter out = new BufferedWriter(fstream);
+//out.write(time + " "+ C +" "+ Pe +" "+ hillPrecIntensity+ " " + hillAcumevent+ " " + " " + input[i] + " " +  input[i+nLi] + " " + input[i+2*nLi]  + " " + qso+ " " + qs1+ " " + output[i] + " " + output[i+nLi]+ " " +output[i+2*nLi]  + " " + qso +  " " + qs1+  " " +qcsup +  " " + qcsoil+ " " + Q_trib+ " " +IA + " " + S + "\n");
+           //Close the output stream
+//out.close();
+//    }catch (Exception e){//Catch exception if any
+//    System.err.println("Error: " + e.getMessage());
+//    }}
+       }
+            break ;
+
 
         }
         return output;
