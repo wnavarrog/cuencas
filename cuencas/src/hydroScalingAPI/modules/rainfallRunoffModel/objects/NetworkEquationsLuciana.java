@@ -572,15 +572,16 @@ public class NetworkEquationsLuciana implements hydroScalingAPI.util.ordDiffEqSo
             output[i+3*nLi]=(1/60.)*qcsup; // runoff rate mm/min
             output[i+4*nLi]=(1/60.)*qcsoil; //subsurface flow mm/min
             output[i+5*nLi]=(1/60.)*hillPrecIntensity; //accumulated precipitation mm/min
-            //           if (i==1462)
- //          {try{
+            //if (i==1462) System.out.println("OutputDir="+OutputDir);
+           //try{
 
 //FileWriter fstream = new FileWriter("C:/CUENCAS/Charlote/results/variableTest4.txt",true);
 //BufferedWriter out = new BufferedWriter(fstream);
 //out.write(time + " "+ C +" "+ Pe +" "+ hillPrecIntensity+ " " + hillAcumevent+ " " + " " + input[i] + " " +  input[i+nLi] + " " + input[i+2*nLi]  + " " + qso+ " " + qs1+ " " + output[i] + " " + output[i+nLi]+ " " +output[i+2*nLi]  + " " + qso +  " " + qs1+  " " +qcsup +  " " + qcsoil+ " " + Q_trib+ " " +IA + " " + S + "\n");
            //Close the output stream
 //out.close();
-//    }catch (Exception e){//Catch exception if any
+
+    //}catch (Exception e){//Catch exception if any
 //    System.err.println("Error: " + e.getMessage());
 //    }}
        }
