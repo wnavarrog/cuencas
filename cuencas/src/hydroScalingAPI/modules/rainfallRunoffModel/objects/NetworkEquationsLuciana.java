@@ -527,7 +527,7 @@ public class NetworkEquationsLuciana implements hydroScalingAPI.util.ordDiffEqSo
                if(input[i+2*nLi]>=S) qso=hillPrecIntensity;
             }
 
-       if (i==119)System.out.println("Link =" + i + "C= "+C+"hillAcumevent=" + hillAcumevent+" Pe ="+Pe+" S = "+S+" So = "+input[i+2*nLi]+" So/S = "+input[i+2*nLi]/S);
+       
             double vr=1.0;
 
             if(vrunoff<0) // for different hillslope velocity according to Land cover type
