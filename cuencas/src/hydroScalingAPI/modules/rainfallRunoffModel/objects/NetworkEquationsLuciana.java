@@ -211,7 +211,7 @@ public class NetworkEquationsLuciana implements hydroScalingAPI.util.ordDiffEqSo
             IA=lambdaSCS*S;
             if(IA<0) IA=0;
             if(S<0) S=0;
-            
+
             double ratio=0.0;
             // indication that it is raining - hillAcumPreccurr>hillAcumPrecprev
 
@@ -230,7 +230,7 @@ public class NetworkEquationsLuciana implements hydroScalingAPI.util.ordDiffEqSo
                 qs1=0;
                 if(hillPrecIntensity>0) qs1=hillPrecIntensity;
             }
-            
+
             double vr=1.0;
 
                if(vrunoff<0) // for different hillslope velocity according to Land cover type
@@ -367,7 +367,7 @@ public class NetworkEquationsLuciana implements hydroScalingAPI.util.ordDiffEqSo
 
             break ;
 
-            case 4 : 
+            case 4 :
                /* Luciana - Considering soil and soil avaliability equal to
                 * Soil storage for AMC =1 - estimated using curve number
                 * This is the SCS equation, where Qacum=(Pacum-IA)^2/(Pacum-IA+St)
@@ -398,7 +398,7 @@ public class NetworkEquationsLuciana implements hydroScalingAPI.util.ordDiffEqSo
            double C=0;
            double Pe=hillAcumevent-IA;
            if(hillPrecIntensity>0.0f && (Pe)>0)
-             { 
+             {
                 if(input[i+2*nLi]>=S) C=1;
                 if(input[i+2*nLi]<S)  C=Pe*(Pe+2*S-2*input[i+2*nLi])/Math.pow((Pe+S-input[i+2*nLi]),2);
                   qso=C*hillPrecIntensity;    /// this would guarantee it is in mm/h
@@ -461,9 +461,10 @@ public class NetworkEquationsLuciana implements hydroScalingAPI.util.ordDiffEqSo
             output[i+3*nLi]=(1/60.)*qcsup; // runoff rate mm/min
             output[i+4*nLi]=(1/60.)*qcsoil; //subsurface flow mm/min
             output[i+5*nLi]=(1/60.)*hillPrecIntensity; //accumulated precipitation mm/min
+ //if (i==119)System.out.println("hillPrecIntensity =" + hillPrecIntensity + "    qcsup= "+qcsup+ "    qcsoil= "+qcsoil+ "    qso "+qso+ "    qs1= "+qs1 +"\n");
             //           if (i==1462)
  //          {try{
- 
+
 //FileWriter fstream = new FileWriter("C:/CUENCAS/Charlote/results/variableTest4.txt",true);
 //BufferedWriter out = new BufferedWriter(fstream);
 //out.write(time + " "+ C +" "+ Pe +" "+ hillPrecIntensity+ " " + hillAcumevent+ " " + " " + input[i] + " " +  input[i+nLi] + " " + input[i+2*nLi]  + " " + qso+ " " + qs1+ " " + output[i] + " " + output[i+nLi]+ " " +output[i+2*nLi]  + " " + qso +  " " + qs1+  " " +qcsup +  " " + qcsoil+ " " + Q_trib+ " " +IA + " " + S + "\n");
@@ -526,7 +527,7 @@ public class NetworkEquationsLuciana implements hydroScalingAPI.util.ordDiffEqSo
                if(input[i+2*nLi]>=S) qso=hillPrecIntensity;
             }
 
-           // if (i==119)System.out.println("Link =" + i + "C= "+C+"hillAcumevent=" + hillAcumevent+" Pe ="+Pe+" S = "+S+" So = "+input[i+2*nLi]+" So/S = "+input[i+2*nLi]/S);
+       if (i==119)System.out.println("Link =" + i + "C= "+C+"hillAcumevent=" + hillAcumevent+" Pe ="+Pe+" S = "+S+" So = "+input[i+2*nLi]+" So/S = "+input[i+2*nLi]/S);
             double vr=1.0;
 
             if(vrunoff<0) // for different hillslope velocity according to Land cover type
@@ -572,6 +573,7 @@ public class NetworkEquationsLuciana implements hydroScalingAPI.util.ordDiffEqSo
             output[i+3*nLi]=(1/60.)*qcsup; // runoff rate mm/min
             output[i+4*nLi]=(1/60.)*qcsoil; //subsurface flow mm/min
             output[i+5*nLi]=(1/60.)*hillPrecIntensity; //accumulated precipitation mm/min
+
             //if (i==1462) System.out.println("OutputDir="+OutputDir);
            //try{
 
