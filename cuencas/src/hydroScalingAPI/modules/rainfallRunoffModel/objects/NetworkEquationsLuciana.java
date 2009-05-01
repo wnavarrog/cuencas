@@ -145,7 +145,6 @@ public class NetworkEquationsLuciana implements hydroScalingAPI.util.ordDiffEqSo
 
         switch (HillType) {
           case 0 :    /* RUNOFF = RAINFALL - NO DELLAY FUNCTION */
-
           double maxInt=0;
           for (int i=0;i<nLi;i++){
 
