@@ -425,8 +425,7 @@ public class SimulationToFileLuciana extends java.lang.Object implements Runnabl
         newfile4.write("\n3,");
         newfile5.write("\n3,");
         newfile6.write("\n3,");
-       // newfile.write("Upstream Area [km^2],");
-        
+       // newfile.write("Upstream Area [km^2],");       
         for (int i=0;i<linksStructure.contactsArray.length;i++){
                 newfile.write(thisNetworkGeom.upStreamArea(i)+",");
                 newfile2.write(thisNetworkGeom.upStreamArea(i)+",");
