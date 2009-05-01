@@ -562,7 +562,16 @@ public class SimulationToFileLuciana extends java.lang.Object implements Runnabl
 
         newfile.close();
         bufferout.close();
-
+        newfile2.close();
+        bufferout2.close();
+        newfile3.close();
+        bufferout3.close();
+        newfile4.close();
+        bufferout4.close();
+        newfile5.close();
+        bufferout5.close();
+        newfile6.close();
+        bufferout6.close();
         System.out.println("Termina escritura de Resultados");
 
 
@@ -969,10 +978,10 @@ System.out.println("ic - "+ic+"  il - "+il);
         routingParams.put("InitialCondition",0.001f); // Porcentage of the soil filled up with water
         routingParams.put("P5Condition",-9.0f); // Porcentage of the soil filled up with water
               ////RUNS PARAMETERS //////////////
-       int[] year_LC= {1992,2001};
+       int[] year_LC= {2001};
        float[] inten_array= {60,120,30,150};
        float vol=60.f;
-       float[] IC_array= {20.0f,50.0f,100.0f}; // ANTECEDENT SOIL MOISTURE CONDICTION
+       float[] IC_array= {50.0f,100.0f}; // ANTECEDENT SOIL MOISTURE CONDICTION
        float[] vr_array= {100.f}; // HILLSLOPE VELOCITY
        float[] vs_array= {1.0f}; // SUBSURFACE FLOW VELOCITY
        float infiltr=0.0f;
@@ -992,8 +1001,13 @@ System.out.println("ic - "+ic+"  il - "+il);
                       {IC=it;
                       for (int iy : year_LC)
                          {
-                         int year=iy;
-                           routingParams.put("vrunoff",vrun);
+
+                          int year=iy;
+                         if(year==1992 && IC==20)
+                         {
+                         }
+                         else {
+                          routingParams.put("vrunoff",vrun);
                            routingParams.put("vssub",vsub);
                            routingParams.put("P5Condition",IC);
                            ///// LANDCOVERDATA /////
@@ -1024,7 +1038,7 @@ System.out.println("ic - "+ic+"  il - "+il);
                 
                             new SimulationToFileLuciana(x,y,matDirs,magnitudes,metaModif,intensity,duration,infiltr,new java.io.File(path),new java.io.File(LandUse),new java.io.File(Soil),routingParams).executeSimulation();
                             path = OutputDir+"/logfile.txt";
-                            Gen_format(path);//}
+                            Gen_format(path);}//}
                             }
                        }
                    }
