@@ -392,15 +392,15 @@ public class SimulationToFileLuciana extends java.lang.Object implements Runnabl
         newfile4.write("1,");
         newfile5.write("1,");
         newfile6.write("1,");
-        for (int i=0;i<linksStructure.completeStreamLinksArray.length;i++){
-            if(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) >= 1)
-                newfile.write(linksStructure.completeStreamLinksArray[i]+",");
-                newfile2.write(linksStructure.completeStreamLinksArray[i]+",");
-                newfile3.write(linksStructure.completeStreamLinksArray[i]+",");
-                newfile4.write(linksStructure.completeStreamLinksArray[i]+",");
-                newfile5.write(linksStructure.completeStreamLinksArray[i]+",");
-                newfile6.write(linksStructure.completeStreamLinksArray[i]+",");
+        for (int i=0;i<linksStructure.contactsArray.length;i++){
+                newfile.write(linksStructure.contactsArray[i]+",");
+                newfile2.write(linksStructure.contactsArray[i]+",");
+                newfile3.write(linksStructure.contactsArray[i]+",");
+                newfile4.write(linksStructure.contactsArray[i]+",");
+                newfile5.write(linksStructure.contactsArray[i]+",");
+                newfile6.write(linksStructure.contactsArray[i]+",");
         }
+
 
         newfile.write("\n2,");
         newfile2.write("\n2,");
@@ -410,14 +410,13 @@ public class SimulationToFileLuciana extends java.lang.Object implements Runnabl
         newfile6.write("\n2,");
        // newfile.write("Horton Order,");
 
-        for (int i=0;i<linksStructure.completeStreamLinksArray.length;i++){
-            if(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) >= 1)
-                newfile.write(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i])+",");
-                newfile2.write(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i])+",");
-                newfile3.write(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i])+",");
-                newfile4.write(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i])+",");
-                newfile5.write(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i])+",");
-                newfile6.write(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i])+",");
+        for (int i=0;i<linksStructure.contactsArray.length;i++){
+                newfile.write(thisNetworkGeom.linkOrder(i)+",");
+                newfile2.write(thisNetworkGeom.linkOrder(i)+",");
+                newfile3.write(thisNetworkGeom.linkOrder(i)+",");
+                newfile4.write(thisNetworkGeom.linkOrder(i)+",");
+                newfile5.write(thisNetworkGeom.linkOrder(i)+",");
+                newfile6.write(thisNetworkGeom.linkOrder(i)+",");
         }
 
         newfile.write("\n3,");
@@ -428,14 +427,13 @@ public class SimulationToFileLuciana extends java.lang.Object implements Runnabl
         newfile6.write("\n3,");
        // newfile.write("Upstream Area [km^2],");
         
-        for (int i=0;i<linksStructure.completeStreamLinksArray.length;i++){
-            if(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) >= 1)
-                newfile.write(thisNetworkGeom.upStreamArea(linksStructure.completeStreamLinksArray[i])+",");
-                newfile2.write(thisNetworkGeom.upStreamArea(linksStructure.completeStreamLinksArray[i])+",");
-                newfile3.write(thisNetworkGeom.upStreamArea(linksStructure.completeStreamLinksArray[i])+",");
-                newfile4.write(thisNetworkGeom.upStreamArea(linksStructure.completeStreamLinksArray[i])+",");
-                newfile5.write(thisNetworkGeom.upStreamArea(linksStructure.completeStreamLinksArray[i])+",");
-                newfile6.write(thisNetworkGeom.upStreamArea(linksStructure.completeStreamLinksArray[i])+",");
+        for (int i=0;i<linksStructure.contactsArray.length;i++){
+                newfile.write(thisNetworkGeom.upStreamArea(i)+",");
+                newfile2.write(thisNetworkGeom.upStreamArea(i)+",");
+                newfile3.write(thisNetworkGeom.upStreamArea(i)+",");
+                newfile4.write(thisNetworkGeom.upStreamArea(i)+",");
+                newfile5.write(thisNetworkGeom.upStreamArea(i)+",");
+                newfile6.write(thisNetworkGeom.upStreamArea(i)+",");
         }
 
     
@@ -981,7 +979,7 @@ System.out.println("ic - "+ic+"  il - "+il);
        int[] year_LC= {2001};
        float[] inten_array= {60,120,30,150};
        float vol=60.f;
-       float[] IC_array= {50.0f,100.0f}; // ANTECEDENT SOIL MOISTURE CONDICTION
+       float[] IC_array= {20.0f,50.0f,100.0f}; // ANTECEDENT SOIL MOISTURE CONDICTION
        float[] vr_array= {100.f}; // HILLSLOPE VELOCITY
        float[] vs_array= {1.0f}; // SUBSURFACE FLOW VELOCITY
        float infiltr=0.0f;
@@ -1003,10 +1001,7 @@ System.out.println("ic - "+ic+"  il - "+il);
                          {
 
                           int year=iy;
-                         if(year==1992 && IC==20)
-                         {
-                         }
-                         else {
+                         
                           routingParams.put("vrunoff",vrun);
                            routingParams.put("vssub",vsub);
                            routingParams.put("P5Condition",IC);
@@ -1038,7 +1033,7 @@ System.out.println("ic - "+ic+"  il - "+il);
                 
                             new SimulationToFileLuciana(x,y,matDirs,magnitudes,metaModif,intensity,duration,infiltr,new java.io.File(path),new java.io.File(LandUse),new java.io.File(Soil),routingParams).executeSimulation();
                             path = OutputDir+"/logfile.txt";
-                            Gen_format(path);}//}
+                            Gen_format(path);//}
                             }
                        }
                    }
