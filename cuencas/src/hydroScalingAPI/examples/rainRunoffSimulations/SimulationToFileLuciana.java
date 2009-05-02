@@ -385,7 +385,6 @@ public class SimulationToFileLuciana extends java.lang.Object implements Runnabl
         //newfile.write("Information on Complete order Streams\n");
         //newfile.write("Links at the bottom of complete streams are:\n");
         //newfile.write("Link #,");
-
         newfile.write("1,");
         newfile2.write("1,");
         newfile3.write("1,");
@@ -433,9 +432,7 @@ public class SimulationToFileLuciana extends java.lang.Object implements Runnabl
                 newfile4.write(thisNetworkGeom.upStreamArea(i)+",");
                 newfile5.write(thisNetworkGeom.upStreamArea(i)+",");
                 newfile6.write(thisNetworkGeom.upStreamArea(i)+",");
-        }
-
-    
+        }   
        // newfile.write("Slope,");
 //       newfile.write("4 ");
 //        for (int i=0;i<linksStructure.completeStreamLinksArray.length;i++){
@@ -1001,7 +998,9 @@ System.out.println("ic - "+ic+"  il - "+il);
 
                           int year=iy;
                          
-                          routingParams.put("vrunoff",vrun);
+                          if(intensity==60 &&IC==20){
+                          }else
+                          {routingParams.put("vrunoff",vrun);
                            routingParams.put("vssub",vsub);
                            routingParams.put("P5Condition",IC);
                            ///// LANDCOVERDATA /////
@@ -1031,8 +1030,8 @@ System.out.println("ic - "+ic+"  il - "+il);
                            //String rain = RaininputDir+"/bin/"+precname;
                 
                             new SimulationToFileLuciana(x,y,matDirs,magnitudes,metaModif,intensity,duration,infiltr,new java.io.File(path),new java.io.File(LandUse),new java.io.File(Soil),routingParams).executeSimulation();
-                            path = OutputDir+"/logfile.txt";
-                            Gen_format(path);//}
+                            path = OutputDir+"/logfile.txt";}
+                            //Gen_format(path);//}
                             }
                        }
                    }
