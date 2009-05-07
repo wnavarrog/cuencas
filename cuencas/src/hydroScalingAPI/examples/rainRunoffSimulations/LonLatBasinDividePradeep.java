@@ -54,7 +54,7 @@ public class LonLatBasinDividePradeep extends java.lang.Object {
         float[][] lonlatdivide=myCuenca.getLonLatBasinDivide();
         
         java.io.File stormFile;
-        stormFile=new java.io.File("C:/Documents and Settings/pmandapa/My Documents/Simulations/ForCuencas/BinScGaussNoise_0.1_1/prec.metaVHC");
+        stormFile=new java.io.File("C:/Documents and Settings/pmandapa/My Documents/ForCuencas/BinScUnifInter_0.50/prec.metaVHC");
         metaStorm=new hydroScalingAPI.io.MetaRaster(stormFile);        
        
         java.io.File theFile;        
@@ -88,7 +88,7 @@ public class LonLatBasinDividePradeep extends java.lang.Object {
                 y2 = sFileMinLat + (j+1)*metaStorm.getResLat()/3600.0;
                 sumx = 0.0; sumy = 0.0; cnt = 0;
                 for (int k=0;k<lonlatdivide[0].length;k++){
-                    if ((lonlatdivide[0][k] > x1)&&(lonlatdivide[0][k] <= x2)&&(lonlatdivide[1][k] > y1)&&(lonlatdivide[1][k] <= y2)){
+                    if ((lonlatdivide[0][k] >= x1)&&(lonlatdivide[0][k] <= x2)&&(lonlatdivide[1][k] >= y1)&&(lonlatdivide[1][k] <= y2)){
                         sumx = sumx + lonlatdivide[0][k];
                         sumy = sumy + lonlatdivide[1][k];
                         cnt = cnt + 1;                        
@@ -116,6 +116,12 @@ public class LonLatBasinDividePradeep extends java.lang.Object {
                     else {
                         jmax = jmax;                    
                     } 
+                }
+                if (jmin!=0){
+                    jmin = jmin - 1;
+                }
+                if (jmax!=39){
+                    jmax = jmax + 1;
                 }
                 for (int j=jmin;j<=jmax;j++){
                     data[i][j] = 1;
