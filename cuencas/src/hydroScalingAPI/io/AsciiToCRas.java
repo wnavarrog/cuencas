@@ -32,8 +32,8 @@ public class AsciiToCRas extends Object {
         ruta = new FileReader(inputFile);
         buffer=new BufferedReader(ruta);         
         
-        columns = 32;
-        rows = 32;        
+        columns = 40;
+        rows = 40;        
         matrix = new float[rows][columns];
         
         for (int i=0;i<rows;i++) {
@@ -84,30 +84,51 @@ public class AsciiToCRas extends Object {
     }
     
     public static void main(String[] args) throws java.io.IOException{
+      
+       /* String resStr = "";
+        for (int ii=0;ii<100;ii++)
+        {
+            int m = ii+1;
+            if (m < 10)
+            {
+                resStr = "00"+m;
+            }
+            if (m >= 10 && m < 100)
+            {
+                resStr = "0"+m;
+            }
+            if (m == 100)
+            {
+                resStr = String.valueOf(m);
+            }*/
+            java.io.File AsciiFile;
+            //File folder = new File("C:/Documents and Settings/pmandapa/My Documents/ForCuencas/RRErrors/KICT_2007_06_26t30/Data");
+            //File folder = new File("C:/Documents and Settings/pmandapa/My Documents/ForCuencas/RRErrors/KICT_2006_07_26t27/PED"+resStr);
+            File folder = new File("C:/Documents and Settings/pmandapa/My Documents/ForCuencas/ScUnifInter_1.00");
         
-        java.io.File AsciiFile;
-        File folder = new File("C:/Documents and Settings/pmandapa/My Documents/ForCuencas/KICT_2007_05_06t07_02_SDS05/");
-        
- 	try{
-	ArrayList<File> files = AsciiToCRas.getFileList(folder);
-	Iterator i = files.iterator();
-	while (i.hasNext()){
-            File temp = (File) i.next();
-            System.out.println(temp.getName());
-            String FileAscIn = folder.getPath()+"/"+temp.getName().substring(0,temp.getName().lastIndexOf("."))+".vhc";
-            AsciiFile = new java.io.File(FileAscIn);
-             try {  
-                 new AsciiToCRas(AsciiFile,new java.io.File("C:/Documents and Settings/pmandapa/My Documents/ForCuencas/BinKICT_2007_05_06t07_02_SDS05"));
-             } catch (Exception IOE){
-                 System.out.print(IOE);
-                 System.exit(0);
-             }
-        }
-        } catch (IOException e){
-            System.err.println("problem creating file list:");
-            e.printStackTrace();
-        }
-    }    
+ 	    try{
+                ArrayList<File> files = AsciiToCRas.getFileList(folder);
+	        Iterator i = files.iterator();
+	        while (i.hasNext()){
+                    File temp = (File) i.next();
+                    System.out.println(temp.getName());
+                    String FileAscIn = folder.getPath()+"/"+temp.getName().substring(0,temp.getName().lastIndexOf("."))+".vhc";
+                    AsciiFile = new java.io.File(FileAscIn);
+                    try {  
+                        //new AsciiToCRas(AsciiFile,new java.io.File("C:/Documents and Settings/pmandapa/My Documents/ForCuencas/RRErrors/BinKICT_2006_07_26t27/PED"+resStr));
+                        //new AsciiToCRas(AsciiFile,new java.io.File("C:/Documents and Settings/pmandapa/My Documents/ForCuencas/RRErrors/BinKICT_2007_06_26t30/Data"));
+                        new AsciiToCRas(AsciiFile,new java.io.File("C:/Documents and Settings/pmandapa/My Documents/ForCuencas/BinScUnifInter_1.00"));
+                    } catch (Exception IOE){
+                        System.out.print(IOE);
+                        System.exit(0);
+                    }
+               }
+            } catch (IOException e){
+                System.err.println("problem creating file list:");
+                e.printStackTrace();
+            }
+        //}  
+    }
  }
 
 
