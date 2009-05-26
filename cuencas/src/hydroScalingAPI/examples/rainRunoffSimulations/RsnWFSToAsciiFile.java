@@ -67,20 +67,6 @@ public class RsnWFSToAsciiFile extends java.lang.Object {
         linksStructure=new hydroScalingAPI.util.randomSelfSimilarNetworks.RsnLinksAnalysis(rsns);
         basinOrder=linksStructure.getBasinOrder();
         
-        thisNetworkGeom=new hydroScalingAPI.modules.rainfallRunoffModel.objects.LinksInfo(linksStructure);
-        thisNetworkGeom.setWidthsHG(3.4f, 0.5f, 0.2f);
-        thisNetworkGeom.setSlopesHG(0.02f, -0.5f, 0.3f);
-        thisNetworkGeom.setCheziHG(14.2f, -1/3.0f);
-        
-        thisNetworkGeom.setVqParams((float)(1.0/Math.pow(0.01, exponentA)), 0.0f, exponentQ, exponentA);
-
-        thisHillsInfo=new hydroScalingAPI.modules.rainfallRunoffModel.objects.HillSlopesInfo(linksStructure);
-        
-        storm=new hydroScalingAPI.modules.rainfallRunoffModel.objects.StormManager(linksStructure,rainIntensity,rainDuration);
-        thisHillsInfo.setStormManager(storm);
-        
-        infilMan=new hydroScalingAPI.modules.rainfallRunoffModel.objects.InfiltrationManager(linksStructure,infiltRate);
-        thisHillsInfo.setInfManager(infilMan);
         
     }
     
@@ -99,29 +85,6 @@ public class RsnWFSToAsciiFile extends java.lang.Object {
 
          */
         String demName="RSN_result";
-        String routingString="";
-        switch (routingType) {
-            case 0:     routingString="VC";
-                        break;
-            case 1:     routingString="CC";
-                        break;
-            case 2:     routingString="CV";
-                        break;
-            case 3:     routingString="CM";
-                        break;
-            case 4:     routingString="VM";
-                        break;
-            case 5:     routingString="GK";
-                        break;
-        }
-        
-        java.io.File theFile1;
-        
-//        theFile1=new java.io.File(outputDirectory.getAbsolutePath()+"/"+demName+"-SN_"+infiltRate+".rsn.csv");
-//        System.out.println("Writing RSN Decoding - "+theFile1);
-//        rsns.writeRsnTreeDecoding(theFile1);
-//        System.out.println("Done writing results");
-        
         java.io.File theFile;
         theFile=new java.io.File(outputDirectory.getAbsolutePath()+"/"+demName+"-SN_"+infiltRate+".wfs.csv");
         java.io.FileOutputStream salida = new java.io.FileOutputStream(theFile);
@@ -162,17 +125,17 @@ public class RsnWFSToAsciiFile extends java.lang.Object {
         
         String outDir="/home/ricardo/simulationResults/widthFunctions/geometricRSNs/constantL/";
         
-        int iniExperiment=200;
-        int finExperiments=499;
+        int iniExperiment=500;
+        int finExperiments=999;
         
         java.text.NumberFormat labelFormat = java.text.NumberFormat.getNumberInstance();
         labelFormat.setGroupingUsed(false);
         labelFormat.setMinimumFractionDigits(2);
         
-        for(double p_i=0.36;p_i<0.50;p_i+=0.02){
+        for(double p_i=0.40;p_i<0.50;p_i+=0.02){
             for(double p_e=0.45;p_e<0.55;p_e+=0.02){
                 new java.io.File(outDir+"p_i"+labelFormat.format(p_i)+"p_e"+labelFormat.format(p_e)).mkdir();
-                for(int sofi=2;sofi<=7;sofi++){
+                for(int sofi=8;sofi<=8;sofi++){
                     new java.io.File(outDir+"p_i"+labelFormat.format(p_i)+"p_e"+labelFormat.format(p_e)+"/ord_"+sofi).mkdir();
                     
                     for(int experiment=iniExperiment;experiment<=finExperiments;experiment++){
@@ -181,7 +144,7 @@ public class RsnWFSToAsciiFile extends java.lang.Object {
                         hydroScalingAPI.util.probability.DiscreteDistribution myUD_E=new hydroScalingAPI.util.probability.GeometricDistribution(p_e,1);
                         hydroScalingAPI.util.randomSelfSimilarNetworks.RsnStructure myRSN=new hydroScalingAPI.util.randomSelfSimilarNetworks.RsnStructure(sofi-1,myUD_I,myUD_E);
                         new RsnWFSToAsciiFile(myRSN,0,1,experiment,2,new java.io.File(outDir+"p_i"+labelFormat.format(p_i)+"p_e"+labelFormat.format(p_e)+"/ord_"+sofi)).executeSimulation();
-                        System.out.println("completed "+outDir+"p_i"+labelFormat.format(p_i)+"p_e"+labelFormat.format(p_e)+"/ord_"+sofi);
+                        System.out.println("completed "+outDir+"p_i"+labelFormat.format(p_i)+"p_e"+labelFormat.format(p_e)+"/ord_"+sofi+"/Network "+experiment);
                     }
                 }
             }
