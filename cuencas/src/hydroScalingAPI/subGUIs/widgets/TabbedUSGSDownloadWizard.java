@@ -28,7 +28,7 @@ public class TabbedUSGSDownloadWizard extends javax.swing.JDialog {
 
     private hydroScalingAPI.subGUIs.widgets.ImportUSGSWeb myQueryManager;
     private javax.swing.JCheckBox[] listOfCheckBoxes;
-    
+
     /** Creates new form TabbedUSGSDownloadWizard */
     public TabbedUSGSDownloadWizard(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
@@ -1250,13 +1250,31 @@ public class TabbedUSGSDownloadWizard extends javax.swing.JDialog {
         s[1] = EndText.getText();
 
 
-        javax.swing.JFileChooser fc=new javax.swing.JFileChooser("/");
+        javax.swing.JFileChooser fc = new javax.swing.JFileChooser("/");
         fc.setFileSelectionMode(fc.DIRECTORIES_ONLY);
-        fc.setDialogTitle("Database root directory");
-        int result = fc.showDialog(this,"Select");
+        fc.setDialogTitle("Gauges Directory");
+        int result = fc.showDialog(this, "Select");
         java.io.File selectedFile = fc.getSelectedFile();
 
-        if (result == javax.swing.JFileChooser.CANCEL_OPTION) return;
+        if (result == javax.swing.JFileChooser.CANCEL_OPTION) {
+            return;
+        }
+
+        String[] outputDirs = new String[2];
+        outputDirs[0] = selectedFile.getAbsolutePath()+File.separator+"StreamFlow";
+        outputDirs[1] = selectedFile.getAbsolutePath()+File.separator+"Stage";
+
+        for (int i = 0; i < 2; i++) {
+
+            boolean success = (new File(outputDirs[i])).mkdirs();
+            if (success) {
+                System.out.println("Directories: " + outputDirs[i] + " created");
+            } else {
+                System.out.println("Directories " + outputDirs[i] + " not created");
+            }
+        }
+
+        
 
         for (int j = 0; j < sel; j++) {
             if (dataTable.getValueAt(j, 0).equals(check2)) {
@@ -1267,17 +1285,8 @@ public class TabbedUSGSDownloadWizard extends javax.swing.JDialog {
             }
         }
 
-        if (Stream.isSelected()) {
-           Vector stcheck = new Vector();
-           stcheck.addElement("stck");
-        }
-        if (GageHeight.isSelected()) {
-            String gagecheck = new String();
-            gagecheck = "gck";
-        }
-
         try {
-            myQueryManager.getData(s, v);
+            myQueryManager.getData(s, v,outputDirs);
         } catch (IOException ex) {
             Logger.getLogger(TabbedUSGSDownloadWizard.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -1905,7 +1914,7 @@ public class TabbedUSGSDownloadWizard extends javax.swing.JDialog {
                     "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI",
                     "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI",
                     "WY"}, {"Stream", "Gage Height", "Volume"}};
-            //java.util.Vector myVector = myQueryManager.filterAllState(statesparam);
+        //java.util.Vector myVector = myQueryManager.filterAllState(statesparam);
         }
 }//GEN-LAST:event_AllSTMouseReleased
 
@@ -2033,7 +2042,7 @@ public class TabbedUSGSDownloadWizard extends javax.swing.JDialog {
                     "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI",
                     "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI",
                     "WY"}, {"Stream", "Gage Height", "Volume"}};
-            //java.util.Vector myVector = myQueryManager.filterAllState(statesparam);
+        //java.util.Vector myVector = myQueryManager.filterAllState(statesparam);
         }
 }//GEN-LAST:event_AllRegActionPerformed
 
@@ -2069,7 +2078,7 @@ public class TabbedUSGSDownloadWizard extends javax.swing.JDialog {
             System.out.println(West.isSelected());
             String[][] statesparam = new String[][]{{"WA", "OR", "CA", "ID", "NV", "MT", "WY", "UT",
                     "AZ", "CO", "NM", "AK", "HI"}, {"Stream", "Gage Height", "Volume"}};
-            //java.util.Vector myVector = myQueryManager.filterWestReg(statesparam);
+        //java.util.Vector myVector = myQueryManager.filterWestReg(statesparam);
         }
 }//GEN-LAST:event_WestMouseReleased
 
@@ -2103,7 +2112,7 @@ public class TabbedUSGSDownloadWizard extends javax.swing.JDialog {
             System.out.println(MidWest.isSelected());
             String[][] statesparam = new String[][]{{"WI", "MI", "IL", "IN", "OH",
                     "ND", "SD", "NE", "KS", "MN", "IA", "MO"}, {"Stream", "Gage Height", "Volume"}};
-            //java.util.Vector myVector = myQueryManager.filterMidWestReg(statesparam);
+        //java.util.Vector myVector = myQueryManager.filterMidWestReg(statesparam);
         }
 }//GEN-LAST:event_MidWestMouseReleased
 
@@ -2147,7 +2156,7 @@ public class TabbedUSGSDownloadWizard extends javax.swing.JDialog {
             System.out.println(South.isSelected());
             String[][] statesparam = new String[][]{{"DE", "MD", "DC", "VA", "WV", "NC", "SC", "GA",
                     "FL", "KY", "TN", "MS", "AL", "OK", "TX", "AR", "LA"}, {"Stream", "Gage Height", "Volume"}};
-            //java.util.Vector myVector = myQueryManager.filterSouthReg(statesparam);
+        //java.util.Vector myVector = myQueryManager.filterSouthReg(statesparam);
         }
 }//GEN-LAST:event_SouthMouseReleased
 
@@ -2175,7 +2184,7 @@ public class TabbedUSGSDownloadWizard extends javax.swing.JDialog {
             System.out.println(NorthEast.isSelected());
             String[][] statesparam = new String[][]{{"ME", "NH", "VT", "MA", "RI",
                     "CT", "NY", "PA", "NJ"}, {"Stream", "Gage Height", "Volume"}};
-            //java.util.Vector myVector = myQueryManager.filterNorthEastReg(statesparam);
+        //java.util.Vector myVector = myQueryManager.filterNorthEastReg(statesparam);
         }
 }//GEN-LAST:event_NorthEastMouseReleased
 
@@ -2198,14 +2207,18 @@ public class TabbedUSGSDownloadWizard extends javax.swing.JDialog {
     }//GEN-LAST:event_GetBoundDataMouseReleased
 
     private void getCoordFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_getCoordFileActionPerformed
-        javax.swing.JFileChooser fc=new javax.swing.JFileChooser("/");
+        javax.swing.JFileChooser fc = new javax.swing.JFileChooser("/");
         fc.setFileSelectionMode(fc.FILES_ONLY);
         fc.setDialogTitle("DEM Selection");
-        javax.swing.filechooser.FileFilter mdtFilter = new visad.util.ExtensionFileFilter("metaDEM","Digital Elevation Model");
+        javax.swing.filechooser.FileFilter mdtFilter = new visad.util.ExtensionFileFilter("metaDEM", "Digital Elevation Model");
         fc.addChoosableFileFilter(mdtFilter);
-        int result = fc.showDialog(this,"Select");
-        if (result == javax.swing.JFileChooser.CANCEL_OPTION) return;
-        if (!fc.getSelectedFile().isFile()) return;
+        int result = fc.showDialog(this, "Select");
+        if (result == javax.swing.JFileChooser.CANCEL_OPTION) {
+            return;
+        }
+        if (!fc.getSelectedFile().isFile()) {
+            return;
+        }
         try {
             hydroScalingAPI.io.MetaRaster metaDEM = new hydroScalingAPI.io.MetaRaster(fc.getSelectedFile());
             NorthLat2.setText(Double.toString(metaDEM.getMaxLat()));
