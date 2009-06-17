@@ -14,15 +14,12 @@ package hydroScalingAPI.subGUIs.widgets;
  *
  * @author Eric Osgood
  */
-import java.awt.Dimension;
 import java.io.*;
-import java.lang.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.*;
 import java.util.*;
 import javax.swing.table.*;
-import javax.swing.text.Element;
 
 public class TabbedUSGSDownloadWizard extends javax.swing.JDialog {
 
@@ -48,7 +45,6 @@ public class TabbedUSGSDownloadWizard extends javax.swing.JDialog {
 
         initComponents();
         setLocation(220, 200);
-
         System.out.println("line 52  components running");
 
         java.util.Calendar todaysDate = java.util.Calendar.getInstance();
@@ -58,7 +54,6 @@ public class TabbedUSGSDownloadWizard extends javax.swing.JDialog {
 
         setVisible(true);
     }
-
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -149,11 +144,7 @@ public class TabbedUSGSDownloadWizard extends javax.swing.JDialog {
         boundPic = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         dataTable = new javax.swing.JTable();
-        Stream = new javax.swing.JCheckBox();
-        GageHeight = new javax.swing.JCheckBox();
         DownloadData = new javax.swing.JButton();
-        Spinner = new javax.swing.JLabel();
-        Working = new javax.swing.JLabel();
         SiteCounterInfo = new javax.swing.JLabel();
         EndDate = new javax.swing.JLabel();
         StartDate = new javax.swing.JLabel();
@@ -616,17 +607,7 @@ public class TabbedUSGSDownloadWizard extends javax.swing.JDialog {
             }
         });
 
-        jLabel9.setIcon(new javax.swing.JLabel() {
-            public javax.swing.Icon getIcon() {
-                try {
-                    return new javax.swing.ImageIcon(
-                        new java.net.URL("http://www.cc.gatech.edu/cpl/projects/graphcuttextures/data/interaction/LittleRiver.jpg")
-                    );
-                } catch (java.net.MalformedURLException e) {
-                }
-                return null;
-            }
-        }.getIcon());
+        jLabel9.setIcon(new javax.swing.ImageIcon("C:\\Users\\Eric Osgood.EricOsgood-PC\\Documents\\NetBeansProjects\\Cuencas\\cuencas\\src\\hydroScalingAPI\\subGUIs\\configuration\\icons\\USGSLittleRiver.jpg")); // NOI18N
 
         org.jdesktop.layout.GroupLayout RegionStateLayout = new org.jdesktop.layout.GroupLayout(RegionState);
         RegionState.setLayout(RegionStateLayout);
@@ -975,20 +956,12 @@ public class TabbedUSGSDownloadWizard extends javax.swing.JDialog {
         dataTable.getColumnModel().getColumn(5).setPreferredWidth(110);
         dataTable.getColumnModel().getColumn(5).setMaxWidth(110);
 
-        Stream.setText("Streamflow");
-
-        GageHeight.setText("Gage height");
-
         DownloadData.setText("Download Data");
         DownloadData.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseReleased(java.awt.event.MouseEvent evt) {
                 DownloadDataMouseReleased(evt);
             }
         });
-
-        Spinner.setIcon(new javax.swing.ImageIcon(getClass().getResource("/hydroScalingAPI/subGUIs/configuration/icons/spinner.gif"))); // NOI18N
-
-        Working.setText("Working...");
 
         SiteCounterInfo.setText("There are X sites available.");
 
@@ -1054,12 +1027,8 @@ public class TabbedUSGSDownloadWizard extends javax.swing.JDialog {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .addContainerGap()
-                .add(Stream)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(GageHeight)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 393, Short.MAX_VALUE)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(561, Short.MAX_VALUE)
                 .add(StartDate)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(StartText, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 113, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
@@ -1070,7 +1039,7 @@ public class TabbedUSGSDownloadWizard extends javax.swing.JDialog {
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(DownloadData)
                 .addContainerGap())
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+            .add(layout.createSequentialGroup()
                 .addContainerGap()
                 .add(SiteCounterInfo)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
@@ -1080,12 +1049,8 @@ public class TabbedUSGSDownloadWizard extends javax.swing.JDialog {
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(CheckMarked, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 110, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(Note, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 504, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 6, Short.MAX_VALUE)
-                .add(Working)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(Spinner)
-                .addContainerGap())
+                .add(Note, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 558, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(35, Short.MAX_VALUE))
             .add(jTabbedPane1)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
@@ -1101,8 +1066,6 @@ public class TabbedUSGSDownloadWizard extends javax.swing.JDialog {
                 .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 406, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(Spinner)
-                    .add(Working)
                     .add(SiteCounterInfo)
                     .add(CheckAll)
                     .add(UncheckAll)
@@ -1112,8 +1075,6 @@ public class TabbedUSGSDownloadWizard extends javax.swing.JDialog {
                 .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 193, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(Stream)
-                    .add(GageHeight)
                     .add(DownloadData)
                     .add(EndText, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(StartText, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
@@ -1261,8 +1222,8 @@ public class TabbedUSGSDownloadWizard extends javax.swing.JDialog {
         }
 
         String[] outputDirs = new String[2];
-        outputDirs[0] = selectedFile.getAbsolutePath()+File.separator+"StreamFlow";
-        outputDirs[1] = selectedFile.getAbsolutePath()+File.separator+"Stage";
+        outputDirs[0] = selectedFile.getAbsolutePath() + File.separator + "StreamFlow";
+        outputDirs[1] = selectedFile.getAbsolutePath() + File.separator + "Stage";
 
         for (int i = 0; i < 2; i++) {
 
@@ -1274,8 +1235,6 @@ public class TabbedUSGSDownloadWizard extends javax.swing.JDialog {
             }
         }
 
-        
-
         for (int j = 0; j < sel; j++) {
             if (dataTable.getValueAt(j, 0).equals(check2)) {
                 //String[] codes = new String[]{(dataTable.getValueAt(sel[j], 1))};
@@ -1286,7 +1245,7 @@ public class TabbedUSGSDownloadWizard extends javax.swing.JDialog {
         }
 
         try {
-            myQueryManager.getData(s, v,outputDirs);
+            myQueryManager.getData(s, v, outputDirs);
         } catch (IOException ex) {
             Logger.getLogger(TabbedUSGSDownloadWizard.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -2241,7 +2200,6 @@ public class TabbedUSGSDownloadWizard extends javax.swing.JDialog {
     public static void main(String args[]) {
         TabbedUSGSDownloadWizard dialog = new TabbedUSGSDownloadWizard(new javax.swing.JFrame(), true);
         System.exit(0);
-
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -2266,7 +2224,6 @@ public class TabbedUSGSDownloadWizard extends javax.swing.JDialog {
     private javax.swing.JTextField EndText;
     private javax.swing.JCheckBox FL;
     private javax.swing.JCheckBox GA;
-    private javax.swing.JCheckBox GageHeight;
     private javax.swing.JButton GetBoundData;
     private javax.swing.JCheckBox HI;
     private javax.swing.JCheckBox IA;
@@ -2310,10 +2267,8 @@ public class TabbedUSGSDownloadWizard extends javax.swing.JDialog {
     private javax.swing.JCheckBox South;
     private javax.swing.JLabel SouthLat;
     private javax.swing.JTextField SouthLat2;
-    private javax.swing.JLabel Spinner;
     private javax.swing.JLabel StartDate;
     private javax.swing.JTextField StartText;
-    private javax.swing.JCheckBox Stream;
     private javax.swing.JCheckBox TN;
     private javax.swing.JCheckBox TX;
     private javax.swing.JLabel USGSLegend;
@@ -2329,7 +2284,6 @@ public class TabbedUSGSDownloadWizard extends javax.swing.JDialog {
     private javax.swing.JCheckBox West;
     private javax.swing.JLabel WestLon;
     private javax.swing.JTextField WestLon2;
-    private javax.swing.JLabel Working;
     private javax.swing.JTextArea boundInstruct;
     private javax.swing.JLabel boundPic;
     private javax.swing.JTable dataTable;

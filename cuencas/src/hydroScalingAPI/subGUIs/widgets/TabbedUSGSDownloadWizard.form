@@ -22,12 +22,8 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="0" attributes="0">
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="Stream" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="GageHeight" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="393" max="32767" attributes="0"/>
+          <Group type="102" alignment="1" attributes="0">
+              <EmptySpace pref="561" max="32767" attributes="0"/>
               <Component id="StartDate" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="StartText" linkSize="1" min="-2" pref="113" max="-2" attributes="0"/>
@@ -39,7 +35,7 @@
               <Component id="DownloadData" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
-          <Group type="102" alignment="1" attributes="0">
+          <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Component id="SiteCounterInfo" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
@@ -49,12 +45,8 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="CheckMarked" min="-2" pref="110" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="Note" min="-2" pref="504" max="-2" attributes="0"/>
-              <EmptySpace pref="6" max="32767" attributes="0"/>
-              <Component id="Working" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="Spinner" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
+              <Component id="Note" min="-2" pref="558" max="-2" attributes="0"/>
+              <EmptySpace pref="35" max="32767" attributes="0"/>
           </Group>
           <Component id="jTabbedPane1" alignment="0" max="32767" attributes="0"/>
           <Group type="102" alignment="0" attributes="0">
@@ -70,8 +62,6 @@
               <Component id="jTabbedPane1" min="-2" pref="406" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="Spinner" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="Working" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="SiteCounterInfo" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="CheckAll" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="UncheckAll" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -82,8 +72,6 @@
               <Component id="jScrollPane1" min="-2" pref="193" max="-2" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="Stream" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="GageHeight" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="DownloadData" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="EndText" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="StartText" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -841,7 +829,7 @@
             <Component class="javax.swing.JLabel" name="jLabel9">
               <Properties>
                 <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-                  <Image iconType="1" name="http://www.cc.gatech.edu/cpl/projects/graphcuttextures/data/interaction/LittleRiver.jpg"/>
+                  <Image iconType="2" name="C:\Users\Eric Osgood.EricOsgood-PC\Documents\NetBeansProjects\Cuencas\cuencas\src\hydroScalingAPI\subGUIs\configuration\icons\USGSLittleRiver.jpg"/>
                 </Property>
               </Properties>
             </Component>
@@ -1095,16 +1083,6 @@
         </Component>
       </SubComponents>
     </Container>
-    <Component class="javax.swing.JCheckBox" name="Stream">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="Streamflow"/>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JCheckBox" name="GageHeight">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="Gage height"/>
-      </Properties>
-    </Component>
     <Component class="javax.swing.JButton" name="DownloadData">
       <Properties>
         <Property name="text" type="java.lang.String" value="Download Data"/>
@@ -1112,18 +1090,6 @@
       <Events>
         <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="DownloadDataMouseReleased"/>
       </Events>
-    </Component>
-    <Component class="javax.swing.JLabel" name="Spinner">
-      <Properties>
-        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-          <Image iconType="3" name="/hydroScalingAPI/subGUIs/configuration/icons/spinner.gif"/>
-        </Property>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JLabel" name="Working">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="Working..."/>
-      </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="SiteCounterInfo">
       <Properties>
