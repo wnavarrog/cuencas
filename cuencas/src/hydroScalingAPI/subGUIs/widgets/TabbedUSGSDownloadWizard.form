@@ -375,7 +375,7 @@
                 <Property name="text" type="java.lang.String" value="NorthEast"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="NorthEastMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="NorthEastItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="South">
@@ -383,7 +383,7 @@
                 <Property name="text" type="java.lang.String" value="South"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="SouthMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="SouthItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="MidWest">
@@ -391,7 +391,7 @@
                 <Property name="text" type="java.lang.String" value="MidWest"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="MidWestMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="MidWestItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="West">
@@ -399,7 +399,7 @@
                 <Property name="text" type="java.lang.String" value="West"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="WestMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="WestItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="AllReg">
@@ -407,7 +407,7 @@
                 <Property name="text" type="java.lang.String" value="All"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="AllRegActionPerformed"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="AllRegItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="AllST">
@@ -415,7 +415,7 @@
                 <Property name="text" type="java.lang.String" value="All"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="AllSTMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="AllSTItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="AL">
@@ -423,7 +423,7 @@
                 <Property name="text" type="java.lang.String" value="AL"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="ALMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="ALItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="AK">
@@ -431,7 +431,7 @@
                 <Property name="text" type="java.lang.String" value="AK"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="AKMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="AKItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="AZ">
@@ -439,7 +439,7 @@
                 <Property name="text" type="java.lang.String" value="AZ"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="AZMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="AZItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="AR">
@@ -447,7 +447,7 @@
                 <Property name="text" type="java.lang.String" value="AR"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="ARMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="ARItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="CA">
@@ -455,7 +455,7 @@
                 <Property name="text" type="java.lang.String" value="CA"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="CAMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="CAItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="CO">
@@ -463,7 +463,7 @@
                 <Property name="text" type="java.lang.String" value="CO"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="COMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="COItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="CT">
@@ -471,7 +471,7 @@
                 <Property name="text" type="java.lang.String" value="CT"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="CTMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="CTItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="DE">
@@ -479,7 +479,7 @@
                 <Property name="text" type="java.lang.String" value="DE"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="DEMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="DEItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="DC">
@@ -487,7 +487,7 @@
                 <Property name="text" type="java.lang.String" value="DC"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="DCMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="DCItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="FL">
@@ -495,7 +495,7 @@
                 <Property name="text" type="java.lang.String" value="FL"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="FLMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="FLItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="GA">
@@ -503,7 +503,7 @@
                 <Property name="text" type="java.lang.String" value="GA"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="GAMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="GAItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="HI">
@@ -511,7 +511,7 @@
                 <Property name="text" type="java.lang.String" value="HI"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="HIMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="HIItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="ID">
@@ -519,7 +519,7 @@
                 <Property name="text" type="java.lang.String" value="ID"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="IDMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="IDItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="IL">
@@ -527,7 +527,7 @@
                 <Property name="text" type="java.lang.String" value="IL"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="ILMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="ILItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="IN">
@@ -535,7 +535,7 @@
                 <Property name="text" type="java.lang.String" value="IN"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="INMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="INItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="IA">
@@ -543,7 +543,7 @@
                 <Property name="text" type="java.lang.String" value="IA"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="IAMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="IAItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="KS">
@@ -551,7 +551,7 @@
                 <Property name="text" type="java.lang.String" value="KS"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="KSMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="KSItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="KY">
@@ -559,7 +559,7 @@
                 <Property name="text" type="java.lang.String" value="KY"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="KYMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="KYItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="LA">
@@ -567,7 +567,7 @@
                 <Property name="text" type="java.lang.String" value="LA"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="LAMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="LAItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="ME">
@@ -575,7 +575,7 @@
                 <Property name="text" type="java.lang.String" value="ME"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="MEMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="MEItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="MD">
@@ -583,7 +583,7 @@
                 <Property name="text" type="java.lang.String" value="MD"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="MDMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="MDItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="MA">
@@ -591,7 +591,7 @@
                 <Property name="text" type="java.lang.String" value="MA"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="MAMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="MAItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="MI">
@@ -599,7 +599,7 @@
                 <Property name="text" type="java.lang.String" value="MI"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="MIMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="MIItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="MN">
@@ -607,7 +607,7 @@
                 <Property name="text" type="java.lang.String" value="MN"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="MNMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="MNItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="MS">
@@ -615,7 +615,7 @@
                 <Property name="text" type="java.lang.String" value="MS"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="MSMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="MSItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="MO">
@@ -623,7 +623,7 @@
                 <Property name="text" type="java.lang.String" value="MO"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="MOMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="MOItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="MT">
@@ -631,7 +631,7 @@
                 <Property name="text" type="java.lang.String" value="MT"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="MTMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="MTItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="NE">
@@ -639,7 +639,7 @@
                 <Property name="text" type="java.lang.String" value="NE"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="NEMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="NEItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="NV">
@@ -647,7 +647,7 @@
                 <Property name="text" type="java.lang.String" value="NV"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="NVMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="NVItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="NH">
@@ -655,7 +655,7 @@
                 <Property name="text" type="java.lang.String" value="NH"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="NHMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="NHItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="NJ">
@@ -663,7 +663,7 @@
                 <Property name="text" type="java.lang.String" value="NJ"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="NJMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="NJItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="NM">
@@ -671,7 +671,7 @@
                 <Property name="text" type="java.lang.String" value="NM"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="NMMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="NMItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="NY">
@@ -679,7 +679,7 @@
                 <Property name="text" type="java.lang.String" value="NY"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="NYMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="NYItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="NC">
@@ -687,7 +687,7 @@
                 <Property name="text" type="java.lang.String" value="NC"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="NCMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="NCItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="ND">
@@ -695,7 +695,7 @@
                 <Property name="text" type="java.lang.String" value="ND"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="NDMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="NDItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="OH">
@@ -703,7 +703,7 @@
                 <Property name="text" type="java.lang.String" value="OH"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="OHMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="OHItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="OK">
@@ -711,7 +711,7 @@
                 <Property name="text" type="java.lang.String" value="OK"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="OKMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="OKItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="OR">
@@ -719,7 +719,7 @@
                 <Property name="text" type="java.lang.String" value="OR"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="ORMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="ORItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="PA">
@@ -727,7 +727,7 @@
                 <Property name="text" type="java.lang.String" value="PA"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="PAMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="PAItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="RI">
@@ -735,7 +735,7 @@
                 <Property name="text" type="java.lang.String" value="RI"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="RIMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="RIItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="SC">
@@ -743,7 +743,7 @@
                 <Property name="text" type="java.lang.String" value="SC"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="SCMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="SCItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="SD">
@@ -751,7 +751,7 @@
                 <Property name="text" type="java.lang.String" value="SD"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="SDMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="SDItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="TN">
@@ -759,7 +759,7 @@
                 <Property name="text" type="java.lang.String" value="TN"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="TNMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="TNItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="TX">
@@ -767,7 +767,7 @@
                 <Property name="text" type="java.lang.String" value="TX"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="TXMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="TXItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="UT">
@@ -775,7 +775,7 @@
                 <Property name="text" type="java.lang.String" value="UT"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="UTMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="UTItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="VT">
@@ -783,7 +783,7 @@
                 <Property name="text" type="java.lang.String" value="VT"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="VTMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="VTItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="VA">
@@ -791,7 +791,7 @@
                 <Property name="text" type="java.lang.String" value="VA"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="VAMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="VAItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="WA">
@@ -799,7 +799,7 @@
                 <Property name="text" type="java.lang.String" value="WA"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="WAMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="WAItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="WV">
@@ -807,7 +807,7 @@
                 <Property name="text" type="java.lang.String" value="WV"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="WVMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="WVItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="WI">
@@ -815,7 +815,7 @@
                 <Property name="text" type="java.lang.String" value="WI"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="WIMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="WIItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="WY">
@@ -823,7 +823,7 @@
                 <Property name="text" type="java.lang.String" value="WY"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="WYMouseReleased"/>
+                <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="WYItemStateChanged"/>
               </Events>
             </Component>
             <Component class="javax.swing.JLabel" name="jLabel9">
@@ -884,7 +884,7 @@
                           <Group type="102" alignment="1" attributes="0">
                               <Component id="getCoordFile" min="-2" max="-2" attributes="0"/>
                               <EmptySpace min="-2" pref="96" max="-2" attributes="0"/>
-                              <Component id="GetBoundData" min="-2" max="-2" attributes="0"/>
+                              <Component id="GetBoundSites" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                       <EmptySpace max="32767" attributes="0"/>
@@ -910,7 +910,7 @@
                                   </Group>
                                   <EmptySpace min="-2" pref="74" max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="3" attributes="0">
-                                      <Component id="GetBoundData" alignment="3" min="-2" max="-2" attributes="0"/>
+                                      <Component id="GetBoundSites" alignment="3" min="-2" max="-2" attributes="0"/>
                                       <Component id="getCoordFile" alignment="3" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <EmptySpace max="-2" attributes="0"/>
@@ -975,12 +975,12 @@
                 <Property name="text" type="java.lang.String" value="Southernmost Latitude"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JButton" name="GetBoundData">
+            <Component class="javax.swing.JButton" name="GetBoundSites">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Get Data"/>
+                <Property name="text" type="java.lang.String" value="Get Sites"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="GetBoundDataMouseReleased"/>
+                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="GetBoundSitesMouseReleased"/>
               </Events>
             </Component>
             <Component class="javax.swing.JButton" name="getCoordFile">

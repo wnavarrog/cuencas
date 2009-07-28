@@ -21,12 +21,20 @@ import javax.swing.*;
 import java.util.*;
 import javax.swing.table.*;
 
+/**
+ *A client to download data from the USGS water.usgs.gov website.
+ * The client contains 3 tabs, the first is a visual representation of water amounts in the USA.  The second is a tab to download data, the third is as well.
+ * @author Eric Osgood
+ */
 public class TabbedUSGSDownloadWizard extends javax.swing.JDialog {
 
     private hydroScalingAPI.subGUIs.widgets.ImportUSGSWeb myQueryManager;
     private javax.swing.JCheckBox[] listOfCheckBoxes;
 
-    /** Creates new form TabbedUSGSDownloadWizard */
+    /** Creates new form TabbedUSGSDownloadWizard
+     * @param parent 
+     * @param modal
+     */
     public TabbedUSGSDownloadWizard(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         setTitle("Import USGS data from Internet");
@@ -137,7 +145,7 @@ public class TabbedUSGSDownloadWizard extends javax.swing.JDialog {
         WestLon = new javax.swing.JLabel();
         SouthLat2 = new javax.swing.JTextField();
         SouthLat = new javax.swing.JLabel();
-        GetBoundData = new javax.swing.JButton();
+        GetBoundSites = new javax.swing.JButton();
         getCoordFile = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         boundInstruct = new javax.swing.JTextArea();
@@ -209,401 +217,401 @@ public class TabbedUSGSDownloadWizard extends javax.swing.JDialog {
         jLabel2.setText("What state or states?");
 
         NorthEast.setText("NorthEast");
-        NorthEast.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                NorthEastMouseReleased(evt);
+        NorthEast.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                NorthEastItemStateChanged(evt);
             }
         });
 
         South.setText("South");
-        South.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                SouthMouseReleased(evt);
+        South.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                SouthItemStateChanged(evt);
             }
         });
 
         MidWest.setText("MidWest");
-        MidWest.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                MidWestMouseReleased(evt);
+        MidWest.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                MidWestItemStateChanged(evt);
             }
         });
 
         West.setText("West");
-        West.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                WestMouseReleased(evt);
+        West.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                WestItemStateChanged(evt);
             }
         });
 
         AllReg.setText("All");
-        AllReg.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                AllRegActionPerformed(evt);
+        AllReg.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                AllRegItemStateChanged(evt);
             }
         });
 
         AllST.setText("All");
-        AllST.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                AllSTMouseReleased(evt);
+        AllST.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                AllSTItemStateChanged(evt);
             }
         });
 
         AL.setText("AL");
-        AL.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                ALMouseReleased(evt);
+        AL.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                ALItemStateChanged(evt);
             }
         });
 
         AK.setText("AK");
-        AK.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                AKMouseReleased(evt);
+        AK.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                AKItemStateChanged(evt);
             }
         });
 
         AZ.setText("AZ");
-        AZ.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                AZMouseReleased(evt);
+        AZ.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                AZItemStateChanged(evt);
             }
         });
 
         AR.setText("AR");
-        AR.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                ARMouseReleased(evt);
+        AR.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                ARItemStateChanged(evt);
             }
         });
 
         CA.setText("CA");
-        CA.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                CAMouseReleased(evt);
+        CA.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                CAItemStateChanged(evt);
             }
         });
 
         CO.setText("CO");
-        CO.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                COMouseReleased(evt);
+        CO.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                COItemStateChanged(evt);
             }
         });
 
         CT.setText("CT");
-        CT.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                CTMouseReleased(evt);
+        CT.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                CTItemStateChanged(evt);
             }
         });
 
         DE.setText("DE");
-        DE.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                DEMouseReleased(evt);
+        DE.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                DEItemStateChanged(evt);
             }
         });
 
         DC.setText("DC");
-        DC.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                DCMouseReleased(evt);
+        DC.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                DCItemStateChanged(evt);
             }
         });
 
         FL.setText("FL");
-        FL.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                FLMouseReleased(evt);
+        FL.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                FLItemStateChanged(evt);
             }
         });
 
         GA.setText("GA");
-        GA.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                GAMouseReleased(evt);
+        GA.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                GAItemStateChanged(evt);
             }
         });
 
         HI.setText("HI");
-        HI.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                HIMouseReleased(evt);
+        HI.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                HIItemStateChanged(evt);
             }
         });
 
         ID.setText("ID");
-        ID.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                IDMouseReleased(evt);
+        ID.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                IDItemStateChanged(evt);
             }
         });
 
         IL.setText("IL");
-        IL.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                ILMouseReleased(evt);
+        IL.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                ILItemStateChanged(evt);
             }
         });
 
         IN.setText("IN");
-        IN.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                INMouseReleased(evt);
+        IN.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                INItemStateChanged(evt);
             }
         });
 
         IA.setText("IA");
-        IA.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                IAMouseReleased(evt);
+        IA.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                IAItemStateChanged(evt);
             }
         });
 
         KS.setText("KS");
-        KS.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                KSMouseReleased(evt);
+        KS.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                KSItemStateChanged(evt);
             }
         });
 
         KY.setText("KY");
-        KY.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                KYMouseReleased(evt);
+        KY.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                KYItemStateChanged(evt);
             }
         });
 
         LA.setText("LA");
-        LA.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                LAMouseReleased(evt);
+        LA.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                LAItemStateChanged(evt);
             }
         });
 
         ME.setText("ME");
-        ME.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                MEMouseReleased(evt);
+        ME.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                MEItemStateChanged(evt);
             }
         });
 
         MD.setText("MD");
-        MD.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                MDMouseReleased(evt);
+        MD.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                MDItemStateChanged(evt);
             }
         });
 
         MA.setText("MA");
-        MA.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                MAMouseReleased(evt);
+        MA.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                MAItemStateChanged(evt);
             }
         });
 
         MI.setText("MI");
-        MI.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                MIMouseReleased(evt);
+        MI.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                MIItemStateChanged(evt);
             }
         });
 
         MN.setText("MN");
-        MN.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                MNMouseReleased(evt);
+        MN.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                MNItemStateChanged(evt);
             }
         });
 
         MS.setText("MS");
-        MS.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                MSMouseReleased(evt);
+        MS.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                MSItemStateChanged(evt);
             }
         });
 
         MO.setText("MO");
-        MO.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                MOMouseReleased(evt);
+        MO.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                MOItemStateChanged(evt);
             }
         });
 
         MT.setText("MT");
-        MT.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                MTMouseReleased(evt);
+        MT.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                MTItemStateChanged(evt);
             }
         });
 
         NE.setText("NE");
-        NE.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                NEMouseReleased(evt);
+        NE.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                NEItemStateChanged(evt);
             }
         });
 
         NV.setText("NV");
-        NV.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                NVMouseReleased(evt);
+        NV.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                NVItemStateChanged(evt);
             }
         });
 
         NH.setText("NH");
-        NH.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                NHMouseReleased(evt);
+        NH.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                NHItemStateChanged(evt);
             }
         });
 
         NJ.setText("NJ");
-        NJ.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                NJMouseReleased(evt);
+        NJ.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                NJItemStateChanged(evt);
             }
         });
 
         NM.setText("NM");
-        NM.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                NMMouseReleased(evt);
+        NM.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                NMItemStateChanged(evt);
             }
         });
 
         NY.setText("NY");
-        NY.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                NYMouseReleased(evt);
+        NY.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                NYItemStateChanged(evt);
             }
         });
 
         NC.setText("NC");
-        NC.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                NCMouseReleased(evt);
+        NC.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                NCItemStateChanged(evt);
             }
         });
 
         ND.setText("ND");
-        ND.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                NDMouseReleased(evt);
+        ND.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                NDItemStateChanged(evt);
             }
         });
 
         OH.setText("OH");
-        OH.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                OHMouseReleased(evt);
+        OH.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                OHItemStateChanged(evt);
             }
         });
 
         OK.setText("OK");
-        OK.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                OKMouseReleased(evt);
+        OK.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                OKItemStateChanged(evt);
             }
         });
 
         OR.setText("OR");
-        OR.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                ORMouseReleased(evt);
+        OR.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                ORItemStateChanged(evt);
             }
         });
 
         PA.setText("PA");
-        PA.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                PAMouseReleased(evt);
+        PA.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                PAItemStateChanged(evt);
             }
         });
 
         RI.setText("RI");
-        RI.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                RIMouseReleased(evt);
+        RI.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                RIItemStateChanged(evt);
             }
         });
 
         SC.setText("SC");
-        SC.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                SCMouseReleased(evt);
+        SC.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                SCItemStateChanged(evt);
             }
         });
 
         SD.setText("SD");
-        SD.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                SDMouseReleased(evt);
+        SD.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                SDItemStateChanged(evt);
             }
         });
 
         TN.setText("TN");
-        TN.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                TNMouseReleased(evt);
+        TN.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                TNItemStateChanged(evt);
             }
         });
 
         TX.setText("TX");
-        TX.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                TXMouseReleased(evt);
+        TX.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                TXItemStateChanged(evt);
             }
         });
 
         UT.setText("UT");
-        UT.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                UTMouseReleased(evt);
+        UT.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                UTItemStateChanged(evt);
             }
         });
 
         VT.setText("VT");
-        VT.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                VTMouseReleased(evt);
+        VT.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                VTItemStateChanged(evt);
             }
         });
 
         VA.setText("VA");
-        VA.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                VAMouseReleased(evt);
+        VA.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                VAItemStateChanged(evt);
             }
         });
 
         WA.setText("WA");
-        WA.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                WAMouseReleased(evt);
+        WA.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                WAItemStateChanged(evt);
             }
         });
 
         WV.setText("WV");
-        WV.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                WVMouseReleased(evt);
+        WV.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                WVItemStateChanged(evt);
             }
         });
 
         WI.setText("WI");
-        WI.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                WIMouseReleased(evt);
+        WI.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                WIItemStateChanged(evt);
             }
         });
 
         WY.setText("WY");
-        WY.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                WYMouseReleased(evt);
+        WY.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                WYItemStateChanged(evt);
             }
         });
 
@@ -807,10 +815,10 @@ public class TabbedUSGSDownloadWizard extends javax.swing.JDialog {
 
         SouthLat.setText("Southernmost Latitude");
 
-        GetBoundData.setText("Get Data");
-        GetBoundData.addMouseListener(new java.awt.event.MouseAdapter() {
+        GetBoundSites.setText("Get Sites");
+        GetBoundSites.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseReleased(java.awt.event.MouseEvent evt) {
-                GetBoundDataMouseReleased(evt);
+                GetBoundSitesMouseReleased(evt);
             }
         });
 
@@ -865,7 +873,7 @@ public class TabbedUSGSDownloadWizard extends javax.swing.JDialog {
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, BoundingBoxLayout.createSequentialGroup()
                         .add(getCoordFile)
                         .add(96, 96, 96)
-                        .add(GetBoundData)))
+                        .add(GetBoundSites)))
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -888,7 +896,7 @@ public class TabbedUSGSDownloadWizard extends javax.swing.JDialog {
                                 .add(SouthLat2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                             .add(74, 74, 74)
                             .add(BoundingBoxLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                                .add(GetBoundData)
+                                .add(GetBoundSites)
                                 .add(getCoordFile))
                             .addContainerGap())
                         .add(BoundingBoxLayout.createSequentialGroup()
@@ -1086,6 +1094,11 @@ public class TabbedUSGSDownloadWizard extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     *Takes vector from downloaded data and reformats correctly, then displays contents in table.
+     * getColumnClass changes the true values into checkboxes.
+     * @param myVector
+     */
     public void makeTable(Vector<String> myVector) {
 
         SiteCounterInfo.setText("There are " + myVector.size() + " sites available");
@@ -1137,7 +1150,6 @@ public class TabbedUSGSDownloadWizard extends javax.swing.JDialog {
                 dataTable.setValueAt("N / A", k, 5);
             }
         }
-        //dataTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         TableColumn col1 = dataTable.getColumnModel().getColumn(0);
         TableColumn col2 = dataTable.getColumnModel().getColumn(1);
         TableColumn col3 = dataTable.getColumnModel().getColumn(2);
@@ -1299,855 +1311,7 @@ public class TabbedUSGSDownloadWizard extends javax.swing.JDialog {
         CheckMarked.setText(noUnder);
     }//GEN-LAST:event_CheckMarkedMouseExited
 
-    private void WYMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_WYMouseReleased
-        if (WY.isSelected()) {
-            System.out.println(WY.isSelected());
-            String[][] statesparam = new String[][]{{"WY"}, {"Stream", "Gage Height", "Volume"}};
-            Vector myVector = myQueryManager.filterByState(statesparam);
-            makeTable(myVector);
-        }
-}//GEN-LAST:event_WYMouseReleased
-
-    private void WIMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_WIMouseReleased
-        if (WI.isSelected()) {
-            System.out.println(WI.isSelected());
-            String[][] statesparam = new String[][]{{"WI"}, {"Stream", "Gage Height", "Volume"}};
-            Vector myVector = myQueryManager.filterByState(statesparam);
-            makeTable(myVector);
-        }
-}//GEN-LAST:event_WIMouseReleased
-
-    private void WVMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_WVMouseReleased
-        if (WV.isSelected()) {
-            System.out.println(WV.isSelected());
-            String[][] statesparam = new String[][]{{"WV"}, {"Stream", "Gage Height", "Volume"}};
-            Vector myVector = myQueryManager.filterByState(statesparam);
-            makeTable(myVector);
-        }
-}//GEN-LAST:event_WVMouseReleased
-
-    private void WAMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_WAMouseReleased
-        if (WA.isSelected()) {
-            System.out.println(WA.isSelected());
-            String[][] statesparam = new String[][]{{"WA"}, {"Stream", "Gage Height", "Volume"}};
-            Vector myVector = myQueryManager.filterByState(statesparam);
-            makeTable(myVector);
-        }
-}//GEN-LAST:event_WAMouseReleased
-
-    private void VAMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_VAMouseReleased
-        if (VA.isSelected()) {
-            System.out.println(VA.isSelected());
-            String[][] statesparam = new String[][]{{"VA"}, {"Stream", "Gage Height", "Volume"}};
-            Vector myVector = myQueryManager.filterByState(statesparam);
-            makeTable(myVector);
-        }
-}//GEN-LAST:event_VAMouseReleased
-
-    private void VTMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_VTMouseReleased
-        if (VT.isSelected()) {
-            System.out.println(VT.isSelected());
-            String[][] statesparam = new String[][]{{"VT"}, {"Stream", "Gage Height", "Volume"}};
-            Vector myVector = myQueryManager.filterByState(statesparam);
-            makeTable(myVector);
-        }
-}//GEN-LAST:event_VTMouseReleased
-
-    private void UTMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_UTMouseReleased
-        if (UT.isSelected()) {
-            System.out.println(UT.isSelected());
-            String[][] statesparam = new String[][]{{"UT"}, {"Stream", "Gage Height", "Volume"}};
-            Vector myVector = myQueryManager.filterByState(statesparam);
-            makeTable(myVector);
-        }
-}//GEN-LAST:event_UTMouseReleased
-
-    private void TXMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TXMouseReleased
-        if (TX.isSelected()) {
-            System.out.println(TX.isSelected());
-            String[][] statesparam = new String[][]{{"TX"}, {"Stream", "Gage Height", "Volume"}};
-            Vector myVector = myQueryManager.filterByState(statesparam);
-            makeTable(myVector);
-        }
-}//GEN-LAST:event_TXMouseReleased
-
-    private void TNMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TNMouseReleased
-        if (TN.isSelected()) {
-            System.out.println(TN.isSelected());
-            String[][] statesparam = new String[][]{{"TN"}, {"Stream", "Gage Height", "Volume"}};
-            Vector myVector = myQueryManager.filterByState(statesparam);
-            makeTable(myVector);
-        }
-}//GEN-LAST:event_TNMouseReleased
-
-    private void SDMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_SDMouseReleased
-        if (SD.isSelected()) {
-            System.out.println(SD.isSelected());
-            String[][] statesparam = new String[][]{{"SD"}, {"Stream", "Gage Height", "Volume"}};
-            Vector myVector = myQueryManager.filterByState(statesparam);
-            makeTable(myVector);
-        }
-}//GEN-LAST:event_SDMouseReleased
-
-    private void SCMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_SCMouseReleased
-        if (SC.isSelected()) {
-            System.out.println(SC.isSelected());
-            String[][] statesparam = new String[][]{{"SC"}, {"Stream", "Gage Height", "Volume"}};
-            Vector myVector = myQueryManager.filterByState(statesparam);
-            makeTable(myVector);
-        }
-}//GEN-LAST:event_SCMouseReleased
-
-    private void RIMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_RIMouseReleased
-        if (RI.isSelected()) {
-            System.out.println(RI.isSelected());
-            String[][] statesparam = new String[][]{{"RI"}, {"Stream", "Gage Height", "Volume"}};
-            Vector myVector = myQueryManager.filterByState(statesparam);
-            makeTable(myVector);
-        }
-}//GEN-LAST:event_RIMouseReleased
-
-    private void PAMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_PAMouseReleased
-        if (PA.isSelected()) {
-            System.out.println(PA.isSelected());
-            String[][] statesparam = new String[][]{{"PA"}, {"Stream", "Gage Height", "Volume"}};
-            Vector myVector = myQueryManager.filterByState(statesparam);
-            makeTable(myVector);
-        }
-}//GEN-LAST:event_PAMouseReleased
-
-    private void ORMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ORMouseReleased
-        if (OR.isSelected()) {
-            System.out.println(OR.isSelected());
-            String[][] statesparam = new String[][]{{"OR"}, {"Stream", "Gage Height", "Volume"}};
-            Vector myVector = myQueryManager.filterByState(statesparam);
-            makeTable(myVector);
-        }
-}//GEN-LAST:event_ORMouseReleased
-
-    private void OKMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_OKMouseReleased
-        if (OK.isSelected()) {
-            System.out.println(OK.isSelected());
-            String[][] statesparam = new String[][]{{"OK"}, {"Stream", "Gage Height", "Volume"}};
-            Vector myVector = myQueryManager.filterByState(statesparam);
-            makeTable(myVector);
-        }
-}//GEN-LAST:event_OKMouseReleased
-
-    private void OHMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_OHMouseReleased
-        if (OH.isSelected()) {
-            System.out.println(OH.isSelected());
-            String[][] statesparam = new String[][]{{"OH"}, {"Stream", "Gage Height", "Volume"}};
-            Vector myVector = myQueryManager.filterByState(statesparam);
-            makeTable(myVector);
-        }
-}//GEN-LAST:event_OHMouseReleased
-
-    private void NDMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_NDMouseReleased
-        if (ND.isSelected()) {
-            System.out.println(ND.isSelected());
-            String[][] statesparam = new String[][]{{"ND"}, {"Stream", "Gage Height", "Volume"}};
-            Vector myVector = myQueryManager.filterByState(statesparam);
-            makeTable(myVector);
-        }
-}//GEN-LAST:event_NDMouseReleased
-
-    private void NCMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_NCMouseReleased
-        if (NC.isSelected()) {
-            System.out.println(NC.isSelected());
-            String[][] statesparam = new String[][]{{"NC"}, {"Stream", "Gage Height", "Volume"}};
-            Vector myVector = myQueryManager.filterByState(statesparam);
-            makeTable(myVector);
-        }
-}//GEN-LAST:event_NCMouseReleased
-
-    private void NYMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_NYMouseReleased
-        if (NY.isSelected()) {
-            System.out.println(NY.isSelected());
-            String[][] statesparam = new String[][]{{"NY"}, {"Stream", "Gage Height", "Volume"}};
-            Vector myVector = myQueryManager.filterByState(statesparam);
-            makeTable(myVector);
-        }
-}//GEN-LAST:event_NYMouseReleased
-
-    private void NMMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_NMMouseReleased
-        if (NM.isSelected()) {
-            System.out.println(NM.isSelected());
-            String[][] statesparam = new String[][]{{"NM"}, {"Stream", "Gage Height", "Volume"}};
-            Vector myVector = myQueryManager.filterByState(statesparam);
-            makeTable(myVector);
-        }
-}//GEN-LAST:event_NMMouseReleased
-
-    private void NJMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_NJMouseReleased
-        if (NJ.isSelected()) {
-            System.out.println(NJ.isSelected());
-            String[][] statesparam = new String[][]{{"NJ"}, {"Stream", "Gage Height", "Volume"}};
-            Vector myVector = myQueryManager.filterByState(statesparam);
-            makeTable(myVector);
-        }
-}//GEN-LAST:event_NJMouseReleased
-
-    private void NHMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_NHMouseReleased
-        if (NH.isSelected()) {
-            System.out.println(NH.isSelected());
-            String[][] statesparam = new String[][]{{"NH"}, {"Stream", "Gage Height", "Volume"}};
-            Vector myVector = myQueryManager.filterByState(statesparam);
-            makeTable(myVector);
-        }
-}//GEN-LAST:event_NHMouseReleased
-
-    private void NVMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_NVMouseReleased
-        if (NV.isSelected()) {
-            System.out.println(NV.isSelected());
-            String[][] statesparam = new String[][]{{"NV"}, {"Stream", "Gage Height", "Volume"}};
-            Vector myVector = myQueryManager.filterByState(statesparam);
-            makeTable(myVector);
-        }
-}//GEN-LAST:event_NVMouseReleased
-
-    private void NEMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_NEMouseReleased
-        if (NE.isSelected()) {
-            System.out.println(NE.isSelected());
-            String[][] statesparam = new String[][]{{"NE"}, {"Stream", "Gage Height", "Volume"}};
-            Vector myVector = myQueryManager.filterByState(statesparam);
-            makeTable(myVector);
-        }
-}//GEN-LAST:event_NEMouseReleased
-
-    private void MTMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_MTMouseReleased
-        if (MT.isSelected()) {
-            System.out.println(MT.isSelected());
-            String[][] statesparam = new String[][]{{"MT"}, {"Stream", "Gage Height", "Volume"}};
-            Vector myVector = myQueryManager.filterByState(statesparam);
-            makeTable(myVector);
-        }
-}//GEN-LAST:event_MTMouseReleased
-
-    private void MOMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_MOMouseReleased
-        if (MO.isSelected()) {
-            System.out.println(MO.isSelected());
-            String[][] statesparam = new String[][]{{"MO"}, {"Stream", "Gage Height", "Volume"}};
-            Vector myVector = myQueryManager.filterByState(statesparam);
-            makeTable(myVector);
-        }
-}//GEN-LAST:event_MOMouseReleased
-
-    private void MSMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_MSMouseReleased
-        if (MS.isSelected()) {
-            System.out.println(MS.isSelected());
-            String[][] statesparam = new String[][]{{"MS"}, {"Stream", "Gage Height", "Volume"}};
-            Vector myVector = myQueryManager.filterByState(statesparam);
-            makeTable(myVector);
-        }
-}//GEN-LAST:event_MSMouseReleased
-
-    private void MNMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_MNMouseReleased
-        if (MN.isSelected()) {
-            System.out.println(MN.isSelected());
-            String[][] statesparam = new String[][]{{"MN"}, {"Stream", "Gage Height", "Volume"}};
-            Vector myVector = myQueryManager.filterByState(statesparam);
-            makeTable(myVector);
-        }
-}//GEN-LAST:event_MNMouseReleased
-
-    private void MIMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_MIMouseReleased
-        if (MI.isSelected()) {
-            System.out.println(MI.isSelected());
-            String[][] statesparam = new String[][]{{"MI"}, {"Stream", "Gage Height", "Volume"}};
-            Vector myVector = myQueryManager.filterByState(statesparam);
-            makeTable(myVector);
-        }
-}//GEN-LAST:event_MIMouseReleased
-
-    private void MAMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_MAMouseReleased
-        if (MA.isSelected()) {
-            System.out.println(MA.isSelected());
-            String[][] statesparam = new String[][]{{"MA"}, {"Stream", "Gage Height", "Volume"}};
-            Vector myVector = myQueryManager.filterByState(statesparam);
-            makeTable(myVector);
-        }
-}//GEN-LAST:event_MAMouseReleased
-
-    private void MDMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_MDMouseReleased
-        if (MD.isSelected()) {
-            System.out.println(MD.isSelected());
-            String[][] statesparam = new String[][]{{"MD"}, {"Stream", "Gage Height", "Volume"}};
-            Vector myVector = myQueryManager.filterByState(statesparam);
-            makeTable(myVector);
-        }
-}//GEN-LAST:event_MDMouseReleased
-
-    private void MEMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_MEMouseReleased
-        if (ME.isSelected()) {
-            System.out.println(ME.isSelected());
-            String[][] statesparam = new String[][]{{"ME"}, {"Stream", "Gage Height", "Volume"}};
-            Vector myVector = myQueryManager.filterByState(statesparam);
-            makeTable(myVector);
-        }
-}//GEN-LAST:event_MEMouseReleased
-
-    private void LAMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_LAMouseReleased
-        if (LA.isSelected()) {
-            System.out.println(LA.isSelected());
-            String[][] statesparam = new String[][]{{"LA"}, {"Stream", "Gage Height", "Volume"}};
-            Vector myVector = myQueryManager.filterByState(statesparam);
-            makeTable(myVector);
-        }
-}//GEN-LAST:event_LAMouseReleased
-
-    private void KYMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_KYMouseReleased
-        if (KY.isSelected()) {
-            System.out.println(KY.isSelected());
-            String[][] statesparam = new String[][]{{"KY"}, {"Stream", "Gage Height", "Volume"}};
-            Vector myVector = myQueryManager.filterByState(statesparam);
-            makeTable(myVector);
-        }
-}//GEN-LAST:event_KYMouseReleased
-
-    private void KSMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_KSMouseReleased
-        if (KS.isSelected()) {
-            System.out.println(KS.isSelected());
-            String[][] statesparam = new String[][]{{"KS"}, {"Stream", "Gage Height", "Volume"}};
-            Vector myVector = myQueryManager.filterByState(statesparam);
-            makeTable(myVector);
-        }
-}//GEN-LAST:event_KSMouseReleased
-
-    private void IAMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_IAMouseReleased
-        if (IA.isSelected()) {
-            System.out.println(IA.isSelected());
-            String[][] statesparam = new String[][]{{"IA"}, {"Stream", "Gage Height", "Volume"}};
-            Vector myVector = myQueryManager.filterByState(statesparam);
-            makeTable(myVector);
-        }
-}//GEN-LAST:event_IAMouseReleased
-
-    private void INMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_INMouseReleased
-        if (IN.isSelected()) {
-            System.out.println(IN.isSelected());
-            String[][] statesparam = new String[][]{{"IN"}, {"Stream", "Gage Height", "Volume"}};
-            Vector myVector = myQueryManager.filterByState(statesparam);
-            makeTable(myVector);
-        }
-}//GEN-LAST:event_INMouseReleased
-
-    private void ILMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ILMouseReleased
-        if (IL.isSelected()) {
-            System.out.println(IL.isSelected());
-            String[][] statesparam = new String[][]{{"IL"}, {"Stream", "Gage Height", "Volume"}};
-            Vector myVector = myQueryManager.filterByState(statesparam);
-            makeTable(myVector);
-        }
-}//GEN-LAST:event_ILMouseReleased
-
-    private void IDMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_IDMouseReleased
-        if (ID.isSelected()) {
-            System.out.println(ID.isSelected());
-            String[][] statesparam = new String[][]{{"ID"}, {"Stream", "Gage Height", "Volume"}};
-            Vector myVector = myQueryManager.filterByState(statesparam);
-            makeTable(myVector);
-        }
-}//GEN-LAST:event_IDMouseReleased
-
-    private void HIMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_HIMouseReleased
-        if (HI.isSelected()) {
-            System.out.println(HI.isSelected());
-            String[][] statesparam = new String[][]{{"HI"}, {"Stream", "Gage Height", "Volume"}};
-            Vector myVector = myQueryManager.filterByState(statesparam);
-            makeTable(myVector);
-        }
-}//GEN-LAST:event_HIMouseReleased
-
-    private void GAMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_GAMouseReleased
-        if (GA.isSelected()) {
-            System.out.println(GA.isSelected());
-            String[][] statesparam = new String[][]{{"GA"}, {"Stream", "Gage Height", "Volume"}};
-            Vector myVector = myQueryManager.filterByState(statesparam);
-            makeTable(myVector);
-        }
-}//GEN-LAST:event_GAMouseReleased
-
-    private void FLMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_FLMouseReleased
-        if (FL.isSelected()) {
-            System.out.println(FL.isSelected());
-            String[][] statesparam = new String[][]{{"FL"}, {"Stream", "Gage Height", "Volume"}};
-            Vector myVector = myQueryManager.filterByState(statesparam);
-            makeTable(myVector);
-        }
-}//GEN-LAST:event_FLMouseReleased
-
-    private void DCMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_DCMouseReleased
-        if (DC.isSelected()) {
-            System.out.println(DC.isSelected());
-            String[][] statesparam = new String[][]{{"DC"}, {"Stream", "Gage Height", "Volume"}};
-            Vector myVector = myQueryManager.filterByState(statesparam);
-            makeTable(myVector);
-        }
-}//GEN-LAST:event_DCMouseReleased
-
-    private void DEMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_DEMouseReleased
-        if (DE.isSelected()) {
-            System.out.println(DE.isSelected());
-            String[][] statesparam = new String[][]{{"DE"}, {"Stream", "Gage Height", "Volume"}};
-            Vector myVector = myQueryManager.filterByState(statesparam);
-            makeTable(myVector);
-        }
-}//GEN-LAST:event_DEMouseReleased
-
-    private void CTMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_CTMouseReleased
-        if (CT.isSelected()) {
-            System.out.println(CT.isSelected());
-            String[][] statesparam = new String[][]{{"CT"}, {"Stream", "Gage Height", "Volume"}};
-            Vector myVector = myQueryManager.filterByState(statesparam);
-            makeTable(myVector);
-        }
-}//GEN-LAST:event_CTMouseReleased
-
-    private void COMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_COMouseReleased
-        if (CO.isSelected()) {
-            System.out.println(CO.isSelected());
-            String[][] statesparam = new String[][]{{"CO"}, {"Stream", "Gage Height", "Volume"}};
-            Vector myVector = myQueryManager.filterByState(statesparam);
-            makeTable(myVector);
-        }
-}//GEN-LAST:event_COMouseReleased
-
-    private void CAMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_CAMouseReleased
-        if (CA.isSelected()) {
-            System.out.println(CA.isSelected());
-            String[][] statesparam = new String[][]{{"CA"}, {"Stream", "Gage Height", "Volume"}};
-            Vector myVector = myQueryManager.filterByState(statesparam);
-            makeTable(myVector);
-        }
-}//GEN-LAST:event_CAMouseReleased
-
-    private void ARMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ARMouseReleased
-        if (AR.isSelected()) {
-            System.out.println(AR.isSelected());
-            String[][] statesparam = new String[][]{{"AR"}, {"Stream", "Gage Height", "Volume"}};
-            Vector myVector = myQueryManager.filterByState(statesparam);
-            makeTable(myVector);
-        }
-}//GEN-LAST:event_ARMouseReleased
-
-    private void AZMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_AZMouseReleased
-        if (AZ.isSelected()) {
-            System.out.println(AZ.isSelected());
-            String[][] statesparam = new String[][]{{"AZ"}, {"Stream", "Gage Height", "Volume"}};
-            java.util.Vector myVector = myQueryManager.filterByState(statesparam);
-            makeTable(myVector);
-        }
-}//GEN-LAST:event_AZMouseReleased
-
-    private void AKMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_AKMouseReleased
-        if (AK.isSelected()) {
-            System.out.println(AK.isSelected());
-            String[][] statesparam = new String[][]{{"AK"}, {"Stream", "Gage Height", "Volume"}};
-            java.util.Vector myVector = myQueryManager.filterByState(statesparam);
-            makeTable(myVector);
-        }
-}//GEN-LAST:event_AKMouseReleased
-
-    private void ALMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ALMouseReleased
-
-        if (AL.isSelected()) {
-            System.out.println(AL.isSelected());
-            String[][] statesparam = new String[][]{{"AL"}, {"Stream", "Gage Height", "Volume"}};
-            java.util.Vector myVector = myQueryManager.filterByState(statesparam);
-            makeTable(myVector);
-
-        }
-}//GEN-LAST:event_ALMouseReleased
-
-    private void AllSTMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_AllSTMouseReleased
-        System.out.println(AllST.isSelected());
-        AL.setSelected(AllST.isSelected());
-        System.out.println(AllST.isSelected());
-        AK.setSelected(AllST.isSelected());
-        System.out.println(AllST.isSelected());
-        AZ.setSelected(AllST.isSelected());
-        System.out.println(AllST.isSelected());
-        AR.setSelected(AllST.isSelected());
-        System.out.println(AllST.isSelected());
-        CA.setSelected(AllST.isSelected());
-        System.out.println(AllST.isSelected());
-        CO.setSelected(AllST.isSelected());
-        System.out.println(AllST.isSelected());
-        CT.setSelected(AllST.isSelected());
-        System.out.println(AllST.isSelected());
-        DE.setSelected(AllST.isSelected());
-        System.out.println(AllST.isSelected());
-        DC.setSelected(AllST.isSelected());
-        System.out.println(AllST.isSelected());
-        FL.setSelected(AllST.isSelected());
-        System.out.println(AllST.isSelected());
-        GA.setSelected(AllST.isSelected());
-        System.out.println(AllST.isSelected());
-        HI.setSelected(AllST.isSelected());
-        System.out.println(AllST.isSelected());
-        ID.setSelected(AllST.isSelected());
-        System.out.println(AllST.isSelected());
-        IL.setSelected(AllST.isSelected());
-        System.out.println(AllST.isSelected());
-        IN.setSelected(AllST.isSelected());
-        System.out.println(AllST.isSelected());
-        IA.setSelected(AllST.isSelected());
-        System.out.println(AllST.isSelected());
-        KS.setSelected(AllST.isSelected());
-        System.out.println(AllST.isSelected());
-        KY.setSelected(AllST.isSelected());
-        System.out.println(AllST.isSelected());
-        LA.setSelected(AllST.isSelected());
-        System.out.println(AllST.isSelected());
-        ME.setSelected(AllST.isSelected());
-        System.out.println(AllST.isSelected());
-        MD.setSelected(AllST.isSelected());
-        System.out.println(AllST.isSelected());
-        MA.setSelected(AllST.isSelected());
-        System.out.println(AllST.isSelected());
-        MI.setSelected(AllST.isSelected());
-        System.out.println(AllST.isSelected());
-        MN.setSelected(AllST.isSelected());
-        System.out.println(AllST.isSelected());
-        MS.setSelected(AllST.isSelected());
-        System.out.println(AllST.isSelected());
-        MO.setSelected(AllST.isSelected());
-        System.out.println(AllST.isSelected());
-        MT.setSelected(AllST.isSelected());
-        System.out.println(AllST.isSelected());
-        NE.setSelected(AllST.isSelected());
-        System.out.println(AllST.isSelected());
-        NV.setSelected(AllST.isSelected());
-        System.out.println(AllST.isSelected());
-        NH.setSelected(AllST.isSelected());
-        System.out.println(AllST.isSelected());
-        NJ.setSelected(AllST.isSelected());
-        System.out.println(AllST.isSelected());
-        NM.setSelected(AllST.isSelected());
-        System.out.println(AllST.isSelected());
-        NY.setSelected(AllST.isSelected());
-        System.out.println(AllST.isSelected());
-        NC.setSelected(AllST.isSelected());
-        System.out.println(AllST.isSelected());
-        ND.setSelected(AllST.isSelected());
-        System.out.println(AllST.isSelected());
-        OH.setSelected(AllST.isSelected());
-        System.out.println(AllST.isSelected());
-        OK.setSelected(AllST.isSelected());
-        System.out.println(AllST.isSelected());
-        OR.setSelected(AllST.isSelected());
-        System.out.println(AllST.isSelected());
-        PA.setSelected(AllST.isSelected());
-        System.out.println(AllST.isSelected());
-        RI.setSelected(AllST.isSelected());
-        System.out.println(AllST.isSelected());
-        SC.setSelected(AllST.isSelected());
-        System.out.println(AllST.isSelected());
-        SD.setSelected(AllST.isSelected());
-        System.out.println(AllST.isSelected());
-        TN.setSelected(AllST.isSelected());
-        System.out.println(AllST.isSelected());
-        TX.setSelected(AllST.isSelected());
-        System.out.println(AllST.isSelected());
-        UT.setSelected(AllST.isSelected());
-        System.out.println(AllST.isSelected());
-        VT.setSelected(AllST.isSelected());
-        System.out.println(AllST.isSelected());
-        VA.setSelected(AllST.isSelected());
-        System.out.println(AllST.isSelected());
-        WA.setSelected(AllST.isSelected());
-        System.out.println(AllST.isSelected());
-        WV.setSelected(AllST.isSelected());
-        System.out.println(AllST.isSelected());
-        WI.setSelected(AllST.isSelected());
-        System.out.println(AllST.isSelected());
-        WY.setSelected(AllST.isSelected());
-
-
-        if (AllST.isSelected()) {
-            System.out.println(AllST.isSelected());
-            String[][] statesparam = new String[][]{{"AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "DC", "FL",
-                    "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME",
-                    "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH",
-                    "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI",
-                    "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI",
-                    "WY"}, {"Stream", "Gage Height", "Volume"}};
-        //java.util.Vector myVector = myQueryManager.filterAllState(statesparam);
-        }
-}//GEN-LAST:event_AllSTMouseReleased
-
-    private void AllRegActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AllRegActionPerformed
-        System.out.println(AllReg.isSelected());
-        NorthEast.setSelected(AllReg.isSelected());
-        System.out.println(AllReg.isSelected());
-        South.setSelected(AllReg.isSelected());
-        System.out.println(AllReg.isSelected());
-        MidWest.setSelected(AllReg.isSelected());
-        System.out.println(AllReg.isSelected());
-        West.setSelected(AllReg.isSelected());
-
-        System.out.println(AllReg.isSelected());
-        AllST.setSelected(AllReg.isSelected());
-
-        System.out.println(AllReg.isSelected());
-        AL.setSelected(AllReg.isSelected());
-        System.out.println(AllReg.isSelected());
-        AK.setSelected(AllReg.isSelected());
-        System.out.println(AllReg.isSelected());
-        AZ.setSelected(AllReg.isSelected());
-        System.out.println(AllReg.isSelected());
-        AR.setSelected(AllReg.isSelected());
-        System.out.println(AllReg.isSelected());
-        CA.setSelected(AllReg.isSelected());
-        System.out.println(AllReg.isSelected());
-        CO.setSelected(AllReg.isSelected());
-        System.out.println(AllReg.isSelected());
-        CT.setSelected(AllReg.isSelected());
-        System.out.println(AllReg.isSelected());
-        DE.setSelected(AllReg.isSelected());
-        System.out.println(AllReg.isSelected());
-        DC.setSelected(AllReg.isSelected());
-        System.out.println(AllReg.isSelected());
-        FL.setSelected(AllReg.isSelected());
-        System.out.println(AllReg.isSelected());
-        GA.setSelected(AllReg.isSelected());
-        System.out.println(AllReg.isSelected());
-        HI.setSelected(AllReg.isSelected());
-        System.out.println(AllReg.isSelected());
-        ID.setSelected(AllReg.isSelected());
-        System.out.println(AllReg.isSelected());
-        IL.setSelected(AllReg.isSelected());
-        System.out.println(AllReg.isSelected());
-        IN.setSelected(AllReg.isSelected());
-        System.out.println(AllReg.isSelected());
-        IA.setSelected(AllReg.isSelected());
-        System.out.println(AllReg.isSelected());
-        KS.setSelected(AllReg.isSelected());
-        System.out.println(AllReg.isSelected());
-        KY.setSelected(AllReg.isSelected());
-        System.out.println(AllReg.isSelected());
-        LA.setSelected(AllReg.isSelected());
-        System.out.println(AllReg.isSelected());
-        ME.setSelected(AllReg.isSelected());
-        System.out.println(AllReg.isSelected());
-        MD.setSelected(AllReg.isSelected());
-        System.out.println(AllReg.isSelected());
-        MA.setSelected(AllReg.isSelected());
-        System.out.println(AllReg.isSelected());
-        MI.setSelected(AllReg.isSelected());
-        System.out.println(AllReg.isSelected());
-        MN.setSelected(AllReg.isSelected());
-        System.out.println(AllReg.isSelected());
-        MS.setSelected(AllReg.isSelected());
-        System.out.println(AllReg.isSelected());
-        MO.setSelected(AllReg.isSelected());
-        System.out.println(AllReg.isSelected());
-        MT.setSelected(AllReg.isSelected());
-        System.out.println(AllReg.isSelected());
-        NE.setSelected(AllReg.isSelected());
-        System.out.println(AllReg.isSelected());
-        NV.setSelected(AllReg.isSelected());
-        System.out.println(AllReg.isSelected());
-        NH.setSelected(AllReg.isSelected());
-        System.out.println(AllReg.isSelected());
-        NJ.setSelected(AllReg.isSelected());
-        System.out.println(AllReg.isSelected());
-        NM.setSelected(AllReg.isSelected());
-        System.out.println(AllReg.isSelected());
-        NY.setSelected(AllReg.isSelected());
-        System.out.println(AllReg.isSelected());
-        NC.setSelected(AllReg.isSelected());
-        System.out.println(AllReg.isSelected());
-        ND.setSelected(AllReg.isSelected());
-        System.out.println(AllReg.isSelected());
-        OH.setSelected(AllReg.isSelected());
-        System.out.println(AllReg.isSelected());
-        OK.setSelected(AllReg.isSelected());
-        System.out.println(AllReg.isSelected());
-        OR.setSelected(AllReg.isSelected());
-        System.out.println(AllReg.isSelected());
-        PA.setSelected(AllReg.isSelected());
-        System.out.println(AllReg.isSelected());
-        RI.setSelected(AllReg.isSelected());
-        System.out.println(AllReg.isSelected());
-        SC.setSelected(AllReg.isSelected());
-        System.out.println(AllReg.isSelected());
-        SD.setSelected(AllReg.isSelected());
-        System.out.println(AllReg.isSelected());
-        TN.setSelected(AllReg.isSelected());
-        System.out.println(AllReg.isSelected());
-        TX.setSelected(AllReg.isSelected());
-        System.out.println(AllReg.isSelected());
-        UT.setSelected(AllReg.isSelected());
-        System.out.println(AllReg.isSelected());
-        VT.setSelected(AllReg.isSelected());
-        System.out.println(AllReg.isSelected());
-        VA.setSelected(AllReg.isSelected());
-        System.out.println(AllReg.isSelected());
-        WA.setSelected(AllReg.isSelected());
-        System.out.println(AllReg.isSelected());
-        WV.setSelected(AllReg.isSelected());
-        System.out.println(AllReg.isSelected());
-        WI.setSelected(AllReg.isSelected());
-        System.out.println(AllReg.isSelected());
-        WY.setSelected(AllReg.isSelected());
-
-        if (AllReg.isSelected()) {
-            System.out.println(AllReg.isSelected());
-            String[][] statesparam = new String[][]{{"AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "DC", "FL",
-                    "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME",
-                    "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH",
-                    "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI",
-                    "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI",
-                    "WY"}, {"Stream", "Gage Height", "Volume"}};
-        //java.util.Vector myVector = myQueryManager.filterAllState(statesparam);
-        }
-}//GEN-LAST:event_AllRegActionPerformed
-
-    private void WestMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_WestMouseReleased
-        System.out.println(West.isSelected());
-        WA.setSelected(West.isSelected());
-        System.out.println(West.isSelected());
-        OR.setSelected(West.isSelected());
-        System.out.println(West.isSelected());
-        CA.setSelected(West.isSelected());
-        System.out.println(West.isSelected());
-        ID.setSelected(West.isSelected());
-        System.out.println(West.isSelected());
-        NV.setSelected(West.isSelected());
-        System.out.println(West.isSelected());
-        MT.setSelected(West.isSelected());
-        System.out.println(West.isSelected());
-        WY.setSelected(West.isSelected());
-        System.out.println(West.isSelected());
-        UT.setSelected(West.isSelected());
-        System.out.println(West.isSelected());
-        AZ.setSelected(West.isSelected());
-        System.out.println(West.isSelected());
-        CO.setSelected(West.isSelected());
-        System.out.println(West.isSelected());
-        NM.setSelected(West.isSelected());
-        System.out.println(West.isSelected());
-        AK.setSelected(West.isSelected());
-        System.out.println(West.isSelected());
-        HI.setSelected(West.isSelected());
-
-        if (West.isSelected()) {
-            System.out.println(West.isSelected());
-            String[][] statesparam = new String[][]{{"WA", "OR", "CA", "ID", "NV", "MT", "WY", "UT",
-                    "AZ", "CO", "NM", "AK", "HI"}, {"Stream", "Gage Height", "Volume"}};
-        //java.util.Vector myVector = myQueryManager.filterWestReg(statesparam);
-        }
-}//GEN-LAST:event_WestMouseReleased
-
-    private void MidWestMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_MidWestMouseReleased
-        System.out.println(MidWest.isSelected());
-        WI.setSelected(MidWest.isSelected());
-        System.out.println(MidWest.isSelected());
-        MI.setSelected(MidWest.isSelected());
-        System.out.println(MidWest.isSelected());
-        IL.setSelected(MidWest.isSelected());
-        System.out.println(MidWest.isSelected());
-        IN.setSelected(MidWest.isSelected());
-        System.out.println(MidWest.isSelected());
-        OH.setSelected(MidWest.isSelected());
-        System.out.println(MidWest.isSelected());
-        ND.setSelected(MidWest.isSelected());
-        System.out.println(MidWest.isSelected());
-        SD.setSelected(MidWest.isSelected());
-        System.out.println(MidWest.isSelected());
-        NE.setSelected(MidWest.isSelected());
-        System.out.println(MidWest.isSelected());
-        KS.setSelected(MidWest.isSelected());
-        System.out.println(MidWest.isSelected());
-        MN.setSelected(MidWest.isSelected());
-        System.out.println(MidWest.isSelected());
-        IA.setSelected(MidWest.isSelected());
-        System.out.println(MidWest.isSelected());
-        MO.setSelected(MidWest.isSelected());
-
-        if (MidWest.isSelected()) {
-            System.out.println(MidWest.isSelected());
-            String[][] statesparam = new String[][]{{"WI", "MI", "IL", "IN", "OH",
-                    "ND", "SD", "NE", "KS", "MN", "IA", "MO"}, {"Stream", "Gage Height", "Volume"}};
-        //java.util.Vector myVector = myQueryManager.filterMidWestReg(statesparam);
-        }
-}//GEN-LAST:event_MidWestMouseReleased
-
-    private void SouthMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_SouthMouseReleased
-        System.out.println(South.isSelected());
-        DE.setSelected(South.isSelected());
-        System.out.println(South.isSelected());
-        MD.setSelected(South.isSelected());
-        System.out.println(South.isSelected());
-        DC.setSelected(South.isSelected());
-        System.out.println(South.isSelected());
-        VA.setSelected(South.isSelected());
-        System.out.println(South.isSelected());
-        WV.setSelected(South.isSelected());
-        System.out.println(South.isSelected());
-        NC.setSelected(South.isSelected());
-        System.out.println(South.isSelected());
-        SC.setSelected(South.isSelected());
-        System.out.println(South.isSelected());
-        GA.setSelected(South.isSelected());
-        System.out.println(South.isSelected());
-        FL.setSelected(South.isSelected());
-        System.out.println(South.isSelected());
-        KY.setSelected(South.isSelected());
-        System.out.println(South.isSelected());
-        TN.setSelected(South.isSelected());
-        System.out.println(South.isSelected());
-        MS.setSelected(South.isSelected());
-        System.out.println(South.isSelected());
-        AL.setSelected(South.isSelected());
-        System.out.println(South.isSelected());
-        OK.setSelected(South.isSelected());
-        System.out.println(South.isSelected());
-        TX.setSelected(South.isSelected());
-        System.out.println(South.isSelected());
-        AR.setSelected(South.isSelected());
-        System.out.println(South.isSelected());
-        LA.setSelected(South.isSelected());
-
-        if (South.isSelected()) {
-            System.out.println(South.isSelected());
-            String[][] statesparam = new String[][]{{"DE", "MD", "DC", "VA", "WV", "NC", "SC", "GA",
-                    "FL", "KY", "TN", "MS", "AL", "OK", "TX", "AR", "LA"}, {"Stream", "Gage Height", "Volume"}};
-        //java.util.Vector myVector = myQueryManager.filterSouthReg(statesparam);
-        }
-}//GEN-LAST:event_SouthMouseReleased
-
-    private void NorthEastMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_NorthEastMouseReleased
-        System.out.println(NorthEast.isSelected());
-        ME.setSelected(NorthEast.isSelected());
-        System.out.println(NorthEast.isSelected());
-        NH.setSelected(NorthEast.isSelected());
-        System.out.println(NorthEast.isSelected());
-        VT.setSelected(NorthEast.isSelected());
-        System.out.println(NorthEast.isSelected());
-        MA.setSelected(NorthEast.isSelected());
-        System.out.println(NorthEast.isSelected());
-        RI.setSelected(NorthEast.isSelected());
-        System.out.println(NorthEast.isSelected());
-        CT.setSelected(NorthEast.isSelected());
-        System.out.println(NorthEast.isSelected());
-        NY.setSelected(NorthEast.isSelected());
-        System.out.println(NorthEast.isSelected());
-        PA.setSelected(NorthEast.isSelected());
-        System.out.println(NorthEast.isSelected());
-        NJ.setSelected(NorthEast.isSelected());
-
-        if (NorthEast.isSelected()) {
-            System.out.println(NorthEast.isSelected());
-            String[][] statesparam = new String[][]{{"ME", "NH", "VT", "MA", "RI",
-                    "CT", "NY", "PA", "NJ"}, {"Stream", "Gage Height", "Volume"}};
-        //java.util.Vector myVector = myQueryManager.filterNorthEastReg(statesparam);
-        }
-}//GEN-LAST:event_NorthEastMouseReleased
-
-    private void GetBoundDataMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_GetBoundDataMouseReleased
+    private void GetBoundSitesMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_GetBoundSitesMouseReleased
         String west, north, east, south;
         String[] bound = new String[4];
 
@@ -2163,7 +1327,7 @@ public class TabbedUSGSDownloadWizard extends javax.swing.JDialog {
 
         Vector face = myQueryManager.filterByLatLon(bound);
         makeTable(face);
-    }//GEN-LAST:event_GetBoundDataMouseReleased
+}//GEN-LAST:event_GetBoundSitesMouseReleased
 
     private void getCoordFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_getCoordFileActionPerformed
         javax.swing.JFileChooser fc = new javax.swing.JFileChooser("/");
@@ -2193,6 +1357,637 @@ public class TabbedUSGSDownloadWizard extends javax.swing.JDialog {
             Logger.getLogger(TabbedUSGSDownloadWizard.class.getName()).log(Level.SEVERE, null, ex);
         }
 }//GEN-LAST:event_getCoordFileActionPerformed
+
+    private void WYItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_WYItemStateChanged
+        if (WY.isSelected()) {
+            System.out.println(WY.isSelected());
+            String[][] statesparam = new String[][]{{"WY"}, {"Stream", "Gage Height", "Volume"}};
+            Vector myVector = myQueryManager.filterByState(statesparam);
+            makeTable(myVector);
+        }
+    }//GEN-LAST:event_WYItemStateChanged
+
+    private void WIItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_WIItemStateChanged
+        if (WI.isSelected()) {
+            System.out.println(WI.isSelected());
+            String[][] statesparam = new String[][]{{"WI"}, {"Stream", "Gage Height", "Volume"}};
+            Vector myVector = myQueryManager.filterByState(statesparam);
+            makeTable(myVector);
+        }
+    }//GEN-LAST:event_WIItemStateChanged
+
+    private void WVItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_WVItemStateChanged
+       if (WV.isSelected()) {
+            System.out.println(WV.isSelected());
+            String[][] statesparam = new String[][]{{"WV"}, {"Stream", "Gage Height", "Volume"}};
+            Vector myVector = myQueryManager.filterByState(statesparam);
+            makeTable(myVector);
+        }
+    }//GEN-LAST:event_WVItemStateChanged
+
+    private void WAItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_WAItemStateChanged
+        if (WA.isSelected()) {
+            System.out.println(WA.isSelected());
+            String[][] statesparam = new String[][]{{"WA"}, {"Stream", "Gage Height", "Volume"}};
+            Vector myVector = myQueryManager.filterByState(statesparam);
+            makeTable(myVector);
+        }
+    }//GEN-LAST:event_WAItemStateChanged
+
+    private void VAItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_VAItemStateChanged
+        if (VA.isSelected()) {
+            System.out.println(VA.isSelected());
+            String[][] statesparam = new String[][]{{"VA"}, {"Stream", "Gage Height", "Volume"}};
+            Vector myVector = myQueryManager.filterByState(statesparam);
+            makeTable(myVector);
+        }
+    }//GEN-LAST:event_VAItemStateChanged
+
+    private void VTItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_VTItemStateChanged
+        if (VT.isSelected()) {
+            System.out.println(VT.isSelected());
+            String[][] statesparam = new String[][]{{"VT"}, {"Stream", "Gage Height", "Volume"}};
+            Vector myVector = myQueryManager.filterByState(statesparam);
+            makeTable(myVector);
+        }
+    }//GEN-LAST:event_VTItemStateChanged
+
+    private void UTItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_UTItemStateChanged
+        if (UT.isSelected()) {
+            System.out.println(UT.isSelected());
+            String[][] statesparam = new String[][]{{"UT"}, {"Stream", "Gage Height", "Volume"}};
+            Vector myVector = myQueryManager.filterByState(statesparam);
+            makeTable(myVector);
+        }
+    }//GEN-LAST:event_UTItemStateChanged
+
+    private void TXItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_TXItemStateChanged
+        if (TX.isSelected()) {
+            System.out.println(TX.isSelected());
+            String[][] statesparam = new String[][]{{"TX"}, {"Stream", "Gage Height", "Volume"}};
+            Vector myVector = myQueryManager.filterByState(statesparam);
+            makeTable(myVector);
+        }
+    }//GEN-LAST:event_TXItemStateChanged
+
+    private void TNItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_TNItemStateChanged
+        if (TN.isSelected()) {
+            System.out.println(TN.isSelected());
+            String[][] statesparam = new String[][]{{"TN"}, {"Stream", "Gage Height", "Volume"}};
+            Vector myVector = myQueryManager.filterByState(statesparam);
+            makeTable(myVector);
+        }
+    }//GEN-LAST:event_TNItemStateChanged
+
+    private void SDItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_SDItemStateChanged
+        if (SD.isSelected()) {
+            System.out.println(SD.isSelected());
+            String[][] statesparam = new String[][]{{"SD"}, {"Stream", "Gage Height", "Volume"}};
+            Vector myVector = myQueryManager.filterByState(statesparam);
+            makeTable(myVector);
+        }
+    }//GEN-LAST:event_SDItemStateChanged
+
+    private void SCItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_SCItemStateChanged
+        if (SC.isSelected()) {
+            System.out.println(SC.isSelected());
+            String[][] statesparam = new String[][]{{"SC"}, {"Stream", "Gage Height", "Volume"}};
+            Vector myVector = myQueryManager.filterByState(statesparam);
+            makeTable(myVector);
+        }
+    }//GEN-LAST:event_SCItemStateChanged
+
+    private void RIItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_RIItemStateChanged
+        if (RI.isSelected()) {
+            System.out.println(RI.isSelected());
+            String[][] statesparam = new String[][]{{"RI"}, {"Stream", "Gage Height", "Volume"}};
+            Vector myVector = myQueryManager.filterByState(statesparam);
+            makeTable(myVector);
+        }
+    }//GEN-LAST:event_RIItemStateChanged
+
+    private void PAItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_PAItemStateChanged
+        if (PA.isSelected()) {
+            System.out.println(PA.isSelected());
+            String[][] statesparam = new String[][]{{"PA"}, {"Stream", "Gage Height", "Volume"}};
+            Vector myVector = myQueryManager.filterByState(statesparam);
+            makeTable(myVector);
+        }
+    }//GEN-LAST:event_PAItemStateChanged
+
+    private void ORItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_ORItemStateChanged
+        if (OR.isSelected()) {
+            System.out.println(OR.isSelected());
+            String[][] statesparam = new String[][]{{"OR"}, {"Stream", "Gage Height", "Volume"}};
+            Vector myVector = myQueryManager.filterByState(statesparam);
+            makeTable(myVector);
+        }
+    }//GEN-LAST:event_ORItemStateChanged
+
+    private void OKItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_OKItemStateChanged
+        if (OK.isSelected()) {
+            System.out.println(OK.isSelected());
+            String[][] statesparam = new String[][]{{"OK"}, {"Stream", "Gage Height", "Volume"}};
+            Vector myVector = myQueryManager.filterByState(statesparam);
+            makeTable(myVector);
+        }
+    }//GEN-LAST:event_OKItemStateChanged
+
+    private void OHItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_OHItemStateChanged
+        if (OH.isSelected()) {
+            System.out.println(OH.isSelected());
+            String[][] statesparam = new String[][]{{"OH"}, {"Stream", "Gage Height", "Volume"}};
+            Vector myVector = myQueryManager.filterByState(statesparam);
+            makeTable(myVector);
+        }
+    }//GEN-LAST:event_OHItemStateChanged
+
+    private void NDItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_NDItemStateChanged
+        if (ND.isSelected()) {
+            System.out.println(ND.isSelected());
+            String[][] statesparam = new String[][]{{"ND"}, {"Stream", "Gage Height", "Volume"}};
+            Vector myVector = myQueryManager.filterByState(statesparam);
+            makeTable(myVector);
+        }
+    }//GEN-LAST:event_NDItemStateChanged
+
+    private void NCItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_NCItemStateChanged
+        if (NC.isSelected()) {
+            System.out.println(NC.isSelected());
+            String[][] statesparam = new String[][]{{"NC"}, {"Stream", "Gage Height", "Volume"}};
+            Vector myVector = myQueryManager.filterByState(statesparam);
+            makeTable(myVector);
+        }
+    }//GEN-LAST:event_NCItemStateChanged
+
+    private void NYItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_NYItemStateChanged
+        if (NY.isSelected()) {
+            System.out.println(NY.isSelected());
+            String[][] statesparam = new String[][]{{"NY"}, {"Stream", "Gage Height", "Volume"}};
+            Vector myVector = myQueryManager.filterByState(statesparam);
+            makeTable(myVector);
+        }
+    }//GEN-LAST:event_NYItemStateChanged
+
+    private void NMItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_NMItemStateChanged
+        if (NM.isSelected()) {
+            System.out.println(NM.isSelected());
+            String[][] statesparam = new String[][]{{"NM"}, {"Stream", "Gage Height", "Volume"}};
+            Vector myVector = myQueryManager.filterByState(statesparam);
+            makeTable(myVector);
+        }
+    }//GEN-LAST:event_NMItemStateChanged
+
+    private void NJItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_NJItemStateChanged
+        if (NJ.isSelected()) {
+            System.out.println(NJ.isSelected());
+            String[][] statesparam = new String[][]{{"NJ"}, {"Stream", "Gage Height", "Volume"}};
+            Vector myVector = myQueryManager.filterByState(statesparam);
+            makeTable(myVector);
+        }
+    }//GEN-LAST:event_NJItemStateChanged
+
+    private void NHItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_NHItemStateChanged
+        if (NH.isSelected()) {
+            System.out.println(NH.isSelected());
+            String[][] statesparam = new String[][]{{"NH"}, {"Stream", "Gage Height", "Volume"}};
+            Vector myVector = myQueryManager.filterByState(statesparam);
+            makeTable(myVector);
+        }
+    }//GEN-LAST:event_NHItemStateChanged
+
+    private void NVItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_NVItemStateChanged
+        if (NV.isSelected()) {
+            System.out.println(NV.isSelected());
+            String[][] statesparam = new String[][]{{"NV"}, {"Stream", "Gage Height", "Volume"}};
+            Vector myVector = myQueryManager.filterByState(statesparam);
+            makeTable(myVector);
+        }
+    }//GEN-LAST:event_NVItemStateChanged
+
+    private void NEItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_NEItemStateChanged
+        if (NE.isSelected()) {
+            System.out.println(NE.isSelected());
+            String[][] statesparam = new String[][]{{"NE"}, {"Stream", "Gage Height", "Volume"}};
+            Vector myVector = myQueryManager.filterByState(statesparam);
+            makeTable(myVector);
+        }
+    }//GEN-LAST:event_NEItemStateChanged
+
+    private void MTItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_MTItemStateChanged
+        if (MT.isSelected()) {
+            System.out.println(MT.isSelected());
+            String[][] statesparam = new String[][]{{"MT"}, {"Stream", "Gage Height", "Volume"}};
+            Vector myVector = myQueryManager.filterByState(statesparam);
+            makeTable(myVector);
+        }
+    }//GEN-LAST:event_MTItemStateChanged
+
+    private void MOItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_MOItemStateChanged
+        if (MO.isSelected()) {
+            System.out.println(MO.isSelected());
+            String[][] statesparam = new String[][]{{"MO"}, {"Stream", "Gage Height", "Volume"}};
+            Vector myVector = myQueryManager.filterByState(statesparam);
+            makeTable(myVector);
+        }
+    }//GEN-LAST:event_MOItemStateChanged
+
+    private void MSItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_MSItemStateChanged
+        if (MS.isSelected()) {
+            System.out.println(MS.isSelected());
+            String[][] statesparam = new String[][]{{"MS"}, {"Stream", "Gage Height", "Volume"}};
+            Vector myVector = myQueryManager.filterByState(statesparam);
+            makeTable(myVector);
+        }
+    }//GEN-LAST:event_MSItemStateChanged
+
+    private void MNItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_MNItemStateChanged
+        if (MN.isSelected()) {
+            System.out.println(MN.isSelected());
+            String[][] statesparam = new String[][]{{"MN"}, {"Stream", "Gage Height", "Volume"}};
+            Vector myVector = myQueryManager.filterByState(statesparam);
+            makeTable(myVector);
+        }
+    }//GEN-LAST:event_MNItemStateChanged
+
+    private void MIItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_MIItemStateChanged
+        if (MI.isSelected()) {
+            System.out.println(MI.isSelected());
+            String[][] statesparam = new String[][]{{"MI"}, {"Stream", "Gage Height", "Volume"}};
+            Vector myVector = myQueryManager.filterByState(statesparam);
+            makeTable(myVector);
+        }
+    }//GEN-LAST:event_MIItemStateChanged
+
+    private void MAItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_MAItemStateChanged
+        if (MA.isSelected()) {
+            System.out.println(MA.isSelected());
+            String[][] statesparam = new String[][]{{"MA"}, {"Stream", "Gage Height", "Volume"}};
+            Vector myVector = myQueryManager.filterByState(statesparam);
+            makeTable(myVector);
+        }
+    }//GEN-LAST:event_MAItemStateChanged
+
+    private void MDItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_MDItemStateChanged
+        if (MD.isSelected()) {
+            System.out.println(MD.isSelected());
+            String[][] statesparam = new String[][]{{"MD"}, {"Stream", "Gage Height", "Volume"}};
+            Vector myVector = myQueryManager.filterByState(statesparam);
+            makeTable(myVector);
+        }
+    }//GEN-LAST:event_MDItemStateChanged
+
+    private void MEItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_MEItemStateChanged
+        if (ME.isSelected()) {
+            System.out.println(ME.isSelected());
+            String[][] statesparam = new String[][]{{"ME"}, {"Stream", "Gage Height", "Volume"}};
+            Vector myVector = myQueryManager.filterByState(statesparam);
+            makeTable(myVector);
+        }
+    }//GEN-LAST:event_MEItemStateChanged
+
+    private void LAItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_LAItemStateChanged
+        if (LA.isSelected()) {
+            System.out.println(LA.isSelected());
+            String[][] statesparam = new String[][]{{"LA"}, {"Stream", "Gage Height", "Volume"}};
+            Vector myVector = myQueryManager.filterByState(statesparam);
+            makeTable(myVector);
+        }
+    }//GEN-LAST:event_LAItemStateChanged
+
+    private void KYItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_KYItemStateChanged
+        if (KY.isSelected()) {
+            System.out.println(KY.isSelected());
+            String[][] statesparam = new String[][]{{"KY"}, {"Stream", "Gage Height", "Volume"}};
+            Vector myVector = myQueryManager.filterByState(statesparam);
+            makeTable(myVector);
+        }
+    }//GEN-LAST:event_KYItemStateChanged
+
+    private void KSItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_KSItemStateChanged
+        if (KS.isSelected()) {
+            System.out.println(KS.isSelected());
+            String[][] statesparam = new String[][]{{"KS"}, {"Stream", "Gage Height", "Volume"}};
+            Vector myVector = myQueryManager.filterByState(statesparam);
+            makeTable(myVector);
+        }
+    }//GEN-LAST:event_KSItemStateChanged
+
+    private void IAItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_IAItemStateChanged
+        if (IA.isSelected()) {
+            System.out.println(IA.isSelected());
+            String[][] statesparam = new String[][]{{"IA"}, {"Stream", "Gage Height", "Volume"}};
+            Vector myVector = myQueryManager.filterByState(statesparam);
+            makeTable(myVector);
+        }
+    }//GEN-LAST:event_IAItemStateChanged
+
+    private void INItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_INItemStateChanged
+        if (IN.isSelected()) {
+            System.out.println(IN.isSelected());
+            String[][] statesparam = new String[][]{{"IN"}, {"Stream", "Gage Height", "Volume"}};
+            Vector myVector = myQueryManager.filterByState(statesparam);
+            makeTable(myVector);
+        }
+    }//GEN-LAST:event_INItemStateChanged
+
+    private void ILItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_ILItemStateChanged
+        if (IL.isSelected()) {
+            System.out.println(IL.isSelected());
+            String[][] statesparam = new String[][]{{"IL"}, {"Stream", "Gage Height", "Volume"}};
+            Vector myVector = myQueryManager.filterByState(statesparam);
+            makeTable(myVector);
+        }
+    }//GEN-LAST:event_ILItemStateChanged
+
+    private void IDItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_IDItemStateChanged
+        if (ID.isSelected()) {
+            System.out.println(ID.isSelected());
+            String[][] statesparam = new String[][]{{"ID"}, {"Stream", "Gage Height", "Volume"}};
+            Vector myVector = myQueryManager.filterByState(statesparam);
+            makeTable(myVector);
+        }
+    }//GEN-LAST:event_IDItemStateChanged
+
+    private void HIItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_HIItemStateChanged
+        if (HI.isSelected()) {
+            System.out.println(HI.isSelected());
+            String[][] statesparam = new String[][]{{"HI"}, {"Stream", "Gage Height", "Volume"}};
+            Vector myVector = myQueryManager.filterByState(statesparam);
+            makeTable(myVector);
+        }
+    }//GEN-LAST:event_HIItemStateChanged
+
+    private void GAItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_GAItemStateChanged
+        if (GA.isSelected()) {
+            System.out.println(GA.isSelected());
+            String[][] statesparam = new String[][]{{"GA"}, {"Stream", "Gage Height", "Volume"}};
+            Vector myVector = myQueryManager.filterByState(statesparam);
+            makeTable(myVector);
+        }
+    }//GEN-LAST:event_GAItemStateChanged
+
+    private void FLItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_FLItemStateChanged
+        if (FL.isSelected()) {
+            System.out.println(FL.isSelected());
+            String[][] statesparam = new String[][]{{"FL"}, {"Stream", "Gage Height", "Volume"}};
+            Vector myVector = myQueryManager.filterByState(statesparam);
+            makeTable(myVector);
+        }
+    }//GEN-LAST:event_FLItemStateChanged
+
+    private void DCItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_DCItemStateChanged
+        if (DC.isSelected()) {
+            System.out.println(DC.isSelected());
+            String[][] statesparam = new String[][]{{"DC"}, {"Stream", "Gage Height", "Volume"}};
+            Vector myVector = myQueryManager.filterByState(statesparam);
+            makeTable(myVector);
+        }
+    }//GEN-LAST:event_DCItemStateChanged
+
+    private void DEItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_DEItemStateChanged
+        if (DE.isSelected()) {
+            System.out.println(DE.isSelected());
+            String[][] statesparam = new String[][]{{"DE"}, {"Stream", "Gage Height", "Volume"}};
+            Vector myVector = myQueryManager.filterByState(statesparam);
+            makeTable(myVector);
+        }
+    }//GEN-LAST:event_DEItemStateChanged
+
+    private void CTItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_CTItemStateChanged
+        if (CT.isSelected()) {
+            System.out.println(CT.isSelected());
+            String[][] statesparam = new String[][]{{"CT"}, {"Stream", "Gage Height", "Volume"}};
+            Vector myVector = myQueryManager.filterByState(statesparam);
+            makeTable(myVector);
+        }
+    }//GEN-LAST:event_CTItemStateChanged
+
+    private void COItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_COItemStateChanged
+        if (CO.isSelected()) {
+            System.out.println(CO.isSelected());
+            String[][] statesparam = new String[][]{{"CO"}, {"Stream", "Gage Height", "Volume"}};
+            Vector myVector = myQueryManager.filterByState(statesparam);
+            makeTable(myVector);
+        }
+    }//GEN-LAST:event_COItemStateChanged
+
+    private void CAItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_CAItemStateChanged
+        if (CA.isSelected()) {
+            System.out.println(CA.isSelected());
+            String[][] statesparam = new String[][]{{"CA"}, {"Stream", "Gage Height", "Volume"}};
+            Vector myVector = myQueryManager.filterByState(statesparam);
+            makeTable(myVector);
+        }
+    }//GEN-LAST:event_CAItemStateChanged
+
+    private void ARItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_ARItemStateChanged
+        if (AR.isSelected()) {
+            System.out.println(AR.isSelected());
+            String[][] statesparam = new String[][]{{"AR"}, {"Stream", "Gage Height", "Volume"}};
+            Vector myVector = myQueryManager.filterByState(statesparam);
+            makeTable(myVector);
+        }
+    }//GEN-LAST:event_ARItemStateChanged
+
+    private void AZItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_AZItemStateChanged
+        if (AZ.isSelected()) {
+            System.out.println(AZ.isSelected());
+            String[][] statesparam = new String[][]{{"AZ"}, {"Stream", "Gage Height", "Volume"}};
+            Vector myVector = myQueryManager.filterByState(statesparam);
+            makeTable(myVector);
+        }
+    }//GEN-LAST:event_AZItemStateChanged
+
+    private void AKItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_AKItemStateChanged
+        if (AK.isSelected()) {
+            System.out.println(AK.isSelected());
+            String[][] statesparam = new String[][]{{"AK"}, {"Stream", "Gage Height", "Volume"}};
+            Vector myVector = myQueryManager.filterByState(statesparam);
+            makeTable(myVector);
+        }
+    }//GEN-LAST:event_AKItemStateChanged
+
+    private void ALItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_ALItemStateChanged
+        if (AL.isSelected()) {
+            System.out.println(AL.isSelected());
+            String[][] statesparam = new String[][]{{"AL"}, {"Stream", "Gage Height", "Volume"}};
+            Vector myVector = myQueryManager.filterByState(statesparam);
+            makeTable(myVector);
+        }
+    }//GEN-LAST:event_ALItemStateChanged
+
+    private void AllSTItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_AllSTItemStateChanged
+//        System.out.println(AllST.isSelected());
+//        AL.setSelected(AllST.isSelected());
+//        System.out.println(AllST.isSelected());
+//        AK.setSelected(AllST.isSelected());
+//        System.out.println(AllST.isSelected());
+//        AZ.setSelected(AllST.isSelected());
+//        System.out.println(AllST.isSelected());
+//        AR.setSelected(AllST.isSelected());
+//        System.out.println(AllST.isSelected());
+//        CA.setSelected(AllST.isSelected());
+//        System.out.println(AllST.isSelected());
+//        CO.setSelected(AllST.isSelected());
+//        System.out.println(AllST.isSelected());
+//        CT.setSelected(AllST.isSelected());
+//        System.out.println(AllST.isSelected());
+//        DE.setSelected(AllST.isSelected());
+//        System.out.println(AllST.isSelected());
+//        DC.setSelected(AllST.isSelected());
+//        System.out.println(AllST.isSelected());
+//        FL.setSelected(AllST.isSelected());
+//        System.out.println(AllST.isSelected());
+//        GA.setSelected(AllST.isSelected());
+//        System.out.println(AllST.isSelected());
+//        HI.setSelected(AllST.isSelected());
+//        System.out.println(AllST.isSelected());
+//        ID.setSelected(AllST.isSelected());
+//        System.out.println(AllST.isSelected());
+//        IL.setSelected(AllST.isSelected());
+//        System.out.println(AllST.isSelected());
+//        IN.setSelected(AllST.isSelected());
+//        System.out.println(AllST.isSelected());
+//        IA.setSelected(AllST.isSelected());
+//        System.out.println(AllST.isSelected());
+//        KS.setSelected(AllST.isSelected());
+//        System.out.println(AllST.isSelected());
+//        KY.setSelected(AllST.isSelected());
+//        System.out.println(AllST.isSelected());
+//        LA.setSelected(AllST.isSelected());
+//        System.out.println(AllST.isSelected());
+//        ME.setSelected(AllST.isSelected());
+//        System.out.println(AllST.isSelected());
+//        MD.setSelected(AllST.isSelected());
+//        System.out.println(AllST.isSelected());
+//        MA.setSelected(AllST.isSelected());
+//        System.out.println(AllST.isSelected());
+//        MI.setSelected(AllST.isSelected());
+//        System.out.println(AllST.isSelected());
+//        MN.setSelected(AllST.isSelected());
+//        System.out.println(AllST.isSelected());
+//        MS.setSelected(AllST.isSelected());
+//        System.out.println(AllST.isSelected());
+//        MO.setSelected(AllST.isSelected());
+//        System.out.println(AllST.isSelected());
+//        MT.setSelected(AllST.isSelected());
+//        System.out.println(AllST.isSelected());
+//        NE.setSelected(AllST.isSelected());
+//        System.out.println(AllST.isSelected());
+//        NV.setSelected(AllST.isSelected());
+//        System.out.println(AllST.isSelected());
+//        NH.setSelected(AllST.isSelected());
+//        System.out.println(AllST.isSelected());
+//        NJ.setSelected(AllST.isSelected());
+//        System.out.println(AllST.isSelected());
+//        NM.setSelected(AllST.isSelected());
+//        System.out.println(AllST.isSelected());
+//        NY.setSelected(AllST.isSelected());
+//        System.out.println(AllST.isSelected());
+//        NC.setSelected(AllST.isSelected());
+//        System.out.println(AllST.isSelected());
+//        ND.setSelected(AllST.isSelected());
+//        System.out.println(AllST.isSelected());
+//        OH.setSelected(AllST.isSelected());
+//        System.out.println(AllST.isSelected());
+//        OK.setSelected(AllST.isSelected());
+//        System.out.println(AllST.isSelected());
+//        OR.setSelected(AllST.isSelected());
+//        System.out.println(AllST.isSelected());
+//        PA.setSelected(AllST.isSelected());
+//        System.out.println(AllST.isSelected());
+//        RI.setSelected(AllST.isSelected());
+//        System.out.println(AllST.isSelected());
+//        SC.setSelected(AllST.isSelected());
+//        System.out.println(AllST.isSelected());
+//        SD.setSelected(AllST.isSelected());
+//        System.out.println(AllST.isSelected());
+//        TN.setSelected(AllST.isSelected());
+//        System.out.println(AllST.isSelected());
+//        TX.setSelected(AllST.isSelected());
+//        System.out.println(AllST.isSelected());
+//        UT.setSelected(AllST.isSelected());
+//        System.out.println(AllST.isSelected());
+//        VT.setSelected(AllST.isSelected());
+//        System.out.println(AllST.isSelected());
+//        VA.setSelected(AllST.isSelected());
+//        System.out.println(AllST.isSelected());
+//        WA.setSelected(AllST.isSelected());
+//        System.out.println(AllST.isSelected());
+//        WV.setSelected(AllST.isSelected());
+//        System.out.println(AllST.isSelected());
+//        WI.setSelected(AllST.isSelected());
+//        System.out.println(AllST.isSelected());
+//        WY.setSelected(AllST.isSelected());
+
+
+        if (AllST.isSelected()) {
+            System.out.println(AllST.isSelected());
+            String[][] statesparam = new String[][]{{"AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "DC", "FL",
+                    "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME",
+                    "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH",
+                    "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI",
+                    "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI",
+                    "WY"}, {"Stream", "Gage Height", "Volume"}};
+        java.util.Vector myVector = myQueryManager.filterByState(statesparam);
+        makeTable(myVector);
+        }
+    }//GEN-LAST:event_AllSTItemStateChanged
+
+    private void AllRegItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_AllRegItemStateChanged
+        if (AllReg.isSelected()) {
+            System.out.println(AllReg.isSelected());
+            String[][] statesparam = new String[][]{{"AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "DC", "FL",
+                    "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME",
+                    "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH",
+                    "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI",
+                    "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI",
+                    "WY"}, {"Stream", "Gage Height", "Volume"}};
+        java.util.Vector myVector = myQueryManager.filterByState(statesparam);
+        makeTable(myVector);
+        }
+    }//GEN-LAST:event_AllRegItemStateChanged
+
+    private void WestItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_WestItemStateChanged
+        if (West.isSelected()) {
+            System.out.println(West.isSelected());
+            String[][] statesparam = new String[][]{{"WA", "OR", "CA", "ID", "NV", "MT", "WY", "UT",
+                    "AZ", "CO", "NM", "AK", "HI"}, {"Stream", "Gage Height", "Volume"}};
+        java.util.Vector myVector = myQueryManager.filterByState(statesparam);
+        makeTable(myVector);
+        }
+    }//GEN-LAST:event_WestItemStateChanged
+
+    private void MidWestItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_MidWestItemStateChanged
+        if (MidWest.isSelected()) {
+            System.out.println(MidWest.isSelected());
+            String[][] statesparam = new String[][]{{"WI", "MI", "IL", "IN", "OH",
+                    "ND", "SD", "NE", "KS", "MN", "IA", "MO"}, {"Stream", "Gage Height", "Volume"}};
+        java.util.Vector myVector = myQueryManager.filterByState(statesparam);
+        makeTable(myVector);
+        }
+    }//GEN-LAST:event_MidWestItemStateChanged
+
+    private void SouthItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_SouthItemStateChanged
+        if (South.isSelected()) {
+            System.out.println(South.isSelected());
+            String[][] statesparam = new String[][]{{"DE", "MD", "DC", "VA", "WV", "NC", "SC", "GA",
+                    "FL", "KY", "TN", "MS", "AL", "OK", "TX", "AR", "LA"}, {"Stream", "Gage Height", "Volume"}};
+        java.util.Vector myVector = myQueryManager.filterByState(statesparam);
+        makeTable(myVector);
+        }
+    }//GEN-LAST:event_SouthItemStateChanged
+
+    private void NorthEastItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_NorthEastItemStateChanged
+        if (NorthEast.isSelected()) {
+            System.out.println(NorthEast.isSelected());
+            String[][] statesparam = new String[][]{{"ME", "NH", "VT", "MA", "RI",
+                    "CT", "NY", "PA", "NJ"}, {"Stream", "Gage Height", "Volume"}};
+        java.util.Vector myVector = myQueryManager.filterByState(statesparam);
+        makeTable(myVector);
+        }
+    }//GEN-LAST:event_NorthEastItemStateChanged
 
     /**
      * @param args the command line arguments
@@ -2224,7 +2019,7 @@ public class TabbedUSGSDownloadWizard extends javax.swing.JDialog {
     private javax.swing.JTextField EndText;
     private javax.swing.JCheckBox FL;
     private javax.swing.JCheckBox GA;
-    private javax.swing.JButton GetBoundData;
+    private javax.swing.JButton GetBoundSites;
     private javax.swing.JCheckBox HI;
     private javax.swing.JCheckBox IA;
     private javax.swing.JCheckBox ID;

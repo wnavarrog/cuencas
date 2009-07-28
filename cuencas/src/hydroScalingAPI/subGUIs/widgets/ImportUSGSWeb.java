@@ -10,10 +10,17 @@ import java.awt.*;
 import java.util.*;
 import java.util.zip.GZIPOutputStream;
 
+/**
+ *
+ * @author Eric Osgood
+ */
 public class ImportUSGSWeb {
 
     private boolean connSuccess = false;
 
+    /**
+     *Creates new ImportUSGSWeb to download data in correct format.
+     */
     public ImportUSGSWeb() {
         //Test connection with water.USGS.gov
         try {
@@ -28,17 +35,25 @@ public class ImportUSGSWeb {
         }
     }
 
+    /**
+     *Checks if machine is connected to internet.
+     * @return connSuccess
+     */
     public boolean connectionTest() {
         return connSuccess;
     }
 
+    /**
+     *Takes the selected state and returns a vector of codes.
+     * @param statesparam
+     * @return The list of site codes
+     */
     public Vector<String> filterByState(String[][] statesparam) {
         //makes URL to show what data is available for sites from USGS
         Vector filteredList = new java.util.Vector(3000);
         /*statesparam = new String[][] {{"AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "DC", "FL",
         "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME",
         "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH",
-        "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI",
         "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI",
         "WY"},{"Stream", "Gage Height", "Volume"}};*/
         try {
@@ -67,6 +82,31 @@ public class ImportUSGSWeb {
         return filteredList;
     }
 
+    public Vector<String> filterAllState(String[][] statesparam) {
+        Vector stateList = new Vector();
+
+        try {
+            URL states = new URL("http://waterdata.usgs.gov/nwis/dv?referred_module=sw&state_cd=al&state_cd=ak&state_cd=az&state_cd=ar&state_cd=ca&state_cd=co&state_cd=ct&state_cd=de&state_cd=dc&state_cd=fl&state_cd=ga&state_cd=hi&state_cd=id&state_cd=il&state_cd=in&state_cd=ia&state_cd=ks&state_cd=ky&state_cd=la&state_cd=me&state_cd=md&state_cd=ma&state_cd=mi&state_cd=mn&state_cd=ms&state_cd=mo&state_cd=mt&state_cd=ne&state_cd=nv&state_cd=nh&state_cd=nj&state_cd=nm&state_cd=ny&state_cd=nc&state_cd=nd&state_cd=oh&state_cd=ok&state_cd=or&state_cd=pa&state_cd=ri&state_cd=sc&state_cd=sd&state_cd=tn&state_cd=tx&state_cd=ut&state_cd=vt&state_cd=va&state_cd=wa&state_cd=wv&state_cd=wi&state_cd=wy&index_pmcode_30208=1&index_pmcode_00061=1&index_pmcode_00065=1&index_pmcode_00060=1&sort_key=site_no&group_key=NONE&format=sitefile_output&sitefile_output_format=rdb&column_name=agency_cd&column_name=site_no&column_name=station_nm&column_name=lat_va&column_name=long_va&column_name=drain_area_va&range_selection=days&period=365&date_format=YYYY-MM-DD&rdb_compression=file&list_of_search_criteria=state_cd,realtime_parameter_selection");
+            System.out.println("http://waterdata.usgs.gov/nwis/dv?referred_module=sw&state_cd=al&state_cd=ak&state_cd=az&state_cd=ar&state_cd=ca&state_cd=co&state_cd=ct&state_cd=de&state_cd=dc&state_cd=fl&state_cd=ga&state_cd=hi&state_cd=id&state_cd=il&state_cd=in&state_cd=ia&state_cd=ks&state_cd=ky&state_cd=la&state_cd=me&state_cd=md&state_cd=ma&state_cd=mi&state_cd=mn&state_cd=ms&state_cd=mo&state_cd=mt&state_cd=ne&state_cd=nv&state_cd=nh&state_cd=nj&state_cd=nm&state_cd=ny&state_cd=nc&state_cd=nd&state_cd=oh&state_cd=ok&state_cd=or&state_cd=pa&state_cd=ri&state_cd=sc&state_cd=sd&state_cd=tn&state_cd=tx&state_cd=ut&state_cd=vt&state_cd=va&state_cd=wa&state_cd=wv&state_cd=wi&state_cd=wy&index_pmcode_30208=1&index_pmcode_00061=1&index_pmcode_00065=1&index_pmcode_00060=1&sort_key=site_no&group_key=NONE&format=sitefile_output&sitefile_output_format=rdb&column_name=agency_cd&column_name=site_no&column_name=station_nm&column_name=lat_va&column_name=long_va&column_name=drain_area_va&range_selection=days&period=365&date_format=YYYY-MM-DD&rdb_compression=file&list_of_search_criteria=state_cd,realtime_parameter_selection");
+            BufferedReader in = new BufferedReader(new InputStreamReader(states.openStream()));
+            String str;
+            while ((str = in.readLine()) != null) {
+                if (str.charAt(0) == 'U') {
+                    stateList.add(str);
+                }
+            }
+            in.close();
+        } catch (IOException e) {
+            System.out.println("Error " + e);
+        }
+        return stateList;
+    }
+
+    /**
+     *Takes latitudes and longitudes from input and returns a vector of codes.
+     * @param bound
+     * @return list of site codes
+     */
     public Vector<String> filterByLatLon(String[] bound) {
         Vector latLonList = new Vector();
         System.out.println(bound);
@@ -89,6 +129,13 @@ public class ImportUSGSWeb {
         return latLonList;
     }
 
+    /**
+     *Takes a vector of codes writes the selected sites to file.
+     * @param s
+     * @param v
+     * @param outputDirs
+     * @throws java.io.IOException
+     */
     public void getData(String[] s, Vector v,String[] outputDirs) throws IOException {
 
         for (int i = 0; i < v.size(); i++) {
@@ -375,6 +422,11 @@ public class ImportUSGSWeb {
         }
     }
 
+    /**
+     *Takes a USGS code for a state and converts it into the actual state name to be written to file.
+     * @param st
+     * @return The full state name.
+     */
     public String states(String st) {
 
         int sn = Integer.parseInt(st);
