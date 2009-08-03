@@ -105,7 +105,7 @@ public class TileSimulationToAsciiFile extends java.lang.Object implements Runna
     
     public void executeSimulation() throws java.io.IOException, VisADException{
         
-        //Here an example of rainfall-runoff in action
+	//Here an example of rainfall-runoff in action
         hydroScalingAPI.util.geomorphology.objects.Basin myCuenca=new hydroScalingAPI.util.geomorphology.objects.Basin(x,y,matDir,metaDatos);
         
         hydroScalingAPI.util.randomSelfSimilarNetworks.RsnTile myTileActual=new hydroScalingAPI.util.randomSelfSimilarNetworks.RsnTile(x,y,xH,yH,matDir,hortonOrders,metaDatos,scale);
@@ -115,7 +115,14 @@ public class TileSimulationToAsciiFile extends java.lang.Object implements Runna
         hydroScalingAPI.util.geomorphology.objects.LinksAnalysis linksStructure=new hydroScalingAPI.util.geomorphology.objects.LinksAnalysis(myCuenca, metaDatos, matDir);
         
         basinOrder=linksStructure.getBasinOrder();
-        
+
+        String demName=metaDatos.getLocationBinaryFile().getName().substring(0,metaDatos.getLocationBinaryFile().getName().lastIndexOf("."));
+//        java.io.File theFile2=new java.io.File(outputDirectory.getAbsolutePath()+"/"+demName+"_"+x+"_"+y+".complete.csv");
+//        java.io.OutputStreamWriter compnewfile = new java.io.OutputStreamWriter(new java.io.BufferedOutputStream(new java.io.FileOutputStream(theFile2)));
+//        for(int i=0;i<linksStructure.completeStreamLinksArray.length;i++) compnewfile.write(linksStructure.completeStreamLinksArray[i]+",");
+//
+//        compnewfile.close();
+
         hydroScalingAPI.modules.rainfallRunoffModel.objects.LinksInfo thisNetworkGeom=new hydroScalingAPI.modules.rainfallRunoffModel.objects.LinksInfo(linksStructure);
         
         float widthCoeff=((Float)routingParams.get("widthCoeff")).floatValue();
@@ -179,7 +186,6 @@ public class TileSimulationToAsciiFile extends java.lang.Object implements Runna
                     Resulatdos
 
          */
-        String demName=metaDatos.getLocationBinaryFile().getName().substring(0,metaDatos.getLocationBinaryFile().getName().lastIndexOf("."));
         String routingString="";
         switch (routingType) {
             case 0:     routingString="VC";
@@ -294,7 +300,7 @@ public class TileSimulationToAsciiFile extends java.lang.Object implements Runna
         thisDate.setTimeInMillis((long)(storm.stormInitialTimeInMinutes()*60.*1000.0));
         System.out.println(thisDate.getTime());
         
-        double outputTimeStep=5.0;Math.min(Math.pow(2.0D,(basinOrder-1)),storm.stormRecordResolutionInMinutes());
+        double outputTimeStep=2.0;//Math.min(Math.pow(2.0D,(basinOrder-1)),storm.stormRecordResolutionInMinutes());
         double extraSimTime=120D*Math.pow(2.0D,(basinOrder-1));
         
         newfile1.write("TimeStep:" + outputTimeStep+"\n");

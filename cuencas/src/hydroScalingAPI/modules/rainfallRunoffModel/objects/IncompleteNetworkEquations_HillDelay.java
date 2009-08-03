@@ -164,7 +164,12 @@ public class IncompleteNetworkEquations_HillDelay implements hydroScalingAPI.uti
         
         double maxInt=0;
 
-        double rr=time>change?0.6:0.2;
+        double rr=1.0;
+
+        java.util.Calendar zeroSimulationTime=java.util.Calendar.getInstance();
+        zeroSimulationTime.set(2008,1, 1, 0, 0, 0);
+
+        if(time>20030760.014933333) rr=time>change?0.5:0.3;
 
         for (int i=0;i<nLi;i++){
             

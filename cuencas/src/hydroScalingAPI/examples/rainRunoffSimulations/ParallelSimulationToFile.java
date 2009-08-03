@@ -38,8 +38,9 @@ public class ParallelSimulationToFile extends java.lang.Object {
     private hydroScalingAPI.io.MetaRaster metaDatos;
     private byte[][] matDir;
     
-    final int simulProcess=8;
+    private int simulProcess=2;
     public int threadsRunning=0;
+    java.util.Hashtable<String,Boolean> compNodeNames=new java.util.Hashtable<String,Boolean>();
 
     private java.util.Calendar zeroSimulationTime;
     
@@ -47,16 +48,16 @@ public class ParallelSimulationToFile extends java.lang.Object {
     public ParallelSimulationToFile(){
         
     }
-    public ParallelSimulationToFile(int x, int y, byte[][] direcc, int[][] magnitudes,byte[][] horOrders, hydroScalingAPI.io.MetaRaster md, float rainIntensity, float rainDuration, float infiltRate, int routingType,java.util.Hashtable routingParams,java.io.File outputDirectory, java.util.Calendar zST) throws java.io.IOException, VisADException{
-        this(x,y,direcc,magnitudes,horOrders,md,rainIntensity,rainDuration,null,null,infiltRate,routingType,routingParams,outputDirectory,zST);
+    public ParallelSimulationToFile(int x, int y, byte[][] direcc, int[][] magnitudes,byte[][] horOrders, hydroScalingAPI.io.MetaRaster md, float rainIntensity, float rainDuration, float infiltRate, int routingType,java.util.Hashtable routingParams,java.io.File outputDirectory, java.util.Calendar zST,java.util.Hashtable MyCnodes,int numNodes,int dscale) throws java.io.IOException, VisADException{
+        this(x,y,direcc,magnitudes,horOrders,md,rainIntensity,rainDuration,null,null,infiltRate,routingType,routingParams,outputDirectory,zST,MyCnodes,numNodes,dscale);
     }
-    public ParallelSimulationToFile(int x, int y, byte[][] direcc, int[][] magnitudes,byte[][] horOrders, hydroScalingAPI.io.MetaRaster md, java.io.File stormFile, hydroScalingAPI.io.MetaRaster infiltMetaRaster, int routingType,java.util.Hashtable routingParams,java.io.File outputDirectory, java.util.Calendar zST) throws java.io.IOException, VisADException{
-        this(x,y,direcc,magnitudes,horOrders,md,0.0f,0.0f,stormFile,infiltMetaRaster,0.0f,routingType,routingParams,outputDirectory,zST);
+    public ParallelSimulationToFile(int x, int y, byte[][] direcc, int[][] magnitudes,byte[][] horOrders, hydroScalingAPI.io.MetaRaster md, java.io.File stormFile, hydroScalingAPI.io.MetaRaster infiltMetaRaster, int routingType,java.util.Hashtable routingParams,java.io.File outputDirectory, java.util.Calendar zST,java.util.Hashtable MyCnodes,int numNodes,int dscale) throws java.io.IOException, VisADException{
+        this(x,y,direcc,magnitudes,horOrders,md,0.0f,0.0f,stormFile,infiltMetaRaster,0.0f,routingType,routingParams,outputDirectory,zST,MyCnodes,numNodes,dscale);
     }
-    public ParallelSimulationToFile(int x, int y, byte[][] direcc, int[][] magnitudes,byte[][] horOrders, hydroScalingAPI.io.MetaRaster md, java.io.File stormFile, float infiltRate, int routingType,java.util.Hashtable routingParams,java.io.File outputDirectory, java.util.Calendar zST) throws java.io.IOException, VisADException{
-        this(x,y,direcc,magnitudes,horOrders,md,0.0f,0.0f,stormFile,null,infiltRate,routingType,routingParams,outputDirectory,zST);
+    public ParallelSimulationToFile(int x, int y, byte[][] direcc, int[][] magnitudes,byte[][] horOrders, hydroScalingAPI.io.MetaRaster md, java.io.File stormFile, float infiltRate, int routingType,java.util.Hashtable routingParams,java.io.File outputDirectory, java.util.Calendar zST,java.util.Hashtable MyCnodes,int numNodes,int dscale) throws java.io.IOException, VisADException{
+        this(x,y,direcc,magnitudes,horOrders,md,0.0f,0.0f,stormFile,null,infiltRate,routingType,routingParams,outputDirectory,zST,MyCnodes,numNodes,dscale);
     }
-    public ParallelSimulationToFile(int x, int y, byte[][] direcc, int[][] magnitudes,byte[][] horOrders, hydroScalingAPI.io.MetaRaster md, float rainIntensity, float rainDuration, java.io.File stormFile, hydroScalingAPI.io.MetaRaster infiltMetaRaster,float infiltRate, int routingType,java.util.Hashtable routingParams,java.io.File outputDirectory, java.util.Calendar zST) throws java.io.IOException, VisADException{
+    public ParallelSimulationToFile(int x, int y, byte[][] direcc, int[][] magnitudes,byte[][] horOrders, hydroScalingAPI.io.MetaRaster md, float rainIntensity, float rainDuration, java.io.File stormFile, hydroScalingAPI.io.MetaRaster infiltMetaRaster,float infiltRate, int routingType,java.util.Hashtable routingParams,java.io.File outputDirectory, java.util.Calendar zST,java.util.Hashtable MyCnodes,int numNodes,int dscale) throws java.io.IOException, VisADException{
 
         zeroSimulationTime=zST;
         matDir=direcc;
@@ -66,7 +67,10 @@ public class ParallelSimulationToFile extends java.lang.Object {
         float lam2=((Float)routingParams.get("lambda2")).floatValue();
 
         float v_o=((Float)routingParams.get("v_o")).floatValue();
-        
+
+        compNodeNames=MyCnodes;
+        simulProcess=numNodes;
+
         //Fractioning
         
         java.util.Hashtable<String,Integer> processList=new java.util.Hashtable();
@@ -79,7 +83,7 @@ public class ParallelSimulationToFile extends java.lang.Object {
         float[][] linkAreas=mylinksAnalysis.getVarValues(0);
         float[][] linkLenghts=mylinksAnalysis.getVarValues(1);
         
-        int decompScale=4;
+        int decompScale=dscale;
         
         int[][] headsTails=myRsnGen.getHeadsAndTails(decompScale);
         int[][] connectionTopology=myRsnGen.getPrunedConnectionStructure(decompScale);
@@ -166,6 +170,8 @@ public class ParallelSimulationToFile extends java.lang.Object {
         float currentDtoO=maxDtoO;
         
         do{
+            System.out.print(">> Processes on Hold: ");
+
             for (int i = 0; i < externalExecutors.length; i++) {
                 int indexProc=processList.get((String)v.get(i));
 
@@ -179,32 +185,41 @@ public class ParallelSimulationToFile extends java.lang.Object {
                     if (required) {
                         
                         //simThreads[indexProc].executeSimulation();
-                        
+
+                        String cn=findFreeNode();
+
+                        System.out.println();
                         System.out.println(">> Process "+indexProc+" is being launched");
+                        externalExecutors[indexProc].setComputingNode(cn);
                         activeThreads[indexProc] = new Thread(externalExecutors[indexProc]);
                         externalExecutors[indexProc].executing=true;
-                        activeThreads[indexProc].start();
+                        compNodeNames.put(cn, true);
+
                         threadsRunning++;
+                        activeThreads[indexProc].start();
                         currentDtoO=Math.min(currentDtoO, thisDtoO);
                         if(threadsRunning == simulProcess) break;
                     } else {
-                        System.out.println(">> Process "+indexProc+" is on hold");
+                        System.out.print(indexProc+",");
                     }
                 } else if(externalExecutors[indexProc].completed == true) activeThreads[indexProc]=null;
             }
-            
+            System.out.println();
             while(threadsRunning == simulProcess){
-                System.out.println(">>>>>  CURRENTLY RUNNING "+threadsRunning+" THREADS. Percentage Completed: "+((1-currentDtoO/maxDtoO)*100)+"%");
-                new visad.util.Delay(1000);
+                System.out.println(">>>>>  CURRENTLY RUNNING "+threadsRunning+" THREADS. Out of "+simulProcess+".Percentage Completed: "+((1-currentDtoO/maxDtoO)*100)+"%");
+                new visad.util.Delay(5000);
             }
-            System.out.println(">> Current reported status "+threadsRunning+" "+simulProcess+" . Percentage Completed: "+((1-currentDtoO/maxDtoO)*100)+"%");
-            
+            System.out.println(">>>>>  CURRENTLY RUNNING "+threadsRunning+" THREADS. Out of "+simulProcess+". Percentage Completed: "+((1-currentDtoO/maxDtoO)*100)+"%");
+
+            System.out.print(">> Running");
             for (int i = 0; i < externalExecutors.length; i++){
                 if(externalExecutors[i].executing) {
-                    System.out.println(">> Running "+i);
-                    new visad.util.Delay(1000);
+                    System.out.print(", "+i);
                 }
             }
+            System.out.println();
+
+            new visad.util.Delay(5000);
             
             allNodesDone=true;
             for (int i = 0; i < externalExecutors.length; i++) allNodesDone&=externalExecutors[i].completed;
@@ -217,16 +232,27 @@ public class ParallelSimulationToFile extends java.lang.Object {
         System.out.println("Running Time:"+(.001*(endTime.getTime()-startTime.getTime()))+" seconds");
         
     }
+
+    private String findFreeNode(){
+        for (Iterator it = compNodeNames.keySet().iterator(); it.hasNext();) {
+            String keyName = (String) it.next();
+            Boolean nodeState=(Boolean)compNodeNames.get(keyName);
+            if(!nodeState.booleanValue()) return keyName;
+        }
+        return "NA";
+    }
     
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        
+
         try{
             
-            //Uniform Rain
-            subMain0(args);  //The test case for Walnut Gulch 30m
+            subMain0(args);  //Using AveragedIowaRiver
+            //subMain1(args);  //Using 30m DEMs
+            //subMain3(args);
+            //subMain4(args);
         } catch (java.io.IOException IOE){
             System.out.print(IOE);
             System.exit(0);
@@ -241,7 +267,40 @@ public class ParallelSimulationToFile extends java.lang.Object {
     
     public static void subMain0(String args[]) throws java.io.IOException, VisADException {
 
-        java.io.File theFile=new java.io.File("C:/Documents and Settings/rmantill/Desktop/Iowa_Rivers_DB/Rasters/Topography/3_arcSec/AveragedIowaRiverAtColumbusJunctions.metaDEM");
+        java.util.Hashtable<String,Boolean> myNodeNames=new java.util.Hashtable<String,Boolean>();
+
+        for (int i = 42; i <= 64; i++) {
+            for (int j = 0; j <= 0; j++) {
+                myNodeNames.put("c0"+Double.toString(i/100.0+0.00001).substring(2,4)+"-"+j, false);
+            }
+        }
+
+//        for (int i = 48; i <= 62; i++) {
+//            for (int j = 0; j <= 3; j++) {
+//                myNodeNames.put("c0"+Double.toString(i/100.0+0.00001).substring(2,4)+"-"+j, false);
+//            }
+//        }
+
+//        for (int i = 54; i <= 54; i++) {
+//            for (int j = 0; j <= 3; j++) {
+//                myNodeNames.put("c0"+Double.toString(i/100.0+0.00001).substring(2,4)+"-"+j, false);
+//            }
+//        }
+//
+//        for (int i = 44; i <= 44; i++) {
+//            for (int j = 0; j <= 3; j++) {
+//                myNodeNames.put("c0"+Double.toString(i/100.0+0.00001).substring(2,4)+"-"+j, false);
+//            }
+//        }
+//        for (int i = 41; i <= 41; i++) {
+//            for (int j = 0; j <= 3; j++) {
+//                myNodeNames.put("c0"+Double.toString(i/100.0+0.00001).substring(2,4)+"-"+j, false);
+//            }
+//        }
+
+        int numNodes=myNodeNames.size();
+
+        java.io.File theFile=new java.io.File("/usr/home/rmantill/CuencasDataBases/Iowa_Rivers_DB/Rasters/Topography/3_arcSec/AveragedIowaRiverAtColumbusJunctions.metaDEM");
         hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
         metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".dir"));
         metaModif.setFormat("Byte");
@@ -269,10 +328,11 @@ public class ParallelSimulationToFile extends java.lang.Object {
 
         routingParams.put("v_o",0.5f);
 
-        stormFile=new java.io.File("C:/Documents and Settings/rmantill/Desktop/Iowa_Rivers_DB/Rasters/Hydrology/storms/observed_events/EventIowaJuneMPE/May29toJune26/hydroNexrad.metaVHC");
+        stormFile=new java.io.File("/usr/home/rmantill/CuencasDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/observed_events/EventIowaJuneMPE/May29toJune26/hydroNexrad.metaVHC");
+        //stormFile=new java.io.File("/usr/home/rmantill/CuencasDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/observed_events/EventIowaJuneHydroNEXRAD/May29toJune26/hydroNexrad.metaVHC");
 
         java.util.Calendar zeroSimulationTime=java.util.Calendar.getInstance();
-        zeroSimulationTime.set(2008,4, 29, 0, 0, 0);
+        zeroSimulationTime.set(2008,4, 29, 00, 00, 0);
 
         java.io.File outputDirectory;
 
@@ -280,32 +340,332 @@ public class ParallelSimulationToFile extends java.lang.Object {
 //
 //            routingParams.put("v_o",v0);
 //
-//            for (float infil = 5.0f; infil <= 5.0f; infil+=5.0f) {
-//                outputDirectory=new java.io.File("C:/Documents and Settings/rmantill/My Documents/temp/Parallel/AveragedIowaRiver_"+v0+"_"+infil+"to11/");
+//            for (float infil = 0.0f; infil <= 0.0f; infil+=5.0f) {
+//                outputDirectory=new java.io.File("/usr/home/rmantill/temp/Parallel/AveragedIowaRiver_"+v0+"_"+infil+"/");
 //                outputDirectory.mkdirs();
 //
-//                new ParallelSimulationToFile(2734, 1069 ,matDirs,magnitudes,horOrders,metaModif,stormFile,infil,2,routingParams,outputDirectory,zeroSimulationTime);
+//                new ParallelSimulationToFile(2734, 1069 ,matDirs,magnitudes,horOrders,metaModif,stormFile,infil,2,routingParams,outputDirectory,zeroSimulationTime,myNodeNames);
 //            }
 //
 //        }
         
-        float v0=0.38f;
+        float v0=0.40f;
         routingParams.put("v_o",v0);
         float lam1 = 0.2f;
-        
+
         //for (float lam1 = 0.2f; lam1 <= 0.5f; lam1+=0.1f) {
             for (float lam2 = -0.1f; lam2 <= -0.1f; lam2+=0.05f) {
 
                 routingParams.put("lambda1",lam1);
                 routingParams.put("lambda2",lam2);
 
-                outputDirectory=new java.io.File("C:/Documents and Settings/rmantill/My Documents/temp/Parallel/CedarRapids/AveragedIowaRiver_"+v0+"_"+lam1+"_"+lam2+"/");
-                outputDirectory.mkdirs();
-                //new ParallelSimulationToFile(1768,1987,matDirs,magnitudes,horOrders,metaModif,stormFile,0.0f,5,routingParams,outputDirectory,zeroSimulationTime);
-                //new ParallelSimulationToFile(1637,1955,matDirs,magnitudes,horOrders,metaModif,stormFile,0.0f,5,routingParams,outputDirectory,zeroSimulationTime);
-                new ParallelSimulationToFile(2734, 1069,matDirs,magnitudes,horOrders,metaModif,stormFile,0.0f,5,routingParams,outputDirectory,zeroSimulationTime);
+//                stormFile=new java.io.File("/usr/home/rmantill/CuencasDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/simulated_events/AveragedEventIowaJuneMPE/May29toJune26/hydroNexrad.metaVHC");
+//                outputDirectory=new java.io.File("/usr/home/rmantill/temp/Parallel/CedarRapids/AveragedIowaRiver_"+v0+"_"+lam1+"_"+lam2+"_AveragedRain_to26/");
+//                outputDirectory.mkdirs();
+//                //new ParallelSimulationToFile(1768,1987,matDirs,magnitudes,horOrders,metaModif,stormFile,0.0f,5,routingParams,outputDirectory,zeroSimulationTime,myNodeNames);
+//                //new ParallelSimulationToFile(1637,1955,matDirs,magnitudes,horOrders,metaModif,stormFile,0.0f,5,routingParams,outputDirectory,zeroSimulationTime,myNodeNames);
+//                new ParallelSimulationToFile(2734, 1069,matDirs,magnitudes,horOrders,metaModif,stormFile,0.0f,5,routingParams,outputDirectory,zeroSimulationTime,myNodeNames);
+
+                //stormFile=new java.io.File("/usr/home/rmantill/CuencasDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/observed_events/EventIowaJuneMPE/May29toJune26/hydroNexrad.metaVHC");
+                //outputDirectory=new java.io.File("/usr/home/rmantill/temp/Parallel/Wapello/AveragedIowaRiver_"+v0+"_"+lam1+"_"+lam2+"to26/");
+                //outputDirectory.mkdirs();
+                //new ParallelSimulationToFile(1768,1987,matDirs,magnitudes,horOrders,metaModif,stormFile,0.0f,5,routingParams,outputDirectory,zeroSimulationTime,myNodeNames);
+                //new ParallelSimulationToFile(1637,1955,matDirs,magnitudes,horOrders,metaModif,stormFile,0.0f,5,routingParams,outputDirectory,zeroSimulationTime,myNodeNames);
+                //new ParallelSimulationToFile(2734, 1069,matDirs,magnitudes,horOrders,metaModif,stormFile,0.0f,5,routingParams,outputDirectory,zeroSimulationTime,myNodeNames,numNodes,5);
+                //new ParallelSimulationToFile(3316,116,matDirs,magnitudes,horOrders,metaModif,stormFile,0.0f,5,routingParams,outputDirectory,zeroSimulationTime,myNodeNames,numNodes,4);
+
+
+//                outputDirectory=new java.io.File("/usr/home/rmantill/temp/Parallel/ClearCreek/AveragedIowaRiver_"+v0+"_"+lam1+"_"+lam2+"/");
+//                outputDirectory.mkdirs();
+//                new ParallelSimulationToFile(2817,713,matDirs,magnitudes,horOrders,metaModif,stormFile,0.0f,5,routingParams,outputDirectory,zeroSimulationTime,myNodeNames);
+                //new ParallelSimulationToFile(2817,713,matDirs,magnitudes,horOrders,metaModif,stormFile,10.0f,5,routingParams,outputDirectory,zeroSimulationTime,myNodeNames);
+                //new ParallelSimulationToFile(2817,713,matDirs,magnitudes,horOrders,metaModif,stormFile,5.0f,5,routingParams,outputDirectory,zeroSimulationTime,myNodeNames);
+
+                //stormFile=new java.io.File("/usr/home/rmantill/CuencasDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/observed_events/SatelliteData/15_arcmin/prec.metaVHC");
+//                stormFile=new java.io.File("/usr/home/rmantill/CuencasDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/observed_events/ResampledNexrad/Radar_15_180min/H00070802_R1504_G_.metaVHC");
+//                outputDirectory=new java.io.File("/usr/home/rmantill/temp/Parallel/CedarRapids_Res/AveragedIowaRiver_"+v0+"_"+lam1+"_"+lam2+"/");
+//                outputDirectory.mkdirs();
+//                new ParallelSimulationToFile(2734, 1069,matDirs,magnitudes,horOrders,metaModif,stormFile,0.0f,5,routingParams,outputDirectory,zeroSimulationTime,myNodeNames,numNodes,5);
+
+//                stormFile=new java.io.File("/usr/home/rmantill/CuencasDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/observed_events/EventIowaJuneWRF/1-Hour/precWRF.metaVHC");
+//                outputDirectory=new java.io.File("/usr/home/rmantill/temp/Parallel/CedarRapids_WRF/AveragedIowaRiver_"+v0+"_"+lam1+"_"+lam2+"/");
+//                outputDirectory.mkdirs();
+//                zeroSimulationTime.set(2008,5, 1, 00, 00, 0);
+//                new ParallelSimulationToFile(2734, 1069,matDirs,magnitudes,horOrders,metaModif,stormFile,0.0f,5,routingParams,outputDirectory,zeroSimulationTime,myNodeNames,numNodes,5);
+
+//                stormFile=new java.io.File("/usr/home/rmantill/CuencasDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/observed_events/EventIowaJuneHE-ASC/precHydroEstimator.metaVHC");
+//                outputDirectory=new java.io.File("/usr/home/rmantill/temp/Parallel/CedarRapids_HE/AveragedIowaRiver_"+v0+"_"+lam1+"_"+lam2+"/");
+//                outputDirectory.mkdirs();
+//                zeroSimulationTime.set(2008,5, 1, 00, 00, 0);
+//                new ParallelSimulationToFile(2734, 1069,matDirs,magnitudes,horOrders,metaModif,stormFile,0.0f,5,routingParams,outputDirectory,zeroSimulationTime,myNodeNames,numNodes,5);
+
+                java.io.File[] stormRealizationsSpace=new java.io.File("/usr/home/rmantill/CuencasDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/simulated_events/AggregatedEventHydroNexrad/").listFiles();
+
+                for (int k = 1; k < stormRealizationsSpace.length; k++){
+                    java.io.File[] stormRealizationsTime=new java.io.File(stormRealizationsSpace[k].getAbsolutePath()).listFiles();
+
+                    for (int l = 0; l < stormRealizationsTime.length; l++){
+                        stormFile=new java.io.File(stormRealizationsTime[l].getAbsolutePath()+"/Time/Bin/H00070802_R1504_G_.metaVHC");
+                        
+                        outputDirectory=new java.io.File("/usr/home/rmantill/temp/Parallel/CedarRapids_"+stormRealizationsSpace[k].getName()+"_"+stormRealizationsTime[l].getName()+"/AveragedIowaRiver_"+v0+"_"+lam1+"_"+lam2+"/");
+                        outputDirectory.mkdirs();
+                        zeroSimulationTime.set(2008,5, 1, 00, 00, 0);
+                        new ParallelSimulationToFile(2734, 1069,matDirs,magnitudes,horOrders,metaModif,stormFile,0.0f,5,routingParams,outputDirectory,zeroSimulationTime,myNodeNames,numNodes,5);
+                    }
+                }
             }
         //}
+    }
+
+    public static void subMain1(String args[]) throws java.io.IOException, VisADException {
+        
+        java.util.Hashtable<String,Boolean> myNodeNames=new java.util.Hashtable<String,Boolean>();
+
+        for (int i = 50; i <= 52; i++) {
+            for (int j = 0; j <= 3; j++) {
+                myNodeNames.put("c0"+Double.toString(i/100.0+0.00001).substring(2,4)+"-"+j, false);
+            }
+        }
+        for (int i = 54; i <= 54; i++) {
+            for (int j = 0; j <= 3; j++) {
+                myNodeNames.put("c0"+Double.toString(i/100.0+0.00001).substring(2,4)+"-"+j, false);
+            }
+        }
+        for (int i = 59; i <= 63; i++) {
+            for (int j = 0; j <= 3; j++) {
+                myNodeNames.put("c0"+Double.toString(i/100.0+0.00001).substring(2,4)+"-"+j, false);
+            }
+        }
+
+        for (int i = 44; i <= 44; i++) {
+            for (int j = 0; j <= 3; j++) {
+                myNodeNames.put("c0"+Double.toString(i/100.0+0.00001).substring(2,4)+"-"+j, false);
+            }
+        }
+        for (int i = 41; i <= 41; i++) {
+            for (int j = 0; j <= 3; j++) {
+                myNodeNames.put("c0"+Double.toString(i/100.0+0.00001).substring(2,4)+"-"+j, false);
+            }
+        }
+
+        int numNodes=myNodeNames.size();
+
+
+        java.io.File theFile=new java.io.File("/usr/home/rmantill/CuencasDataBases/Iowa_Rivers_DB/Rasters/Topography/1_arcSec/05454300/NED_00159011.metaDEM");
+        hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
+        metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".dir"));
+        metaModif.setFormat("Byte");
+        byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
+
+        metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".magn"));
+        metaModif.setFormat("Integer");
+        int [][] magnitudes=new hydroScalingAPI.io.DataRaster(metaModif).getInt();
+
+        metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".horton"));
+        metaModif.setFormat("Byte");
+        byte [][] horOrders=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
+
+        java.io.File stormFile;
+        java.util.Hashtable routingParams=new java.util.Hashtable();
+        routingParams.put("widthCoeff",1.0f);
+        routingParams.put("widthExponent",0.4f);
+        routingParams.put("widthStdDev",0.0f);
+
+        routingParams.put("chezyCoeff",14.2f);
+        routingParams.put("chezyExponent",-1/3.0f);
+
+        routingParams.put("lambda1",0.3f);
+        routingParams.put("lambda2",-0.1f);
+
+        routingParams.put("v_o",0.5f);
+
+        stormFile=new java.io.File("/usr/home/rmantill/CuencasDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/observed_events/EventIowaJuneMPE/May29toJune26/hydroNexrad.metaVHC");
+
+        java.util.Calendar zeroSimulationTime=java.util.Calendar.getInstance();
+        zeroSimulationTime.set(2008,4, 29, 0, 0, 0);
+
+        java.io.File outputDirectory;
+
+        float v0=0.40f;
+        routingParams.put("v_o",v0);
+        float lam1 = 0.2f;
+
+        //for (float lam1 = 0.2f; lam1 <= 0.5f; lam1+=0.1f) {
+            for (float lam2 = -0.1f; lam2 <= -0.1f; lam2+=0.05f) {
+
+                routingParams.put("lambda1",lam1);
+                routingParams.put("lambda2",lam2);
+
+                outputDirectory=new java.io.File("/usr/home/rmantill/temp/Parallel/ClearCreek/FullIowaRiver_"+v0+"_"+lam1+"_"+lam2+"/");
+                outputDirectory.mkdirs();
+                new ParallelSimulationToFile(1570,127,matDirs,magnitudes,horOrders,metaModif,stormFile,0.0f,5,routingParams,outputDirectory,zeroSimulationTime,myNodeNames,numNodes,4);
+
+            }
+        //}
+    }
+
+    public static void subMain3(String args[]) throws java.io.IOException, VisADException {
+
+        java.util.Hashtable<String,Boolean> myNodeNames=new java.util.Hashtable<String,Boolean>();
+
+        for (int i = 59; i <= 63; i++) {
+            for (int j = 0; j <= 3; j++) {
+                myNodeNames.put("c0"+Double.toString(i/100.0+0.00001).substring(2,4)+"-"+j, false);
+            }
+        }
+
+        for (int i = 50; i <= 52; i++) {
+            for (int j = 0; j <= 3; j++) {
+                myNodeNames.put("c0"+Double.toString(i/100.0+0.00001).substring(2,4)+"-"+j, false);
+            }
+        }
+
+        for (int i = 54; i <= 54; i++) {
+            for (int j = 0; j <= 3; j++) {
+                myNodeNames.put("c0"+Double.toString(i/100.0+0.00001).substring(2,4)+"-"+j, false);
+            }
+        }
+
+        for (int i = 44; i <= 44; i++) {
+            for (int j = 0; j <= 3; j++) {
+                myNodeNames.put("c0"+Double.toString(i/100.0+0.00001).substring(2,4)+"-"+j, false);
+            }
+        }
+        for (int i = 41; i <= 41; i++) {
+            for (int j = 0; j <= 3; j++) {
+                myNodeNames.put("c0"+Double.toString(i/100.0+0.00001).substring(2,4)+"-"+j, false);
+            }
+        }
+
+        for (int i = 47; i <= 47; i++) {
+            for (int j = 0; j <= 1; j++) {
+                myNodeNames.put("c0"+Double.toString(i/100.0+0.00001).substring(2,4)+"-"+j, false);
+            }
+        }
+
+        int numNodes=myNodeNames.size();
+        int xOut=3316;
+        int yOut=116;
+        int dScale=4;
+
+        if(args.length == 4){
+            xOut=Integer.parseInt(args[0]);
+            yOut=Integer.parseInt(args[1]);
+            numNodes=Integer.parseInt(args[2]);
+            dScale=Integer.parseInt(args[3]);
+        }
+
+        java.io.File theFile=new java.io.File("/usr/home/rmantill/CuencasDataBases/Iowa_Rivers_DB/Rasters/Topography/3_arcSec/AveragedIowaRiverAtColumbusJunctions.metaDEM");
+        hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
+        metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".dir"));
+        metaModif.setFormat("Byte");
+        byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
+
+        metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".magn"));
+        metaModif.setFormat("Integer");
+        int [][] magnitudes=new hydroScalingAPI.io.DataRaster(metaModif).getInt();
+
+        metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".horton"));
+        metaModif.setFormat("Byte");
+        byte [][] horOrders=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
+
+        java.io.File stormFile;
+        java.util.Hashtable routingParams=new java.util.Hashtable();
+        routingParams.put("widthCoeff",1.0f);
+        routingParams.put("widthExponent",0.4f);
+        routingParams.put("widthStdDev",0.0f);
+
+        routingParams.put("chezyCoeff",14.2f);
+        routingParams.put("chezyExponent",-1/3.0f);
+
+        routingParams.put("lambda1",0.2f);
+        routingParams.put("lambda2",-0.1f);
+
+        routingParams.put("v_o",0.4f);
+
+        stormFile=new java.io.File("/usr/home/rmantill/CuencasDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/observed_events/EventIowaJuneMPE/May29toJune26/hydroNexrad.metaVHC");
+        
+        java.util.Calendar zeroSimulationTime=java.util.Calendar.getInstance();
+        zeroSimulationTime.set(2008,4, 29, 0, 0, 0);
+
+        java.io.File outputDirectory;
+        outputDirectory=new java.io.File("/usr/home/rmantill/temp/Parallel/AveragedIowaRiver_"+xOut+"_"+yOut+"_NP"+numNodes+"_DL"+dScale+"/");
+        outputDirectory.mkdirs();
+        new ParallelSimulationToFile(xOut,yOut,matDirs,magnitudes,horOrders,metaModif,stormFile,0.0f,5,routingParams,outputDirectory,zeroSimulationTime,myNodeNames,numNodes,dScale);
+    }
+
+    public static void subMain4(String args[]) throws java.io.IOException, VisADException {
+
+        int pl=0;
+        String folder="";
+
+        if(args[0].equalsIgnoreCase("0")){
+            pl = 0;
+            folder="Data";
+        }
+
+        if(args[0].equalsIgnoreCase("1")){
+            pl = 0;
+            folder="sim01-25";
+        }
+
+        if(args[0].equalsIgnoreCase("2")){
+            pl = 1;
+            folder="sim26-50";
+        }
+
+        if(args[0].equalsIgnoreCase("3")){
+            pl = 2;
+            folder="sim51-75";
+        }
+
+        if(args[0].equalsIgnoreCase("4")){
+            pl = 3;
+            folder="sim76-00";
+        }
+
+        java.util.Hashtable<String,Boolean> myNodeNames=new java.util.Hashtable<String,Boolean>();
+
+        for (int i = 45; i <= 52; i++) for (int j = pl; j <= pl; j++) myNodeNames.put("c0"+Double.toString(i/100.0+0.00001).substring(2,4)+"-"+j, false);
+
+        int numNodes=myNodeNames.size();
+
+        java.io.File theFile=new java.io.File("/usr/home/rmantill/CuencasDataBases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS_2005/Whitewaters.metaDEM");
+        hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
+        metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".dir"));
+        metaModif.setFormat("Byte");
+        byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
+        metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".magn"));
+        metaModif.setFormat("Integer");
+        int [][] magnitudes=new hydroScalingAPI.io.DataRaster(metaModif).getInt();
+        metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".horton"));
+        metaModif.setFormat("Byte");
+        byte [][] horOrders=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
+        java.io.File stormFile;
+        java.util.Hashtable routingParams=new java.util.Hashtable();
+        routingParams.put("widthCoeff",1.0f);
+        routingParams.put("widthExponent",0.4f);
+        routingParams.put("widthStdDev",0.0f);
+        routingParams.put("chezyCoeff",14.2f);
+        routingParams.put("chezyExponent",-1/3.0f);
+        routingParams.put("lambda1",0.3f);
+        routingParams.put("lambda2",-0.1f);
+        routingParams.put("v_o",0.5f);
+        
+        java.util.Calendar zeroSimulationTime=java.util.Calendar.getInstance();
+        zeroSimulationTime.set(2006,6, 26, 20, 0, 0);
+
+        java.io.File[] stormRealizations=new java.io.File("/usr/home/rmantill/CuencasDataBases/Whitewater_database/Rasters/Hydrology/storms/simulated_events/BinKICT_2006_07_26t27/"+folder+"/").listFiles();
+
+        java.io.File outputDirectory;
+
+        for (int k = 0; k < 1; k++){
+
+                stormFile=new java.io.File(stormRealizations[k].getAbsolutePath()+"/prec.metaVHC");
+                outputDirectory=new java.io.File("/usr/home/rmantill/temp/Parallel/Whitewaters/"+stormRealizations[k].getName());
+                outputDirectory.mkdirs();
+                new ParallelSimulationToFile(1063,496,matDirs,magnitudes,horOrders,metaModif,stormFile,0.0f,2,routingParams,outputDirectory,zeroSimulationTime,myNodeNames,numNodes,4);
+        }
     }
         
 }

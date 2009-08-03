@@ -64,7 +64,9 @@ public class ExternalTileToFile extends Thread{
                                         
         procName=pn;
         
-        command=new String[] {  System.getProperty("java.home")+System.getProperty("file.separator")+"bin"+System.getProperty("file.separator")+"java",
+        command=new String[] {  "/usr/bin/ssh",
+                                "NODENAME",
+                                System.getProperty("java.home")+System.getProperty("file.separator")+"bin"+System.getProperty("file.separator")+"java",
                                 "-Xmx1500m",
                                 "-Xrs",
                                 "-cp",
@@ -87,13 +89,20 @@ public class ExternalTileToFile extends Thread{
                                 correctionsO,
                                 ""+iniTimeInMilliseconds};
         coordinatorProc=coordinator;
+        System.out.println(">>>> Original state: "+coordinatorProc.threadsRunning);
 
     }
-    
+
+    public void setComputingNode(String cn){
+        procName=cn;
+        command[1]=cn.split("-")[0];
+    }
+
     public void run(){
         
         try{
             System.out.println(java.util.Arrays.toString(command));
+
             localProcess=java.lang.Runtime.getRuntime().exec(command);
             System.out.println(">> The command was sent");
 
@@ -109,11 +118,18 @@ public class ExternalTileToFile extends Thread{
                 }
             }
             
-            localProcess.destroy();
-            System.out.println("Command completed for "+procName);
             completed=true;
             executing=false;
+
+            coordinatorProc.compNodeNames.put(procName, false);
+            System.out.println(">>>> Previous state: "+coordinatorProc.threadsRunning);
             coordinatorProc.threadsRunning--;
+            System.out.println(">>>> New state: "+coordinatorProc.threadsRunning);
+
+            localProcess.destroy();
+            System.out.println("Command completed for "+procName);
+            
+
 
         }catch(java.io.IOException ioe){
             System.err.println("Failed launching external process");

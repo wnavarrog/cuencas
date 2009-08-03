@@ -152,7 +152,7 @@ public class RKF extends java.lang.Object {
             }
 
             //System.out.println("    --> "+timeStep+" "+epsilon+" "+Delta+" "+factor+" "+newTimeStep+" ("+java.util.Calendar.getInstance().getTime()+")");
-            if(newTimeStep < 1/60.) newTimeStep=1/60.;
+            if(newTimeStep < 0.001/60.) newTimeStep=0.001/60.;
             return step(currentTime, IC, newTimeStep, true);
         }
 
@@ -850,11 +850,11 @@ public class RKF extends java.lang.Object {
 
         int ouletID = linksStructure.getOutletID();
 
-        outputStream.write("\n");
-        outputStream.write(currentTime + ",");
-        for (int i = 0; i < linksStructure.contactsArray.length; i++) {
-            outputStream.write(IC[i] + ",");
-        }
+//        outputStream.write("\n");
+//        outputStream.write(currentTime + ",");
+//        for (int i = 0; i < linksStructure.contactsArray.length; i++) {
+//            outputStream.write(IC[i] + ",");
+//        }
 
         java.util.Calendar thisDate = java.util.Calendar.getInstance();
         thisDate.setTimeInMillis((long) (currentTime * 60. * 1000.0));
@@ -910,11 +910,11 @@ public class RKF extends java.lang.Object {
             givenStep[0][0] = currentTime;
             IC = givenStep[1];
 
-            outputStream.write("\n");
-            outputStream.write(currentTime + ",");
-            for (int i = 0; i < linksStructure.contactsArray.length; i++) {
-                    outputStream.write(IC[i] + ",");
-            }
+//            outputStream.write("\n");
+//            outputStream.write(currentTime + ",");
+//            for (int i = 0; i < linksStructure.contactsArray.length; i++) {
+//                    outputStream.write(IC[i] + ",");
+//            }
 
             thisDate = java.util.Calendar.getInstance();
             thisDate.setTimeInMillis((long) (currentTime * 60. * 1000.0));
@@ -932,11 +932,11 @@ public class RKF extends java.lang.Object {
             givenStep[0][0] = currentTime;
             IC = givenStep[1];
 
-            outputStream.write("\n");
-            outputStream.write(currentTime + ",");
-            for (int i = 0; i < linksStructure.contactsArray.length; i++) {
-                    outputStream.write(IC[i] + ",");
-            }
+//            outputStream.write("\n");
+//            outputStream.write(currentTime + ",");
+//            for (int i = 0; i < linksStructure.contactsArray.length; i++) {
+//                    outputStream.write(IC[i] + ",");
+//            }
 
             thisDate = java.util.Calendar.getInstance();
             thisDate.setTimeInMillis((long) (currentTime * 60. * 1000.0));
