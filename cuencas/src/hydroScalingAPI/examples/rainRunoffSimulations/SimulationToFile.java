@@ -72,7 +72,7 @@ public class SimulationToFile extends java.lang.Object {
         float lam1=((Float)routingParams.get("lambda1")).floatValue();
         float lam2=((Float)routingParams.get("lambda2")).floatValue();
 
-        float v_o=(float)(0.5/Math.pow(200,lam1)/Math.pow(1100,lam2));
+        float v_o=(float)(2.0/Math.pow(200,lam1)/Math.pow(1100,lam2));
 
         thisNetworkGeom.setVqParams(v_o,0.0f,lam1,lam2);
 
@@ -138,6 +138,73 @@ public class SimulationToFile extends java.lang.Object {
         linkID=linksStructure.getResSimID(3139,	3926);
         System.out.println("006:    "+linkID+"  "+thisNetworkGeom.upStreamArea(linkID-1));
         System.exit(0);*/
+
+        /*
+        //Some particular links relevant to Goodwin Creek using CCI prunning
+        linkID=linksStructure.getResSimID(55,114);
+        System.out.println("01:    "+linkID+"  "+thisNetworkGeom.upStreamArea(linkID-1));
+        linkID=linksStructure.getResSimID(111,180);
+        System.out.println("02:    "+linkID+"  "+thisNetworkGeom.upStreamArea(linkID-1));
+        linkID=linksStructure.getResSimID(203,216);
+        System.out.println("03:    "+linkID+"  "+thisNetworkGeom.upStreamArea(linkID-1));
+        linkID=linksStructure.getResSimID(196,209);
+        System.out.println("04:    "+linkID+"  "+thisNetworkGeom.upStreamArea(linkID-1));
+        linkID=linksStructure.getResSimID(256,227);
+        System.out.println("05:    "+linkID+"  "+thisNetworkGeom.upStreamArea(linkID-1));
+        linkID=linksStructure.getResSimID(240,256);
+        System.out.println("06:    "+linkID+"  "+thisNetworkGeom.upStreamArea(linkID-1));
+        linkID=linksStructure.getResSimID(243,199);
+        System.out.println("07:    "+linkID+"  "+thisNetworkGeom.upStreamArea(linkID-1));
+        linkID=linksStructure.getResSimID(325,249);
+        System.out.println("08:    "+linkID+"  "+thisNetworkGeom.upStreamArea(linkID-1));
+        linkID=linksStructure.getResSimID(325,250);
+        System.out.println("09:    "+linkID+"  "+thisNetworkGeom.upStreamArea(linkID-1));
+        linkID=linksStructure.getResSimID(319,225);
+        System.out.println("10:    "+linkID+"  "+thisNetworkGeom.upStreamArea(linkID-1));
+        linkID=linksStructure.getResSimID(344,233);
+        System.out.println("11:    "+linkID+"  "+thisNetworkGeom.upStreamArea(linkID-1));
+        linkID=linksStructure.getResSimID(364,239);
+        System.out.println("12:    "+linkID+"  "+thisNetworkGeom.upStreamArea(linkID-1));
+        linkID=linksStructure.getResSimID(127,187);
+        System.out.println("13:    "+linkID+"  "+thisNetworkGeom.upStreamArea(linkID-1));
+        linkID=linksStructure.getResSimID(172,191);
+        System.out.println("14:    "+linkID+"  "+thisNetworkGeom.upStreamArea(linkID-1));
+        System.exit(0);
+        */
+
+        /*
+        //Some particular links relevant to Goodwin Creek using AT=0.1 km^2
+        linkID=linksStructure.getResSimID(44,111);
+        System.out.println("01:    "+linkID+"  "+thisNetworkGeom.upStreamArea(linkID-1));
+        linkID=linksStructure.getResSimID(111,177);
+        System.out.println("02:    "+linkID+"  "+thisNetworkGeom.upStreamArea(linkID-1));
+        linkID=linksStructure.getResSimID(203,216);
+        System.out.println("03:    "+linkID+"  "+thisNetworkGeom.upStreamArea(linkID-1));
+        linkID=linksStructure.getResSimID(196,209);
+        System.out.println("04:    "+linkID+"  "+thisNetworkGeom.upStreamArea(linkID-1));
+        linkID=linksStructure.getResSimID(256,227);
+        System.out.println("05:    "+linkID+"  "+thisNetworkGeom.upStreamArea(linkID-1));
+        linkID=linksStructure.getResSimID(234,249);
+        System.out.println("06:    "+linkID+"  "+thisNetworkGeom.upStreamArea(linkID-1));
+        linkID=linksStructure.getResSimID(243,199);
+        System.out.println("07:    "+linkID+"  "+thisNetworkGeom.upStreamArea(linkID-1));
+        linkID=linksStructure.getResSimID(325,249);
+        System.out.println("08:    "+linkID+"  "+thisNetworkGeom.upStreamArea(linkID-1));
+        linkID=linksStructure.getResSimID(325,250);
+        System.out.println("09:    "+linkID+"  "+thisNetworkGeom.upStreamArea(linkID-1));
+        linkID=linksStructure.getResSimID(296,223);
+        System.out.println("10:    "+linkID+"  "+thisNetworkGeom.upStreamArea(linkID-1));
+        linkID=linksStructure.getResSimID(344,243);
+        System.out.println("11:    "+linkID+"  "+thisNetworkGeom.upStreamArea(linkID-1));
+        linkID=linksStructure.getResSimID(346,244);
+        System.out.println("12:    "+linkID+"  "+thisNetworkGeom.upStreamArea(linkID-1));
+        linkID=linksStructure.getResSimID(127,187);
+        System.out.println("13:    "+linkID+"  "+thisNetworkGeom.upStreamArea(linkID-1));
+        linkID=linksStructure.getResSimID(172,191);
+        System.out.println("14:    "+linkID+"  "+thisNetworkGeom.upStreamArea(linkID-1));
+        System.exit(0);
+        */
+
         
         System.out.println("Loading Storm ...");
         
@@ -295,7 +362,9 @@ public class SimulationToFile extends java.lang.Object {
         
         System.out.println("Termina calculo de WFs");
         
-        hydroScalingAPI.modules.rainfallRunoffModel.objects.NetworkEquations_ChannelLosses thisBasinEqSys=new hydroScalingAPI.modules.rainfallRunoffModel.objects.NetworkEquations_ChannelLosses(linksStructure,thisHillsInfo,thisNetworkGeom,routingType);
+        //hydroScalingAPI.modules.rainfallRunoffModel.objects.NetworkEquations_ChannelLosses thisBasinEqSys=new hydroScalingAPI.modules.rainfallRunoffModel.objects.NetworkEquations_ChannelLosses(linksStructure,thisHillsInfo,thisNetworkGeom,routingType);
+        hydroScalingAPI.modules.rainfallRunoffModel.objects.NetworkEquations_HillDelay thisBasinEqSys=new hydroScalingAPI.modules.rainfallRunoffModel.objects.NetworkEquations_HillDelay(linksStructure,thisHillsInfo,thisNetworkGeom,routingType);
+
         double[] initialCondition=new double[linksStructure.contactsArray.length*2];
         
         float[][] areasHillArray=thisHillsInfo.getAreasArray();
@@ -325,7 +394,7 @@ public class SimulationToFile extends java.lang.Object {
         
         for (int k=0;k<numPeriods;k++) {
             System.out.println("Period "+(k+1)+" of "+numPeriods);
-            int timeStepOutput=(int)Math.min(Math.pow(2,(basinOrder-1)),storm.stormRecordResolutionInMinutes());
+            int timeStepOutput=(int)Math.min(Math.pow(2,(basinOrder-1)),1);//,storm.stormRecordResolutionInMinutes());
             rainRunoffRaining.jumpsRunToFile(storm.stormInitialTimeInMinutes()+k*storm.stormRecordResolutionInMinutes(),storm.stormInitialTimeInMinutes()+(k+1)*storm.stormRecordResolutionInMinutes(),timeStepOutput,initialCondition,newfile);
             initialCondition=rainRunoffRaining.finalCond;
             rainRunoffRaining.setBasicTimeStep(30/60.);
@@ -333,8 +402,11 @@ public class SimulationToFile extends java.lang.Object {
         java.util.Date interTime=new java.util.Date();
         System.out.println("Intermedia Time:"+interTime.toString());
         System.out.println("Running Time:"+(.001*(interTime.getTime()-startTime.getTime()))+" seconds");
-        int timeStepOutput=(int)Math.min(Math.pow(2,(basinOrder-1)),storm.stormRecordResolutionInMinutes());
-        rainRunoffRaining.jumpsRunToFile(storm.stormInitialTimeInMinutes()+numPeriods*storm.stormRecordResolutionInMinutes(),(storm.stormInitialTimeInMinutes()+(numPeriods+1)*storm.stormRecordResolutionInMinutes())+3000,timeStepOutput,initialCondition,newfile);
+
+        int timeStepOutput=(int)Math.min(Math.pow(2,(basinOrder-1)),1);//,storm.stormRecordResolutionInMinutes());
+        double extraSimTime=120D*Math.pow(2.0D,(basinOrder-1));
+
+        rainRunoffRaining.jumpsRunToFile(storm.stormInitialTimeInMinutes()+numPeriods*storm.stormRecordResolutionInMinutes(),(storm.stormInitialTimeInMinutes()+(numPeriods+1)*storm.stormRecordResolutionInMinutes())+extraSimTime,timeStepOutput,initialCondition,newfile);
         
         System.out.println("Termina simulacion RKF");
         java.util.Date endTime=new java.util.Date();
@@ -386,7 +458,7 @@ public class SimulationToFile extends java.lang.Object {
         
         try{
             
-            //Uniform Rain
+            //Simulated Rain
             //subMain1(args);  //The test case for Whitewater
             //subMain3(args);  //The test case for Walnut Gulch 30m
             //subMain4(args);   //The test case for TestDem
@@ -394,14 +466,16 @@ public class SimulationToFile extends java.lang.Object {
             //subMain6(args);   //The Peano Tree
             //subMain8(args);   //The Test Case for Walnut Creek
             //subMain9(args);  //The test case for Walnut Gulch 10m
-            
+            subMain13(args);     //Simulations for Goodwin Creek
             
             //Rainfields from data
             //subMain2(args);   //using constant infiltration in space
             //subMain7(args);   //using a map to set infiltration values
             //subMain10(args);     //Simulations for Upper Rio Puerco Using Nexrad
             //subMain11(args);     //Simulations for Mogollon Basin Using Nexrad
-            subMain12(args);     //Simulations for Iowa Floods 2008
+            //subMain12(args);     //Simulations for Iowa Floods 2008
+
+
         } catch (java.io.IOException IOE){
             System.out.print(IOE);
             System.exit(0);
@@ -964,6 +1038,69 @@ public class SimulationToFile extends java.lang.Object {
         new SimulationToFile(2151, 372,matDirs,magnitudes,metaModif,stormFile,2.0f,5,routingParams);
         
         
+    }
+
+
+
+    public static void subMain13(String args[]) throws java.io.IOException, VisADException {
+
+        java.io.File theFile=new java.io.File("/hidrosigDataBases//Goodwin_Creek_MS_database/Rasters/Topography/1_ArcSec_USGS/newDEM/goodwinCreek-nov03.metaDEM");
+        hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
+        metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases//Goodwin_Creek_MS_database/Rasters/Topography/1_ArcSec_USGS/newDEM/goodwinCreek-nov03.dir"));
+
+        metaModif.setFormat("Byte");
+        byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
+
+        metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".magn"));
+        metaModif.setFormat("Integer");
+        int [][] magnitudes=new hydroScalingAPI.io.DataRaster(metaModif).getInt();
+
+        java.util.Hashtable routingParams=new java.util.Hashtable();
+        routingParams.put("widthCoeff",1.0f);
+        routingParams.put("widthExponent",0.4f);
+        routingParams.put("widthStdDev",0.0f);
+
+        routingParams.put("chezyCoeff",14.2f);
+        routingParams.put("chezyExponent",-1/3.0f);
+
+        routingParams.put("lambda1",0.2f);
+        routingParams.put("lambda2",-0.1f);
+        routingParams.put("v_o", 0.4f);
+
+        float infil=0.0f;
+
+        java.io.File stormFile;
+        stormFile=new java.io.File("/hidrosigDataBases/Goodwin_Creek_MS_database/Rasters/Hydrology/precipitation/storms/gaussian_events/05min_ts/event_01_sd1p00_coe2p85/precipitation_gaussian_ev01.metaVHC");
+
+        for (double lam1 = 0; lam1 <= 6; lam1 += 2) {
+            routingParams.put("lambda1", (float)(lam1/10.0));
+            for (double lam2 = -2; lam2 <= 1; lam2 += 1.0) {
+
+                routingParams.put("lambda2", (float)(lam2/10.0));
+
+                for (float intV = 3f; intV <= 3f; intV += 1.0) {
+                    float v_o=(float)(intV/10.0f/Math.pow(10,lam1/10.0)/Math.pow(254,lam2/10.0));
+                    routingParams.put("v_o", v_o);
+                    new SimulationToFile(44,111,matDirs,magnitudes,metaModif,stormFile,0.0f,5,routingParams);
+                }
+            }
+        }
+
+        stormFile=new java.io.File("/hidrosigDataBases/Goodwin_Creek_MS_database/Rasters/Hydrology/precipitation/storms/gaussian_events/05min_ts/event_04_sd6p00_coe2p85/precipitation_gaussian_ev04.metaVHC");
+
+        for (double lam1 = 0; lam1 <= 4; lam1 += 2) {
+            routingParams.put("lambda1", (float)(lam1/10.0));
+            for (double lam2 = -2; lam2 <= 1; lam2 += 1.0) {
+
+                routingParams.put("lambda2", (float)(lam2/10.0));
+
+                for (float intV = 3f; intV <= 3f; intV += 1.0) {
+                    float v_o=(float)(intV/10.0f/Math.pow(10,lam1/10.0)/Math.pow(254,lam2/10.0));
+                    routingParams.put("v_o", v_o);
+                    new SimulationToFile(44,111,matDirs,magnitudes,metaModif,stormFile,0.0f,5,routingParams);
+                }
+            }
+        }
     }
     
 }

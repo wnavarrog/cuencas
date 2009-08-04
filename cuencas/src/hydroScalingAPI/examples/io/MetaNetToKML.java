@@ -166,9 +166,9 @@ public class MetaNetToKML {
 //            int x=1570,y=127;
 //            String uniqueIdentifier="IowaRiverAtWapoello90";
             
-            String fileName="/hidrosigDataBases/Iowa_Rivers_DB/Rasters/Topography/1_arcSec/05454300/NED_00159011";
-            int x=1570, y= 127;
-            String uniqueIdentifier="ClearCreekAtCoralville";
+//            String fileName="/hidrosigDataBases/Iowa_Rivers_DB/Rasters/Topography/1_arcSec/05454300/NED_00159011";
+//            int x=1570, y= 127;
+//            String uniqueIdentifier="ClearCreekAtCoralville";
             
 //            String fileName="/hidrosigDataBases/Iowa_Rivers_DB/Rasters/Topography/1_arcSec/CedarRiver";
 //            int x=7875, y= 1361;
@@ -177,6 +177,30 @@ public class MetaNetToKML {
 //            String fileName="/hidrosigDataBases/Iowa_Rivers_DB/Rasters/Topography/1_arcSec/IowaRiverAtIowaCity";
 //            int x=6602, y= 1539;
 //            String uniqueIdentifier="IowaRiverAtIowaCity";
+            
+//            String fileName="/hidrosigDataBases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS/Whitewaters";
+//            int x=1064, y= 496;
+//            String uniqueIdentifier="WhitewaterKS";
+
+//            String fileName="/hidrosigDataBases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS/Whitewaters";
+//            int x=1007, y= 1177;
+//            String uniqueIdentifier="WhitewaterZ1KS";
+
+//            String fileName="/hidrosigDataBases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS/Whitewaters";
+//            int x=736, y= 1414;
+//            String uniqueIdentifier="WhitewaterZ2KS";
+
+//            String fileName="/hidrosigDataBases/Goodwin_Creek_MS_database/Rasters/Topography/1_ArcSec_USGS/newDEM/goodwinCreek-nov03";
+//            int x=44, y= 111;
+//            String uniqueIdentifier="GoodwinCreek";
+
+//            String fileName="/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Topography/1_ArcSec_USGS/walnutGulchUpdated";
+//            int x=194, y= 281 ;
+//            String uniqueIdentifier="WalnutGulchAZ";
+
+            String fileName="/hidrosigDataBases/Iowa_Rivers_DB/Rasters/Topography/1_arcSec/DryCreek/NED_79047246";
+            int x=866, y= 480 ;
+            String uniqueIdentifier="DryCreekIA";
             
             java.io.File theFile=new java.io.File(fileName+".metaDEM");
             hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);

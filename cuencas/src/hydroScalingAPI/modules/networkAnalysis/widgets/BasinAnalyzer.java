@@ -2857,7 +2857,7 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
           displayMap_Hortonian.removeAllReferences();
           
           String theMeta=fc.getSelectedFile().getPath();
-          theMeta=theMeta.substring(0,theMeta.lastIndexOf("."))+".metaVHC";
+          theMeta=theMeta.substring(0,theMeta.indexOf("."))+".metaVHC";
           
           hydroScalingAPI.io.MetaRaster metaVHC=new hydroScalingAPI.io.MetaRaster(new java.io.File(theMeta));
           metaVHC.setLocationBinaryFile(fc.getSelectedFile());
@@ -2880,9 +2880,9 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
           displayMap_Hortonian.addReference(data_ref_varRaster);
           
           ProjectionControl pc = displayMap_Hortonian.getProjectionControl();
-          pc.setAspect(new double[] {1.0, (double) (metaDatos.getNumRows()/(double) metaDatos.getNumCols())});
+          pc.setAspectCartesian(new double[] {1.0, (double) (metaDatos.getNumRows()/(double) metaDatos.getNumCols())});
           
-          for (int i=data_refSubBasins.length-2;i<data_refSubBasins.length;i++) {
+          for (int i=data_refSubBasins.length-4;i<data_refSubBasins.length;i++) {
               ConstantMap[] distCMap = {  new ConstantMap( red[i]/255., Display.Red),
               new ConstantMap( green[i]/255., Display.Green),
               new ConstantMap( blue[i]/255., Display.Blue),
@@ -2902,9 +2902,9 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
           plotHortonGraphHortonian(ratios,NLvsOrder,"Log(Spatial Variable)");
           
       } catch (VisADException v){
-          System.err.println(v);
+          v.printStackTrace();
       } catch (java.io.IOException ioe){
-          System.err.println("Error numero 6.1: "+ioe);
+          ioe.printStackTrace();
       }
       
       
@@ -3456,6 +3456,7 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
                         spatialVarDist[i][j]+=Float.parseFloat(valores.evaluate(new RealTuple(campo,new double[] {misCoordenadas[0][k],misCoordenadas[1][k]})).toString());
                     }
                 }
+                System.out.println(java.util.Arrays.toString(spatialVarDist[i]));
             }
         } catch (java.io.IOException IOE){
             IOE.printStackTrace();

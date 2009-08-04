@@ -205,9 +205,10 @@ public class ParallelSimulationToFile extends java.lang.Object {
                 } else if(externalExecutors[indexProc].completed == true) activeThreads[indexProc]=null;
             }
             System.out.println();
+            int counterSeconds=0;
             while(threadsRunning == simulProcess){
                 System.out.println(">>>>>  CURRENTLY RUNNING "+threadsRunning+" THREADS. Out of "+simulProcess+".Percentage Completed: "+((1-currentDtoO/maxDtoO)*100)+"%");
-                new visad.util.Delay(5000);
+                new visad.util.Delay(1000);
             }
             System.out.println(">>>>>  CURRENTLY RUNNING "+threadsRunning+" THREADS. Out of "+simulProcess+". Percentage Completed: "+((1-currentDtoO/maxDtoO)*100)+"%");
 
@@ -219,7 +220,7 @@ public class ParallelSimulationToFile extends java.lang.Object {
             }
             System.out.println();
 
-            new visad.util.Delay(5000);
+            new visad.util.Delay(1000);
             
             allNodesDone=true;
             for (int i = 0; i < externalExecutors.length; i++) allNodesDone&=externalExecutors[i].completed;
@@ -248,8 +249,8 @@ public class ParallelSimulationToFile extends java.lang.Object {
     public static void main(String args[]) {
 
         try{
-            
-            subMain0(args);  //Using AveragedIowaRiver
+            subMain_1(args);  //Using Walnut Gulch, AZ
+            //subMain0(args);  //Using AveragedIowaRiver
             //subMain1(args);  //Using 30m DEMs
             //subMain3(args);
             //subMain4(args);
@@ -264,7 +265,54 @@ public class ParallelSimulationToFile extends java.lang.Object {
         System.exit(0);
         
     }
-    
+
+    public static void subMain_1(String args[]) throws java.io.IOException, VisADException {
+
+        java.util.Hashtable<String,Boolean> myNodeNames=new java.util.Hashtable<String,Boolean>();
+        for (int j = 0; j <= 7; j++) {
+            myNodeNames.put("localhost"+"-"+j, false);
+        }
+
+        int numNodes=myNodeNames.size();
+
+        java.io.File theFile=new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Topography/1_ArcSec_USGS/walnutGulchUpdated.metaDEM");
+        hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
+        metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".dir"));
+        metaModif.setFormat("Byte");
+        byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
+
+        metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".magn"));
+        metaModif.setFormat("Integer");
+        int [][] magnitudes=new hydroScalingAPI.io.DataRaster(metaModif).getInt();
+
+        metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".horton"));
+        metaModif.setFormat("Byte");
+        byte [][] horOrders=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
+
+        java.io.File stormFile;
+        java.util.Hashtable routingParams=new java.util.Hashtable();
+        routingParams.put("widthCoeff",1.0f);
+        routingParams.put("widthExponent",0.4f);
+        routingParams.put("widthStdDev",0.0f);
+
+        routingParams.put("chezyCoeff",14.2f);
+        routingParams.put("chezyExponent",-1/3.0f);
+
+        int routingType=Integer.parseInt("5");
+
+        routingParams.put("v_o",0.5f);
+        routingParams.put("lambda1",0.3f);
+        routingParams.put("lambda2",-0.1f);
+
+        java.util.Calendar zeroSimulationTime=java.util.Calendar.getInstance();
+        zeroSimulationTime.set(1971,7, 18, 20, 00, 0);
+
+        stormFile=new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Hydrology/storms/precipitation_events/event_02/precipitation_interpolated_ev02.metaVHC");
+        java.io.File outputDirectory=new java.io.File("/Users/ricardo/simulationResults/Parallel/WalnutGulch/");
+        outputDirectory.mkdirs();
+        new ParallelSimulationToFile(194, 281,matDirs,magnitudes,horOrders,metaModif,stormFile,0.0f,routingType,routingParams,outputDirectory,zeroSimulationTime,myNodeNames,numNodes,4);
+    }
+
     public static void subMain0(String args[]) throws java.io.IOException, VisADException {
 
         java.util.Hashtable<String,Boolean> myNodeNames=new java.util.Hashtable<String,Boolean>();
@@ -449,7 +497,7 @@ public class ParallelSimulationToFile extends java.lang.Object {
         }
 
         int numNodes=myNodeNames.size();
-
+        int dScale=4;
 
         java.io.File theFile=new java.io.File("/usr/home/rmantill/CuencasDataBases/Iowa_Rivers_DB/Rasters/Topography/1_arcSec/05454300/NED_00159011.metaDEM");
         hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
@@ -501,7 +549,13 @@ public class ParallelSimulationToFile extends java.lang.Object {
                 new ParallelSimulationToFile(1570,127,matDirs,magnitudes,horOrders,metaModif,stormFile,0.0f,5,routingParams,outputDirectory,zeroSimulationTime,myNodeNames,numNodes,4);
 
             }
+
         //}
+        routingParams.put("v_o",0.5f);
+        outputDirectory=new java.io.File("/home/ricardo/simulationResults/Parallel/AveragedIowaRiver_NonLinear/");
+        outputDirectory.mkdirs();
+        new ParallelSimulationToFile(2734, 1069 ,matDirs,magnitudes,horOrders,metaModif,stormFile,0.0f,5,routingParams,outputDirectory,zeroSimulationTime,myNodeNames,numNodes,dScale);
+
     }
 
     public static void subMain3(String args[]) throws java.io.IOException, VisADException {

@@ -338,10 +338,11 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
             
             //subMain0(args);   //To Run as a external program from shell
             //subMain1(args);   //The test case for TestDem
-            subMain2(args);   //Case for Walnut Gulch
+            //subMain2(args);   //Case for Walnut Gulch
             //subMain3(args);   //Case Upper Rio Puerco
             //subMain4(args);   //Case Whitewater
-            //subMain5(args);   //Case Clear Creek June 3 to 7
+            subMain5(args);   //Case Clear Creek June 3 to 7
+            
             
         } catch (java.io.IOException IOE){
             System.out.print(IOE);
@@ -576,8 +577,8 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
         routingParams.put("chezyCoeff",14.2f);
         routingParams.put("chezyExponent",-1/3.0f);
         
-        routingParams.put("lambda1",0.0f);
-        routingParams.put("lambda2",0.0f);
+        routingParams.put("lambda1",0.2f);
+        routingParams.put("lambda2",-0.1f);
         routingParams.put("v_o", 0.4f);
         
         java.io.File stormFile;
@@ -587,7 +588,7 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
         
         float infil=0.0f;
 
-        new SimulationToAsciiFile(1570, 127, matDirs, magnitudes, metaModif, stormFile, infil, 2, new java.io.File("/home/ricardo/simulationResults/ClearCreek/"), routingParams).executeSimulation();
+        new SimulationToAsciiFile(1570, 127, matDirs, magnitudes, metaModif, stormFile, infil, 5, new java.io.File("/home/ricardo/simulationResults/ClearCreek/"), routingParams).executeSimulation();
         
         System.exit(0);
         

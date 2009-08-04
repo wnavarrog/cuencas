@@ -34,9 +34,6 @@ import visad.*;
  */
 public class RsnFlowSimulationToAsciiFile extends java.lang.Object {
     
-    private hydroScalingAPI.io.MetaRaster metaDatos;
-    private byte[][] matDir;
-    
     hydroScalingAPI.util.randomSelfSimilarNetworks.RsnStructure rsns;
     float rainIntensity;
     float rainDuration;
@@ -282,7 +279,7 @@ public class RsnFlowSimulationToAsciiFile extends java.lang.Object {
             
             //subMain7(args);   //E1I1 different lambda1 and lambda2
             
-            subMain8(args);   //Non-Self similar Trees
+            //subMain8(args);   //Non-Self similar Trees
             
         } catch (java.io.IOException IOE){
             System.out.print(IOE);

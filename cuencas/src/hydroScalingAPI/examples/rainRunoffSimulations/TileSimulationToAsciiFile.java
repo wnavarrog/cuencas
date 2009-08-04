@@ -300,7 +300,7 @@ public class TileSimulationToAsciiFile extends java.lang.Object implements Runna
         thisDate.setTimeInMillis((long)(storm.stormInitialTimeInMinutes()*60.*1000.0));
         System.out.println(thisDate.getTime());
         
-        double outputTimeStep=2.0;//Math.min(Math.pow(2.0D,(basinOrder-1)),storm.stormRecordResolutionInMinutes());
+        double outputTimeStep=storm.stormRecordResolutionInMinutes();
         double extraSimTime=120D*Math.pow(2.0D,(basinOrder-1));
         
         newfile1.write("TimeStep:" + outputTimeStep+"\n");
@@ -318,6 +318,8 @@ public class TileSimulationToAsciiFile extends java.lang.Object implements Runna
         System.out.println("Intermedia Time:"+interTime.toString());
         System.out.println("Running Time:"+(.001*(interTime.getTime()-startTime.getTime()))+" seconds");
 
+
+        outputTimeStep=5*Math.pow(2.0D,(basinOrder-1));
         rainRunoffRaining.jumpsRunCompleteToAsciiFile(storm.stormInitialTimeInMinutes()+numPeriods*storm.stormRecordResolutionInMinutes(),(storm.stormInitialTimeInMinutes()+(numPeriods+1)*storm.stormRecordResolutionInMinutes())+extraSimTime,outputTimeStep,initialCondition,newfile,linksStructure,thisNetworkGeom,newfile1);
         
         newfile1.close();
@@ -477,9 +479,12 @@ public class TileSimulationToAsciiFile extends java.lang.Object implements Runna
         
         stormFile=new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Hydrology/storms/precipitation_events/event_02/precipitation_interpolated_ev02.metaVHC");
         
-        java.io.File outputDirectory=new java.io.File("/Users/ricardo/simulationResults/Parallel/Walnut_Gulch/");
+        java.util.Calendar zeroSimulationTime=java.util.Calendar.getInstance();
+        zeroSimulationTime.set(1971,7, 18, 20, 00, 0);
+
+        java.io.File outputDirectory=new java.io.File("/Users/ricardo/simulationResults/Parallel/WalnutGulch/");
         
-        new TileSimulationToAsciiFile(229,286,-1,-1,3,matDirs,magnitudes,horOrders,metaModif,20.0f,5.0f,stormFile,null,0.0f,2,routingParams,outputDirectory,new int[] {},new float[] {},0).executeSimulation();
+        new TileSimulationToAsciiFile(729,130,-1,-1,4,matDirs,magnitudes,horOrders,metaModif,20.0f,5.0f,stormFile,null,0.0f,2,routingParams,outputDirectory,new int[] {},new float[] {},zeroSimulationTime.getTimeInMillis()).executeSimulation();
         //new TileSimulationToAsciiFile(229,286,-1,-1,3,matDirs,magnitudes,horOrders,metaModif,20.0f,5.0f,stormFile,null,0.0f,2,routingParams,outputDirectory,new int[] {314711, 315971},monitor,new float[] {0.027654171f, 0.20069313f}).executeSimulation();
             
     }

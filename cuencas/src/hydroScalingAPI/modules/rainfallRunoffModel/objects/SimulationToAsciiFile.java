@@ -170,7 +170,7 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
         double[][] wfs=linksStructure.getWidthFunctions(linksStructure.completeStreamLinksArray,0);
         
         for (int i=0;i<linksStructure.completeStreamLinksArray.length;i++){
-            if(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > 1){
+            if(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > 0){
                 newfile.write("Link #"+linksStructure.completeStreamLinksArray[i]+",");
                 for (int j=0;j<wfs[i].length;j++) newfile.write(wfs[i][j]+",");
                 newfile.write("\n");
@@ -196,7 +196,7 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
         newfile.write("Link #,");
         
         for (int i=0;i<linksStructure.completeStreamLinksArray.length;i++){
-            if(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > 1)
+            if(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > 0)
                 newfile.write("Link-"+linksStructure.completeStreamLinksArray[i]+",");
         }
         
@@ -204,7 +204,7 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
         newfile.write("Horton Order,");
         
         for (int i=0;i<linksStructure.completeStreamLinksArray.length;i++){
-            if(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > 1)
+            if(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > 0)
                 newfile.write(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i])+",");
         }
         
@@ -212,7 +212,7 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
         newfile.write("Upstream Area [km^2],");
         
         for (int i=0;i<linksStructure.completeStreamLinksArray.length;i++){
-            if(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > 1)
+            if(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > 0)
                 newfile.write(thisNetworkGeom.upStreamArea(linksStructure.completeStreamLinksArray[i])+",");
         }
         
@@ -220,7 +220,7 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
         newfile.write("Link Outlet ID,");
         
         for (int i=0;i<linksStructure.completeStreamLinksArray.length;i++){
-            if(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > 1)
+            if(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > 0)
                 newfile.write(linksStructure.contactsArray[linksStructure.completeStreamLinksArray[i]]+",");
         }
         
@@ -232,7 +232,7 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
         newfile.write("Time,");
         
         for (int i=0;i<linksStructure.completeStreamLinksArray.length;i++){
-            if(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > 1)
+            if(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > 0)
                 newfile.write("Link-"+linksStructure.completeStreamLinksArray[i]+",");
         }
         
@@ -275,7 +275,7 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
         if(stormFile == null){
             for (int k=0;k<numPeriods;k++) {
                 System.out.println("Period"+(k)+" out of "+numPeriods);
-                rainRunoffRaining.jumpsRunToAsciiFile(storm.stormInitialTimeInMinutes()+k*rainDuration,storm.stormInitialTimeInMinutes()+(k+1)*rainDuration,rainDuration,initialCondition,newfile,linksStructure,thisNetworkGeom);
+                rainRunoffRaining.jumpsRunToAsciiFile(storm.stormInitialTimeInMinutes()+k*rainDuration,storm.stormInitialTimeInMinutes()+(k+1)*rainDuration,5,initialCondition,newfile,linksStructure,thisNetworkGeom);
                 initialCondition=rainRunoffRaining.finalCond;
                 rainRunoffRaining.setBasicTimeStep(10/60.);
             }
@@ -284,7 +284,7 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
             System.out.println("Intermedia Time:"+interTime.toString());
             System.out.println("Running Time:"+(.001*(interTime.getTime()-startTime.getTime()))+" seconds");
             
-            rainRunoffRaining.jumpsRunToAsciiFile(storm.stormInitialTimeInMinutes()+numPeriods*rainDuration,(storm.stormInitialTimeInMinutes()+(numPeriods+1)*rainDuration)+8000,15,initialCondition,newfile,linksStructure,thisNetworkGeom);
+            rainRunoffRaining.jumpsRunToAsciiFile(storm.stormInitialTimeInMinutes()+numPeriods*rainDuration,(storm.stormInitialTimeInMinutes()+(numPeriods+1)*rainDuration)+8000,5,initialCondition,newfile,linksStructure,thisNetworkGeom);
             
         } else {
             for (int k=0;k<numPeriods;k++) {
@@ -313,7 +313,7 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
         newfile.write("\n");
         newfile.write("Maximum Discharge [m^3/s],");
         for (int i=0;i<linksStructure.completeStreamLinksArray.length;i++){
-            if(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > 1)
+            if(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > 0)
                 newfile.write(maximumsAchieved[linksStructure.completeStreamLinksArray[i]]+",");
         }
         

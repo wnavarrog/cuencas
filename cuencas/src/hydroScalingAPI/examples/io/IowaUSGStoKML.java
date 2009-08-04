@@ -129,6 +129,8 @@ public class IowaUSGStoKML {
             writerKml.write("   "+theGauge.toString()+"<br />"+ret);
             writerKml.write("   "+"Basin Area: "+theGauge.getProperty("[drainage area (km^2)]")+"km^2 <br />"+ret);
             writerKml.write("   "+"<img src=\"http://cires.colorado.edu/~ricardo/temp/figures/"+theGauge.getProperty("[code]")+".csv.jpg\">"+ret);
+            writerKml.write("   <br />"+ret);
+            writerKml.write("   "+"<img src=\"http://cires.colorado.edu/~ricardo/temp/figures/"+theGauge.getProperty("[code]")+".csv.rain.jpg\">"+ret);
             writerKml.write("   ]]>"+ret);
             writerKml.write("  </description>"+ret);
             writerKml.write("  <Point>"+ret);
