@@ -81,7 +81,8 @@ public class StreamFlowTimeSeries {
 //        System.out.println("Evaluating, Limits: "+firstTime+" "+lastTime);
 //        System.out.println("Desired Time: "+time+" Test "+(time <= timesRecorded[0]));
 
-        
+        if(time < firstTime) return 0.0;
+        if(time >= lastTime) return 0.0;
         
         int k=0;
         for (int i = 0; i < breakLocations[0].length; i++) {
@@ -92,8 +93,6 @@ public class StreamFlowTimeSeries {
             k++;
         }
         
-        if(time < firstTime) return 0.0;
-        if(time >= lastTime) return 0.0;
         if(k == timesRecorded.length-1) return 0.0;
         
         double leftT=timesRecorded[k];
