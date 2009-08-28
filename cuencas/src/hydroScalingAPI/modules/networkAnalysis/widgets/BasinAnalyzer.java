@@ -1150,7 +1150,7 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
             System.out.println("Mean: "+varStats.meanValue);
             System.out.println("Standard Deviation: "+varStats.standardDeviation);
             System.out.println("Min: "+varStats.minValue);
-            System.out.println("MAx: "+varStats.maxValue);
+            System.out.println("Max: "+varStats.maxValue);
             
             minXVarValueSlider.setValue(0);
             maxXVarValueSlider.setValue(100);
@@ -3226,12 +3226,21 @@ public class BasinAnalyzer extends javax.swing.JDialog implements visad.DisplayL
     }//GEN-LAST:event_closeDialog
 
     private void printVarValuesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_printVarValuesActionPerformed
+        
+        
         try {
+
+            String stringOfText="";
+
+            stringOfText=(String)xvarList.getSelectedValue()+"<br>";
+
             float[][] varValues = getFilteredLinkValues(false);
             for (int i = 0; i < varValues[0].length; i++) {
-                System.out.println(varValues[0][i]);
+               stringOfText+=varValues[0][i]+"<br>";
 
             }
+
+            htmlGeomorphometricReport.setText(stringOfText);
 
         } catch (IOException iOException) {
             iOException.printStackTrace();
