@@ -98,7 +98,7 @@ public class GetGeomorphologyROM extends Object {
                     }
                     else{
                         outs[0].writeByte((byte)-1);
-                        outs[1].writeInt(-1);
+                        if(Proc.RedRas[i+1][j+1] == 0) outs[1].writeInt(-1); else outs[1].writeInt(0);
                         outs[2].writeFloat(0.0f);
                         outs[3].writeFloat(0.0f);
                         outs[4].writeInt(0);
@@ -199,9 +199,10 @@ public class GetGeomorphologyROM extends Object {
                 Ltc.seek((long)4*(i*nc+j)); float lt2=Ltc.readFloat();
                 Lcp.seek((long)4*(i*nc+j)); float lc2=Lcp.readFloat();
                 Lcp.seek((long)4*(x1*nc+y1)); float lc3=Lcp.readFloat();
-                if (llegan[i][j]== 0)
-                    esc("Magn", x1,y1,true,1);
-                else esc("Magn",x1,y1,true,m2);
+                if (GEO[x1][y1] == 0)
+                    esc("Magn", x1,y1,true,m2);
+                else 
+                    esc("Magn",x1,y1,true,m2);
                 esc("Ltc",x1,y1,true,lt2);
                 esc("Lcp",x1,y1,false,Math.max(lc2,lc3));
             }
@@ -299,7 +300,8 @@ public class GetGeomorphologyROM extends Object {
                     Magn.seek((long)4*(i*nc+j));
                     Magn.writeInt(v+d);
                 }
-                else  Magn.writeInt(v);
+                else
+                    Magn.writeInt(v);
             }
         }catch (java.io.IOException e1){
             System.err.println("ERROR3** "+e1.getMessage());}

@@ -492,7 +492,7 @@ public class NetworkExtractionModule implements Runnable {
             GetGeomorphologyRAM.getAreas(this);
             GetGeomorphologyRAM.bordes(this);
             if(taskDIR && !lAzules){
-                GetGeomorphologyRAM.getMaxPend(this);
+                //GetGeomorphologyRAM.getMaxPend(this);
                 writePREL(metaDEM.getLocationBinaryFile());
             }
         }
@@ -506,7 +506,7 @@ public class NetworkExtractionModule implements Runnable {
             boolean red_umbrales = (ordenMax < Integer.MAX_VALUE || pixPodado > 0);
             if(lAzules){
                 RasterNetworkBlueLines.cabecitas(this,LA,true);
-                GetGeomorphologyRAM.getMaxPend(this);
+                //GetGeomorphologyRAM.getMaxPend(this);
                 writePREL(metaDEM.getLocationBinaryFile());
             }
             if(red_umbrales){
@@ -548,7 +548,7 @@ public class NetworkExtractionModule implements Runnable {
             GetRasterNetwork.fixIntersections(this);
             
             GetGeomorphologyRAM.getAreas(this);
-            GetGeomorphologyRAM.getMaxPend(this);
+            //GetGeomorphologyRAM.getMaxPend(this);
             
             writePREL(metaDEM.getLocationBinaryFile());
             
@@ -796,7 +796,7 @@ public class NetworkExtractionModule implements Runnable {
                 else{
                     outs[0].writeFloat(Areas[i][j]);
                     outs[1].writeDouble(DEM[i][j]);
-                    outs[2].writeDouble(MaxPend[i][j]);
+                    //outs[2].writeDouble(MaxPend[i][j]);
                     outs[3].writeByte((byte)DIR[i][j]);
                 }
             }

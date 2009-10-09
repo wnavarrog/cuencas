@@ -331,7 +331,7 @@ public abstract class GetGeomorphologyRAM extends Object {
         
         if (Proc.printDebug) System.out.println(">>> Calculating Distance to Border for Network Points");
 
-        double[][] GDO=new double[Proc.metaDEM.getNumRows()+2][Proc.metaDEM.getNumCols()+2];
+        float[][] GDO=new float[Proc.metaDEM.getNumRows()+2][Proc.metaDEM.getNumCols()+2];
         int[][] TDO=new int[Proc.metaDEM.getNumRows()+2][Proc.metaDEM.getNumCols()+2];
         
         /*for(int i=2;i<Proc.DIR[0].length-2;i++){
@@ -399,27 +399,27 @@ public abstract class GetGeomorphologyRAM extends Object {
                                 }
                             }
 
-                            double dist = 0.0;
+                            float dist = 0.0f;
 
                             switch (Proc.DIR[iIndex][jIndex]) {
 
-                                case 1:     dist=Proc.dxy[iIndex];
+                                case 1:     dist=(float)Proc.dxy[iIndex];
                                             break;  
-                                case 2:     dist=Proc.dy;
+                                case 2:     dist=(float)Proc.dy;
                                             break;
-                                case 3:     dist=Proc.dxy[iIndex];
+                                case 3:     dist=(float)Proc.dxy[iIndex];
                                             break;
-                                case 4:     dist=Proc.dx[iIndex];
+                                case 4:     dist=(float)Proc.dx[iIndex];
                                             break;
                                 case 5:     dist=1;
                                             break;
-                                case 6:     dist=Proc.dx[iIndex];
+                                case 6:     dist=(float)Proc.dx[iIndex];
                                             break;
-                                case 7:     dist=Proc.dxy[iIndex];
+                                case 7:     dist=(float)Proc.dxy[iIndex];
                                             break;
-                                case 8:     dist=Proc.dy;
+                                case 8:     dist=(float)Proc.dy;
                                             break;
-                                case 9:     dist=Proc.dxy[iIndex];
+                                case 9:     dist=(float)Proc.dxy[iIndex];
                                             break;
                             }
 
@@ -482,13 +482,15 @@ public abstract class GetGeomorphologyRAM extends Object {
 //                    outs[1].writeInt(-10);
 //                }
 //                else{
-                    outs[0].writeFloat((float)GDO[i][j]);
+                    outs[0].writeFloat(GDO[i][j]);
                     outs[1].writeInt(TDO[i][j]);
 //                }
             }
             for(int k=0 ; k<destinations.length ; k++)
                 buffOuts[k].close() ;
         }catch(java.io.IOException e1){System.err.println(e1.toString());}
+
+        System.exit(0);
         
     }
     
