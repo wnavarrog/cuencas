@@ -489,8 +489,6 @@ public abstract class GetGeomorphologyRAM extends Object {
             for(int k=0 ; k<destinations.length ; k++)
                 buffOuts[k].close() ;
         }catch(java.io.IOException e1){System.err.println(e1.toString());}
-
-        System.exit(0);
         
     }
     
