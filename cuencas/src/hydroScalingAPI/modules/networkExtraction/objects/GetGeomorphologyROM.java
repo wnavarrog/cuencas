@@ -60,7 +60,7 @@ public class GetGeomorphologyROM extends Object {
     private void inicio(){
         
         try{
-            System.out.println(">>> Initializtion Process Starts <<<");
+            System.out.println(">>> Initialization Process Starts <<<");
             
             String rutaMR = MR.getLocationBinaryFile().getPath();
             String rutaDatos = rutaMR.substring(0,rutaMR.lastIndexOf("."));
