@@ -26,6 +26,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 package hydroScalingAPI.io;
 
+import java.io.*;
+
 /**
  * This class create Location-type files using a database registry.
  * @author Ricardo Mantilla
@@ -147,8 +149,49 @@ public class LocationWriter {
      */
     public static void main(String[] args) {
         try{
-            System.out.println(new java.io.File("c:/temp/some/other/").mkdirs()); 
-            System.out.println(new java.io.File("c:/temp/some/other/stuff.yes").createNewFile());
+
+            String[] types=new String[] {"Large cities","Medium size cities","Small towns"};
+
+            File inFile = new File("C:\\Users\\Eric Osgood.EricOsgood-PC\\Documents\\NetBeansProjects\\TestApplications\\CitiesInIowa2.csv");
+            BufferedReader buff = new BufferedReader(new FileReader(inFile));
+
+            boolean eof1 = false;
+            while (!eof1){
+                String line = buff.readLine();
+                if (line ==null){
+                    eof1 = true;
+                } else{
+                    if (line.charAt(0) != 'L'){
+                        String[] linarray = line.split(",");
+
+                        Object[] register=new Object[10];
+
+                        register[0]=types[Integer.parseInt(linarray[2])];
+                        register[1]="www.city-data.com";
+                        String[] cityName=((String)linarray[3]).split("</a>");
+                        cityName=cityName[0].split(">");
+                        cityName=cityName[cityName.length-1].split(",");
+                        register[2]=cityName[0];
+
+                        register[3]="N/A";
+                        register[4]="IA";
+                        register[5]=hydroScalingAPI.tools.DegreesToDMS.getprettyString(Double.parseDouble(linarray[0]),0);
+                        register[6]=hydroScalingAPI.tools.DegreesToDMS.getprettyString(Double.parseDouble(linarray[1]),1);
+                        register[7]="N/A";
+                        register[8]=new Object[0];
+                        register[9]="www.citi-data.com";
+
+                        System.out.println(java.util.Arrays.toString(register));
+
+                        File outFile = new File("C:\\Users\\Eric Osgood.EricOsgood-PC\\Documents\\TemporalLocations\\"+cityName[0]+".txt.gz");
+
+                        new LocationWriter(outFile, register);
+
+                    }
+                }
+
+            }
+            buff.close();
         }catch(java.io.IOException ioe){
             System.out.println(ioe);
         }
