@@ -104,16 +104,16 @@ public class RealTimeSystemSimulationManager extends java.lang.Object {
                 
                 double[] initialCondition=getInitialCondition(stringInicFileDate);
 
-//                hydroScalingAPI.examples.rainRunoffSimulations.RealTimeSystem.SimulationToAsciiFileRealTimeSystem simulator=
-//                    new hydroScalingAPI.examples.rainRunoffSimulations.RealTimeSystem.SimulationToAsciiFileRealTimeSystem(
-//                        myCuenca,
-//                        linksStructure,
-//                        thisNetworkGeom,
-//                        thisHillsInfo,
-//                        matDir, magnitudes, metaDatos,
-//                        initialCondition,
-//                        theRain.getPathToRain(),
-//                        0.5f,5, outputDirectory,routingParams);
+                hydroScalingAPI.examples.rainRunoffSimulations.RealTimeSystem.SimulationToAsciiFileRealTimeSystem simulator=
+                    new hydroScalingAPI.examples.rainRunoffSimulations.RealTimeSystem.SimulationToAsciiFileRealTimeSystem(
+                        myCuenca,
+                        linksStructure,
+                        thisNetworkGeom,
+                        thisHillsInfo,
+                        matDir, magnitudes, metaDatos,
+                        initialCondition,
+                        theRain.getPathToRain(),
+                        0.5f,5, outputDirectory,routingParams);
 
                 new hydroScalingAPI.examples.rainRunoffSimulations.RealTimeSystem.OutputSimulationKML(metaDatos, outputDirectory, myCuenca, matDir, "ClearCreekAtCoralville",stringRainFileDate);
 
