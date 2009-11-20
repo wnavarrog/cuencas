@@ -52,7 +52,7 @@ public class RKF extends java.lang.Object {
     double[] c = {37 / 378., 0., 250 / 621., 125 / 594., 0., 512 / 1771.};
     double[] cStar = {2825 / 27648., 0., 18575 / 48384., 13525 / 55296., 277 / 14336., 1 / 4.};
     double[] Derivs;
-    double[] carrier, k0, k1, k2, k3, k4, k5, newY, newYstar, maxAchieved;
+    double[] carrier, k0, k1, k2, k3, k4, k5, newY, newYstar, maxAchieved, timeOfMaximumAchieved;
     double Delta, newTimeStep, factor;
     
     /**
@@ -82,6 +82,7 @@ public class RKF extends java.lang.Object {
         //if first time call ever define array maxAchieved
         if (maxAchieved == null) {
             maxAchieved = new double[IC.length];
+            timeOfMaximumAchieved= new double[IC.length];
             java.util.Arrays.fill(maxAchieved, Double.MIN_VALUE);
         }
 
@@ -132,9 +133,12 @@ public class RKF extends java.lang.Object {
 
         if (finalize) {
 
-            for (int i = 0; i < IC.length; i++) {
-                maxAchieved[i] = Math.max(maxAchieved[i], newY[i]);
-            }
+//            for (int i = 0; i < IC.length; i++) {
+//                if(newY[i] > maxAchieved[i]){
+//                    maxAchieved[i] = newY[i];
+//                    timeOfMaximumAchieved[i]=currentTime;
+//                }
+//            }
             return new double[][]{{newTimeStep}, newY};
         } else {
             if (Delta != 0.0) {
@@ -1010,22 +1014,36 @@ public class RKF extends java.lang.Object {
                 givenStep[0][0] = currentTime;
                 IC = givenStep[1];
 
-                outputStream1.write(currentTime + "," + IC[ouletID] + "\n");
+                if (currentTime < targetTime){
+                    for (int i = 0; i < IC.length; i++) {
+                        if(IC[i] > maxAchieved[i]){
+                            maxAchieved[i] = IC[i];
+                            timeOfMaximumAchieved[i]=currentTime;
+                        }
+                    }
+                    thisDate = java.util.Calendar.getInstance();
+                    thisDate.setTimeInMillis((long) (currentTime * 60. * 1000.0));
+                    System.out.println(thisDate.getTime() + " (" + java.util.Calendar.getInstance().getTime() + ")" + " Outlet Discharge: " + IC[ouletID]);
+
+                    outputStream1.write(currentTime + "," + IC[ouletID] + "\n");
+                }
+
+                
 
             }
-            /*thisDate=java.util.Calendar.getInstance();
+            thisDate=java.util.Calendar.getInstance();
             thisDate.setTimeInMillis((long)(currentTime*60.*1000.0));
-            System.out.println("outsideLoop"+thisDate.getTime());*/
+            System.out.println("outsideLoop"+thisDate.getTime());
 
             if (targetTime == finalTime) {
-                //System.out.println("******** I'll go to End Of Step ********");
+                System.out.println("******** I'll go to End Of Step ********");
                 break;
             }
 
             givenStep = step(currentTime, IC, targetTime - currentTime, true);
 
             if (currentTime + givenStep[0][0] >= finalTime) {
-                //System.out.println("******** False Step ********");
+                System.out.println("******** False Step ********");
                 break;
             }
 
@@ -1497,6 +1515,14 @@ public class RKF extends java.lang.Object {
      */
     public double[] getMaximumAchieved() {
         return maxAchieved;
+    }
+
+    /**
+     * Returns an array with the time to maximum value calculated during the iteration process
+     * @param newBTS The time step to assign
+     */
+    public double[] getTimeToMaximumAchieved() {
+        return timeOfMaximumAchieved;
     }
 
     /**
