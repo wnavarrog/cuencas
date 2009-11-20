@@ -235,7 +235,7 @@ public class SimulationToAsciiFileWithHillslope extends java.lang.Object impleme
         for (int i=0;i<linksStructure.contactsArray.length;i++){
             initialCondition[i]=0.0;
             initialCondition[i+1*linksStructure.contactsArray.length]=0.0;
-            initialCondition[i+2*linksStructure.contactsArray.length]=25.0;
+            initialCondition[i+2*linksStructure.contactsArray.length]=50.0;
         }
         
         java.util.Date startTime=new java.util.Date();

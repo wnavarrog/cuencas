@@ -490,6 +490,60 @@ public class Basin extends Object{
         }
         return basinMask;
     }
+
+    /**
+     * Returns and array of the same size of the DEM with and ID in the positions that belong to the basin.
+     * Points with the same ID correspond to a unique pseudo-hillslope at the level Omega
+     * @param myRSNAnalysis
+     * @param level
+     * @return A byte[][] with the basin network mask
+     */
+     public  int[][] getHillslopesMask(byte[][] matDir, hydroScalingAPI.util.randomSelfSimilarNetworks.RSNDecomposition myRSNAnalysis, int level){
+        try{
+            java.io.File hortFile=new java.io.File(localMetaRaster.getLocationBinaryFile().getPath().substring(0,localMetaRaster.getLocationBinaryFile().getPath().lastIndexOf("."))+".horton");
+            localMetaRaster.setLocationBinaryFile(hortFile);
+            localMetaRaster.setFormat("Byte");
+            byte [][] matOrders=new hydroScalingAPI.io.DataRaster(localMetaRaster).getByte();
+            
+            localMetaRaster.restoreOriginalFormat();
+
+            int[][] matrizPintada=new int[localMetaRaster.getNumRows()][localMetaRaster.getNumCols()];
+            int[][] headsTails=myRSNAnalysis.getHeadsAndTails(level);
+
+            hydroScalingAPI.util.randomSelfSimilarNetworks.RsnTile myTileActual;
+
+            int numCols=localMetaRaster.getNumCols();
+
+            //for(int i=0;i<headsTails[0].length;i++){
+            for(int i=0;i<2;i++){
+                int xOulet=headsTails[0][i]%numCols;
+                int yOulet=headsTails[0][i]/numCols;
+
+                int xSource=headsTails[2][i]%numCols;
+                int ySource=headsTails[2][i]/numCols;
+
+                if(headsTails[3][i] == 0){
+                    xSource=-1;
+                    ySource=-1;
+                }
+
+                int tileColor=i+1;
+                //System.out.println("Head: "+xOulet+","+yOulet+" Tail: "+xSource+","+ySource+" Color: "+tileColor+" Scale: "+(scale+1));
+
+                myTileActual=new hydroScalingAPI.util.randomSelfSimilarNetworks.RsnTile(xOulet,yOulet,xSource,ySource,matDir,matOrders,localMetaRaster,level+1);
+                int elementsInTile=myTileActual.getXYRsnTile()[0].length;
+                for (int j=0;j<elementsInTile;j++){
+                    matrizPintada[myTileActual.getXYRsnTile()[1][j]][myTileActual.getXYRsnTile()[0][j]]=tileColor;
+                }
+            }
+
+            return matrizPintada;
+
+        }  catch (java.io.IOException ioe){
+            ioe.printStackTrace();
+            return null;
+        }
+    }
     
     /**
      * Returns and array of the same size of the DEM with 1s in the positions that are network and belong to the basin
@@ -713,12 +767,21 @@ public class Basin extends Object{
         return hyp;
         
     }
-    
+
     /**
      * Tests for the class
      * @param args The command line arguments
      */
     public static void main (String args[]) {
+        //main0(args);
+        main1(args);
+    }
+    
+    /**
+     * Tests for the class
+     * @param args The command line arguments
+     */
+    public static void main0 (String args[]) {
         
         
         try{
@@ -752,6 +815,47 @@ public class Basin extends Object{
             System.exit(0);
         }
         
+        System.exit(0);
+    }
+
+    /**
+     * Tests for the class
+     * @param args The command line arguments
+     */
+    public static void main1 (String args[]) {
+
+
+        try{
+            java.io.File theFile=new java.io.File("/hidrosigDataBases/Iowa_Rivers_DB/Rasters/Topography/1_arcSec/05454300/NED_00159011.metaDEM");
+            hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
+            metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Iowa_Rivers_DB/Rasters/Topography/1_arcSec/05454300/NED_00159011.dir"));
+
+            metaModif.setFormat("Byte");
+            byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
+
+            metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".magn"));
+            metaModif.setFormat("Integer");
+            int [][] magnitudes=new hydroScalingAPI.io.DataRaster(metaModif).getInt();
+
+            java.util.Hashtable routingParams=new java.util.Hashtable();
+            routingParams.put("widthCoeff",1.0f);
+            routingParams.put("widthExponent",0.4f);
+            routingParams.put("widthStdDev",0.0f);
+
+            routingParams.put("chezyCoeff",14.2f);
+            routingParams.put("chezyExponent",-1/3.0f);
+
+            routingParams.put("lambda1",0.2f);
+            routingParams.put("lambda2",-0.1f);
+            routingParams.put("v_o", 0.4f);
+
+            System.exit(0);
+
+        } catch (java.io.IOException IOE){
+            System.out.print(IOE);
+            System.exit(0);
+        }
+
         System.exit(0);
     }
 

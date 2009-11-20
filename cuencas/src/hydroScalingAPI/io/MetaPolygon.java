@@ -309,7 +309,7 @@ public class MetaPolygon {
      * @param newKmlLocation The File descriptor where the information will be written.
      * @throws java.io.IOException Captures errors while writing the file
      */
-    public void writeKmlPolygon(java.io.File newKmlLocation) throws java.io.IOException{
+    public void writeKmlPolygon(java.io.File newKmlLocation,String label) throws java.io.IOException{
         
         String testName=newKmlLocation.getName();
         if(!testName.contains(".kml")) newKmlLocation=new java.io.File(newKmlLocation.getPath()+".kml");
@@ -323,8 +323,8 @@ public class MetaPolygon {
         writerKml.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+ret);
         writerKml.write("<kml xmlns=\"http://www.opengis.net/kml/2.2\">");
         writerKml.write("<Document>"+ret);
-        writerKml.write("  <name>Polygon</name>"+ret);
-        writerKml.write("  <open>1</open>"+ret);
+//        writerKml.write("  <name>"+label+"</name>"+ret);
+//        writerKml.write("  <open>0</open>"+ret);
         writerKml.write("  <LookAt>"+ret);
         writerKml.write("    <longitude>"+xyContour[0][0]+"</longitude>"+ret);
         writerKml.write("    <latitude>"+xyContour[1][0]+"</latitude>"+ret);
@@ -337,7 +337,7 @@ public class MetaPolygon {
         writerKml.write("    <PolyStyle>"+ret);
         writerKml.write("      <color>7f969696</color>"+ret);
         writerKml.write("      <width>1</width>"+ret);
-        writerKml.write("      <fill>0</fill>"+ret);
+        writerKml.write("      <fill>1</fill>"+ret);
         writerKml.write("      <outline>1</outline>"+ret);
         writerKml.write("    </PolyStyle>"+ret);
         writerKml.write("    <LineStyle>"+ret);
@@ -346,7 +346,8 @@ public class MetaPolygon {
         writerKml.write("    </LineStyle>"+ret);
         writerKml.write("  </Style>"+ret);
         writerKml.write("  <Placemark>"+ret);
-        writerKml.write("  <name>"+(String)properties.get(parameters[0])+"</name>"+ret);
+        //writerKml.write("  <name>"+(String)properties.get(parameters[0])+"</name>"+ret);
+        writerKml.write("  <name>"+label+"</name>"+ret);
         writerKml.write("  <styleUrl>#polyStyleDivide</styleUrl>"+ret);
         writerKml.write("  <Polygon>"+ret);
         writerKml.write("      <outerBoundaryIs>"+ret);

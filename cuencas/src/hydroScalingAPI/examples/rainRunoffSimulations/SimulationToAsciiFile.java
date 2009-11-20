@@ -360,7 +360,7 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
         
         //java.util.StringTokenizer tokenizer = new java.util.StringTokenizer("B_26	1110  462	B_26");
         java.util.StringTokenizer tokenizer = new java.util.StringTokenizer(args[0]);
-        String path = "/hidrosigDataBases/Continental_US_database/Rasters/";
+        String path = "/CuencasDataBases/Continental_US_database/Rasters/";
         String filepath = path + "Topography/Dd_Basins_30_ArcSec/" + tokenizer.nextToken();
         int x_outlet = Integer.parseInt(tokenizer.nextToken());
         int y_outlet = Integer.parseInt(tokenizer.nextToken());
@@ -396,21 +396,21 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
     
     public static void subMain1(String args[]) throws java.io.IOException, VisADException {
         
-        java.io.File theFile=new java.io.File("/hidrosigDataBases/FractalTrees_database/Rasters/Topography/man-vis/man-vis.metaDEM");
+        java.io.File theFile=new java.io.File("/CuencasDataBases/FractalTrees_database/Rasters/Topography/man-vis/man-vis.metaDEM");
         hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
-        metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/FractalTrees_database/Rasters/Topography/man-vis/man-vis.dir"));
+        metaModif.setLocationBinaryFile(new java.io.File("/CuencasDataBases/FractalTrees_database/Rasters/Topography/man-vis/man-vis.dir"));
         
-        //java.io.File theFile=new java.io.File("/hidrosigDataBases/Test_DB/Rasters/Topography/58447060.metaDEM");
+        //java.io.File theFile=new java.io.File("/CuencasDataBases/Test_DB/Rasters/Topography/58447060.metaDEM");
         //hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
-        //metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Test_DB/Rasters/Topography/58447060.dir"));
+        //metaModif.setLocationBinaryFile(new java.io.File("/CuencasDataBases/Test_DB/Rasters/Topography/58447060.dir"));
         
-        //java.io.File theFile=new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Topography/1_ArcSec_USGS/walnutGulchUpdated.metaDEM");
+        //java.io.File theFile=new java.io.File("/CuencasDataBases/Walnut_Gulch_AZ_database/Rasters/Topography/1_ArcSec_USGS/walnutGulchUpdated.metaDEM");
         //hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
-        //metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Topography/1_ArcSec_USGS/walnutGulchUpdated.dir"));
+        //metaModif.setLocationBinaryFile(new java.io.File("/CuencasDataBases/Walnut_Gulch_AZ_database/Rasters/Topography/1_ArcSec_USGS/walnutGulchUpdated.dir"));
         
-        //java.io.File theFile=new java.io.File("/hidrosigDataBases/Goodwin_Creek_MS_database/Rasters/Topography/1_ArcSec_USGS/newDEM/goodwinCreek-nov03.metaDEM");
+        //java.io.File theFile=new java.io.File("/CuencasDataBases/Goodwin_Creek_MS_database/Rasters/Topography/1_ArcSec_USGS/newDEM/goodwinCreek-nov03.metaDEM");
         //hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
-        //metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Goodwin_Creek_MS_database/Rasters/Topography/1_ArcSec_USGS/newDEM/goodwinCreek-nov03.dir"));
+        //metaModif.setLocationBinaryFile(new java.io.File("/CuencasDataBases/Goodwin_Creek_MS_database/Rasters/Topography/1_ArcSec_USGS/newDEM/goodwinCreek-nov03.dir"));
         
         metaModif.setFormat("Byte");
         byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
@@ -441,16 +441,16 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
         //new SimulationToAsciiFile(289,136,matDirs,magnitudes,metaModif,50.0f,5.0f,0.0f,2,new java.io.File("/tmp/"));
         
         //java.io.File stormFile;
-        //stormFile=new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Hydrology/storms/simulated_events/WCuniform_45_10.metaVHC");
+        //stormFile=new java.io.File("/CuencasDataBases/Whitewater_database/Rasters/Hydrology/storms/simulated_events/WCuniform_45_10.metaVHC");
         //new SimulationToAsciiFile(289,136,matDirs,magnitudes,metaModif,stormFile,0.0f,2,new java.io.File("/tmp/"));
         
         //new SimulationToAsciiFile(777, 324,matDirs,magnitudes,metaModif,10.0f,5.0f,0.0f,2,new java.io.File("/tmp/"));
         
         java.io.File stormFile;
-        stormFile=new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Hydrology/storms/precipitation_events/event_06/precipitation_interpolated_ev06.metaVHC");
+        stormFile=new java.io.File("/CuencasDataBases/Walnut_Gulch_AZ_database/Rasters/Hydrology/storms/precipitation_events/event_06/precipitation_interpolated_ev06.metaVHC");
         new SimulationToAsciiFile(777, 324,matDirs,magnitudes,metaModif,stormFile,0.0f,0,new java.io.File("/tmp/"),routingParams);
         
-        stormFile=new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Hydrology/storms/precipitation_events/event_10/precipitation_interpolated_ev10.metaVHC");
+        stormFile=new java.io.File("/CuencasDataBases/Walnut_Gulch_AZ_database/Rasters/Hydrology/storms/precipitation_events/event_10/precipitation_interpolated_ev10.metaVHC");
         new SimulationToAsciiFile(777, 324,matDirs,magnitudes,metaModif,stormFile,0.0f,2,new java.io.File("/tmp/"),routingParams);
         
     }
@@ -471,9 +471,9 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
         routingParams.put("v_o",0.5f);
         
         
-        java.io.File theFile=new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Topography/1_ArcSec_USGS/walnutGulchUpdated.metaDEM");
+        java.io.File theFile=new java.io.File("/CuencasDataBases/Walnut_Gulch_AZ_database/Rasters/Topography/1_ArcSec_USGS/walnutGulchUpdated.metaDEM");
         hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
-        metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Walnut_Gulch_AZ_database/Rasters/Topography/1_ArcSec_USGS/walnutGulchUpdated.dir"));
+        metaModif.setLocationBinaryFile(new java.io.File("/CuencasDataBases/Walnut_Gulch_AZ_database/Rasters/Topography/1_ArcSec_USGS/walnutGulchUpdated.dir"));
         
         metaModif.setFormat("Byte");
         byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
@@ -492,9 +492,9 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
     
     public static void subMain3(String args[]) throws java.io.IOException, VisADException {
         
-        java.io.File theFile=new java.io.File("/hidrosigDataBases/Upper Rio Puerco DB/Rasters/Topography/1_ArcSec/NED_54212683.metaDEM");
+        java.io.File theFile=new java.io.File("/CuencasDataBases/Upper Rio Puerco DB/Rasters/Topography/1_ArcSec/NED_54212683.metaDEM");
         hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
-        metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Upper Rio Puerco DB/Rasters/Topography/1_ArcSec/NED_54212683.dir"));
+        metaModif.setLocationBinaryFile(new java.io.File("/CuencasDataBases/Upper Rio Puerco DB/Rasters/Topography/1_ArcSec/NED_54212683.dir"));
         
         metaModif.setFormat("Byte");
         byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
@@ -516,15 +516,15 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
         
         hydroScalingAPI.mainGUI.ParentGUI tempFrame=new hydroScalingAPI.mainGUI.ParentGUI();
         
-        new SimulationToAsciiFile(381, 221,matDirs,magnitudes,metaModif,new java.io.File("/hidrosigDataBases/Upper Rio Puerco DB/Rasters/Hydrology/Rainfall/nexrad_prec.metaVHC"),0.0f,0,new java.io.File("/tmp/"),routingParams).executeSimulation();
+        new SimulationToAsciiFile(381, 221,matDirs,magnitudes,metaModif,new java.io.File("/CuencasDataBases/Upper Rio Puerco DB/Rasters/Hydrology/Rainfall/nexrad_prec.metaVHC"),0.0f,0,new java.io.File("/tmp/"),routingParams).executeSimulation();
         
     }
     
     public static void subMain4(String args[]) throws java.io.IOException, VisADException {
         
-        java.io.File theFile=new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS_2005/Whitewaters.metaDEM");
+        java.io.File theFile=new java.io.File("/CuencasDataBases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS_2005/Whitewaters.metaDEM");
         hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
-        metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS_2005/Whitewaters.dir"));
+        metaModif.setLocationBinaryFile(new java.io.File("/CuencasDataBases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS_2005/Whitewaters.dir"));
         
         metaModif.setFormat("Byte");
         byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
@@ -552,15 +552,15 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
         
         
         java.io.File stormFile;
-        stormFile=new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Hydrology/storms/simulated_events/uniform_030_120.metaVHC");
+        stormFile=new java.io.File("/CuencasDataBases/Whitewater_database/Rasters/Hydrology/storms/simulated_events/uniform_030_120.metaVHC");
         new SimulationToAsciiFile(1063,496,matDirs,magnitudes,metaModif,stormFile,0.0f,2,new java.io.File("/home/ricardo/simulationResults/walnutGulch/"),routingParams).executeSimulation();
     }
     
     public static void subMain5(String args[]) throws java.io.IOException, VisADException {
         
-        java.io.File theFile=new java.io.File("/hidrosigDataBases/Iowa_Rivers_DB/Rasters/Topography/1_arcSec/05454300/NED_00159011.metaDEM");
+        java.io.File theFile=new java.io.File("/CuencasDataBases/Iowa_Rivers_DB/Rasters/Topography/1_arcSec/ClearCreek/NED_00159011.metaDEM");
         hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
-        metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Iowa_Rivers_DB/Rasters/Topography/1_arcSec/05454300/NED_00159011.dir"));
+        metaModif.setLocationBinaryFile(new java.io.File("/CuencasDataBases/Iowa_Rivers_DB/Rasters/Topography/1_arcSec/ClearCreek/NED_00159011.dir"));
         
         metaModif.setFormat("Byte");
         byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
@@ -582,9 +582,9 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
         routingParams.put("v_o", 0.4f);
         
         java.io.File stormFile;
-        stormFile=new java.io.File("/hidrosigDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/observed_events/EventIowaJuneMPE/May29toJune26/hydroNexrad.metaVHC");
-        //stormFile=new java.io.File("/hidrosigDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/observed_events/EventIowaJuneMPE/June3toJune5/hydroNexrad.metaVHC");
-        //stormFile=new java.io.File("/hidrosigDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/observed_events/EventIowaJuneHydroNEXRAD/June3toJune5/hydroNexrad.metaVHC");
+        stormFile=new java.io.File("/CuencasDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/observed_events/EventIowaJuneMPE/May15toJune11/hydroNexrad.metaVHC");
+        //stormFile=new java.io.File("/CuencasDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/observed_events/EventIowaJuneMPE/June3toJune5/hydroNexrad.metaVHC");
+        //stormFile=new java.io.File("/CuencasDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/observed_events/EventIowaJuneHydroNEXRAD/June3toJune5/hydroNexrad.metaVHC");
         
         float infil=0.0f;
 

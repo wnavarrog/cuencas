@@ -197,7 +197,7 @@ public class NetworkEquations_HillDelay implements hydroScalingAPI.util.ordDiffE
                                 *Math.pow(lengthArray[0][i],-1)
                                 *Math.pow(slopeArray[0][i],3/10.);
                             break;
-                case 5:     K_Q=CkArray[0][i]*Math.pow(input[i],lamda1)*Math.pow(upAreasArray[0][i],lamda2)*Math.pow(lengthArray[0][i],-1);
+                case 5:     K_Q=CkArray[0][i]*Math.pow(input[i],lamda1)*Math.pow(upAreasArray[0][i],lamda2)*Math.pow(lengthArray[0][i],-1)/(1-lamda1);
             }
             
             if (input[i] == 0) K_Q=0.1/(lengthArray[0][i]);

@@ -80,17 +80,17 @@ public class NetworkEquations_HillDelayPlusLinearHillslope implements hydroScali
         
         So=new double[linksConectionStruct.connectionsArray.length];
         for (int i = 0; i < So.length; i++) {
-            So[i] = 50+20*Math.random();
+            So[i] = 50;//+20*Math.random();
         }
 
         k_inf=new double[linksConectionStruct.connectionsArray.length];
         for (int i = 0; i < k_inf.length; i++) {
-            k_inf[i] = 10+2*Math.random();
+            k_inf[i] = 10;//+2*Math.random();
         }
 
         Ts=new double[linksConectionStruct.connectionsArray.length];
         for (int i = 0; i < So.length; i++) {
-            Ts[i] = 1+0.2*Math.random();
+            Ts[i] = 1;//+0.2*Math.random();
         }
 
         
