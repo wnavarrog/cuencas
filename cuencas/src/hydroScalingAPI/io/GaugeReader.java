@@ -98,7 +98,7 @@ public class GaugeReader{
                 fullLine=fileMeta.readLine();
             } while (!fullLine.equalsIgnoreCase(parameters[i]));
             fullLine=fileMeta.readLine();
-            if (fullLine.equalsIgnoreCase("n/a")) register[i]=fullLine;
+            if (fullLine.equalsIgnoreCase("n/a") || fullLine.equalsIgnoreCase("n / a")) register[i]=fullLine;
                 else register[i]=new Double(fullLine);
         }
         for (int i=12;i<parameters.length;i++){
