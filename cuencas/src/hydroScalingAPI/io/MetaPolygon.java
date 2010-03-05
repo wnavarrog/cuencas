@@ -303,13 +303,21 @@ public class MetaPolygon {
         writerMeta.close();
         
     }
-    
+
     /**
      * Writes an *.kml file in the specified path
      * @param newKmlLocation The File descriptor where the information will be written.
      * @throws java.io.IOException Captures errors while writing the file
      */
     public void writeKmlPolygon(java.io.File newKmlLocation,String label) throws java.io.IOException{
+        writeKmlPolygon(newKmlLocation,label,"N/A");
+    }
+    /**
+     * Writes an *.kml file in the specified path
+     * @param newKmlLocation The File descriptor where the information will be written.
+     * @throws java.io.IOException Captures errors while writing the file
+     */
+    public void writeKmlPolygon(java.io.File newKmlLocation,String label, String myDescription) throws java.io.IOException{
         
         String testName=newKmlLocation.getName();
         if(!testName.contains(".kml")) newKmlLocation=new java.io.File(newKmlLocation.getPath()+".kml");
@@ -319,42 +327,26 @@ public class MetaPolygon {
         java.io.BufferedWriter writerKml = new java.io.BufferedWriter(new java.io.FileWriter(newKmlLocation));
         
         String ret="\n";
+
+
         
         writerKml.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+ret);
-        writerKml.write("<kml xmlns=\"http://www.opengis.net/kml/2.2\">");
-        writerKml.write("<Document>"+ret);
-//        writerKml.write("  <name>"+label+"</name>"+ret);
-//        writerKml.write("  <open>0</open>"+ret);
-        writerKml.write("  <LookAt>"+ret);
-        writerKml.write("    <longitude>"+xyContour[0][0]+"</longitude>"+ret);
-        writerKml.write("    <latitude>"+xyContour[1][0]+"</latitude>"+ret);
-        writerKml.write("    <altitude>0</altitude>"+ret);
-        writerKml.write("    <range>1500</range>"+ret);
-        writerKml.write("    <tilt>30</tilt>"+ret);
-        writerKml.write("    <heading>0</heading>"+ret);
-        writerKml.write("  </LookAt>"+ret);
-        writerKml.write("  <Style id=\"polyStyleDivide\">"+ret);
-        writerKml.write("    <PolyStyle>"+ret);
-        writerKml.write("      <color>7f969696</color>"+ret);
-        writerKml.write("      <width>1</width>"+ret);
-        writerKml.write("      <fill>1</fill>"+ret);
-        writerKml.write("      <outline>1</outline>"+ret);
-        writerKml.write("    </PolyStyle>"+ret);
-        writerKml.write("    <LineStyle>"+ret);
-        writerKml.write("      <color>7f969696</color>"+ret);
-        writerKml.write("      <width>3</width>"+ret);
-        writerKml.write("    </LineStyle>"+ret);
-        writerKml.write("  </Style>"+ret);
-        writerKml.write("  <Placemark>"+ret);
-        //writerKml.write("  <name>"+(String)properties.get(parameters[0])+"</name>"+ret);
-        writerKml.write("  <name>"+label+"</name>"+ret);
-        writerKml.write("  <styleUrl>#polyStyleDivide</styleUrl>"+ret);
-        writerKml.write("  <Polygon>"+ret);
+        writerKml.write("<kml xmlns=\"http://www.opengis.net/kml/2.2\" xmlns:gx=\"http://www.google.com/kml/ext/2.2\" xmlns:kml=\"http://www.opengis.net/kml/2.2\" xmlns:atom=\"http://www.w3.org/2005/Atom\">");
+        writerKml.write("<Style id=\"Polygon\">" + ret);
+        writerKml.write("<LabelStyle><color>00000000</color>" +ret);
+        writerKml.write("<scale>0</scale></LabelStyle>" + ret);
+        writerKml.write("<LineStyle><color>ff6e6e6e</color>" + ret);
+        writerKml.write("<width>0.4</width></LineStyle>" +ret);
+        writerKml.write("<PolyStyle><color>EA6BE3FD</color></PolyStyle></Style>" +ret);
+    
+        writerKml.write("  <Placemark>><description><![CDATA["+myDescription+"]]></description>"+ret+ "<styleUrl>#Polygon</styleUrl>"+ret);
+        writerKml.write("<Polygon>");
+        writerKml.write("<name>"+label+"</name>"+ret);
         writerKml.write("      <outerBoundaryIs>"+ret);
         writerKml.write("      <LinearRing>"+ret);
         writerKml.write("        <coordinates>"+ret);
         writerKml.write("           ");
-        for (int i=0;i<xyContour[0].length;i++){
+      for (int i=0;i<xyContour[0].length;i++){
             writerKml.write(xyContour[0][i]+","+xyContour[1][i]+" ");
         }
         writerKml.write(ret);
@@ -363,10 +355,60 @@ public class MetaPolygon {
         writerKml.write("    </outerBoundaryIs>"+ret);
         writerKml.write("  </Polygon>"+ret);
         writerKml.write("</Placemark>"+ret);
-        writerKml.write("</Document>"+ret);
         writerKml.write("</kml>"+ret);
-        
+
         writerKml.close();
+
+
+
+//        writerKml.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+ret);
+//        writerKml.write("<kml xmlns=\"http://www.opengis.net/kml/2.2\">");
+//        writerKml.write("<Document>"+ret);
+////        writerKml.write("  <name>"+label+"</name>"+ret);
+////        writerKml.write("  <open>0</open>"+ret);
+//        writerKml.write("  <LookAt>"+ret);
+//        writerKml.write("    <longitude>"+xyContour[0][0]+"</longitude>"+ret);
+//        writerKml.write("    <latitude>"+xyContour[1][0]+"</latitude>"+ret);
+//        writerKml.write("    <altitude>0</altitude>"+ret);
+//        writerKml.write("    <range>1500</range>"+ret);
+//        writerKml.write("    <tilt>30</tilt>"+ret);
+//        writerKml.write("    <heading>0</heading>"+ret);
+//        writerKml.write("  </LookAt>"+ret);
+//        writerKml.write("  <Style id=\"polyStyleDivide\">"+ret);
+//        writerKml.write("    <PolyStyle>"+ret);
+//        writerKml.write("      <color>7f969696</color>"+ret);
+//        writerKml.write("      <width>1</width>"+ret);
+//        writerKml.write("      <fill>1</fill>"+ret);
+//        writerKml.write("      <outline>1</outline>"+ret);
+//        writerKml.write("    </PolyStyle>"+ret);
+//        writerKml.write("    <LineStyle>"+ret);
+//        writerKml.write("      <color>7f969696</color>"+ret);
+//        writerKml.write("      <width>3</width>"+ret);
+//        writerKml.write("    </LineStyle>"+ret);
+//        writerKml.write("  </Style>"+ret);
+//        writerKml.write("  <Placemark>"+ret);
+//        //writerKml.write("  <name>"+(String)properties.get(parameters[0])+"</name>"+ret);
+//        writerKml.write("  <name>"+label+"</name>"+ret);
+//        writerKml.write("  <description>"+myDescription+"</description>"+ret);
+//        writerKml.write("  <styleUrl>#polyStyleDivide</styleUrl>"+ret);
+//        writerKml.write("  <Polygon>"+ret);
+//        writerKml.write("      <outerBoundaryIs>"+ret);
+//        writerKml.write("      <LinearRing>"+ret);
+//        writerKml.write("        <coordinates>"+ret);
+//        writerKml.write("           ");
+//        for (int i=0;i<xyContour[0].length;i++){
+//            writerKml.write(xyContour[0][i]+","+xyContour[1][i]+" ");
+//        }
+//        writerKml.write(ret);
+//        writerKml.write("        </coordinates>"+ret);
+//        writerKml.write("      </LinearRing>"+ret);
+//        writerKml.write("    </outerBoundaryIs>"+ret);
+//        writerKml.write("  </Polygon>"+ret);
+//        writerKml.write("</Placemark>"+ret);
+//        writerKml.write("</Document>"+ret);
+//        writerKml.write("</kml>"+ret);
+//
+//        writerKml.close();
         
     }
     

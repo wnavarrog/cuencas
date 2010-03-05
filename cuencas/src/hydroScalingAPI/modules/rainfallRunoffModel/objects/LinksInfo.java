@@ -38,7 +38,7 @@ public class LinksInfo extends java.lang.Object {
     /*El proposito de este progrma es ser la base de datos de gemetria hidraulica, rugosidad y en general todos los
            parametros asociados al sistema de links de la cuenca*/
 
-    private float[][] upStreamAreaArray, lengthArray, cheziArray, manningArray, widthArray, dropArray,orderArray, slopeArray, totalChannelLengthArray;
+    private float[][] upStreamAreaArray, lengthArray, cheziArray, manningArray, widthArray, dropArray,orderArray, slopeArray, totalChannelLengthArray,mainChannelLenghtArray;
     private float basinArea;
 
     private float[][] Ck;
@@ -57,6 +57,7 @@ public class LinksInfo extends java.lang.Object {
         orderArray=linksCon.getVarValues(4);
         basinArea=upStreamAreaArray[0][linksCon.getOutletID()];
         totalChannelLengthArray=linksCon.getVarValues(5);
+        mainChannelLenghtArray=linksCon.getVarValues(11);
 
         slopeArray=new float[1][lengthArray[0].length];
         for (int LinkNumber=0;LinkNumber<slopeArray[0].length;LinkNumber++) {
@@ -266,6 +267,15 @@ public class LinksInfo extends java.lang.Object {
      */
     public double upStreamTotalLength(int LinkNumber){
         return (double) (totalChannelLengthArray[0][LinkNumber]);
+    }
+
+    /**
+     * Returns the upstream total channels lenght for a given link
+     * @param LinkNumber The index of the desired link
+     * @return The link slope
+     */
+    public double mainChannelLength(int LinkNumber){
+        return (double) (mainChannelLenghtArray[0][LinkNumber]);
     }
 
     /**
