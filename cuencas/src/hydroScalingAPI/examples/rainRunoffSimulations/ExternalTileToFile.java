@@ -40,6 +40,7 @@ public class ExternalTileToFile extends Thread{
     public boolean completed = false; 
     public boolean executing = false;
     private java.lang.Process localProcess;
+    private int managerProcIndex;
     
     hydroScalingAPI.examples.rainRunoffSimulations.ParallelSimulationToFile coordinatorProc;
     
@@ -93,15 +94,16 @@ public class ExternalTileToFile extends Thread{
 
     }
 
-    public void setComputingNode(String cn){
+    public void setComputingNode(String cn, int indexProc){
         procName=cn;
         command[1]=cn.split("-")[0];
+        managerProcIndex=indexProc;
     }
 
     public void run(){
         
         try{
-            System.out.println(java.util.Arrays.toString(command));
+            System.out.println("Manager Created Process "+managerProcIndex+" executes: "+java.util.Arrays.toString(command));
 
             localProcess=java.lang.Runtime.getRuntime().exec(command);
             System.out.println(">> The command was sent");

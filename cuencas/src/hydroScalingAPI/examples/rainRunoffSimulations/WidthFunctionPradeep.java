@@ -57,7 +57,7 @@ public class WidthFunctionPradeep extends java.lang.Object {
         double[][] wfs=linksStructure.getWidthFunctions(linksStructure.completeStreamLinksArray,0);
        
         java.io.File theFile;        
-        theFile=new java.io.File(outputDirectory.getAbsolutePath()+"/"+demName+"-SN"+".AreasWFS");
+        theFile=new java.io.File(outputDirectory.getAbsolutePath()+"/"+demName+"-1063_496"+".AreasWFS");
         System.out.println("Writing Width Functions - "+theFile);
         java.io.FileOutputStream salida = new java.io.FileOutputStream(theFile);
         java.io.BufferedOutputStream bufferout = new java.io.BufferedOutputStream(salida);
@@ -65,6 +65,9 @@ public class WidthFunctionPradeep extends java.lang.Object {
         
         for (int i=0;i<linksStructure.completeStreamLinksArray.length;i++){
                 newfile.write("Link #"+linksStructure.completeStreamLinksArray[i]+"\t");                        
+//                newfile.write(linksStructure.contactsArray[linksStructure.completeStreamLinksArray[i]]+"\t");
+//                newfile.write(linksStructure.headsArray[linksStructure.completeStreamLinksArray[i]]+"\t");
+//                newfile.write(linksStructure.tailsArray[linksStructure.completeStreamLinksArray[i]]+"\t");
                 newfile.write(thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i])+"\t");
                 newfile.write(thisNetworkGeom.upStreamArea(linksStructure.completeStreamLinksArray[i])+"\t");
                 newfile.write(wfs[i].length+"\t");
@@ -80,18 +83,34 @@ public class WidthFunctionPradeep extends java.lang.Object {
     public static void main(String args[]) {
         
         try{ 
-        java.io.File theFile=new java.io.File("/u/ac/pmandapa/cuencasDatabases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS_2005/Whitewaters.metaDEM");
+        //java.io.File theFile=new java.io.File("/usr/home/rmantill/CuencasDataBases/Iowa_Rivers_DB/Rasters/Topography/1_arcSec/CedarRiver.metaDEM");
+        java.io.File theFile=new java.io.File("/usr/home/rmantill/CuencasDataBases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS_2005/Whitewaters.metaDEM");
         hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
-        metaModif.setLocationBinaryFile(new java.io.File("/u/ac/pmandapa/cuencasDatabases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS_2005/Whitewaters.dir"));
-        
+        //metaModif.setLocationBinaryFile(new java.io.File("/usr/home/rmantill/CuencasDataBases/Iowa_Rivers_DB/Rasters/Topography/1_arcSec/CedarRiver.dir"));
+        metaModif.setLocationBinaryFile(new java.io.File("/usr/home/rmantill/CuencasDataBases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS_2005/Whitewaters.dir"));
+
         metaModif.setFormat("Byte");
         byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
         
         metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".magn"));
         metaModif.setFormat("Integer");
         int [][] magnitudes=new hydroScalingAPI.io.DataRaster(metaModif).getInt();
+
+//        metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".areas"));
+//        metaModif.setFormat("Float");
+//        float [][] areas=new hydroScalingAPI.io.DataRaster(metaModif).getFloat();
+//
+//        for (int i = 0; i < areas.length; i+=100) {
+//            for (int j = 0; j < areas[0].length; j+=100) {
+//                System.out.print(areas[i][j]+",");
+//            }
+//            System.out.println();
+//        }
+//
+//        System.exit(0);
        
-        new WidthFunctionPradeep(1063,496,matDirs,magnitudes,metaModif,new java.io.File("/u/ac/pmandapa/Results/Cuencas"));
+        //new WidthFunctionPradeep(7875, 1361,matDirs,magnitudes,metaModif,new java.io.File("/usr/home/rmantill/temp"));
+        new WidthFunctionPradeep(1063,496,matDirs,magnitudes,metaModif,new java.io.File("/usr/home/rmantill/temp"));
         } catch (java.io.IOException IOE){
             System.out.print(IOE);
             System.exit(0);

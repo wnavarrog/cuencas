@@ -66,7 +66,7 @@ public class StreamFlowTimeSeries {
             for (int i = 0; i < breakLocations[0].length; i++) {
                 breakLocations[0][i]=timesRecorded.length/(breakLocations[0].length+2)*(i+1);
                 breakLocations[1][i]=timesRecorded[(int)breakLocations[0][i]];
-                System.out.println(breakLocations[0][i]+" "+breakLocations[1][i]);
+                //System.out.println(breakLocations[0][i]+" "+breakLocations[1][i]);
             }
             
         } catch (java.io.IOException ex) {

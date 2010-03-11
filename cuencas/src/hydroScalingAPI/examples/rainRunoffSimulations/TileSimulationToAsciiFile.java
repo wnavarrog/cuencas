@@ -294,14 +294,14 @@ public class TileSimulationToAsciiFile extends java.lang.Object implements Runna
         
         hydroScalingAPI.util.ordDiffEqSolver.RKF rainRunoffRaining=new hydroScalingAPI.util.ordDiffEqSolver.RKF(thisBasinEqSys,1e-3,10/60.);
         
-        int numPeriods = (int) ((storm.stormFinalTimeInMinutes()-storm.stormInitialTimeInMinutes())/storm.stormRecordResolutionInMinutes());
-        
+        int numPeriods = Math.round(((float)storm.stormFinalTimeInMinutes()-(float)storm.stormInitialTimeInMinutes())/(float)storm.stormRecordResolutionInMinutes());
+
         java.util.Calendar thisDate=java.util.Calendar.getInstance();
         thisDate.setTimeInMillis((long)(storm.stormInitialTimeInMinutes()*60.*1000.0));
         System.out.println(thisDate.getTime());
         
         double outputTimeStep=storm.stormRecordResolutionInMinutes();
-        double extraSimTime=120D*Math.pow(2.0D,(basinOrder-1));
+        double extraSimTime=240D*Math.pow(2.0D,(basinOrder-1));
         
         newfile1.write("TimeStep:" + outputTimeStep+"\n");
         newfile1.write("Time (minutes), Discharge [m3/s] \n");
@@ -332,6 +332,7 @@ public class TileSimulationToAsciiFile extends java.lang.Object implements Runna
         
         
         double[] maximumsAchieved=rainRunoffRaining.getMaximumAchieved();
+//        double[] timeToMaximumsAchieved=rainRunoffRaining.getTimeToMaximumAchieved();
         
         newfile.write("\n");
         newfile.write("\n");
@@ -339,9 +340,32 @@ public class TileSimulationToAsciiFile extends java.lang.Object implements Runna
         for (int i=0;i<linksStructure.contactsArray.length;i++){
                 newfile.write(maximumsAchieved[i]+",");
         }
-        
+//        newfile.write("\n");
+//        newfile.write("Time to Maximum Discharge [minutes],");
+//        for (int i=0;i<linksStructure.contactsArray.length;i++){
+//                newfile.write(timeToMaximumsAchieved[i]+",");
+//        }
+//        newfile.write("\n");
+//        newfile.write("\n");
+//
+//        newfile.write("Precipitation Rates [mm/hr],");
+//
+//        newfile.write("\n");
+//
+//        for (int k=0;k<numPeriods;k++) {
+//            double currTime=storm.stormInitialTimeInMinutes()+k*storm.stormRecordResolutionInMinutes();
+//            newfile.write(currTime+",");
+//            for (int i=0;i<linksStructure.contactsArray.length;i++){
+//
+//                newfile.write(thisHillsInfo.precipitation(i,currTime)+",");
+//
+//            }
+//
+//            newfile.write("\n");
+//
+//        }
+
         System.out.println("Inicia escritura de Resultados");
-        newfile.write("\n");
         
         newfile.close();
         bufferout.close();

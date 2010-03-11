@@ -54,7 +54,8 @@ public class LonLatBasinDividePradeep extends java.lang.Object {
         float[][] lonlatdivide=myCuenca.getLonLatBasinDivide();
         
         java.io.File stormFile;
-        stormFile=new java.io.File("C:/Documents and Settings/pmandapa/My Documents/ForCuencas/BinScUnifInter_0.50/prec.metaVHC");
+//        stormFile=new java.io.File("C:/Documents and Settings/pmandapa/My Documents/ForCuencas/BinScUnifInter_0.50/prec.metaVHC");
+        stormFile=new java.io.File("/usr/home/rmantill/CuencasDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/simulated_events/FromPradeep/BinScUnif_25_5/prec.metaVHC");
         metaStorm=new hydroScalingAPI.io.MetaRaster(stormFile);        
        
         java.io.File theFile;        
@@ -74,13 +75,13 @@ public class LonLatBasinDividePradeep extends java.lang.Object {
         //System.out.println(metaStorm.getMaxLon()+","+metaStorm.getMaxLat());
 
         double x1,x2,y1,y2,sumx,sumy;
-        int[] myArray = new int[40];
-        int[][] data = new int[40][40];
+        int[] myArray = new int[360];
+        int[][] data = new int[360][360];
         int cnt,jmin,jmax,k1;
         
-        for (int i=0;i<40;i++){
+        for (int i=0;i<360;i++){
             k1 = 0;
-            for (int j=0;j<40;j++){
+            for (int j=0;j<360;j++){
                 data[i][j] = 0;
                 x1 = sFileMinLon + i*metaStorm.getResLon()/3600.0;
                 x2 = sFileMinLon + (i+1)*metaStorm.getResLon()/3600.0;
@@ -120,7 +121,7 @@ public class LonLatBasinDividePradeep extends java.lang.Object {
                 if (jmin!=0){
                     jmin = jmin - 1;
                 }
-                if (jmax!=39){
+                if (jmax!=359){
                     jmax = jmax + 1;
                 }
                 for (int j=jmin;j<=jmax;j++){
@@ -131,8 +132,8 @@ public class LonLatBasinDividePradeep extends java.lang.Object {
         newfile.close();
         bufferout.close();  
         
-        for (int j=0;j<40;j++){
-            for (int i=0;i<40;i++){
+        for (int j=0;j<360;j++){
+            for (int i=0;i<360;i++){
                 newfile1.write(data[i][j]+"\t");
             }
             newfile1.write("\n");
@@ -147,9 +148,9 @@ public class LonLatBasinDividePradeep extends java.lang.Object {
     public static void main(String args[]) {
         
         try{ 
-        java.io.File theFile=new java.io.File("C:/Documents and Settings/pmandapa/My Documents/CuencasDatabases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS_2005/Whitewaters.metaDEM");
+        java.io.File theFile=new java.io.File("/usr/home/rmantill/CuencasDataBases/Iowa_Rivers_DB/Rasters/Topography/1_arcsec/IowaRiverAtIowaCity.metaDEM");
         hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
-        metaModif.setLocationBinaryFile(new java.io.File("C:/Documents and Settings/pmandapa/My Documents/CuencasDatabases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS_2005/Whitewaters.dir"));
+        metaModif.setLocationBinaryFile(new java.io.File("/usr/home/rmantill/CuencasDataBases/Iowa_Rivers_DB/Rasters/Topography/1_arcsec/IowaRiverAtIowaCity.dir"));
         
         metaModif.setFormat("Byte");
         byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
@@ -158,7 +159,7 @@ public class LonLatBasinDividePradeep extends java.lang.Object {
         metaModif.setFormat("Integer");
         int [][] magnitudes=new hydroScalingAPI.io.DataRaster(metaModif).getInt();
        
-        new LonLatBasinDividePradeep(1063,496,matDirs,magnitudes,metaModif,new java.io.File("E:/Documents and Settings/pmandapa/My Documents/Research/Cuencas"));
+        new LonLatBasinDividePradeep(6602,1539,matDirs,magnitudes,metaModif,new java.io.File("/usr/home/rmantill/temp"));
         } catch (java.io.IOException IOE){
             System.out.print(IOE);
             System.exit(0);

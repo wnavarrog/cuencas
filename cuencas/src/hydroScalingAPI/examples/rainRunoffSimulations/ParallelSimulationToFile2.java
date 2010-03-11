@@ -190,7 +190,7 @@ public class ParallelSimulationToFile2 extends hydroScalingAPI.examples.rainRuno
 
                         System.out.println();
                         System.out.print(">> Process "+indexProc+" is being launched");
-                        externalExecutors[indexProc].setComputingNode(cn);
+                        externalExecutors[indexProc].setComputingNode(cn,indexProc);
                         activeThreads[indexProc] = new Thread(externalExecutors[indexProc]);
                         externalExecutors[indexProc].executing=true;
                         compNodeNames.put(cn, true);
