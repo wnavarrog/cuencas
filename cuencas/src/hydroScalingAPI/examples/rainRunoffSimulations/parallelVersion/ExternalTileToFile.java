@@ -24,7 +24,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * Created on September 5, 2003, 4:50 PM
  */
 
-package hydroScalingAPI.examples.rainRunoffSimulations;
+package hydroScalingAPI.examples.rainRunoffSimulations.parallelVersion;
 
 /**
  * This is the Thread used by the {@link
@@ -42,7 +42,7 @@ public class ExternalTileToFile extends Thread{
     private java.lang.Process localProcess;
     private int managerProcIndex;
     
-    hydroScalingAPI.examples.rainRunoffSimulations.ParallelSimulationToFile coordinatorProc;
+    hydroScalingAPI.examples.rainRunoffSimulations.parallelVersion.ParallelSimulationToFile coordinatorProc;
     
     public ExternalTileToFile(      String pn,
                                     String mFN, 
@@ -60,8 +60,13 @@ public class ExternalTileToFile extends Thread{
                                     String outputDirectory,
                                     String connectionsO,
                                     String correctionsO,
-                                    hydroScalingAPI.examples.rainRunoffSimulations.ParallelSimulationToFile coordinator,
-                                    long iniTimeInMilliseconds){
+                                    hydroScalingAPI.examples.rainRunoffSimulations.parallelVersion.ParallelSimulationToFile coordinator,
+                                    long iniTimeInMilliseconds,
+                                    int dynaIndex){
+
+        String[] possibleTileDynamics=new String[] { "hydroScalingAPI.examples.rainRunoffSimulations.parallelVersion.TileSimulationToAsciiFile",
+                                                     "hydroScalingAPI.examples.rainRunoffSimulations.parallelVersion.TileSimulationToAsciiFile2"
+                                                    };
                                         
         procName=pn;
         
@@ -72,7 +77,7 @@ public class ExternalTileToFile extends Thread{
                                 "-Xrs",
                                 "-cp",
                                 System.getProperty("java.class.path"),
-                                "hydroScalingAPI.examples.rainRunoffSimulations.TileSimulationToAsciiFile",
+                                possibleTileDynamics[dynaIndex],
                                 mFN,
                                 ""+xx,
                                 ""+yy, 
@@ -114,7 +119,7 @@ public class ExternalTileToFile extends Thread{
                 String s=new String(new byte[] {Byte.parseByte(""+localProcess.getInputStream().read())});
                 concat+=s;
                 if(s.equalsIgnoreCase("\n")) {
-                    //System.out.print(concat);
+                    System.out.print(concat);
                     if(concat.substring(0, Math.min(31,concat.length())).equalsIgnoreCase("Termina escritura de Resultados")) break;
                     concat="";
                 }

@@ -24,7 +24,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * Created on January 27, 2009, 8:00 AM
  */
 
-package hydroScalingAPI.examples.rainRunoffSimulations;
+package hydroScalingAPI.examples.rainRunoffSimulations.parallelVersion;
 
 import java.util.Iterator;
 import visad.*;
@@ -33,7 +33,7 @@ import visad.*;
  *
  * @author Ricardo Mantilla
  */
-public class ParallelSimulationToFile2 extends hydroScalingAPI.examples.rainRunoffSimulations.ParallelSimulationToFile {
+public class ParallelSimulationToFile2 extends hydroScalingAPI.examples.rainRunoffSimulations.parallelVersion.ParallelSimulationToFile {
     
     private hydroScalingAPI.io.MetaRaster metaDatos;
     private byte[][] matDir;
@@ -113,7 +113,7 @@ public class ParallelSimulationToFile2 extends hydroScalingAPI.examples.rainRuno
         }
 
         Thread[] activeThreads=new Thread[connectionTopology.length];
-        hydroScalingAPI.examples.rainRunoffSimulations.ExternalTileToFile[] externalExecutors=new hydroScalingAPI.examples.rainRunoffSimulations.ExternalTileToFile[connectionTopology.length];
+        hydroScalingAPI.examples.rainRunoffSimulations.parallelVersion.ExternalTileToFile[] externalExecutors=new hydroScalingAPI.examples.rainRunoffSimulations.parallelVersion.ExternalTileToFile[connectionTopology.length];
 
         float maxDtoO=Float.parseFloat(((String)v.get(0)).substring(0, 9));
 
@@ -158,7 +158,7 @@ public class ParallelSimulationToFile2 extends hydroScalingAPI.examples.rainRuno
             System.out.println(java.util.Arrays.toString(connectionIDs));
             System.out.println(java.util.Arrays.toString(corrections));
 
-            externalExecutors[i]=new hydroScalingAPI.examples.rainRunoffSimulations.ExternalTileToFile("Element "+i,md.getLocationMeta().getAbsolutePath(),xOutlet, yOutlet,xSource, ySource,decompScale,routingType,lam1,lam2,v_o,stormFile.getAbsolutePath(),infiltRate,outputDirectory.getAbsolutePath(),connectionString,correctionString,this,zeroSimulationTime.getTimeInMillis());
+            externalExecutors[i]=new hydroScalingAPI.examples.rainRunoffSimulations.parallelVersion.ExternalTileToFile("Element "+i,md.getLocationMeta().getAbsolutePath(),xOutlet, yOutlet,xSource, ySource,decompScale,routingType,lam1,lam2,v_o,stormFile.getAbsolutePath(),infiltRate,outputDirectory.getAbsolutePath(),connectionString,correctionString,this,zeroSimulationTime.getTimeInMillis(),0);
         }
         
         boolean allNodesDone=true;

@@ -24,7 +24,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  * Created on December 6, 2001, 10:34 AM
  */
 
-package hydroScalingAPI.examples.rainRunoffSimulations;
+package hydroScalingAPI.examples.rainRunoffSimulations.parallelVersion;
 
 import visad.*;
 
@@ -32,7 +32,7 @@ import visad.*;
  *
  * @author Ricardo Mantilla
  */
-public class TileSimulationToAsciiFile extends java.lang.Object implements Runnable{
+public class TileSimulationToAsciiFile2 extends java.lang.Object implements Runnable{
     
     private hydroScalingAPI.io.MetaRaster metaDatos;
     private byte[][] matDir,hortonOrders;
@@ -54,7 +54,7 @@ public class TileSimulationToAsciiFile extends java.lang.Object implements Runna
 
     private java.util.Calendar zeroSimulationTime;
 
-    public TileSimulationToAsciiFile(   int xx, 
+    public TileSimulationToAsciiFile2(   int xx, 
                                         int yy, 
                                         int xxHH, 
                                         int yyHH,
@@ -332,7 +332,7 @@ public class TileSimulationToAsciiFile extends java.lang.Object implements Runna
         
         
         double[] maximumsAchieved=rainRunoffRaining.getMaximumAchieved();
-//        double[] timeToMaximumsAchieved=rainRunoffRaining.getTimeToMaximumAchieved();
+        double[] timeToMaximumsAchieved=rainRunoffRaining.getTimeToMaximumAchieved();
         
         newfile.write("\n");
         newfile.write("\n");
@@ -340,30 +340,30 @@ public class TileSimulationToAsciiFile extends java.lang.Object implements Runna
         for (int i=0;i<linksStructure.contactsArray.length;i++){
                 newfile.write(maximumsAchieved[i]+",");
         }
-//        newfile.write("\n");
-//        newfile.write("Time to Maximum Discharge [minutes],");
-//        for (int i=0;i<linksStructure.contactsArray.length;i++){
-//                newfile.write(timeToMaximumsAchieved[i]+",");
-//        }
-//        newfile.write("\n");
-//        newfile.write("\n");
-//
-//        newfile.write("Precipitation Rates [mm/hr],");
-//
-//        newfile.write("\n");
-//
-//        for (int k=0;k<numPeriods;k++) {
-//            double currTime=storm.stormInitialTimeInMinutes()+k*storm.stormRecordResolutionInMinutes();
-//            newfile.write(currTime+",");
-//            for (int i=0;i<linksStructure.contactsArray.length;i++){
-//
-//                newfile.write(thisHillsInfo.precipitation(i,currTime)+",");
-//
-//            }
-//
-//            newfile.write("\n");
-//
-//        }
+        newfile.write("\n");
+        newfile.write("Time to Maximum Discharge [minutes],");
+        for (int i=0;i<linksStructure.contactsArray.length;i++){
+                newfile.write(timeToMaximumsAchieved[i]+",");
+        }
+        newfile.write("\n");
+        newfile.write("\n");
+
+        newfile.write("Precipitation Rates [mm/hr],");
+
+        newfile.write("\n");
+
+        for (int k=0;k<numPeriods;k++) {
+            double currTime=storm.stormInitialTimeInMinutes()+k*storm.stormRecordResolutionInMinutes();
+            newfile.write(currTime+",");
+            for (int i=0;i<linksStructure.contactsArray.length;i++){
+
+                newfile.write(thisHillsInfo.precipitation(i,currTime)+",");
+
+            }
+
+            newfile.write("\n");
+
+        }
 
         System.out.println("Inicia escritura de Resultados");
         
@@ -467,7 +467,7 @@ public class TileSimulationToAsciiFile extends java.lang.Object implements Runna
             corrO=new float[corr.length]; for (int i = 0; i < corrO.length; i++) corrO[i]=Float.parseFloat(corr[i].trim());
         }
         
-        new TileSimulationToAsciiFile(Integer.parseInt(args[1]),Integer.parseInt(args[2]),Integer.parseInt(args[3]),Integer.parseInt(args[4]),Integer.parseInt(args[5]),matDirs,magnitudes,horOrders,metaModif,0.0f,0.0f,stormFile,null,infilRate,routingType,routingParams,outputDirectory,connO,corrO,Long.parseLong(args[15])).executeSimulation();
+        new TileSimulationToAsciiFile2(Integer.parseInt(args[1]),Integer.parseInt(args[2]),Integer.parseInt(args[3]),Integer.parseInt(args[4]),Integer.parseInt(args[5]),matDirs,magnitudes,horOrders,metaModif,0.0f,0.0f,stormFile,null,infilRate,routingType,routingParams,outputDirectory,connO,corrO,Long.parseLong(args[15])).executeSimulation();
         
     }
     
@@ -508,7 +508,7 @@ public class TileSimulationToAsciiFile extends java.lang.Object implements Runna
 
         java.io.File outputDirectory=new java.io.File("/Users/ricardo/simulationResults/Parallel/WalnutGulch/");
         
-        new TileSimulationToAsciiFile(729,130,-1,-1,4,matDirs,magnitudes,horOrders,metaModif,20.0f,5.0f,stormFile,null,0.0f,2,routingParams,outputDirectory,new int[] {},new float[] {},zeroSimulationTime.getTimeInMillis()).executeSimulation();
+        new TileSimulationToAsciiFile2(729,130,-1,-1,4,matDirs,magnitudes,horOrders,metaModif,20.0f,5.0f,stormFile,null,0.0f,2,routingParams,outputDirectory,new int[] {},new float[] {},zeroSimulationTime.getTimeInMillis()).executeSimulation();
         //new TileSimulationToAsciiFile(229,286,-1,-1,3,matDirs,magnitudes,horOrders,metaModif,20.0f,5.0f,stormFile,null,0.0f,2,routingParams,outputDirectory,new int[] {314711, 315971},monitor,new float[] {0.027654171f, 0.20069313f}).executeSimulation();
             
     }
