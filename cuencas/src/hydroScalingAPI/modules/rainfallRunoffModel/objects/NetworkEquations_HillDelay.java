@@ -144,13 +144,17 @@ public class NetworkEquations_HillDelay implements hydroScalingAPI.util.ordDiffE
         thisDate.setTimeInMillis((long)(time*60.*1000.0));
         System.out.println("    "+thisDate.getTime()+" "+basinHillSlopesInfo.precipitation(0,time)+" "+input[287]);*/
         
+        double runoffCoeff=0.0;
+
+        if(time >= 1.966746E7) runoffCoeff=0.3; else runoffCoeff=0.05;
+
         double maxInt=0;
         
         for (int i=0;i<nLi;i++){
             
             if (input[i] < 0) input[i]=0;
             
-            double hillPrecIntensity=basinHillSlopesInfo.precipitation(i,time);// for URP event apply this rule*0.143;
+            double hillPrecIntensity=basinHillSlopesInfo.precipitation(i,time)*runoffCoeff;// for URP event apply this rule*0.143;
             
             maxInt=Math.max(maxInt,hillPrecIntensity);
             
@@ -225,6 +229,21 @@ public class NetworkEquations_HillDelay implements hydroScalingAPI.util.ordDiffE
         //if (Math.random() > 0.99) if (maxInt>0) System.out.println("      --> The Max precipitation intensity is: "+maxInt);
 
         return output;
+    }
+
+    public static void main(String[] args){
+        java.util.Calendar date=java.util.Calendar.getInstance();
+        date.clear();
+        date.set(2007, 4, 24, 18, 0, 0);
+
+        System.out.println(date.getTime());
+        System.out.println(date.getTimeInMillis()/1000./60.);
+
+        System.exit(0);
+
+
+
+
     }
     
 }

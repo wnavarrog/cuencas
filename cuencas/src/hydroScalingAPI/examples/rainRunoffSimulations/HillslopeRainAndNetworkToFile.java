@@ -41,7 +41,7 @@ public class HillslopeRainAndNetworkToFile {
         
         thisHillsInfo.setStormManager(storm);
         
-        String Directory="/home/ricardo/simulationResults/iowaRivers/";
+        String Directory="/Users/ricardo/simulationResults/iowaRivers/";
         String demName=md.getLocationBinaryFile().getName().substring(0,md.getLocationBinaryFile().getName().lastIndexOf("."));
         java.io.File theFile=new java.io.File(Directory+demName+"_"+x+"_"+y+"-"+storm.stormName()+".dat");
         System.out.println(theFile);
@@ -76,13 +76,22 @@ public class HillslopeRainAndNetworkToFile {
         newfile.writeInt(numPeriods);
         
         java.util.Date startTime1=new java.util.Date();
+
+        double[] myRain=new double[linksStructure.contactsArray.length];
+
         for (int k=0;k<numPeriods;k++) {
-            System.out.println("Initiating time step "+k);
+            //System.out.println("Initiating time step "+k);
             double currTime=storm.stormInitialTimeInMinutes()+k*storm.stormRecordResolutionInMinutes();
+            
+            System.out.print(currTime+",");
+
             newfile.writeDouble(currTime);
             for (int i=0;i<linksStructure.contactsArray.length;i++){
                 newfile.writeDouble(thisHillsInfo.precipitation(i,currTime));
+                myRain[i]=thisHillsInfo.precipitation(i,currTime);
             }
+            System.out.print(new hydroScalingAPI.util.statistics.Stats(myRain).meanValue+",");
+            System.out.println();
         }
         java.util.Date endTime1=new java.util.Date();
         System.out.println("Time Getting "+(linksStructure.contactsArray.length*numPeriods)+" records :"+((endTime1.getTime()-startTime1.getTime()))+" milliseconds");
@@ -99,7 +108,8 @@ public class HillslopeRainAndNetworkToFile {
         //main0(args); //The mogollon test case
         //main1(args); //Whitewater 15-minute Rain
         //main2(args); //Nexrad Whitewater
-        main3(args); //Nexrad MPE Iowa River Basins
+        //main3(args); //Nexrad MPE Iowa River Basins
+        main4(args); //Nexrad MPE Iowa River Basins
     }
     
     public static void main0(String args[]) {
@@ -291,6 +301,36 @@ public class HillslopeRainAndNetworkToFile {
             System.exit(0);
         }
         
+    }
+
+    public static void main4(String args[]) {
+
+        try{
+            java.io.File theFile=new java.io.File("/CuencasDataBases/Iowa_Rivers_DB/Rasters/Topography/1_arcSec/Squaw Creek At Ames/NED_86024003.metaDEM");
+            hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
+            metaModif.setLocationBinaryFile(new java.io.File("/CuencasDataBases/Iowa_Rivers_DB/Rasters/Topography/1_arcSec/Squaw Creek At Ames/NED_86024003.dir"));
+
+            String formatoOriginal=metaModif.getFormat();
+            metaModif.setFormat("Byte");
+            byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
+
+            metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".magn"));
+            metaModif.setFormat("Integer");
+            int [][] magnitudes=new hydroScalingAPI.io.DataRaster(metaModif).getInt();
+
+            java.io.File stormFile;
+            stormFile=new java.io.File("/CuencasDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/observed_events/OverSquawCreek/hydroNexrad.metaVHC");
+
+            new HillslopeRainAndNetworkToFile(1425, 349,matDirs,magnitudes,metaModif,stormFile);
+
+        } catch (java.io.IOException IOE){
+            System.out.print(IOE);
+            System.exit(0);
+        } catch (VisADException v){
+            System.out.print(v);
+            System.exit(0);
+        }
+
     }
 
 }

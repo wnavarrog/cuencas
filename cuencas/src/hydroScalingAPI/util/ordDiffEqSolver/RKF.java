@@ -460,7 +460,7 @@ public class RKF extends java.lang.Object {
         outputStream.write("\n");
         outputStream.write(currentTime + ",");
         for (int i = 0; i < linksStructure.completeStreamLinksArray.length; i++) {
-            if (thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) >= 1) {
+            if (thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > 1) {
                 outputStream.write(IC[linksStructure.completeStreamLinksArray[i]] + ",");
             }
         }
@@ -493,6 +493,18 @@ public class RKF extends java.lang.Object {
                 givenStep[0][0] = currentTime;
                 IC = givenStep[1];
 
+                if (currentTime < targetTime){
+                    for (int i = 0; i < IC.length; i++) {
+                        if(IC[i] > maxAchieved[i]){
+                            maxAchieved[i] = IC[i];
+                            timeOfMaximumAchieved[i]=currentTime;
+                        }
+                    }
+                    thisDate = java.util.Calendar.getInstance();
+                    thisDate.setTimeInMillis((long) (currentTime * 60. * 1000.0));
+                    System.out.println(thisDate.getTime() + " (" + java.util.Calendar.getInstance().getTime() + ")" + " Outlet Discharge: " + IC[ouletID]);
+                }
+
 
             }
             /*thisDate=java.util.Calendar.getInstance();
@@ -524,7 +536,7 @@ public class RKF extends java.lang.Object {
             outputStream.write("\n");
             outputStream.write(currentTime + ",");
             for (int i = 0; i < linksStructure.completeStreamLinksArray.length; i++) {
-                if (thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) >= 1) {
+                if (thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > 1) {
                     outputStream.write(IC[linksStructure.completeStreamLinksArray[i]] + ",");
                 }
             }
@@ -548,7 +560,7 @@ public class RKF extends java.lang.Object {
             outputStream.write("\n");
             outputStream.write(currentTime + ",");
             for (int i = 0; i < linksStructure.completeStreamLinksArray.length; i++) {
-                if (thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) >= 1) {
+                if (thisNetworkGeom.linkOrder(linksStructure.completeStreamLinksArray[i]) > 1) {
                     outputStream.write(IC[linksStructure.completeStreamLinksArray[i]] + ",");
                 }
             }

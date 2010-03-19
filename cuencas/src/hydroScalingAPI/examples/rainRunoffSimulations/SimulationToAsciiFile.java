@@ -260,6 +260,9 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
         java.util.Calendar thisDate=java.util.Calendar.getInstance();
         thisDate.setTimeInMillis((long)(storm.stormInitialTimeInMinutes()*60.*1000.0));
         System.out.println(thisDate.getTime());
+
+        int basinOrder=linksStructure.getBasinOrder();
+        double extraSimTime=120D*Math.pow(2.0D,(basinOrder-1));
         
         if(stormFile == null){
             for (int k=0;k<numPeriods;k++) {
@@ -274,12 +277,12 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
             System.out.println("Intermedia Time:"+interTime.toString());
             System.out.println("Running Time:"+(.001*(interTime.getTime()-startTime.getTime()))+" seconds");
             
-            rainRunoffRaining.jumpsRunToAsciiFile(storm.stormInitialTimeInMinutes()+numPeriods*rainDuration,(storm.stormInitialTimeInMinutes()+(numPeriods+1)*rainDuration)+8000,15,initialCondition,newfile,linksStructure,thisNetworkGeom);
+            rainRunoffRaining.jumpsRunToAsciiFile(storm.stormInitialTimeInMinutes()+numPeriods*rainDuration,(storm.stormInitialTimeInMinutes()+(numPeriods+1)*rainDuration)+extraSimTime,60,initialCondition,newfile,linksStructure,thisNetworkGeom);
             
         } else {
             for (int k=0;k<numPeriods;k++) {
                 System.out.println("Period "+(k+1)+" of "+numPeriods);
-                rainRunoffRaining.jumpsRunToAsciiFile(storm.stormInitialTimeInMinutes()+k*storm.stormRecordResolutionInMinutes(),storm.stormInitialTimeInMinutes()+(k+1)*storm.stormRecordResolutionInMinutes(),15,initialCondition,newfile,linksStructure,thisNetworkGeom);
+                rainRunoffRaining.jumpsRunToAsciiFile(storm.stormInitialTimeInMinutes()+k*storm.stormRecordResolutionInMinutes(),storm.stormInitialTimeInMinutes()+(k+1)*storm.stormRecordResolutionInMinutes(),60,initialCondition,newfile,linksStructure,thisNetworkGeom);
                 initialCondition=rainRunoffRaining.finalCond;
                 rainRunoffRaining.setBasicTimeStep(10/60.);
             }
@@ -288,7 +291,7 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
             System.out.println("Intermedia Time:"+interTime.toString());
             System.out.println("Running Time:"+(.001*(interTime.getTime()-startTime.getTime()))+" seconds");
             
-            rainRunoffRaining.jumpsRunToAsciiFile(storm.stormInitialTimeInMinutes()+numPeriods*storm.stormRecordResolutionInMinutes(),(storm.stormInitialTimeInMinutes()+(numPeriods+1)*storm.stormRecordResolutionInMinutes())+300,15,initialCondition,newfile,linksStructure,thisNetworkGeom);
+            rainRunoffRaining.jumpsRunToAsciiFile(storm.stormInitialTimeInMinutes()+numPeriods*storm.stormRecordResolutionInMinutes(),(storm.stormInitialTimeInMinutes()+(numPeriods+1)*storm.stormRecordResolutionInMinutes())+extraSimTime,60,initialCondition,newfile,linksStructure,thisNetworkGeom);
         }
         
         System.out.println("Termina simulacion RKF");
@@ -341,7 +344,9 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
             //subMain2(args);   //Case for Walnut Gulch
             //subMain3(args);   //Case Upper Rio Puerco
             //subMain4(args);   //Case Whitewater
-            subMain5(args);   //Case Clear Creek June 3 to 7
+            //subMain5(args);   //Case Clear Creek June 3 to 7
+
+            subMain6(args);   //Case Squaw Creek April 20 to May 10
             
             
         } catch (java.io.IOException IOE){
@@ -607,5 +612,59 @@ public class SimulationToAsciiFile extends java.lang.Object implements Runnable{
                 }
             }
         }
+    }
+
+    public static void subMain6(String args[]) throws java.io.IOException, VisADException {
+
+        java.io.File theFile=new java.io.File("/CuencasDataBases/Iowa_Rivers_DB/Rasters/Topography/1_arcSec/Squaw Creek At Ames/NED_86024003.metaDEM");
+        hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
+        metaModif.setLocationBinaryFile(new java.io.File("/CuencasDataBases/Iowa_Rivers_DB/Rasters/Topography/1_arcSec/Squaw Creek At Ames/NED_86024003.dir"));
+
+        metaModif.setFormat("Byte");
+        byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
+
+        metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".magn"));
+        metaModif.setFormat("Integer");
+        int [][] magnitudes=new hydroScalingAPI.io.DataRaster(metaModif).getInt();
+
+        java.util.Hashtable routingParams=new java.util.Hashtable();
+        routingParams.put("widthCoeff",1.0f);
+        routingParams.put("widthExponent",0.4f);
+        routingParams.put("widthStdDev",0.0f);
+
+        routingParams.put("chezyCoeff",14.2f);
+        routingParams.put("chezyExponent",-1/3.0f);
+
+        routingParams.put("lambda1",0.2f);
+        routingParams.put("lambda2",-0.1f);
+        routingParams.put("v_o", 0.4f);
+
+        java.io.File stormFile;
+
+        stormFile=new java.io.File("/CuencasDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/observed_events/EventIowaJune/EventIowaJune8thNoon/hydroNexrad.metaVHC");
+        //stormFile=new java.io.File("/CuencasDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/observed_events/EventIowaJuneMPE/May15toJune11/hydroNexrad.metaVHC");
+        //stormFile=new java.io.File("/CuencasDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/observed_events/EventIowaJuneMPE/June3toJune5/hydroNexrad.metaVHC");
+        //stormFile=new java.io.File("/CuencasDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/observed_events/EventIowaJuneHydroNEXRAD/June3toJune5/hydroNexrad.metaVHC");
+
+        float infil=0.0f;
+
+        //new SimulationToAsciiFile(1425, 349, matDirs, magnitudes, metaModif, 20,2, infil, 5, new java.io.File("/Users/ricardo/simulationResults/SquawCreek/"), routingParams).executeSimulation();
+
+        //routingParams.put("v_o", 0.75f);
+        //new SimulationToAsciiFile(1425, 349, matDirs, magnitudes, metaModif, 40,60, infil, 2, new java.io.File("/Users/ricardo/simulationResults/SquawCreek/"), routingParams).executeSimulation();
+
+
+        stormFile=new java.io.File("/CuencasDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/observed_events/OverSquawCreek/hydroNexrad.metaVHC");
+        routingParams.put("v_o", 0.3f);
+        new SimulationToAsciiFile(1425, 349, matDirs, magnitudes, metaModif, stormFile, infil, 2, new java.io.File("/Users/ricardo/simulationResults/SquawCreek/"), routingParams).executeSimulation();
+
+//        stormFile=new java.io.File("/CuencasDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/observed_events/OverSquawCreek/hydroNexrad.metaVHC");
+//        routingParams.put("lambda1",0.2f);
+//        routingParams.put("lambda2",-0.1f);
+//        routingParams.put("v_o", 0.3f);
+//        new SimulationToAsciiFile(1425, 349, matDirs, magnitudes, metaModif, stormFile, infil, 5, new java.io.File("/Users/ricardo/simulationResults/SquawCreek/"), routingParams).executeSimulation();
+
+        System.exit(0);
+
     }
 }

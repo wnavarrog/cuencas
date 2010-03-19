@@ -167,9 +167,6 @@ public class OutputSimulationKML {
      */
     public static void main(String[] args) {
 
-        for(int i=0;i<255;i++) System.out.println(i+":"+Integer.toHexString(i));
-        System.exit(0);
-        
         main0(args);
         //main1(args);
     }
