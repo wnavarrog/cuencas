@@ -8,10 +8,7 @@ package hydroScalingAPI.examples.io;
  *
  * @author Eric Osgood
  */
-import hydroScalingAPI.mainGUI.objects.LocationsManager;
-import hydroScalingAPI.util.fileUtilities.NameDotFilter;
 import java.io.*;
-import java.util.*;
 import java.util.zip.*;
 import java.net.*;
 
@@ -78,7 +75,7 @@ public class BasinMaskXY {
             }
         }
 
-        File dir = new File("C:\\Users\\Eric Osgood.EricOsgood-PC\\Documents\\Iowa Flood Center\\Cities");
+        File dir = new File("/Users/ricardo/rawData/BasinMasks/Gauges");
         int filecount = dir.list().length;
         System.out.println(filecount);
         File[] files = dir.listFiles();

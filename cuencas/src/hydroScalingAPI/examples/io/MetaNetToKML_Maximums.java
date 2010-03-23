@@ -1,0 +1,223 @@
+/*
+CUENCAS is a River Network Oriented GIS
+Copyright (C) 2005  Ricardo Mantilla
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
+/*
+ * MetaNetToKML.java
+ *
+ * Created on October 10, 2008, 5:00 PM
+ */
+
+package hydroScalingAPI.examples.io;
+
+/**
+ *
+ * @author Ricardo Mantilla
+ */
+public class MetaNetToKML_Maximums {
+    
+    public MetaNetToKML_Maximums(hydroScalingAPI.io.MetaRaster metaModif, java.io.File outputDirectory,hydroScalingAPI.util.geomorphology.objects.Basin myCuenca,byte [][] matDir,String uniqueIdentifier) throws java.io.IOException{
+
+        java.io.File InputVals=new java.io.File("/Users/ricardo/simulationResults/ClearCreek/VALUES.txt");
+        java.io.BufferedReader fileMeta = new java.io.BufferedReader(new java.io.FileReader(InputVals));
+        String[] fileInformation=new String[5];
+        for (int i = 0; i < fileInformation.length; i++) {
+            fileInformation[i]=fileMeta.readLine();
+        }
+        fileMeta.close();
+
+        java.util.Hashtable<String,float[]> hashInfo= new java.util.Hashtable();
+
+        String[] linkIDs= fileInformation[3].split(",");
+
+        String[] hortonOrders=fileInformation[1].split(",");
+        String[] areasBasins=fileInformation[2].split(",");
+        String[] peakFlows=fileInformation[4].split(",");
+
+        for (int i = 1; i < linkIDs.length; i++) {
+            hashInfo.put(linkIDs[i],new float[]{Float.parseFloat(hortonOrders[i]),Float.parseFloat(areasBasins[i]),Float.parseFloat(peakFlows[i])});
+        }
+
+        float xO=myCuenca.getLonLatBasin()[0][0];
+        float yO=myCuenca.getLonLatBasin()[1][0];
+        
+        hydroScalingAPI.io.MetaRaster metaDatos=metaModif;
+        
+        hydroScalingAPI.io.MetaNetwork netStructure=new hydroScalingAPI.io.MetaNetwork(metaModif);
+        
+        hydroScalingAPI.util.geomorphology.objects.LinksAnalysis linksStructure=new hydroScalingAPI.util.geomorphology.objects.LinksAnalysis(myCuenca, metaDatos, matDir);
+        
+        hydroScalingAPI.io.MetaPolygon metaPolyToWrite=new hydroScalingAPI.io.MetaPolygon ();
+        metaPolyToWrite.setName(myCuenca.toString());
+        metaPolyToWrite.setCoordinates(myCuenca.getLonLatBasinDivide());
+        metaPolyToWrite.setInformation("Basin Divide as captured by Cuencas");
+
+        java.io.File fileSalida=new java.io.File(outputDirectory+"/Divide_"+uniqueIdentifier+".kml");
+        java.io.FileOutputStream        outputDir;
+        java.io.OutputStreamWriter      newfile;
+        java.io.BufferedOutputStream    bufferout;
+        String                          ret="\n";
+        
+
+        metaPolyToWrite.writeKmlPolygon(fileSalida,uniqueIdentifier);
+
+        byte[][] basMask=myCuenca.getBasinMask();
+
+        fileSalida=new java.io.File(outputDirectory+"/RiverNetworkHighRes_"+uniqueIdentifier+".kml");
+        
+        
+        outputDir = new java.io.FileOutputStream(fileSalida);
+        bufferout=new java.io.BufferedOutputStream(outputDir);
+        newfile=new java.io.OutputStreamWriter(bufferout);
+        
+        newfile.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+ret);
+        newfile.write("<kml xmlns=\"http://www.opengis.net/kml/2.2\">");
+        newfile.write("<Document>"+ret);
+        newfile.write("  <name>RiverNetwork_"+uniqueIdentifier+".kml</name>"+ret);
+        newfile.write("  <open>0</open>"+ret);
+        newfile.write("  <LookAt>"+ret);
+        newfile.write("    <longitude>"+xO+"</longitude>"+ret);
+        newfile.write("    <latitude>"+yO+"</latitude>"+ret);
+        newfile.write("    <altitude>0</altitude>"+ret);
+        newfile.write("    <range>1500</range>"+ret);
+        newfile.write("    <tilt>30</tilt>"+ret);
+        newfile.write("    <heading>0</heading>"+ret);
+        newfile.write("  </LookAt>"+ret);
+        
+        newfile.write("  <Style id=\"linestyleNormal\">"+ret);
+        newfile.write("    <LineStyle>"+ret);
+        newfile.write("      <color>7f"+Integer.toHexString(50)+"0000</color>"+ret);
+        newfile.write("      <width>"+2+"</width>"+ret);
+        newfile.write("    </LineStyle>"+ret);
+        newfile.write("  </Style>"+ret);
+
+        newfile.write("  <Style id=\"linestyleDanger\">"+ret);
+        newfile.write("    <LineStyle>"+ret);
+        newfile.write("      <color>7f0000"+Integer.toHexString(50)+"</color>"+ret);
+        newfile.write("      <width>"+5+"</width>"+ret);
+        newfile.write("    </LineStyle>"+ret);
+        newfile.write("  </Style>"+ret);
+
+        for(int i=1;i<=linksStructure.basinOrder;i++){
+            newfile.write("  <Folder>"+ret);
+            newfile.write("    <name>Order "+i+" Streams</name>"+ret);
+            newfile.write("    <visibility>1</visibility>"+ret);
+            newfile.write("    <open>0</open>"+ret);
+            netStructure.getLineStringXYs2(i,basMask,newfile,hashInfo);
+            newfile.write("  </Folder>"+ret);
+        }
+
+        newfile.write("</Document>"+ret);
+        newfile.write("</kml>"+ret);
+        
+        newfile.close();
+        bufferout.close();
+        outputDir.close();
+        
+    }
+
+    /**
+     * Tests for the class
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        main0(args);
+        //main1(args);
+    }
+    /**
+     * Tests for the class
+     * @param args the command line arguments
+     */
+    public static void main0(String[] args) {
+        
+        try{
+            
+            
+            String fileName="/CuencasDataBases/Iowa_Rivers_DB/Rasters/Topography/1_arcSec/ClearCreek/NED_00159011";
+            int x=1570, y= 127;
+            String uniqueIdentifier="ClearCreekAtCoralville";
+                       
+            java.io.File theFile=new java.io.File(fileName+".metaDEM");
+            hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
+            metaModif.setLocationBinaryFile(new java.io.File(fileName+".dir"));
+        
+            metaModif.setFormat("Byte");
+            byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
+            
+            hydroScalingAPI.util.geomorphology.objects.Basin laCuenca=new hydroScalingAPI.util.geomorphology.objects.Basin(x, y,matDirs,metaModif);
+            
+            MetaNetToKML_Maximums exporter=new MetaNetToKML_Maximums(metaModif,new java.io.File("/Users/ricardo/temp/"),laCuenca,matDirs,uniqueIdentifier);
+            
+        } catch (Exception IOE){
+            System.out.print(IOE);
+            IOE.printStackTrace();
+            System.exit(0);
+        }
+        
+        System.exit(0);
+        
+    }
+
+    /**
+     * Tests for the class
+     * @param args the command line arguments
+     */
+    public static void main1(String[] args) {
+
+        try{
+
+            String[] basins=new hydroScalingAPI.io.BasinsLogReader(new java.io.File("/Users/ricardo/workFiles/myWorkingStuff/AdvisorThesis/Eric/res.log")).getPresetBasins();
+
+            String fileName="/CuencasDataBases/Iowa_Rivers_DB/Rasters/Topography/4_arcSec/res";
+            
+            
+            for (int i = 0; i < basins.length; i++) {
+                String[] basLabel = basins[i].split(";");
+
+                int x=Integer.parseInt(basLabel[0].split(",")[0].split("x:")[1].trim());
+                int y=Integer.parseInt(basLabel[0].split(",")[1].split("y:")[1].trim());
+                
+                String uniqueIdentifier=basLabel[1];
+
+                System.out.println(x+" "+y+" "+uniqueIdentifier);
+
+
+                java.io.File theFile=new java.io.File(fileName+".metaDEM");
+                hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
+                metaModif.setLocationBinaryFile(new java.io.File(fileName+".dir"));
+
+                metaModif.setFormat("Byte");
+                byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
+
+                hydroScalingAPI.util.geomorphology.objects.Basin laCuenca=new hydroScalingAPI.util.geomorphology.objects.Basin(x, y,matDirs,metaModif);
+
+                MetaNetToKML_Maximums exporter=new MetaNetToKML_Maximums(metaModif,new java.io.File("/Users/ricardo/temp/cities/"),laCuenca,matDirs,uniqueIdentifier);
+
+            }
+        } catch (Exception IOE){
+            System.out.print(IOE);
+            IOE.printStackTrace();
+            System.exit(0);
+        }
+
+        System.exit(0);
+
+    }
+
+}
+
