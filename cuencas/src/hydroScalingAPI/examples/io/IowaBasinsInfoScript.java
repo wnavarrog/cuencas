@@ -12,13 +12,22 @@ import java.io.*;
 import java.util.zip.*;
 import java.net.*;
 
-public class BasinMaskXY {
+public class IowaBasinsInfoScript implements Runnable{
 
-    float[][] matrix;
+    float[][][] matrix;
 
-    public BasinMaskXY() throws IOException {
+    public IowaBasinsInfoScript() throws IOException {
 
-    URLConnection urlConn = null;
+    }
+
+    public void run() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void ReloadRealTimeRainfall() throws IOException {
+
+        URLConnection urlConn = null;
+        
         try{
 
         System.out.println("Opening connection");
@@ -31,7 +40,7 @@ public class BasinMaskXY {
         BufferedReader is = new BufferedReader(xover);
 
         System.out.println("Opening connection");
-        matrix = new float[464][700];
+        matrix = new float[500][464][700];
         String line;
 
         for (int i = 0; i < 464; i++) {
@@ -49,7 +58,7 @@ public class BasinMaskXY {
                     System.out.println("NFE" + nfe.getMessage());
                 }
 
-                matrix[i][j] = f;
+                matrix[0][i][j] = f;
 
             }
         }
@@ -63,21 +72,16 @@ public class BasinMaskXY {
         catch(MalformedURLException e){
            e.printStackTrace();
         }
-        CountFolder();
+
     }
 
-    public void CountFolder() throws IOException {
-
-        matrix = new float[464][700];
-        for (int i = 0; i < matrix.length; i++) {
-            for (int j = 0; j < matrix[i].length; j++) {
-                matrix[i][j] = (float) Math.random();
-            }
-        }
+    public void RecreateKMLs() throws IOException {
 
         File dir = new File("/Users/ricardo/rawData/BasinMasks/Gauges");
         int filecount = dir.list().length;
+
         System.out.println(filecount);
+
         File[] files = dir.listFiles();
         File[] inCity = new File[filecount];
         File[] XYBasins = new File[filecount];
@@ -109,7 +113,7 @@ public class BasinMaskXY {
                     int xxx = Integer.parseInt(linarray2[0].trim());
                     int yyy = Integer.parseInt(linarray2[1].trim());
 
-                    averageValue += matrix[yyy / 10][xxx / 10];
+                    averageValue += matrix[0][yyy / 10][xxx / 10];
                     numElements++;
 
                 }
@@ -121,14 +125,16 @@ public class BasinMaskXY {
                 fin.close();
 
             }
-        //System.out.println(XYBasins[i]);
+
+            //System.out.println(XYBasins[i]);
 
         }
     }
 
     public static void main(String[] args) throws IOException {
 
-        BasinMaskXY mask = new BasinMaskXY();
+        IowaBasinsInfoScript mask = new IowaBasinsInfoScript();
 
     }
+
 }

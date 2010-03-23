@@ -36,7 +36,7 @@ public class RSNDecomposition {
     
     private hydroScalingAPI.util.geomorphology.objects.LinksAnalysis mylinksAnalysis;
     
-    private java.util.Vector[] metaLinks;
+    private java.util.Vector[] metaLinks,metaLinksHeritage;
     private java.util.Vector generatorsInfo=new java.util.Vector();
     
     private int[] numFullLinks;
@@ -57,11 +57,13 @@ public class RSNDecomposition {
          mylinksAnalysis=mla;
          
          metaLinks= new java.util.Vector[mylinksAnalysis.getBasinOrder()];
+         metaLinksHeritage= new java.util.Vector[mylinksAnalysis.getBasinOrder()];
          numFullLinks=new int[mylinksAnalysis.getBasinOrder()];
          
          for (int i=0;i<mylinksAnalysis.getBasinOrder();i++){
              
              metaLinks[i]=new java.util.Vector();
+             metaLinksHeritage[i]=new java.util.Vector();
              
          }
          
@@ -81,14 +83,17 @@ public class RSNDecomposition {
              findChain(tempList);
 
              metaLinks[(int)linksOrders[0][subOutlets[i]]-1].add(tempList);
+             int currentLength=metaLinks[(int)linksOrders[0][subOutlets[i]]-1].size();
+             int codex=(int)(((int)linksOrders[0][subOutlets[i]])*1e6+currentLength-1);
+             metaLinksHeritage[(int)linksOrders[0][subOutlets[i]]-1].add(new int[] {codex,-1,dsIndexes[subOutlets[i]]});
              numFullLinks[(int)linksOrders[0][subOutlets[i]]-1]++;
              
          }
-         
+             
          for (int i=metaLinks.length;i>1;i--){
              java.util.Vector toBreak=metaLinks[i-1];
              for(int j=0;j<toBreak.size();j++){
-                 breakMetaLink((java.util.Vector)toBreak.get(j),i);
+                 breakMetaLink((java.util.Vector)toBreak.get(j),j,i);
              }
              
          }
@@ -111,12 +116,15 @@ public class RSNDecomposition {
         
     }
     
-    private void breakMetaLink(java.util.Vector currentMetaLink, int Scale){
+    private void breakMetaLink(java.util.Vector currentMetaLink, int metaLinkIndex, int Scale){
         
         int NumBreaks=-1; //because there is always one break at the top and we don't want to count it.
         int linkOrder=0;
         
         int[] toLookFor=(int[])currentMetaLink.get(0);
+
+        int parent=(int)(Scale*1e6+metaLinkIndex);
+
         linkOrder=(int)linksOrders[0][toLookFor[0]];
         
         java.util.Vector tempMetaLink=new java.util.Vector();
@@ -128,21 +136,40 @@ public class RSNDecomposition {
             toLookFor=(int[])currentMetaLink.get(i);
             tempMetaLink.add(toLookFor);
             incoming=usIndexes[toLookFor[0]];
+
+            boolean flagBreak=true;
+
             for (int j=0;j<incoming.length;j++){
-            
-                if(((Scale-1) == linksOrders[0][incoming[j]]) || (i == (sizeMetaLink-1))){
+
+                if(flagBreak && (((Scale-1) == linksOrders[0][incoming[j]]) || (i == (sizeMetaLink-1)))){
                     metaLinks[Scale-2].add(tempMetaLink.clone());
+                    int codex=(int)((Scale-1)*1e6+metaLinks[Scale-2].size()-1);
+                    metaLinksHeritage[Scale-2].add(new int[] {codex,parent,dsIndexes[incoming[j]]});
+
                     tempMetaLink=new java.util.Vector();
-                    
                     NumBreaks++;
 
-                    break;
-                    
+                    flagBreak=false;
+
                 }
+
+                if(((Scale-1) == linksOrders[0][incoming[j]])){
+                    for (int k = 0; k < metaLinksHeritage[Scale-2].size(); k++) {
+                        int[] indexFamily=(int[])metaLinksHeritage[Scale-2].get(k);
+                        if(indexFamily[2]==toLookFor[0]) {
+                            indexFamily[1]=parent;
+                            metaLinksHeritage[Scale-2].set(k, indexFamily);
+                            break;
+                        }
+                    }
+                }
+
             }
+
         }
-        
-        generatorsInfo.add(new int[] {linkOrder,(Scale-1),NumBreaks});
+
+        int[] indexFamily=(int[])metaLinksHeritage[Scale-1].get(metaLinkIndex);
+        generatorsInfo.add(new int[] {linkOrder,(Scale-1),NumBreaks,indexFamily[0],indexFamily[1]});
         
     }
     
@@ -178,7 +205,7 @@ public class RSNDecomposition {
         
         for(int i=0;i<generatorsInfo.size();i++){
             int[] tempArr=(int[])generatorsInfo.get(i);
-            newfile.write(tempArr[0]+" "+tempArr[1]+" "+tempArr[2]+returnCh);
+            newfile.write(tempArr[0]+" "+tempArr[1]+" "+tempArr[2]+" "+tempArr[3]+" "+tempArr[4]+returnCh);
         }
         
         newfile.close();
@@ -463,7 +490,7 @@ public class RSNDecomposition {
         
         int x_outlet = 222; //222,218
         int y_outlet = 254; //254,252
-        String filename = "/hidrosigDataBases/Test_DB/Rasters/Topography/58447060";
+        String filename = "/CuencasDataBases/Test_DB/Rasters/Topography/58447060";
         
         try{
         
@@ -556,7 +583,7 @@ public class RSNDecomposition {
     private static void subMain1(String[] args) {
         
         java.util.StringTokenizer tokenizer = new java.util.StringTokenizer(args[0]);
-        String path = "/hidrosigDataBases/Continental_US_database/Rasters/";
+        String path = "/CuencasDataBases/Continental_US_database/Rasters/";
         String filepath = path + "Topography/Dd_Basins_1_ArcSec/" + tokenizer.nextToken();
         int x_outlet = Integer.parseInt(tokenizer.nextToken());
         int y_outlet = Integer.parseInt(tokenizer.nextToken());
@@ -581,7 +608,7 @@ public class RSNDecomposition {
             RSNDecomposition myRsnGen=new RSNDecomposition(mylinksAnalysis);
             long finTime=System.currentTimeMillis();
             
-            myRsnGen.printGeneratorsToFile("/home/ricardo/workFiles/ecologyWork/DD/output_rsns/"+metaModif.getLocationMeta().getName()+"_x_"+laCuenca.getXYBasin()[0][0]+"_y_"+laCuenca.getXYBasin()[1][0]+".rsnGens.txt");
+            myRsnGen.printGeneratorsToFile("/Users/ricardo/workFiles/ecologyWork/DD/output_rsns/"+metaModif.getLocationMeta().getName()+"_x_"+laCuenca.getXYBasin()[0][0]+"_y_"+laCuenca.getXYBasin()[1][0]+".rsnGens.txt");
             
             System.out.println((finTime-iniTime)/1000./60.);
             
@@ -589,7 +616,7 @@ public class RSNDecomposition {
             
             hydroScalingAPI.util.geomorphology.objects.HortonAnalysis myBasinResults=new hydroScalingAPI.util.geomorphology.objects.HortonAnalysis(laCuenca, metaModif, matDirs);
             
-            String outFileName="/home/ricardo/workFiles/ecologyWork/DD/output_rsns/"+metaModif.getLocationMeta().getName()+"_x_"+laCuenca.getXYBasin()[0][0]+"_y_"+laCuenca.getXYBasin()[1][0]+".hortonProps.txt";
+            String outFileName="/Users/ricardo/workFiles/ecologyWork/DD/output_rsns/"+metaModif.getLocationMeta().getName()+"_x_"+laCuenca.getXYBasin()[0][0]+"_y_"+laCuenca.getXYBasin()[1][0]+".hortonProps.txt";
             
             java.io.File outFile=new java.io.File(outFileName);
         
@@ -681,7 +708,7 @@ public class RSNDecomposition {
     private static void subMain2(String[] args) {
 
         java.util.StringTokenizer tokenizer = new java.util.StringTokenizer(args[0]);
-        String path = "/hidrosigDataBases/Continental_US_database/Rasters/";
+        String path = "/CuencasDataBases/Continental_US_database/Rasters/";
         String filepath = path + "Topography/Dd_Basins_30_ArcSec/" + tokenizer.nextToken();
         int x_outlet = Integer.parseInt(tokenizer.nextToken());
         int y_outlet = Integer.parseInt(tokenizer.nextToken());
@@ -752,7 +779,7 @@ public class RSNDecomposition {
     private static void subMain3(String[] args) {
         
         java.util.StringTokenizer tokenizer = new java.util.StringTokenizer(args[0]);
-        String path = "/hidrosigDataBases/Continental_US_database/Rasters/";
+        String path = "/CuencasDataBases/Continental_US_database/Rasters/";
         String filepath = path + "Topography/Dd_Basins_30_ArcSec/" + tokenizer.nextToken();
         int x_outlet = Integer.parseInt(tokenizer.nextToken());
         int y_outlet = Integer.parseInt(tokenizer.nextToken());
@@ -812,7 +839,7 @@ public class RSNDecomposition {
     private static void subMain4(String[] args) {
 
         java.util.StringTokenizer tokenizer = new java.util.StringTokenizer(args[0]);
-        String path = "/hidrosigDataBases/Continental_US_database/Rasters/";
+        String path = "/CuencasDataBases/Continental_US_database/Rasters/";
         String filepath = path + "Topography/Dd_Basins_30_ArcSec/" + tokenizer.nextToken();
         int x_outlet = Integer.parseInt(tokenizer.nextToken());
         int y_outlet = Integer.parseInt(tokenizer.nextToken());
