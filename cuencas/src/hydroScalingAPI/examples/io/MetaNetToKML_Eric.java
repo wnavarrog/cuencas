@@ -56,6 +56,25 @@ public class MetaNetToKML_Eric {
         java.io.OutputStreamWriter      newfile;
         java.io.BufferedOutputStream    bufferout;
         String                          ret="\n";
+
+        fileSalida=new java.io.File(outputDirectory+"/BasinXY_"+uniqueIdentifier+".txt.gz");
+
+        outputDir = new java.io.FileOutputStream(fileSalida);
+        java.util.zip.GZIPOutputStream outputComprim=new java.util.zip.GZIPOutputStream(outputDir);
+        bufferout=new java.io.BufferedOutputStream(outputComprim);
+        newfile=new java.io.OutputStreamWriter(bufferout);
+
+        float[][] xyBasin=myCuenca.getLonLatBasin();
+
+        newfile.write(uniqueIdentifier+ret);
+        for (int i = 0; i < xyBasin[0].length; i++) {
+            newfile.write(xyBasin[0][i]+","+xyBasin[1][i]+ret);
+        }
+
+        newfile.close();
+        bufferout.close();
+        outputComprim.close();
+        outputDir.close();
         
         String lon=hydroScalingAPI.tools.DegreesToDMS.getprettyString(xO, 1);
         String lat=hydroScalingAPI.tools.DegreesToDMS.getprettyString(yO, 0);
@@ -103,8 +122,6 @@ public class MetaNetToKML_Eric {
         bufferout=new java.io.BufferedOutputStream(outputDir);
         newfile=new java.io.OutputStreamWriter(bufferout);
         
-        
-        
         newfile.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+ret);
         newfile.write("<kml xmlns=\"http://www.opengis.net/kml/2.2\">");
         newfile.write("<Document>"+ret);
@@ -150,6 +167,14 @@ public class MetaNetToKML_Eric {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+        args=new String[] { "/Users/ricardo/workFiles/myWorkingStuff/AdvisorThesis/Eric/res_large_cities.log",
+                            "/CuencasDataBases/Iowa_Rivers_DB/Rasters/Topography/4_arcsec/res",
+                            "/Users/ricardo/rawData/BasinMasks/large_cities/"};
+
+        args=new String[] { "/Users/ricardo/workFiles/myWorkingStuff/AdvisorThesis/Eric/res_usgs_gauges.log",
+                            "/CuencasDataBases/Iowa_Rivers_DB/Rasters/Topography/4_arcsec/res",
+                            "/Users/ricardo/rawData/BasinMasks/usgs_gauges/"};
+
         main1(args);
     }
 
@@ -161,9 +186,9 @@ public class MetaNetToKML_Eric {
 
         try{
 
-            String[] basins=new hydroScalingAPI.io.BasinsLogReader(new java.io.File("/Users/ricardo/workFiles/myWorkingStuff/AdvisorThesis/Eric/res_usgs_gauges.log")).getPresetBasins();
+            String[] basins=new hydroScalingAPI.io.BasinsLogReader(new java.io.File(args[0])).getPresetBasins();
 
-            String fileName="/CuencasDataBases/Iowa_Rivers_DB/Rasters/Topography/4_arcsec/res";
+            String fileName=args[1];
 
             java.io.File theFile=new java.io.File(fileName+".metaDEM");
             hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
@@ -189,7 +214,7 @@ public class MetaNetToKML_Eric {
 
                     hydroScalingAPI.util.geomorphology.objects.Basin laCuenca=new hydroScalingAPI.util.geomorphology.objects.Basin(x, y,matDirs,metaModif);
 
-                    java.io.File outputDir=new java.io.File("/Users/ricardo/rawData/BasinMasks/usgs_gauges/"+cityName[0]);
+                    java.io.File outputDir=new java.io.File(args[2]+cityName[0]);
                     outputDir.mkdirs();
 
                     MetaNetToKML_Eric exporter=new MetaNetToKML_Eric(metaModif,outputDir,laCuenca,matDirs,uniqueIdentifier);

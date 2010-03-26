@@ -339,20 +339,20 @@ public class MetaPolygon {
         writerKml.write("<width>0.4</width></LineStyle>" +ret);
         writerKml.write("<PolyStyle><color>EA6BE3FD</color></PolyStyle></Style>" +ret);
     
-        writerKml.write("  <Placemark>><description><![CDATA["+myDescription+"]]></description>"+ret+ "<styleUrl>#Polygon</styleUrl>"+ret);
-        writerKml.write("<Polygon>");
-        writerKml.write("<name>"+label+"</name>"+ret);
-        writerKml.write("      <outerBoundaryIs>"+ret);
-        writerKml.write("      <LinearRing>"+ret);
-        writerKml.write("        <coordinates>"+ret);
-        writerKml.write("           ");
+        writerKml.write("<Placemark><description><![CDATA["+myDescription+"]]></description>"+ret+ "<styleUrl>#Polygon</styleUrl>"+ret);
+        writerKml.write("   <Polygon>");
+        writerKml.write("       <name>"+label+"</name>"+ret);
+        writerKml.write("       <outerBoundaryIs>"+ret);
+        writerKml.write("       <LinearRing>"+ret);
+        writerKml.write("          <coordinates>"+ret);
+        writerKml.write("          ");
       for (int i=0;i<xyContour[0].length;i++){
             writerKml.write(xyContour[0][i]+","+xyContour[1][i]+" ");
         }
         writerKml.write(ret);
-        writerKml.write("        </coordinates>"+ret);
-        writerKml.write("      </LinearRing>"+ret);
-        writerKml.write("    </outerBoundaryIs>"+ret);
+        writerKml.write("           </coordinates>"+ret);
+        writerKml.write("        </LinearRing>"+ret);
+        writerKml.write("     </outerBoundaryIs>"+ret);
         writerKml.write("  </Polygon>"+ret);
         writerKml.write("</Placemark>"+ret);
         writerKml.write("</kml>"+ret);
