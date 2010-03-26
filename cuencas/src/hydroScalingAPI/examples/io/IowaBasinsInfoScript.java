@@ -45,7 +45,7 @@ public class IowaBasinsInfoScript{
     public IowaBasinsInfoScript(String KMLsPath1,String OutputPath1) throws IOException {
         KMLsPath=KMLsPath1;
         OutputPath=OutputPath1;
-        for (int i = 0; i < 40; i++) {
+        for (int i = 0; i < 1; i++) {
             ReloadRealTimeRainfall();
             RecreateKMLs();
             System.out.println(">> Waiting for next real-time rainfall field");
@@ -231,7 +231,7 @@ public class IowaBasinsInfoScript{
                 is = new BufferedReader(xover);
 
                 fileSalida=new java.io.File(OutputPath+"/polygons/"+webSafeName+".kmz");
-                String polyWebAddress="http://ricardo-mantillas-mac-pro.ecn.uiowa.edu/~ricardo/iowa_basins_data/"+new java.io.File(OutputPath).getName()+"/polygons/"+webSafeName+".kmz";
+                String polyWebAddress="http://www.iihr.uiowa.edu/~ricardo/temp/iowa_basins_data/"+new java.io.File(OutputPath).getName()+"/polygons/"+webSafeName+".kmz";
 
                 outputDir = new java.io.FileOutputStream(fileSalida);
                 java.util.zip.ZipOutputStream outputComprim=new java.util.zip.ZipOutputStream(outputDir);
@@ -273,7 +273,7 @@ public class IowaBasinsInfoScript{
 
 
                 fileSalida=new java.io.File(OutputPath+"/networks/"+webSafeName+".kmz");
-                String netWebAddress="http://ricardo-mantillas-mac-pro.ecn.uiowa.edu/~ricardo/iowa_basins_data/"+new java.io.File(OutputPath).getName()+"/networks/"+webSafeName+".kmz";
+                String netWebAddress="http://www.iihr.uiowa.edu/~ricardo/temp/iowa_basins_data/"+new java.io.File(OutputPath).getName()+"/networks/"+webSafeName+".kmz";
 
                 outputDir = new java.io.FileOutputStream(fileSalida);
                 outputComprim=new java.util.zip.ZipOutputStream(outputDir);
