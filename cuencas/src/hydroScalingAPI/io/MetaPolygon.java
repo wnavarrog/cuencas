@@ -332,6 +332,7 @@ public class MetaPolygon {
         
         writerKml.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+ret);
         writerKml.write("<kml xmlns=\"http://www.opengis.net/kml/2.2\" xmlns:gx=\"http://www.google.com/kml/ext/2.2\" xmlns:kml=\"http://www.opengis.net/kml/2.2\" xmlns:atom=\"http://www.w3.org/2005/Atom\">");
+        writerKml.write("<Document>" + ret);
         writerKml.write("<Style id=\"Polygon\">" + ret);
         writerKml.write("<LabelStyle><color>00000000</color>" +ret);
         writerKml.write("<scale>0</scale></LabelStyle>" + ret);
@@ -355,6 +356,7 @@ public class MetaPolygon {
         writerKml.write("     </outerBoundaryIs>"+ret);
         writerKml.write("  </Polygon>"+ret);
         writerKml.write("</Placemark>"+ret);
+        writerKml.write("</Document>" + ret);
         writerKml.write("</kml>"+ret);
 
         writerKml.close();

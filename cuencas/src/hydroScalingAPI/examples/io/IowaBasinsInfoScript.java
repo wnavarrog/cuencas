@@ -6,17 +6,19 @@ package hydroScalingAPI.examples.io;
 
 /**
  *
- * @author Eric Osgood
+ * @author Ricardo Mantilla
  */
 import java.io.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.zip.*;
 import java.net.*;
 
 public class IowaBasinsInfoScript{
 
-    float[][][] matrix = new float[10][1057][1741];
+    java.io.FileInputStream dataPath;
+    java.io.BufferedInputStream dataBuffer;
+    java.io.DataInputStream dataDataStream;
+
+    float[][] matrix = new float[1057][1741];
 
     int numCol_Rain=1741;
     int numRow_Rain=1057;
@@ -35,26 +37,58 @@ public class IowaBasinsInfoScript{
     java.io.File fileSalida;
     java.io.FileOutputStream        outputDir;
     java.io.OutputStreamWriter      newfile;
+    java.io.DataOutputStream        newOutputStream;
     java.io.BufferedOutputStream    bufferout;
     String                          ret="\n";
+
+    java.io.File dirOut=new java.io.File("/Users/ricardo/rawData/RainfallAccumulations");
 
     String KMLsPath, OutputPath;
 
 
+    public IowaBasinsInfoScript(int action) throws IOException{
+        switch (action){
+            case 0:Reset(); break;
+            case 1:ReloadRealTimeRainfall(); break;
+        }
+
+    }
 
     public IowaBasinsInfoScript(String KMLsPath1,String OutputPath1) throws IOException {
         KMLsPath=KMLsPath1;
         OutputPath=OutputPath1;
-        for (int i = 0; i < 1; i++) {
-            ReloadRealTimeRainfall();
-            RecreateKMLs();
-            System.out.println(">> Waiting for next real-time rainfall field");
-            new visad.util.Delay(1000*60*5);
 
-        }
-
+        RecreateKMLs();
+        System.out.println(">> Waiting for next real-time rainfall field");
+        
         System.out.println(">> Process Completed");
         
+    }
+
+    public void Reset() throws java.io.IOException{
+
+        System.out.println(">> Reseting Rainfall Accumulation Files");
+
+        for(int k=1;k<=500;k++){
+
+            System.out.println(">> Working on File # "+k);
+
+            outputDir = new FileOutputStream(dirOut.getPath()+"/Current/accum"+k);
+            bufferout=new BufferedOutputStream(outputDir);
+            newOutputStream=new DataOutputStream(bufferout);
+
+            for (int i=0;i<numRow_Rain;i++) for (int j=0;j<numCol_Rain;j++) {
+                newOutputStream.writeFloat(0.0f);
+            }
+
+            newOutputStream.close();
+            bufferout.close();
+            outputDir.close();
+            
+        }
+
+        System.out.println(">> Rainfall Accumulation Files Ready");
+
     }
 
     public void ReloadRealTimeRainfall() throws IOException {
@@ -101,7 +135,7 @@ public class IowaBasinsInfoScript{
 
             System.out.println(">> Reading Real-Time Rainfall Data");
 
-            float[][] currentMatrix = new float[numRow_Rain][numCol_Rain];
+            matrix = new float[numRow_Rain][numCol_Rain];
             
             for (int i = 0; i < numRow_Rain; i++) {
 
@@ -118,9 +152,7 @@ public class IowaBasinsInfoScript{
                         System.out.println("NFE" + nfe.getMessage());
                     }
 
-                    currentMatrix[i][j] = f;
-
-                    currentMatrix[i][j] = (float)Math.random()+(float)i/(float)numRow_Rain*10.0f;
+                    matrix[i][j] = f;
 
                 }
             }
@@ -130,24 +162,56 @@ public class IowaBasinsInfoScript{
             
             System.out.println(">> Matrix Read!");
 
-            System.out.println(">> Updating Accumulations Matrix");
+            System.out.println(">> Updating Accumulations Files");
 
-            for (int k=matrix.length-1;k>0;k--){
+            float[][] dataFloat=new float[numRow_Rain][numCol_Rain];
 
-                for (int i = 0; i < numRow_Rain; i++) {
+            for (int k=500;k>1;k--){
 
-                    for (int j = 0; j < numCol_Rain; j++) {
+//                dataPath=new java.io.FileInputStream("/Users/ricardo/rawData/RainfallAccumulations/Current/accum"+(k-1));
+//                dataBuffer=new java.io.BufferedInputStream(dataPath);
+//                dataDataStream=new java.io.DataInputStream(dataBuffer);
+//
+//                for (int i=0;i<numRow_Rain;i++) for(int j=0;j<numCol_Rain;j++) {
+//                    dataFloat[i][j]=dataDataStream.readFloat();
+//                }
+//
+//
+//                dataBuffer.close();
+//                dataDataStream.close();
+//
+//                outputDir = new FileOutputStream(dirOut.getPath()+"/Current/accum"+k);
+//                bufferout=new BufferedOutputStream(outputDir);
+//                newOutputStream=new DataOutputStream(bufferout);
+//
+//                for (int i=numRow_Rain-1;i>-1;i--) for (int j=0;j<numCol_Rain;j++) {
+//                    newOutputStream.writeFloat(dataFloat[i][j]+matrix[i][j]);
+//                }
+//
+//                newOutputStream.close();
+//                bufferout.close();
+//                outputDir.close();
 
-                        matrix[k][i][j]=matrix[k-1][i][j]+currentMatrix[i][j];
-
-                    }
-                }
-                
             }
 
-            matrix[0]=currentMatrix;
+            outputDir = new FileOutputStream(dirOut.getPath()+"/Current/accum0");
+            bufferout=new BufferedOutputStream(outputDir);
+            newOutputStream=new DataOutputStream(bufferout);
 
-            System.out.println(">> Accumulations Matrix Completed");
+            for (int i=numRow_Rain-1;i>-1;i--) for (int j=0;j<numCol_Rain;j++) {
+                if(matrix[i][j] != -99.0) {
+                    newOutputStream.writeFloat(matrix[i][j]);
+                } else{
+                    newOutputStream.writeFloat(0.0f);
+                }
+
+            }
+
+            newOutputStream.close();
+            bufferout.close();
+            outputDir.close();
+
+            System.out.println(">> Accumulations Files Update Completed");
 
         }
         catch(MalformedURLException e){
@@ -173,7 +237,6 @@ public class IowaBasinsInfoScript{
         String tableRadek="City Name;River Name;Latitude;Longitude;File Polygon;File Network;Zoom Level"+ret;
         
         for (int i = 0; i < files.length; i++) {
-        //for (int i = 0; i < 10; i++) {
         
             inCity1 = files[i].listFiles(new hydroScalingAPI.util.fileUtilities.NameDotFilter("Basin","txt.gz"));
             inCity2 = files[i].listFiles(new hydroScalingAPI.util.fileUtilities.NameDotFilter("Divide","kml"));
@@ -182,15 +245,55 @@ public class IowaBasinsInfoScript{
 
             for (int j = 0; j < inCity1.length; j++) {
 
+                FileInputStream fin;
+                GZIPInputStream gzis;
+                InputStreamReader xover;
+                BufferedReader is;
+
+                fin = new FileInputStream(inCity4[j]);
+                xover = new InputStreamReader(fin);
+                is = new BufferedReader(xover);
+
+                is.readLine();
+
+                double latitude=hydroScalingAPI.tools.DMSToDegrees.getDegrees(is.readLine().split(">")[2].trim());
+                double longitude=hydroScalingAPI.tools.DMSToDegrees.getDegrees(is.readLine().split(">")[2].trim());
+
+                is.readLine();
+                is.readLine();
+
+                double responseTime=Double.parseDouble(is.readLine().split(">")[2].trim());
+
+                is.close();
+                xover.close();
+                fin.close();
+
+                long fileIndex=Math.max(0L,Math.round(responseTime));
+
+                System.out.println("/Users/ricardo/rawData/RainfallAccumulations/Current/accum"+fileIndex);
+
+                dataPath=new java.io.FileInputStream("/Users/ricardo/rawData/RainfallAccumulations/Current/accum"+fileIndex);
+                dataBuffer=new java.io.BufferedInputStream(dataPath);
+                dataDataStream=new java.io.DataInputStream(dataBuffer);
+
+                for (int ii=0;ii<numRow_Rain;ii++) for(int jj=0;jj<numCol_Rain;jj++) {
+                    matrix[ii][jj]=dataDataStream.readFloat();
+                    matrix[ii][jj] = (float)Math.random()+(float)ii/(float)numRow_Rain*10.0f;
+                }
+
+
+                dataBuffer.close();
+                dataDataStream.close();
+
                 float averageValue = 0.0f;
                 float numElements = 0.0f;
 
                 //Open the File for reading
 
-                FileInputStream fin = new FileInputStream(inCity1[j]);
-                GZIPInputStream gzis = new GZIPInputStream(fin);
-                InputStreamReader xover = new InputStreamReader(gzis);
-                BufferedReader is = new BufferedReader(xover);
+                fin = new FileInputStream(inCity1[j]);
+                gzis = new GZIPInputStream(fin);
+                xover = new InputStreamReader(gzis);
+                is = new BufferedReader(xover);
 
                 String line2;
                 String line3;
@@ -203,7 +306,7 @@ public class IowaBasinsInfoScript{
                     int xxx = (int)((Float.parseFloat(linarray2[0].trim())-minLon_Rain)/matRes_Rain);
                     int yyy = (int)((Float.parseFloat(linarray2[1].trim())-minLat_Rain)/matRes_Rain);
 
-                    averageValue += matrix[0][yyy][xxx];
+                    averageValue += matrix[yyy][xxx];
                     numElements++;
 
                 }
@@ -242,11 +345,13 @@ public class IowaBasinsInfoScript{
                 while ((line2 = is.readLine()) != null) {
 
                     if(line2.equalsIgnoreCase("<PolyStyle><color>EA6BE3FD</color></PolyStyle></Style>")){
-                        
-                        line2="<PolyStyle><color>7d12b712</color></PolyStyle></Style>";
 
-                        if(averageValue > 5.00) line2="<PolyStyle><color>7d0080ff</color></PolyStyle></Style>";
-                        if(averageValue > 7.00) line2="<PolyStyle><color>7d3232fd</color></PolyStyle></Style>";
+                        //Green
+                        line2="<PolyStyle><color>be22c122</color></PolyStyle></Style>";
+                        //Orange
+                        if(averageValue > 5.00) line2="<PolyStyle><color>be0062ff</color></PolyStyle></Style>";
+                        //Red
+                        if(averageValue > 7.00) line2="<PolyStyle><color>be2023ff</color></PolyStyle></Style>";
                         
                     }
 
@@ -295,19 +400,6 @@ public class IowaBasinsInfoScript{
                 xover.close();
                 fin.close();
 
-                fin = new FileInputStream(inCity4[j]);
-                xover = new InputStreamReader(fin);
-                is = new BufferedReader(xover);
-
-                is.readLine();
-
-                double latitude=hydroScalingAPI.tools.DMSToDegrees.getDegrees(is.readLine().split(">")[2].trim());
-                double longitude=hydroScalingAPI.tools.DMSToDegrees.getDegrees(is.readLine().split(">")[2].trim());
-
-                is.close();
-                xover.close();
-                fin.close();
-
                 tableRadek+=cityName[0]+";"+riverName[0]+";"+latitude+";"+longitude+";"+polyWebAddress+";"+netWebAddress+";10"+ret;
 
                 
@@ -336,9 +428,32 @@ public class IowaBasinsInfoScript{
     public static void main(String[] args) throws IOException {
 
         String[] command;
-        java.lang.Process localProcess1,localProcess2;
+        java.lang.Process localProcess0,localProcess1,localProcess2;
         
         if(args.length == 0) {
+
+            command=new String[] {  System.getProperty("java.home")+System.getProperty("file.separator")+"bin"+System.getProperty("file.separator")+"java",
+                                    "-Xmx1500m",
+                                    "-Xrs",
+                                    "-cp",
+                                    System.getProperty("java.class.path"),
+                                    "hydroScalingAPI.examples.io.IowaBasinsInfoScript",
+                                    "reload-rain"};
+            localProcess0=java.lang.Runtime.getRuntime().exec(command);
+
+            String concat0="";
+
+            boolean monitor0=true;
+
+            while(monitor0){
+                String s1=new String(new byte[] {Byte.parseByte(""+localProcess0.getInputStream().read())});
+                concat0+=s1;
+                if(s1.equalsIgnoreCase("\n")) {
+                    System.out.print("Processor 0: "+concat0);
+                    if(concat0.substring(0, Math.min(39,concat0.length())).equalsIgnoreCase(">> Accumulations Files Update Completed")) monitor0=false;
+                    concat0="";
+                }
+            }
 
             command=new String[] {  System.getProperty("java.home")+System.getProperty("file.separator")+"bin"+System.getProperty("file.separator")+"java",
                                     "-Xmx1500m",
@@ -384,6 +499,16 @@ public class IowaBasinsInfoScript{
             System.exit(0);
 
         } else {
+
+            if(args[0].equalsIgnoreCase("reset")){
+                new IowaBasinsInfoScript(0);
+                System.exit(0);
+            }
+
+            if(args[0].equalsIgnoreCase("reload-rain")){
+                new IowaBasinsInfoScript(1);
+                System.exit(0);
+            }
             new IowaBasinsInfoScript(args[0],args[1]);
             System.exit(0);
         }

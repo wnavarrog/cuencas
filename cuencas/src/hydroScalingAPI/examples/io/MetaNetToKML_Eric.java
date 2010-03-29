@@ -35,6 +35,11 @@ public class MetaNetToKML_Eric {
 
         String[] cityName=uniqueIdentifier.split(" \\(");
         String[] riverName=cityName[1].split("\\)");
+        String[] commentName=null;
+
+        if(riverName.length > 1) commentName=riverName[1].split(":"); else commentName=new String[] {"N/A"," [information N/A]"};
+
+        uniqueIdentifier=cityName[0]+" ("+riverName[0]+")";
         
         float xO=myCuenca.getLonLatBasin()[0][0];
         float yO=myCuenca.getLonLatBasin()[1][0];
@@ -80,6 +85,11 @@ public class MetaNetToKML_Eric {
         String lat=hydroScalingAPI.tools.DegreesToDMS.getprettyString(yO, 0);
         double areaUp=Math.round(thisNetworkGeom.upStreamArea(linksStructure.OuletLinkNum)*10)/10.0;
         double lengthUp=Math.round(thisNetworkGeom.mainChannelLength(linksStructure.OuletLinkNum)*100)/100.0;
+        double timeUp=Math.round(thisNetworkGeom.mainChannelLength(linksStructure.OuletLinkNum)*1000/0.5/3600.0*100)/100.0;
+
+        double areaUpSqMi=Math.round(thisNetworkGeom.upStreamArea(linksStructure.OuletLinkNum)*0.38610*10)/10.0;
+        double lengthUpMi=Math.round(thisNetworkGeom.mainChannelLength(linksStructure.OuletLinkNum)*0.62137*100)/100.0;
+        double timeUpDay=Math.round(thisNetworkGeom.mainChannelLength(linksStructure.OuletLinkNum)*1000/0.5/3600.0/24*100)/100.0;
 
 
         fileSalida=new java.io.File(outputDirectory+"/InfoFile_"+uniqueIdentifier+".txt");
@@ -94,24 +104,28 @@ public class MetaNetToKML_Eric {
         newfile.write("<b>Longitude:</b> "+lon+ret);
         newfile.write("<b>Upstream Area [km<sup>2</sup>]:</b> "+areaUp+ret);
         newfile.write("<b>Main Channel Length [km]:</b> "+lengthUp+ret);
+        newfile.write("<b>Typical Response Time [hr]:</b> "+timeUp+ret);
 
         newfile.close();
         bufferout.close();
         outputDir.close();
 
         String myDescription =  "<h3>Name: " + uniqueIdentifier + "</h3>"
-                                + "<b>Latitude:</b> " + lat +"<br>"
-                                + "<b>Longitude:</b> " + lon + "<br>"
-                                + "<b>Upstream Area:</b> " + areaUp + " [km<sup>2</sup>]"+ "<br>"
-                                +"<b>Main Channel Length:</b> "+lengthUp+" [km]"+ "<br>" + "<br>"
-                                +"<b>Comment:</b>"+ "<br>"
-                                +"Monitoring rain over this area which controls potential flooding of "+riverName[0]+" that affects (ERIC'S COMMENT)";
-
+                                //+ "<b>Baisin Outlet Information</b><br><br>"
+                                //+ "<b>Latitude:</b> " + lat +"<br>"
+                                //+ "<b>Longitude:</b> " + lon + "<br>"
+                                //+ "<b>Upstream Area:</b> " + areaUpSqMi + " [mi<sup>2</sup>] (" + areaUp + " [km<sup>2</sup>])"+ "<br>"
+                                //+ "<b>Main Channel Length:</b> "+lengthUpMi+" [miles] ("+lengthUp+" [km])"+ "<br>"
+                                //+ "<b>Typical Response Time:</b> "+timeUp+" [hours] ("+timeUpDay+" [days])"+ "<br>" + "<br>"
+                                + "<b>Upstream Area:</b> " + areaUpSqMi + " [mi<sup>2</sup>]"+ "<br>"
+                                + "<b>Main Channel Length:</b> "+lengthUpMi+" [miles]"+ "<br>"
+                                + "<b>Typical Response Time:</b> "+timeUp+" [hours]"+ "<br>" + "<br>"
+                                + "<b>Comment:</b>"+ "<br>"
+                                + "Monitoring rain over this area which controls potential flooding of "+riverName[0]+" that affects"+commentName[1]+".";
+        
         fileSalida=new java.io.File(outputDirectory+"/Divide_"+uniqueIdentifier+".kml");
 
         metaPolyToWrite.writeKmlPolygon(fileSalida,uniqueIdentifier, myDescription);
-
-
 
         byte[][] basMask=myCuenca.getBasinMask();
 
@@ -171,9 +185,9 @@ public class MetaNetToKML_Eric {
                             "/CuencasDataBases/Iowa_Rivers_DB/Rasters/Topography/4_arcsec/res",
                             "/Users/ricardo/rawData/BasinMasks/large_cities/"};
 
-        args=new String[] { "/Users/ricardo/workFiles/myWorkingStuff/AdvisorThesis/Eric/res_usgs_gauges.log",
-                            "/CuencasDataBases/Iowa_Rivers_DB/Rasters/Topography/4_arcsec/res",
-                            "/Users/ricardo/rawData/BasinMasks/usgs_gauges/"};
+//        args=new String[] { "/Users/ricardo/workFiles/myWorkingStuff/AdvisorThesis/Eric/res_usgs_gauges.log",
+//                            "/CuencasDataBases/Iowa_Rivers_DB/Rasters/Topography/4_arcsec/res",
+//                            "/Users/ricardo/rawData/BasinMasks/usgs_gauges/"};
 
         main1(args);
     }
@@ -218,7 +232,7 @@ public class MetaNetToKML_Eric {
                     outputDir.mkdirs();
 
                     MetaNetToKML_Eric exporter=new MetaNetToKML_Eric(metaModif,outputDir,laCuenca,matDirs,uniqueIdentifier);
-                    
+
                 }
             }
         } catch (Exception IOE){
