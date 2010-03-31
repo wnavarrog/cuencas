@@ -259,7 +259,7 @@ public class SimulationToAsciiFileWithHillslope extends java.lang.Object impleme
         if(stormFile == null){
             for (int k=0;k<numPeriods;k++) {
                 System.out.println("Period"+(k)+" out of "+numPeriods);
-                rainRunoffRaining.jumpsRunToAsciiFileHillType1(storm.stormInitialTimeInMinutes()+k*rainDuration,storm.stormInitialTimeInMinutes()+(k+1)*rainDuration,rainDuration,initialCondition,newfile,linksStructure,thisNetworkGeom);
+                //rainRunoffRaining.jumpsRunToAsciiFileHillType1(storm.stormInitialTimeInMinutes()+k*rainDuration,storm.stormInitialTimeInMinutes()+(k+1)*rainDuration,rainDuration,initialCondition,newfile,linksStructure,thisNetworkGeom);
                 //rainRunoffRaining.jumpsRunToAsciiFile(storm.stormInitialTimeInMinutes()+k*rainDuration,storm.stormInitialTimeInMinutes()+(k+1)*rainDuration,10,initialCondition,newfile,linksStructure,thisNetworkGeom);
                 initialCondition=rainRunoffRaining.finalCond;
                 rainRunoffRaining.setBasicTimeStep(10/60.);
@@ -269,12 +269,12 @@ public class SimulationToAsciiFileWithHillslope extends java.lang.Object impleme
             System.out.println("Intermedia Time:"+interTime.toString());
             System.out.println("Running Time:"+(.001*(interTime.getTime()-startTime.getTime()))+" seconds");
             
-            rainRunoffRaining.jumpsRunToAsciiFileHillType1(storm.stormInitialTimeInMinutes()+numPeriods*rainDuration,(storm.stormInitialTimeInMinutes()+(numPeriods+1)*rainDuration)+8000,15,initialCondition,newfile,linksStructure,thisNetworkGeom);
+            //rainRunoffRaining.jumpsRunToAsciiFileHillType1(storm.stormInitialTimeInMinutes()+numPeriods*rainDuration,(storm.stormInitialTimeInMinutes()+(numPeriods+1)*rainDuration)+8000,15,initialCondition,newfile,linksStructure,thisNetworkGeom);
             
         } else {
             for (int k=0;k<numPeriods;k++) {
                 System.out.println("Period "+(k+1)+" of "+numPeriods);
-                rainRunoffRaining.jumpsRunToAsciiFileHillType1(storm.stormInitialTimeInMinutes()+k*storm.stormRecordResolutionInMinutes(),storm.stormInitialTimeInMinutes()+(k+1)*storm.stormRecordResolutionInMinutes(),15,initialCondition,newfile,linksStructure,thisNetworkGeom);
+                //rainRunoffRaining.jumpsRunToAsciiFileHillType1(storm.stormInitialTimeInMinutes()+k*storm.stormRecordResolutionInMinutes(),storm.stormInitialTimeInMinutes()+(k+1)*storm.stormRecordResolutionInMinutes(),15,initialCondition,newfile,linksStructure,thisNetworkGeom);
                 initialCondition=rainRunoffRaining.finalCond;
                 rainRunoffRaining.setBasicTimeStep(10/60.);
             }
@@ -283,7 +283,7 @@ public class SimulationToAsciiFileWithHillslope extends java.lang.Object impleme
             System.out.println("Intermedia Time:"+interTime.toString());
             System.out.println("Running Time:"+(.001*(interTime.getTime()-startTime.getTime()))+" seconds");
             
-            rainRunoffRaining.jumpsRunToAsciiFileHillType1(storm.stormInitialTimeInMinutes()+numPeriods*storm.stormRecordResolutionInMinutes(),(storm.stormInitialTimeInMinutes()+(numPeriods+1)*storm.stormRecordResolutionInMinutes())+2400,15,initialCondition,newfile,linksStructure,thisNetworkGeom);
+            //rainRunoffRaining.jumpsRunToAsciiFileHillType1(storm.stormInitialTimeInMinutes()+numPeriods*storm.stormRecordResolutionInMinutes(),(storm.stormInitialTimeInMinutes()+(numPeriods+1)*storm.stormRecordResolutionInMinutes())+2400,15,initialCondition,newfile,linksStructure,thisNetworkGeom);
         }
         
         System.out.println("Termina simulacion RKF");

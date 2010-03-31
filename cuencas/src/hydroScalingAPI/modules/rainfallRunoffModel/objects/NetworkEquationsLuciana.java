@@ -153,9 +153,33 @@ public class NetworkEquationsLuciana implements hydroScalingAPI.util.ordDiffEqSo
             double hillPrecIntensity=basinHillSlopesInfo.precipitation(i,time);// for URP event apply this rule*0.143;
 
             maxInt=Math.max(maxInt,hillPrecIntensity);
-            double qd=Math.max(hillPrecIntensity-basinHillSlopesInfo.infiltRate(i,time),0.0);
-            double effPrecip=hillPrecIntensity-qd;
+
             double qs=0.0;
+            qso=Math.max(hillPrecIntensity-basinHillSlopesInfo.infiltRate(i,time),0.0);
+
+            qs1=0;
+            double vr=1.0;
+
+               if(vrunoff<0) // for different hillslope velocity according to Land cover type
+               {
+               if(basinHillSlopesInfo.LandUseSCS(i)==0) vr=500.0; // water
+               if(basinHillSlopesInfo.LandUseSCS(i)==1) vr=250.0; // urban area
+               if(basinHillSlopesInfo.LandUseSCS(i)==2) vr=100.0; // baren soil
+               if(basinHillSlopesInfo.LandUseSCS(i)==3) vr=10.0; // Forest
+               if(basinHillSlopesInfo.LandUseSCS(i)==4) vr=100.0; // Shrubland
+               if(basinHillSlopesInfo.LandUseSCS(i)==5) vr=20.0; // Non-natural woody/Orchards
+               if(basinHillSlopesInfo.LandUseSCS(i)==6) vr=100.0; // Grassland
+               if(basinHillSlopesInfo.LandUseSCS(i)==7) vr=20.0; // Row Crops
+               if(basinHillSlopesInfo.LandUseSCS(i)==8) vr=100.0; // Pasture/Small Grains
+               if(basinHillSlopesInfo.LandUseSCS(i)==9) vr=50.0; // Wetlands
+               }
+            else{vr=vrunoff;}
+            double dist=areasHillArray[0][i]*1000000/(4*lengthArray[0][i]); //(m)
+            double tim_run=dist/vr; //hour
+            double tim_sub=dist/vsub;     //hour
+            qcsup=(1/tim_run)*input[i+nLi];
+
+
             qe=((input[i+nLi] > 0)?1:0)*(1/Te*(input[i+nLi]));
 
             Q_trib=0.0;
@@ -176,12 +200,10 @@ public class NetworkEquationsLuciana implements hydroScalingAPI.util.ordDiffEqSo
             double ks=0/3.6e6;
 
             double chanLoss=lengthArray[0][i]*widthArray[0][i]*ks;
-
-            //the links
-            output[i]=60*K_Q*(1/3.6*areasHillArray[0][i]*(qd+qs)+Q_trib-input[i]-chanLoss);
-
-            //the hillslopes
-            output[i+linksConectionStruct.connectionsArray.length]=1/60.*(effPrecip-qs-qe);
+//the links
+            output[i]=60*K_Q*((1/3.6*areasHillArray[0][i]*(qcsup+qcsoil))+Q_trib-input[i]-chanLoss); //[m3/s]/min
+  //the hillslopes
+            output[i+nLi]=(1/60.)*(qso-qcsup-qe); //output[mm/min] qd and qs [mm/hour]
 
           }
 
@@ -526,7 +548,7 @@ public class NetworkEquationsLuciana implements hydroScalingAPI.util.ordDiffEqSo
                if(input[i+2*nLi]>=S) qso=hillPrecIntensity;
             }
 
-       
+
             double vr=1.0;
 
             if(vrunoff<0) // for different hillslope velocity according to Land cover type

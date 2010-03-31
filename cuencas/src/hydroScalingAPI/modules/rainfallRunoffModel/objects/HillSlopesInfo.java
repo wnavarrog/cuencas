@@ -42,6 +42,7 @@ public class HillSlopesInfo extends java.lang.Object {
 
 
     private float[][] areasArray,infilRateArray, SoArray, TsArray, TeArray;
+    private float[][] VolRes,GreenRoof;
 
     hydroScalingAPI.modules.rainfallRunoffModel.objects.StormManager thisStormEvent;
     hydroScalingAPI.modules.rainfallRunoffModel.objects.InfiltrationManager thisInfiltManager;
@@ -73,6 +74,39 @@ public class HillSlopesInfo extends java.lang.Object {
      */
     public void setArea(int HillNumber,float newArea){
         areasArray[0][HillNumber]=newArea;
+    }
+
+    /**
+     * Set the volume of reservation (mm)for hillslope and Greenroof area (m2)
+     * @param HillNumber The index of the desired hillslope
+     * Vo Volume of reservation
+     */
+    public void setVolRes(float[][] Voo){
+        VolRes=Voo;
+    }
+
+
+    public void setGreenRoof(float[][] Go){
+        GreenRoof=Go;
+    }
+    /**
+     * Return the volume of reservation (mm)for hillslope and Greenroof area (m2)
+     * @param HillNumber The index of the desired hillslope
+     */
+    public float[][] getVolResArray(){
+        return VolRes;
+    }
+
+    public float[][] getGreenRoofAreaArray(){
+        return GreenRoof;
+    }
+
+    public float VolRes(int HillNumber){
+        return VolRes[0][HillNumber];
+    }
+
+    public float getGreenRoofAreaArray(int HillNumber){
+        return GreenRoof[0][HillNumber];
     }
 
     /**
@@ -121,6 +155,7 @@ public class HillSlopesInfo extends java.lang.Object {
     public float meanPrecipitation(int HillNumber){
         return thisStormEvent.getMeanPrecOnHillslope(HillNumber);
     }
+
 
     /**
      * Returns the value of infiltration rate in mm/h for a given moment of time
@@ -271,50 +306,80 @@ public class HillSlopesInfo extends java.lang.Object {
         double etrate_mphr = etrate_mpd*(1./24.);
         return etrate_mphr;
     }
-    /* PF ADDITION - ... END */
-     /* Returns the value of LanUse for a given moment of time
+
+
+    /* Luciana Cunha Edition - To add land cover, soil hydrologic group and hillslope properties to the rainfall runoff transformation method
+     *
+    /* Luciana Cunha Edition - LanUseManager
      * @param HillNumber The index of the desired hillslope
-     * @param timeInMinutes The time in minutes
-     * @return The value of rainfall intensity
+     * @return The predominant land use in the hillslope
      */
     public double LandUse(int HillNumber){
         return thisLandUse.getMaxHillSlopeLU(HillNumber);
     }
-
+    /* Luciana Cunha Edition - LanUseManager
+     * @param HillNumber The index of the desired hillslope
+     * @return The porcentage of the predominant land use in the hillslope
+     */
     public double LandUsePerc(int HillNumber){
         return thisLandUse.getMaxHillSlopeLUPerc(HillNumber);
     }
-
+    /* Luciana Cunha Edition - SCS Manager - Object for Network Equations using SCSmethod
+     * @param HillNumber The index of the desired hillslope
+     * @return The predominant land use in the hillslope
+     */
    public double LandUseSCS(int HillNumber){
         return thisSCSData.getMaxHillLU(HillNumber);
     }
-
+   /* Luciana Cunha Edition - SCS Manager - Object for Network Equations using SCSmethod
+     * @param HillNumber The index of the desired hillslope
+     * @return The porcentage of the predominant land use in the hillslope
+     */
     public double LandUsePercSCS(int HillNumber){
         return thisSCSData.getMaxHillLUPerc(HillNumber);
     }
-
+    /* Luciana Cunha Edition - SCS Manager - Object for Network Equations using SCSmethod
+     * @param HillNumber The index of the desired hillslope
+     * @return The predominant soil hydrologic group - from 0 (lower infiltration) to 3 (higher infiltration)
+     */
     public double Soil_SCS(int HillNumber){
         return thisSCSData.getMaxHillSOIL(HillNumber);
     }
-
+    /* Luciana Cunha Edition - SCS Manager - Object for Network Equations using SCSmethod
+     * @param HillNumber The index of the desired hillslope
+     * @return The porcentage of the dominant soil hydrologic group - from 0 (lower infiltration) to 3 (higher infiltration)
+     */
     public double Soil_PercSCS(int HillNumber){
         return thisSCSData.getMaxHillSOILPerc(HillNumber);
     }
+    /* Luciana Cunha Edition - SCS Manager - Object for Network Equations using SCSmethod
+     * @param HillNumber The index of the desired hillslope
+     * @return The average CN2 for the hillslope. It is calculated as an average for all the pixels in the basin
+     * (CN2 - represents the average class of antecendent soil moisture) - base to calculate CN1 and CN3)*/
     public double SCS_CN2(int HillNumber){
         return thisSCSData.getAverCN2(HillNumber);
     }
-
+     /* Luciana Cunha Edition - SCS Manager - Object for Network Equations using SCSmethod
+     * @param HillNumber The index of the desired hillslope
+     * @return The average CN1 for the hillslope. calculate using CN2 - It is used to represent the maximum soil capacity*/
    public Double SCS_CN1(int HillNumber){
         return thisSCSData.getAverCN1(HillNumber);
     }
+   /* Luciana Cunha Edition - SCS Manager - Object for Network Equations using SCSmethod
+     * @param HillNumber The index of the desired hillslope
+     * @return The average CN3 for the hillslope. calculate using CN2 - very wet soil*/
    public Double SCS_CN3(int HillNumber){
         return thisSCSData.getAverCN3(HillNumber);
     }
-
+ /* Luciana Cunha Edition - SCS Manager - Object for Network Equations using SCSmethod
+     * @param HillNumber The index of the desired hillslope
+     * SCS _S1, SCS_S2, and SCS_S3 - @return Soil Storage - calculate in function of the Curve number
+     * SCS _IA1, SCS_IA2, and SCS_IA3 - @return initial abstraction  - calculate in function of the Curve number - see comments before about different CN*/
     public double SCS_S1(int HillNumber){
      return ((25400/thisSCSData.getAverCN1(HillNumber))-254);
     }
-     public double SCS_IA1(int HillNumber){
+
+    public double SCS_IA1(int HillNumber){
      return (0.05*((25400/thisSCSData.getAverCN1(HillNumber))-254));
     }
 
@@ -332,11 +397,39 @@ public class HillSlopesInfo extends java.lang.Object {
    public double SCS_IA3(int HillNumber){
         return (0.05*((25400/thisSCSData.getAverCN3(HillNumber))-254));
     }
-    public double MinHillBasedCN(int HillNumber){
+  /* Luciana Cunha Edition - SCS Manager - Object for Network Equations using SCSmethod
+     * @param HillNumber The index of the desired hillslope
+     * @return The minimum CN present in the hillslope - provide an idea about the variability of land cover in the unit*/
+   public double MinHillBasedCN(int HillNumber){
         return thisSCSData.minHillBasedCN(HillNumber);
     }
 
+  /* Luciana Cunha Edition - SCS Manager - Object for Network Equations using SCSmethod
+     * @param HillNumber The index of the desired hillslope
+     * @return The maximum CN present in the hillslope - provide an idea about the variability of land cover in the unit*/
      public double MaxHillBasedCN(int HillNumber){
         return thisSCSData.maxHillBasedCN(HillNumber);
     }
+   /* Luciana Cunha Edition - SCS Manager - Object for Network Equations using SCSmethod
+     * @param HillNumber The index of the desired hillslope
+     * @return The maximum Relief in the hillslope - maxZ - minZ*/
+     public double HillRelief(int HillNumber){
+        return thisSCSData.getHillRelief(HillNumber);
+    }
+   /* Luciana Cunha Edition - SCS Manager - Object for Network Equations using SCSmethod
+     * @param HillNumber The index of the desired hillslope
+     * @return The average manning roughness parameter in the hillslope*/
+     public double HillManning(int HillNumber){
+        return thisSCSData.getAverManning(HillNumber);
+    }
+     public double Hill_K_NRCS(int HillNumber){
+        return thisSCSData.getAverK_NRCS(HillNumber);
+    }
+     /* Luciana Cunha Edition - SCS Manager - Object for Network Equations using SCSmethod
+     * @param HillNumber The index of the desired hillslope
+     * @return The average hillslope SLOPE - calculated by a */
+      public double getHillslope(int HillNumber){
+        return thisSCSData.getavehillBasedSlope(HillNumber);
+    }
+
 }

@@ -40,7 +40,7 @@ package hydroScalingAPI.modules.rainfallRunoffModel.objects;
  * @author Luciana Cunha
  * Adapted from LandUseManager.java(@author Luciana Cunha)
  */
-public class SCSManager {
+public class SCSManagerGreenRoof {
 
     // Main variables for each hillslope  - average
     double[] Hyd_Group;  // [link]//
@@ -62,7 +62,7 @@ public class SCSManager {
     // Estimate the curvature of the hillslope - 5 classes
     double[][] HillslopeReliefArea; //[link][class]
     double[][] hillclasses; //[link][class]
-
+    
     private boolean success=false,veryFirstDrop=true;
     private hydroScalingAPI.io.MetaRaster metaLandUse;
     private hydroScalingAPI.io.MetaRaster metaSoilData;
@@ -87,7 +87,7 @@ public class SCSManager {
 
      /**
      * Creates a new instance of SCSManager
-     *
+     * 
      * @param DemData The path to the DEM files - used to calculate hillslope relief
      * @param LandUse The path to the Land Cover files
      * @param SoilPro The path to the Land Cover files
@@ -98,7 +98,7 @@ public class SCSManager {
      * @param matDir The directions matrix of the DEM that contains the basin
      * @param magnitudes The magnitudes matrix of the DEM that contains the basin
      */
-    public SCSManager(java.io.File DemData,java.io.File LandUse,java.io.File SoilData, hydroScalingAPI.util.geomorphology.objects.Basin myCuenca, hydroScalingAPI.util.geomorphology.objects.LinksAnalysis linksStructure, hydroScalingAPI.io.MetaRaster metaDatos, byte[][] matDir, int[][] magnitudes) {
+    public SCSManagerGreenRoof(java.io.File DemData,java.io.File LandUse,java.io.File SoilData,java.io.File Build, hydroScalingAPI.util.geomorphology.objects.Basin myCuenca, hydroScalingAPI.util.geomorphology.objects.LinksAnalysis linksStructure, hydroScalingAPI.io.MetaRaster metaDatos, byte[][] matDir, int[][] magnitudes) {
 
         System.out.println("START THE SCS MANAGER \n");
         java.io.File LCFile=LandUse;
@@ -115,7 +115,7 @@ public class SCSManager {
         String baseNameDEM=directorio+"\\"+(DemData.getName().substring(0,DemData.getName().lastIndexOf(".")))+".dem";
 
         int[][] matDirBox=new int[myCuenca.getMaxY()-myCuenca.getMinY()+3][myCuenca.getMaxX()-myCuenca.getMinX()+3];
-
+        
         for (int i=1;i<matDirBox.length-1;i++) for (int j=1;j<matDirBox[0].length-1;j++){
             matDirBox[i][j]=(int) matDir[i+myCuenca.getMinY()-1][j+myCuenca.getMinX()-1];
         }
@@ -338,7 +338,7 @@ public class SCSManager {
                        if(PixelK_NRCS<minHillBasedMan[matrizPintada[j][k]-1] || PixelK_NRCS>0) minHillBasedMan[matrizPintada[j][k]-1]=PixelK_NRCS;
 
                        currentHillNumPixels[matrizPintada[j][k]-1]++;
-
+                                        
                     }
 
                 }
@@ -396,8 +396,8 @@ for (int j=0;j<linksStructure.contactsArray.length;j++)
        maxHillBasedH[j]=0;
        minHillBasedH[j]=1000000;
        avehillBasedSlope[j]=0;
-}
-
+} 
+     
        double DemMinLon=metaDemData.getMinLon();
        double DemMinLat=metaDemData.getMinLat();
        double DemResLon=metaDemData.getResLon();
@@ -417,29 +417,24 @@ for (int j=0;j<linksStructure.contactsArray.length;j++)
        if (matrizPintada[j][k] > 0){
            double PixelH=dataSnapShotDem[MatYDem][MatXDem];
            double maxslope=0.0;
-           ///// remove the Math.abs because I just want the ones in the direction of the flow
-           // what means PixelH>neighPixel, and the value will be positive
-           // before it was considering negative and positive values in the average
-           // taking the maximum value at each time
-           // the maximum value should be smaller than 0.5
-           double slope=((PixelH-dataSnapShotDem[MatYDem-1][MatXDem-1])/PixelDiag);
+           double slope=Math.abs((PixelH-dataSnapShotDem[MatYDem-1][MatXDem-1])/PixelDiag);
            maxslope=Math.max(maxslope,slope);
-           slope=((PixelH-dataSnapShotDem[MatYDem-1][MatXDem])/PixelSize);
-           maxslope=Math.max(maxslope,slope);
-           slope=((PixelH-dataSnapShotDem[MatYDem-1][MatXDem+1])/PixelDiag);
-           maxslope=Math.max(maxslope,slope);
-           slope=((PixelH-dataSnapShotDem[MatYDem+1][MatXDem-1])/PixelDiag);
-           maxslope=Math.max(maxslope,slope);
-           slope=((PixelH-dataSnapShotDem[MatYDem+1][MatXDem])/PixelSize);
-           maxslope=Math.max(maxslope,slope);
-           slope=((PixelH-dataSnapShotDem[MatYDem+1][MatXDem+1])/PixelDiag);
-           maxslope=Math.max(maxslope,slope);
-           slope=((PixelH-dataSnapShotDem[MatYDem][MatXDem-1])/PixelSize);
-           maxslope=Math.max(maxslope,slope);
-           slope=((PixelH-dataSnapShotDem[MatYDem][MatXDem+1])/PixelSize);
-           maxslope=Math.max(maxslope,slope);
+           slope=Math.abs((PixelH-dataSnapShotDem[MatYDem-1][MatXDem])/PixelSize);
+           if(slope<0.5) maxslope=Math.max(maxslope,slope);
+           slope=Math.abs((PixelH-dataSnapShotDem[MatYDem-1][MatXDem+1])/PixelDiag);
+           if(slope<0.5) maxslope=Math.max(maxslope,slope);
+           slope=Math.abs((PixelH-dataSnapShotDem[MatYDem+1][MatXDem-1])/PixelDiag);
+           if(slope<0.5) maxslope=Math.max(maxslope,slope);
+           slope=Math.abs((PixelH-dataSnapShotDem[MatYDem+1][MatXDem])/PixelSize);
+           if(slope<0.5) maxslope=Math.max(maxslope,slope);
+           slope=Math.abs((PixelH-dataSnapShotDem[MatYDem+1][MatXDem+1])/PixelDiag);
+           if(slope<0.5) maxslope=Math.max(maxslope,slope);
+           slope=Math.abs((PixelH-dataSnapShotDem[MatYDem][MatXDem-1])/PixelSize);
+           if(slope<0.5) maxslope=Math.max(maxslope,slope);
+           slope=Math.abs((PixelH-dataSnapShotDem[MatYDem][MatXDem+1])/PixelSize);
+           if(slope<0.5) maxslope=Math.max(maxslope,slope);
 
-
+           
            avehillBasedSlope[matrizPintada[j][k]-1]=avehillBasedSlope[matrizPintada[j][k]-1]+maxslope;
   //System.out.println("MatXDem = " + MatXDem +"MatYDem = " + MatYDem+"dataSnapShotDem= " + dataSnapShotDem[MatYDem][MatXDem]+"\n");
 ///////////////////// land use ///////////////////
@@ -505,9 +500,7 @@ for (int j=0;j<linksStructure.contactsArray.length;j++)
     public double EstimateSCS(double soil,double LC)
     {double PixelCN=-9.9;
         if(soil==5 || soil==6) PixelCN=100;
-
-        if(LC==101) PixelCN=84; // IF IT IS GREENROOF IT WILL BE CN=84 INDEPENDENTLY OF THE SOIL
-        if(soil==1 && LC!=101)
+        if(soil==1)
             {if(LC==82) PixelCN=64;
             else if(LC==41 || LC==42 || LC ==43 ||LC==2000 ) PixelCN=30;
             else if(LC==31 || LC==32 || LC==51 || LC==52 ||
@@ -517,10 +510,11 @@ for (int j=0;j<linksStructure.contactsArray.length;j++)
             else if(LC==22) PixelCN=57;
             else if(LC==23) PixelCN=61;
             else if(LC==24) PixelCN=77;
+            else if(LC==101) PixelCN=84; // GREENROOF
             else if(LC==11 || LC==12 || LC==90 || LC==95 || LC==92)PixelCN=100;
             else PixelCN=40;
             }
-        if(soil==2 && LC!=101)
+        if(soil==2)
             {if(LC==82) PixelCN=75;
              else if(LC==41 ||LC==42 ||LC==43 || LC==2000 ) PixelCN=55;
              else if(LC==31 || LC==32 || LC==51 || LC==52 ||
@@ -535,7 +529,7 @@ for (int j=0;j<linksStructure.contactsArray.length;j++)
              else PixelCN=45;
              }
 
-        if(soil==3 && LC!=101)
+        if(soil==3)
            {if(LC==82) PixelCN=82;
             else if(LC==41 ||LC==42 ||LC==43 ||LC==2000 ) PixelCN=70;
             else if(LC==31 || LC==32 ||LC==51 || LC==52 ||
@@ -549,7 +543,7 @@ for (int j=0;j<linksStructure.contactsArray.length;j++)
             else if(LC==11 || LC==12 || LC==90 || LC==95 || LC==92)PixelCN=100;
                         else PixelCN=50;
            }
-        if(soil==4 && LC!=101)
+        if(soil==4)
            {if(LC==82) PixelCN=85;
             else if(LC==41 ||LC==42 ||LC==2000 || LC==43 ) PixelCN=77;
             else if(LC==31 || LC==32 ||LC==51 || LC==52 ||
@@ -567,8 +561,6 @@ for (int j=0;j<linksStructure.contactsArray.length;j++)
 }
     public double EstimateManing(double soil,double LC)
     {double PixelMan=-9.9;
-                      if(soil==5 && soil==6) PixelMan=0.02;
-                      if(LC==101) PixelMan=0.05;
                       if(soil==1)
                         { if(LC==11 || LC==12 ||LC==90 || LC==95 || LC==92)PixelMan=0.01;
                           else if(LC==21 || LC==83 || LC==84 || LC==85 ) PixelMan=0.07;
@@ -638,9 +630,9 @@ for (int j=0;j<linksStructure.contactsArray.length;j++)
     { double PixelK_NRCS=-9.9;
          if(LC==11 || LC==12 || LC==90 || LC==95 || LC==92)PixelK_NRCS=15.7;
                           else if(LC==21 || LC==22 || LC==23 || LC==24) PixelK_NRCS=20.4;
-                          else if(LC==31 || LC==32 || LC==33|| LC==71
+                          else if(LC==31 || LC==32 || LC==33|| LC==71 || LC==101
                                   || LC==81 || LC==85) PixelK_NRCS=7.035;
-                          else if(LC==41 || LC==42 ||  LC==2000 || LC==43  || LC==101) PixelK_NRCS=1.4;
+                          else if(LC==41 || LC==42 ||  LC==2000 || LC==43 ) PixelK_NRCS=1.4;
                           else if(LC==51 || LC==52) PixelK_NRCS=1.4;
                           else if(LC==82 || LC==83) PixelK_NRCS=4.6;
                           else PixelK_NRCS=7.0;
@@ -660,7 +652,7 @@ for (int j=0;j<linksStructure.contactsArray.length;j++)
    public String SoilName(){
         return thisSoilData;
     }
-
+  
     /**
      * The LandUse time as a {@link java.util.Calendar} object
      * @return A {@link java.util.Calendar} object indicating the land cover date
@@ -726,8 +718,8 @@ for (int j=0;j<linksStructure.contactsArray.length;j++)
     }
 
     /**
-     * The minimum manning roughness parameter over a hillslope
-     * @param HillNumber
+     * The minimum manning roughness parameter over a hillslope 
+     * @param HillNumber 
      * @return The min manning roughness parameter
      */
     public double getminHillBasedManning(int HillNumber){
@@ -765,29 +757,29 @@ for (int j=0;j<linksStructure.contactsArray.length;j++)
     public float getMaxHillSOILPerc(int HillNumber){
         return MaxHillBasedSOILPerc[HillNumber];
     }
-
+    
     public double getHillReliefPorc(int HillNumber,int HillClass){
         if(HillClass<5) return HillslopeReliefArea[HillNumber][HillClass];
-         else
+         else 
         {System.out.println("Error defining hillclass");
         return -1;}
-    }
-
+    } 
+    
     public double getHillReliefClass(int HillNumber,int HillClass){
         if(HillClass<5) return hillclasses[HillNumber][HillClass];
-        else
+        else 
         {System.out.println("Error defining hillclass");
         return -1;}
-    }
-
+    } 
+    
      public double getHillRelief(int HillNumber){
         return HillslopeRelief[HillNumber];
-    }
-
+    } 
+    
      public double getHillReliefAve(int HillNumber){
         return avehillBasedH[HillNumber];
     }
-
+     
      public double getHillReliefMax(int HillNumber){
         return maxHillBasedH[HillNumber];
     }

@@ -38,10 +38,8 @@ public class StormManager {
     private boolean success=false,veryFirstDrop=true;
     private hydroScalingAPI.io.MetaRaster metaStorm;
     private java.util.Calendar firstWaterDrop,lastWaterDrop;
-
     private float[][] totalPixelBasedPrec;
     private float[] totalHillBasedPrec;
-
     private hydroScalingAPI.util.fileUtilities.ChronoFile[] arCron;
 
     int[][] matrizPintada;
@@ -49,6 +47,14 @@ public class StormManager {
     private double recordResolutionInMinutes;
 
     private String thisStormName;
+
+    private int ncol;   // create
+    private int nrow;   // create
+    private double xllcorner;
+    private double yllcorner;
+    private double cellsize;
+
+
 
     /**
      * Creates a new instance of StormManager (with constant rainfall rate
@@ -93,7 +99,9 @@ public class StormManager {
      */
     public StormManager(java.io.File locFile, hydroScalingAPI.util.geomorphology.objects.Basin myCuenca, hydroScalingAPI.util.geomorphology.objects.LinksAnalysis linksStructure, hydroScalingAPI.io.MetaRaster metaDatos, byte[][] matDir, int[][] magnitudes) {
 
-
+        System.out.println("locFile.getParentFile()" + locFile.getParentFile());
+        int temp=locFile.getName().lastIndexOf(".");
+        System.out.println("temp"+temp+"locFile.getName..." + locFile.getName());
         java.io.File directorio=locFile.getParentFile();
         String baseName=locFile.getName().substring(0,locFile.getName().lastIndexOf("."));
 
@@ -109,7 +117,7 @@ public class StormManager {
         //Una vez leidos los archivos:
         //Lleno la matriz de direcciones
 
-        //for (int i=0;i<lasQueSi.length;i++) {System.out.println("File list="+arCron[i].fileName.getName());}
+   //     for (int i=0;i<lasQueSi.length;i++) {System.out.println("File list="+arCron[i].fileName.getName());}
 
         int[][] matDirBox=new int[myCuenca.getMaxY()-myCuenca.getMinY()+3][myCuenca.getMaxX()-myCuenca.getMinX()+3];
 
@@ -120,6 +128,12 @@ public class StormManager {
         try{
 
             metaStorm=new hydroScalingAPI.io.MetaRaster(locFile);
+            nrow=metaStorm.getNumRows();
+            ncol=metaStorm.getNumCols();
+            xllcorner=metaStorm.getMinLon();
+            yllcorner=metaStorm.getMinLat();
+            cellsize=metaStorm.getResLat();
+
 
             /****** OJO QUE ACA PUEDE HABER UN ERROR (POR LA CUESTION DE LA COBERTURA DEL MAPA SOBRE LA CUENCA)*****************/
             if (metaStorm.getMinLon() > metaDatos.getMinLon()+myCuenca.getMinX()*metaDatos.getResLon()/3600.0 ||
@@ -185,8 +199,9 @@ public class StormManager {
                 System.out.println("--> Loading data from "+arCron[i].fileName.getName());
                 dataSnapShot=new hydroScalingAPI.io.DataRaster(metaStorm).getDouble();
 
-//                hydroScalingAPI.util.statistics.Stats rainStats=new hydroScalingAPI.util.statistics.Stats(dataSnapShot,new Double(metaStorm.getMissing()).doubleValue());
-//                System.out.println("    --> Stats of the File:  Max = "+rainStats.maxValue+" Min = "+rainStats.minValue+" Mean = "+rainStats.meanValue);
+
+                hydroScalingAPI.util.statistics.Stats rainStats=new hydroScalingAPI.util.statistics.Stats(dataSnapShot,new Double(metaStorm.getMissing()).doubleValue());
+                System.out.println("    --> Stats of the File:  Max = "+rainStats.maxValue+" Min = "+rainStats.minValue+" Mean = "+rainStats.meanValue);
 
 
                 //recorto la seccion que esta en la cuenca (TIENE QUE CONTENERLA)
@@ -425,6 +440,18 @@ public class StormManager {
         return totalPixelBasedPrec[i][j];
 
     }
+
+      /**
+     * The number of rows of the original raster
+     * The number of col of the original raster
+     * lat and long  of the original raster
+     * cel resolution of the original raster Arcsec
+     */
+    public int getnrow(){return nrow;}
+    public int getncol(){return ncol;}
+    public double getxllcorner(){return xllcorner;}
+    public double getyllcorner(){return yllcorner;}
+    public double getcellsize(){return cellsize;}
 
     /**
      * The total rainfall over a given hillslope

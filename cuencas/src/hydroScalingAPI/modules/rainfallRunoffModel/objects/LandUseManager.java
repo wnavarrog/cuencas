@@ -148,7 +148,7 @@ public class LandUseManager {
             int MatX,MatY;
 
             //System.out.println("-----------------Start of Files Reading----------------");
-            int nclasses=10;
+            int nclasses=11;
             totalPixelBasedLandUse=new float[matDirBox.length][matDirBox[0].length];
             LandUseOnBasinArray=new float[linksStructure.contactsArray.length][nclasses];
             MaxHillBasedLandUse=new int[linksStructure.contactsArray.length];
@@ -203,6 +203,8 @@ public class LandUseManager {
                         if(dataSnapShot[MatY][MatX]==82 ) currentHillBasedLandUse[matrizPintada[j][k]-1][7]++;
                         if(dataSnapShot[MatY][MatX]>80 && dataSnapShot[MatY][MatX]<90  && dataSnapShot[MatY][MatX]!=82 ) currentHillBasedLandUse[matrizPintada[j][k]-1][8]++;
                         if(dataSnapShot[MatY][MatX]>90 && dataSnapShot[MatY][MatX]<100 ) currentHillBasedLandUse[matrizPintada[j][k]-1][9]++;
+                        if(dataSnapShot[MatY][MatX]==2000) currentHillBasedLandUse[matrizPintada[j][k]-1][2]++;
+                        if(dataSnapShot[MatY][MatX]==101 ) currentHillBasedLandUse[matrizPintada[j][k]-1][10]++;
 
                         currentHillNumPixels[matrizPintada[j][k]-1]++;
                     }
