@@ -65,11 +65,12 @@ public class ExternalTileToFile extends Thread{
                                     int dynaIndex){
 
         String[] possibleTileDynamics=new String[] { "hydroScalingAPI.examples.rainRunoffSimulations.parallelVersion.TileSimulationToAsciiFile",
-                                                     "hydroScalingAPI.examples.rainRunoffSimulations.parallelVersion.TileSimulationToAsciiFile2"
-                                                    };
+                                                     "hydroScalingAPI.examples.rainRunoffSimulations.parallelVersion.TileSimulationToAsciiFileLuciana"
+                                                     };
                                         
         procName=pn;
         
+        System.out.println("main - dynaindex=" + "tilesim =" + dynaIndex + possibleTileDynamics[dynaIndex]);
         command=new String[] {  "/usr/bin/ssh",
                                 "NODENAME",
                                 System.getProperty("java.home")+System.getProperty("file.separator")+"bin"+System.getProperty("file.separator")+"java",

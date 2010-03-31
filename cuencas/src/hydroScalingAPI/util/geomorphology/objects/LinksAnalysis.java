@@ -1180,4 +1180,85 @@ public class LinksAnalysis extends java.lang.Object {
 
     }
 
+/**
+     * Tests for the class
+     * @param args the command line arguments
+     */
+    public static void main5(String args[]) {
+
+        String[][] codesCoord={
+            {"05451210","951","1479"},
+            {"05451500","1245","1181"},
+            {"05451700","1312","1112"},
+            {"05451900","1765","981"},
+            {"05452200","1871","903"},
+            {"05453000","2115","801"},
+            {"05453100","2256","876"},
+            {"05453520","2900","768"},
+            {"05454000","2949","741"},
+            {"05454220","2646","762"},
+            {"05454300","2817","713"},
+            {"05454500","2885","690"},
+            {"05455100","2796","629"},
+            {"05455500","2676","465"},
+            {"05455700","2958","410"},
+            {"05457000","1164","3066"},
+            {"05457700","1526","2376"},
+            {"05458000","1730","2341"},
+            {"05458300","1770","1987"},
+            {"05458500","1775","1879"},
+            {"05458900","1682","1858"},
+            {"05459500","903","2499"},
+            {"05462000","1634","1956"},
+            {"05463000","1590","1789"},
+            {"05463500","1779","1591"},
+            {"05464000","1932","1695"},
+            {"05464220","1978","1403"},
+            {"05464500","2734","1069"},
+            {"05464942","3113","705"},
+            {"05465000","3186","392"},
+            {"05465500","3316","116"}};
+
+
+        java.text.NumberFormat number2 = java.text.NumberFormat.getNumberInstance();
+        java.text.DecimalFormat dpoint2 = (java.text.DecimalFormat)number2;
+        dpoint2.applyPattern("0.00000000");
+
+        try{
+
+            java.io.File theFile=new java.io.File("/hidrosigDataBases/Iowa_Rivers_DB/Rasters/Topography/3_arcSec/AveragedIowaRiverAtColumbusJunctions.metaDEM");
+            hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
+            metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".dir"));
+
+            metaModif.setFormat("Byte");
+            byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
+
+            for (int c = 0; c < codesCoord.length; c++) {
+                int xx = Integer.parseInt(codesCoord[c][1]);
+                int yy = Integer.parseInt(codesCoord[c][2]);
+
+                hydroScalingAPI.util.geomorphology.objects.Basin laCuenca=new hydroScalingAPI.util.geomorphology.objects.Basin(xx,yy,matDirs,metaModif);
+
+                LinksAnalysis myResults=new LinksAnalysis(laCuenca, metaModif, matDirs);
+
+                double[][] wfs=myResults.getWidthFunctions(new int[]{myResults.getOutletID()},0);
+                for (int i = 0; i < wfs.length; i++) {
+                    hydroScalingAPI.util.statistics.Stats myStats=new hydroScalingAPI.util.statistics.Stats(wfs[i]);
+                    System.out.println(codesCoord[c][0]+","+myStats.maxValue);
+                }
+
+            }
+
+
+
+        } catch (java.io.IOException IOE){
+            System.out.print(IOE);
+            System.exit(0);
+        }
+
+        System.exit(0);
+
+    }
+
+
 }

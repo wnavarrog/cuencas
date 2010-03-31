@@ -180,7 +180,7 @@ public class IncompleteNetworkEquations_HillDelay implements hydroScalingAPI.uti
             effPrecip=Math.max(hillPrecIntensity-basinHillSlopesInfo.infiltRate(i,time),0.0);
             
             qs=vh*lengthArray[0][i]/areasHillArray[0][i]*input[i+nLi]/1e3*3.6;
-            //qs=effPrecip; //Uncomment to eliminate the effect of network routing
+            //qs=effPrecip; //Uncomment to eliminate the effect of hillslope routing
             
             Q_trib=0.0;
             for (int j=0;j<linksConectionStruct.connectionsArray[i].length;j++){

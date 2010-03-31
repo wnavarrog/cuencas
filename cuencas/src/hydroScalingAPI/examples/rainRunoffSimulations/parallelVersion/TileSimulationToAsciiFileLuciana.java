@@ -27,12 +27,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 package hydroScalingAPI.examples.rainRunoffSimulations.parallelVersion;
 
 import visad.*;
+import java.text.DecimalFormat;
 
 /**
  *
  * @author Ricardo Mantilla
  */
-public class TileSimulationToAsciiFile extends java.lang.Object implements Runnable{
+public class TileSimulationToAsciiFileLuciana extends java.lang.Object implements Runnable{
     
     private hydroScalingAPI.io.MetaRaster metaDatos;
     private byte[][] matDir,hortonOrders;
@@ -54,7 +55,7 @@ public class TileSimulationToAsciiFile extends java.lang.Object implements Runna
 
     private java.util.Calendar zeroSimulationTime;
 
-    public TileSimulationToAsciiFile(   int xx, 
+    public TileSimulationToAsciiFileLuciana(   int xx,
                                         int yy, 
                                         int xxHH, 
                                         int yyHH,
@@ -118,7 +119,7 @@ public class TileSimulationToAsciiFile extends java.lang.Object implements Runna
 
         String demName=metaDatos.getLocationBinaryFile().getName().substring(0,metaDatos.getLocationBinaryFile().getName().lastIndexOf("."));
         java.io.File theFile2=new java.io.File(outputDirectory.getAbsolutePath()+"/"+demName+"_"+x+"_"+y+".complete.csv");
-       java.io.OutputStreamWriter compnewfile = new java.io.OutputStreamWriter(new java.io.BufferedOutputStream(new java.io.FileOutputStream(theFile2)));
+        java.io.OutputStreamWriter compnewfile = new java.io.OutputStreamWriter(new java.io.BufferedOutputStream(new java.io.FileOutputStream(theFile2)));
         for(int i=0;i<linksStructure.completeStreamLinksArray.length;i++) compnewfile.write(linksStructure.completeStreamLinksArray[i]+",");
 
         compnewfile.close();
@@ -228,36 +229,43 @@ public class TileSimulationToAsciiFile extends java.lang.Object implements Runna
         java.io.FileOutputStream salida1 = new java.io.FileOutputStream(theFile1);
         java.io.BufferedOutputStream bufferout1 = new java.io.BufferedOutputStream(salida1);
         java.io.OutputStreamWriter newfile1 = new java.io.OutputStreamWriter(bufferout1);
-        
-        
-        newfile.write("Information on Complete order Streams\n");
+
+        DecimalFormat df = new DecimalFormat("###");
+        DecimalFormat df1 = new DecimalFormat("###.#");
+        DecimalFormat df2 = new DecimalFormat("###.##");
+        DecimalFormat df3 = new DecimalFormat("###.###");
+        DecimalFormat df10 = new DecimalFormat("###.##########");
+
+        newfile.write("Information on order Streams\n");
         newfile.write("Links at the bottom of complete streams are:\n");
         newfile.write("Link #,");
         
         for (int i=0;i<linksStructure.contactsArray.length;i++){
-                newfile.write("Link-"+i+",");
+                newfile.write("Link-"+df.format(i)+",");
         }
         
         newfile.write("\n");
         newfile.write("Horton Order,");
         
         for (int i=0;i<linksStructure.contactsArray.length;i++){
-                newfile.write(thisNetworkGeom.linkOrder(i)+",");
+                newfile.write(df.format(thisNetworkGeom.linkOrder(i))+",");
         }
         
         newfile.write("\n");
         newfile.write("Upstream Area [km^2],");
         
         for (int i=0;i<linksStructure.contactsArray.length;i++){
-                newfile.write(thisNetworkGeom.upStreamArea(i)+",");
+                newfile.write(df3.format(thisNetworkGeom.upStreamArea(i))+",");
         }
-        
+
+
         newfile.write("\n");
         newfile.write("Link Outlet ID,");
         
         for (int i=0;i<linksStructure.contactsArray.length;i++){
-                newfile.write(i+",");
+                newfile.write(df.format(i)+",");
         }
+
         
         
         newfile.write("\n\n\n");
@@ -267,7 +275,7 @@ public class TileSimulationToAsciiFile extends java.lang.Object implements Runna
         newfile.write("Time,");
         
         for (int i=0;i<linksStructure.contactsArray.length;i++){
-                newfile.write("Link-"+i+",");
+                newfile.write("Link-"+df.format(i)+",");
         }
         
         
@@ -338,15 +346,16 @@ public class TileSimulationToAsciiFile extends java.lang.Object implements Runna
         newfile.write("\n");
         newfile.write("Maximum Discharge [m^3/s],");
         for (int i=0;i<linksStructure.contactsArray.length;i++){
-                newfile.write(maximumsAchieved[i]+",");
+                newfile.write(df3.format(maximumsAchieved[i])+",");
         }
         newfile.write("\n");
         newfile.write("Time to Maximum Discharge [minutes],");
         for (int i=0;i<linksStructure.contactsArray.length;i++){
-                newfile.write(timeToMaximumsAchieved[i]+",");
+                newfile.write(df2.format(timeToMaximumsAchieved[i])+",");
         }
         newfile.write("\n");
         newfile.write("\n");
+
 
         newfile.write("Precipitation Rates [mm/hr],");
 
@@ -357,7 +366,7 @@ public class TileSimulationToAsciiFile extends java.lang.Object implements Runna
             newfile.write(currTime+",");
             for (int i=0;i<linksStructure.contactsArray.length;i++){
 
-                newfile.write(thisHillsInfo.precipitation(i,currTime)+",");
+                newfile.write(df2.format(thisHillsInfo.precipitation(i,currTime))+",");
 
             }
 
@@ -365,11 +374,223 @@ public class TileSimulationToAsciiFile extends java.lang.Object implements Runna
 
         }
 
-        System.out.println("Inicia escritura de Resultados");
+        System.out.println("Inicia escritura de Resultados de precipitacao");
         
         newfile.close();
         bufferout.close();
+
+
+        /// Print Rainfall Statistics - in space - variability among hillslopes
         
+        theFile2=new java.io.File(theFile.getAbsolutePath()+".Prec.csv");
+        java.io.FileOutputStream salida2 = new java.io.FileOutputStream(theFile2);
+        java.io.BufferedOutputStream bufferout2 = new java.io.BufferedOutputStream(salida2);
+        java.io.OutputStreamWriter newfile2 = new java.io.OutputStreamWriter(bufferout2);
+
+
+
+        System.out.println("comeca arquivo de chuva - parte 1!!");
+        newfile2.write("Information on order Streams\n");
+        newfile2.write("Links at the bottom of complete streams are:\n");
+        newfile2.write("Link #,");
+        
+        for (int i=0;i<linksStructure.contactsArray.length;i++){
+                newfile2.write("Link-"+df.format(i)+",");
+        }
+
+        newfile2.write("\n");
+        newfile2.write("Horton Order,");
+
+        for (int i=0;i<linksStructure.contactsArray.length;i++){
+                newfile2.write(df.format(thisNetworkGeom.linkOrder(i))+",");
+        }
+
+        newfile2.write("\n");
+        newfile2.write("Upstream Area [km^2],");
+
+        for (int i=0;i<linksStructure.contactsArray.length;i++){
+                newfile2.write(df2.format(thisNetworkGeom.upStreamArea(i))+",");
+        }
+
+
+        newfile2.write("\n");
+        newfile2.write("Link Outlet ID,");
+
+        for (int i=0;i<linksStructure.contactsArray.length;i++){
+            newfile2.write(df.format(i)+",");
+        }
+
+System.out.println("passa primeiras linhas5");
+        newfile2.write("\n");
+        newfile2.write("Link Outlet X,");
+
+        for (int i=0;i<linksStructure.contactsArray.length;i++){
+        int xCon=linksStructure.contactsArray[i]%metaDatos.getNumCols();
+        newfile2.write(df.format(xCon)+",");
+        }
+
+        newfile2.write("\n");
+        newfile2.write("Link Outlet Y,");
+
+        for (int i=0;i<linksStructure.contactsArray.length;i++){
+        int yCon=linksStructure.contactsArray[i]/metaDatos.getNumCols();
+        newfile2.write(df.format(yCon)+",");
+        }
+
+        newfile2.write("\n");
+        newfile2.write("Link Outlet dist,");
+
+        for (int i=0;i<linksStructure.contactsArray.length;i++){
+        int yCon=linksStructure.contactsArray[i]/metaDatos.getNumCols();
+        int xCon=linksStructure.contactsArray[i]%metaDatos.getNumCols();
+        double dist=Math.pow(Math.pow((xCon-x),2)+Math.pow((yCon-y),2),0.5);
+        newfile2.write(df2.format(dist)+",");
+        }
+
+
+        System.out.println("comeca arquivo de chuva - parte 2!");
+        double [] coverTime=new double[linksStructure.contactsArray.length];
+        double [] mean=new double[linksStructure.contactsArray.length];
+        double [] stdev=new double[linksStructure.contactsArray.length];
+        double [] max=new double[linksStructure.contactsArray.length];
+        double [] timemax=new double[linksStructure.contactsArray.length];
+        double [] acum=new double[linksStructure.contactsArray.length];
+
+        for (int i=0;i<linksStructure.contactsArray.length;i++){
+            mean[i]=0.0;
+            stdev[i]=0;
+            max[i]=0;
+            timemax[i]=0;
+            acum[i]=0;
+            coverTime[i]=0;
+            for (int k=0;k<numPeriods;k++) {
+            double currTime=storm.stormInitialTimeInMinutes()+k*storm.stormRecordResolutionInMinutes();
+            double prevcurrTime=0;
+            if(k>0)
+               {prevcurrTime=storm.stormInitialTimeInMinutes()+(k-1)*storm.stormRecordResolutionInMinutes();
+               acum[i]=acum[i]+thisHillsInfo.precipitation(i,currTime)*(currTime-prevcurrTime)/60;}
+            mean[i]=mean[i]+thisHillsInfo.precipitation(i,currTime);
+            if(max[i]<thisHillsInfo.precipitation(i,currTime))
+               {max[i]=thisHillsInfo.precipitation(i,currTime);
+                timemax[i]=currTime;}
+            if(thisHillsInfo.precipitation(i,currTime)>0)  coverTime[i]=coverTime[i]+1;
+
+            }
+            mean[i]=mean[i]/(numPeriods);
+            coverTime[i]=coverTime[i]*100/(numPeriods);
+
+            for (int k=0;k<numPeriods;k++)
+               {double currTime=storm.stormInitialTimeInMinutes()+k*storm.stormRecordResolutionInMinutes();
+                stdev[i]=stdev[i]+Math.pow((mean[i]-thisHillsInfo.precipitation(i,currTime)),2);
+                }
+            stdev[i]=stdev[i]/(numPeriods);
+
+        }
+
+        newfile2.write("\n");
+        newfile2.write("Mean Rain,");
+
+        for (int i=0;i<linksStructure.contactsArray.length;i++){
+            newfile2.write(df2.format(mean[i])+",");
+        }
+
+        newfile2.write("\n");
+        newfile2.write("Acum Rain,");
+
+        for (int i=0;i<linksStructure.contactsArray.length;i++){
+            newfile2.write(df2.format(acum[i])+",");
+        }
+
+        newfile2.write("\n");
+        newfile2.write("max Rain,");
+
+        for (int i=0;i<linksStructure.contactsArray.length;i++){
+            newfile2.write(df2.format(max[i])+",");
+        }
+
+
+        newfile2.write("\n");
+        newfile2.write("time to max,");
+
+        for (int i=0;i<linksStructure.contactsArray.length;i++){
+            newfile2.write(df2.format(timemax[i])+",");
+        }
+
+        newfile2.write("\n");
+        newfile2.write("coverage on time,");
+
+        for (int i=0;i<linksStructure.contactsArray.length;i++){
+            newfile2.write(df2.format(coverTime[i])+",");
+        }
+        System.out.println("comeca arquivo de chuva - parte 3!");
+        newfile2.write("\n");
+        newfile2.write("\n");
+        newfile2.write("Statistics by time interval");
+        newfile2.write("\n");
+        /// Print Rainfall Statistics - in time
+        double [] coverSpace=new double[numPeriods];
+        double [] means=new double[numPeriods];
+        double [] stdevs=new double[numPeriods];
+        double [] maxs=new double[numPeriods];
+        double [] acums=new double[numPeriods];
+        double [] CMP=new double[numPeriods];
+        double [] CMB=new double[numPeriods];
+
+        for (int k=0;k<numPeriods;k++)
+           {CMP[k]=0;
+            CMB[k]=0;
+            means[k]=0;
+            acums[k]=0;
+            coverSpace[k]=0;
+            stdevs[k]=0;
+            maxs[k]=0;}
+System.out.println("passa primeiras linhas1");
+
+        for (int k=0;k<numPeriods;k++)
+           {double currTime=storm.stormInitialTimeInMinutes()+k*storm.stormRecordResolutionInMinutes();
+
+            for (int i=0;i<linksStructure.contactsArray.length;i++){
+
+               int xCon=linksStructure.contactsArray[i]%metaDatos.getNumCols();
+               int yCon=linksStructure.contactsArray[i]/metaDatos.getNumCols();
+
+               double dist=Math.pow(Math.pow((xCon-x),2)+Math.pow((yCon-y),2),0.5);
+               
+               CMP[k]=CMP[k]+dist*thisHillsInfo.precipitation(i,currTime);
+               CMB[k]=CMB[k]+dist;
+               means[k]=means[k]+thisHillsInfo.precipitation(i,currTime);
+               acums[k]=acums[k]+thisHillsInfo.precipitation(i,currTime);
+
+            if(maxs[k]<thisHillsInfo.precipitation(i,currTime)) maxs[k]=thisHillsInfo.precipitation(i,currTime);
+
+            if(thisHillsInfo.precipitation(i,currTime)>0)  coverSpace[k]=coverSpace[k]+1;
+
+            }
+            means[k]=means[k]/(linksStructure.contactsArray.length);
+            coverSpace[k]=coverSpace[k]*100/(linksStructure.contactsArray.length);
+
+            for (int i=0;i<linksStructure.contactsArray.length;i++) stdevs[k]=stdevs[k]+Math.pow((means[k]-thisHillsInfo.precipitation(i,currTime)),2);
+            stdevs[k]=Math.pow((stdevs[k]/(linksStructure.contactsArray.length)),0.5);
+
+ }
+
+        System.out.println("passa primeiras linhas2");
+         newfile2.write("Time"+","+"Coverage"+","+"Mean"+","+"Stdev"+","+"Max"+","+"Acum"+","+"Prec_CM"+","+"basin_CM");
+         newfile2.write("\n");
+         for (int k=0;k<numPeriods;k++)
+           {double currTime=storm.stormInitialTimeInMinutes()+k*storm.stormRecordResolutionInMinutes();
+     
+            newfile2.write(df2.format(currTime)+","+df2.format(coverSpace[k])+","+df2.format(means[k])
+            +","+df2.format(stdevs[k])+","+df2.format(maxs[k])+","+df2.format(acums[k])+","+df2.format(CMP[k])
+                    +","+df2.format(CMB[k]));
+            newfile2.write("\n");
+         }
+
+        System.out.println("arquivo de chuva - done2!!");
+        newfile2.close();
+        bufferout2.close();
+        System.out.println("arquivo de chuva - done3!!");
+
         //ATTENTION
         //The followng print statement announces the completion of the program.
         //DO NOT modify!  It tells the queue manager that the process can be
@@ -409,7 +630,8 @@ public class TileSimulationToAsciiFile extends java.lang.Object implements Runna
     }
     
     public static void subMain0(String args[]) throws java.io.IOException, VisADException {
-        
+
+
         java.io.File theFile=new java.io.File(args[0]);
         hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
         metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".dir"));
@@ -467,7 +689,7 @@ public class TileSimulationToAsciiFile extends java.lang.Object implements Runna
             corrO=new float[corr.length]; for (int i = 0; i < corrO.length; i++) corrO[i]=Float.parseFloat(corr[i].trim());
         }
         
-        new TileSimulationToAsciiFile(Integer.parseInt(args[1]),Integer.parseInt(args[2]),Integer.parseInt(args[3]),Integer.parseInt(args[4]),Integer.parseInt(args[5]),matDirs,magnitudes,horOrders,metaModif,0.0f,0.0f,stormFile,null,infilRate,routingType,routingParams,outputDirectory,connO,corrO,Long.parseLong(args[15])).executeSimulation();
+        new TileSimulationToAsciiFileLuciana(Integer.parseInt(args[1]),Integer.parseInt(args[2]),Integer.parseInt(args[3]),Integer.parseInt(args[4]),Integer.parseInt(args[5]),matDirs,magnitudes,horOrders,metaModif,0.0f,0.0f,stormFile,null,infilRate,routingType,routingParams,outputDirectory,connO,corrO,Long.parseLong(args[15])).executeSimulation();
         
     }
     
@@ -508,7 +730,7 @@ public class TileSimulationToAsciiFile extends java.lang.Object implements Runna
 
         java.io.File outputDirectory=new java.io.File("/Users/ricardo/simulationResults/Parallel/WalnutGulch/");
         
-        new TileSimulationToAsciiFile(729,130,-1,-1,4,matDirs,magnitudes,horOrders,metaModif,20.0f,5.0f,stormFile,null,0.0f,2,routingParams,outputDirectory,new int[] {},new float[] {},zeroSimulationTime.getTimeInMillis()).executeSimulation();
+        new TileSimulationToAsciiFileLuciana(729,130,-1,-1,4,matDirs,magnitudes,horOrders,metaModif,20.0f,5.0f,stormFile,null,0.0f,2,routingParams,outputDirectory,new int[] {},new float[] {},zeroSimulationTime.getTimeInMillis()).executeSimulation();
         //new TileSimulationToAsciiFile(229,286,-1,-1,3,matDirs,magnitudes,horOrders,metaModif,20.0f,5.0f,stormFile,null,0.0f,2,routingParams,outputDirectory,new int[] {314711, 315971},monitor,new float[] {0.027654171f, 0.20069313f}).executeSimulation();
             
     }

@@ -71,7 +71,7 @@ public class ParallelSimulationToFile extends java.lang.Object {
         int dynaIndex=0;
 
         if(routingParams.get("dynaIndex") != null) dynaIndex=((Integer)routingParams.get("dynaIndex")).intValue();
-
+        System.out.println("main - dynaindex=" + dynaIndex);
         compNodeNames=MyCnodes;
         simulProcess=numNodes;
 
@@ -175,12 +175,12 @@ public class ParallelSimulationToFile extends java.lang.Object {
         
         do{
             System.out.print(">> Processes on Hold: ");
-
+            System.out.println("externalExecutors.length = "+externalExecutors.length +"\n");
             for (int i = 0; i < externalExecutors.length; i++) {
                 int indexProc=processList.get((String)v.get(i));
-
+                System.out.println("indexProc = "+indexProc +"\n");
                 float thisDtoO=Float.parseFloat(((String)v.get(i)).substring(0, 9));
-                
+                System.out.println("externalExecutors[indexProc].completed = "+externalExecutors[indexProc].completed +"\n");
                 if(externalExecutors[indexProc].completed == false && externalExecutors[indexProc].executing == false){
                     boolean required=true;
                     for (int j = 0; j < connectionTopology[indexProc].length; j++) {
@@ -260,8 +260,8 @@ public class ParallelSimulationToFile extends java.lang.Object {
             //subMain0(args);  //Using AveragedIowaRiver
             //subMain1(args);  //Using 30m DEMs
             //subMain3(args);
-            subMainLUCIANA_IOWA3(args);
-//            subMainLUCIANA_CEDAR3(args);
+            //subMainLUCIANA_IOWA3(args);
+            subMainLUCIANA_EVENT2008(args);
 //            subMainLUCIANA_IOWA1(args);
 //            subMainLUCIANA_CEDAR1(args);
             //subMain4(args);
@@ -674,20 +674,21 @@ public class ParallelSimulationToFile extends java.lang.Object {
         routingParams.put("lambda1",0.3f);
         routingParams.put("lambda2",-0.1f);
         routingParams.put("v_o",0.5f);
-        
+        routingParams.put("dynaIndex",0);
+
         java.util.Calendar zeroSimulationTime=java.util.Calendar.getInstance();
         zeroSimulationTime.set(2006,6, 26, 20, 0, 0);
 
-        java.io.File[] stormRealizations=new java.io.File("/usr/home/rmantill/CuencasDataBases/Whitewater_database/Rasters/Hydrology/storms/simulated_events/BinKICT_2006_07_26t27/CondUncorr/"+folder+"/").listFiles();
+        java.io.File[] stormRealizations=new java.io.File("/usr/home/rmantill/CuencasDataBases/Whitewater_database/Rasters/Hydrology/storms/simulated_events/BinKICT_2006_07_26t27/"+folder+"/").listFiles();
 
         java.io.File outputDirectory;
 
-        for (int k = 0; k < 50; k++){
+        for (int k = 0; k < 1; k++){
 
                 stormFile=new java.io.File(stormRealizations[k].getAbsolutePath()+"/prec.metaVHC");
-                outputDirectory=new java.io.File("/usr/home/rmantill/temp/Parallel/Whitewaters/CV/"+stormRealizations[k].getName());
+                outputDirectory=new java.io.File("/usr/home/rmantill/temp/Parallel/Whitewaters/KICT_2006_07_26t27/"+stormRealizations[k].getName());
                 outputDirectory.mkdirs();
-                new ParallelSimulationToFile(1063,496,matDirs,magnitudes,horOrders,metaModif,stormFile,0.0f,2,routingParams,outputDirectory,zeroSimulationTime,myNodeNames,numNodes,4);
+                new ParallelSimulationToFile(1063,496,matDirs,magnitudes,horOrders,metaModif,stormFile,0.0f,5,routingParams,outputDirectory,zeroSimulationTime,myNodeNames,numNodes,4);
         }
     }
 
@@ -765,11 +766,13 @@ public class ParallelSimulationToFile extends java.lang.Object {
         // CHECK WHAT IS AVAILABLE
         // USE ALL  NODES BUT NOT ALL PROCESSORS
 
-        for (int i = 44; i <= 44; i++){
-            for (int j = 0; j <= 0; j++){
+        for (int i = 41; i <= 44; i++){
+            for (int j = 0; j <= 1; j++){
                 myNodeNames.put("c0"+Double.toString(i/100.0+0.00001).substring(2,4)+"-"+j, false);
             }
         }
+
+      
 
 //        for (int i = 62; i <= 64; i++){
 //            for (int j = 0; j <= 1; j++){
@@ -810,7 +813,8 @@ public class ParallelSimulationToFile extends java.lang.Object {
         // DEFINE - CHECK IF RICARDO FIX THE 1/(1-LAMBDA1)
         routingParams.put("v_o",0.4f);
 
-        routingParams.put("dynaIndex",1);
+        routingParams.put("dynaIndex",0);   // running default tile simulation to file
+
         // DEFINE THE STORM FILE - IF PRECIPITATION IS NOT CONSTANT
         //stormFile=new java.io.File("/usr/home/rmantill/CuencasDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/observed_events/EventIowaJuneMPE/May29toJune26/hydroNexrad.metaVHC");
         //stormFile=new java.io.File("/usr/home/rmantill/CuencasDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/observed_events/EventIowaJuneHydroNEXRAD/May29toJune26/hydroNexrad.metaVHC");
@@ -827,31 +831,48 @@ public class ParallelSimulationToFile extends java.lang.Object {
         int xOut=2885;
         int yOut=690; // Iowa River at Iowa City
 
-        xOut=2858; yOut=742;
+        int[] nday= {1,3,7};
+        int[] SWE= {25,40};
+        for (int in : nday)
+        {int nnday=in;
+           for (int iss : SWE)
+           {int SWEvalue=iss;
 
-        outputDirectory=new java.io.File("/usr/home/rmantill/luciana/Parallel/snow/3IowaRiver_1day/");
-        outputDirectory.mkdirs();       
-        stormFile=new java.io.File("/usr/home/rmantill/CuencasDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/simulated_events/constant/1day/vhc/snow_1day.metaVHC");
+        xOut=2885;
+        yOut=690; // Iowa River at Iowa City
+
+        outputDirectory=new java.io.File("/usr/home/rmantill/luciana/Parallel/snow/3IowaRiver/"+SWEvalue+"/"+nnday+"/");
+        outputDirectory.mkdirs();     
+        System.out.println(outputDirectory);
+        System.out.println(outputDirectory);
+        stormFile=new java.io.File("/usr/home/rmantill/CuencasDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/simulated_events/constant/"+SWEvalue+"/"+nnday+"day/vhc/snow_" + nnday +"day.metaVHC");
+        System.out.println(stormFile);
         zeroSimulationTime.set(2010,0, 1, 00, 00, 00);
         new ParallelSimulationToFile(xOut,yOut,matDirs,magnitudes,horOrders,metaModif,stormFile,0.0f,5,routingParams,outputDirectory,zeroSimulationTime,myNodeNames,numNodes,4);
 
-       outputDirectory=new java.io.File("/usr/home/rmantill/luciana/Parallel/snow/3IowaRiver_7day/");
-       outputDirectory.mkdirs();
-       stormFile=new java.io.File("/usr/home/rmantill/CuencasDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/simulated_events/constant/7day/vhc/snow_7day.metaVHC");
-       zeroSimulationTime.set(2010,0, 1, 00, 00, 00);
-       new ParallelSimulationToFile(xOut,yOut,matDirs,magnitudes,horOrders,metaModif,stormFile,0.0f,5,routingParams,outputDirectory,zeroSimulationTime,myNodeNames,numNodes,2);
+        xOut=2734;
+        yOut=1069;
 
+        outputDirectory=new java.io.File("/usr/home/rmantill/luciana/Parallel/snow/3CedarRiver/"+SWEvalue+"/"+nnday+"/");
+        outputDirectory.mkdirs();
+        stormFile=new java.io.File("/usr/home/rmantill/CuencasDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/simulated_events/constant/"+SWEvalue+"/"+nnday+"day/vhc/snow_" + nnday +"day.metaVHC");
+        zeroSimulationTime.set(2010,0, 1, 00, 00, 00);
+        new ParallelSimulationToFile(xOut,yOut,matDirs,magnitudes,horOrders,metaModif,stormFile,0.0f,5,routingParams,outputDirectory,zeroSimulationTime,myNodeNames,numNodes,4);
 
+           }
+        }
             //        }
     }
-    public static void subMainLUCIANA_CEDAR3(String args[]) throws java.io.IOException, VisADException {
+    
+    
+    public static void subMainLUCIANA_EVENT2008(String args[]) throws java.io.IOException, VisADException {
 
         java.util.Hashtable<String,Boolean> myNodeNames=new java.util.Hashtable<String,Boolean>();
         // DEFINE THE PROCESSORS TO BE USED IN THE KENNEDY MACHINE
         // CHECK WHAT IS AVAILABLE
         // USE ALL  NODES BUT NOT ALL PROCESSORS
 
-        for (int i = 44; i <= 60; i++){
+        for (int i = 41; i <= 60; i++){
             for (int j = 0; j <= 1; j++){
                 myNodeNames.put("c0"+Double.toString(i/100.0+0.00001).substring(2,4)+"-"+j, false);
             }
@@ -861,102 +882,13 @@ public class ParallelSimulationToFile extends java.lang.Object {
             for (int j = 0; j <= 1; j++){
                 myNodeNames.put("c0"+Double.toString(i/100.0+0.00001).substring(2,4)+"-"+j, false);
             }
-        }
+        } 
 
         int numNodes=myNodeNames.size();
         // DEFINE THE DEM
 
-        java.io.File theFile=new java.io.File("/usr/home/rmantill/CuencasDataBases/Iowa_Rivers_DB/Rasters/Topography/1_arcSec/CedarRiver.metaDEM");
-        hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
-        metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".dir"));
-        metaModif.setFormat("Byte");
-        byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
-
-        metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".magn"));
-        metaModif.setFormat("Integer");
-        int [][] magnitudes=new hydroScalingAPI.io.DataRaster(metaModif).getInt();
-
-        metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".horton"));
-        metaModif.setFormat("Byte");
-        byte [][] horOrders=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
-
-        java.io.File stormFile;
-        java.util.Hashtable routingParams=new java.util.Hashtable();
-
-        // DEFINE BASIN PARAMETERS
-        routingParams.put("widthCoeff",1.0f);
-        routingParams.put("widthExponent",0.4f);
-        routingParams.put("widthStdDev",0.0f);
-
-        routingParams.put("chezyCoeff",14.2f);
-        routingParams.put("chezyExponent",-1/3.0f);
-
-        routingParams.put("lambda1",0.3f);
-        routingParams.put("lambda2",-0.1f);
-        // DEFINE - CHECK IF RICARDO FIX THE 1/(1-LAMBDA1)
-        routingParams.put("v_o",0.5f);
-        // DEFINE THE STORM FILE - IF PRECIPITATION IS NOT CONSTANT
-        //stormFile=new java.io.File("/usr/home/rmantill/CuencasDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/observed_events/EventIowaJuneMPE/May29toJune26/hydroNexrad.metaVHC");
-        //stormFile=new java.io.File("/usr/home/rmantill/CuencasDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/observed_events/EventIowaJuneHydroNEXRAD/May29toJune26/hydroNexrad.metaVHC");
-
-        java.util.Calendar zeroSimulationTime=java.util.Calendar.getInstance();
-        // DEFINE THE INITIAL TIME OF THE SIMULATION
-
-        //zeroSimulationTime.set(2008,4, 29, 00, 00, 0);
-        zeroSimulationTime.set(2010,2, 27, 00, 00, 0);
-        java.io.File outputDirectory;
-
-//        for (float vd = 1.00f; vd <= 14.0f; vd+=2.0f) {
-//
-//        float rt=25/(1*24);
-        
-        
-        
-       
-       int xOut=2734;
-       int yOut=1069;
-
-       outputDirectory=new java.io.File("/usr/home/rmantill/luciana/Parallel/snow/3CedarRiver_1day/");
-       outputDirectory.mkdirs();
-       stormFile=new java.io.File("usr/home/rmantill/CuencasDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/simulated_events/constant/7day/vhc/snow_1day.metaVHC");
-       zeroSimulationTime.set(2010,1, 1, 00, 00, 00);
-       new ParallelSimulationToFile(xOut,yOut,matDirs,magnitudes,horOrders,metaModif,stormFile,0.0f,5,routingParams,outputDirectory,zeroSimulationTime,myNodeNames,numNodes,4);
-
-
-       outputDirectory=new java.io.File("/usr/home/rmantill/luciana/Parallel/snow/3CedarRiver_7day/");
-       outputDirectory.mkdirs();
-       stormFile=new java.io.File("usr/home/rmantill/CuencasDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/simulated_events/constant/7day/vhc/snow_7day.metaVHC");
-       zeroSimulationTime.set(2010,1, 1, 00, 00, 00);
-       new ParallelSimulationToFile(xOut,yOut,matDirs,magnitudes,horOrders,metaModif,stormFile,0.0f,5,routingParams,outputDirectory,zeroSimulationTime,myNodeNames,numNodes,4);
-
- //       }//        }
-
-
-   }
-
-   public static void subMainLUCIANA_IOWA1(String args[]) throws java.io.IOException, VisADException {
-
-        java.util.Hashtable<String,Boolean> myNodeNames=new java.util.Hashtable<String,Boolean>();
-        // DEFINE THE PROCESSORS TO BE USED IN THE KENNEDY MACHINE
-        // CHECK WHAT IS AVAILABLE
-        // USE ALL  NODES BUT NOT ALL PROCESSORS
-
-        for (int i = 44; i <= 60; i++){
-            for (int j = 0; j <= 1; j++){
-                myNodeNames.put("c0"+Double.toString(i/100.0+0.00001).substring(2,4)+"-"+j, false);
-            }
-        }
-
-        for (int i = 62; i <= 64; i++){
-            for (int j = 0; j <= 1; j++){
-                myNodeNames.put("c0"+Double.toString(i/100.0+0.00001).substring(2,4)+"-"+j, false);
-            }
-        }
-
-        int numNodes=myNodeNames.size();
-        // DEFINE THE DEM
-                java.io.File theFile=new java.io.File("/usr/home/rmantill/CuencasDataBases/Iowa_Rivers_DB/Rasters/Topography/1_arcSec/IowaRiverAtIowaCity.metaDEM");
-     //           java.io.File theFile=new java.io.File("/usr/home/rmantill/CuencasDataBases/Iowa_Rivers_DB/Rasters/Topography/1_arcSec/IowaRiverAtIowaCity.metaDEM");
+       java.io.File theFile=new java.io.File("/usr/home/rmantill/CuencasDataBases/Iowa_Rivers_DB/Rasters/Topography/3_arcSec/AveragedIowaRiverAtColumbusJunctions.metaDEM");
+     //java.io.File theFile=new java.io.File("/usr/home/rmantill/CuencasDataBases/Iowa_Rivers_DB/Rasters/Topography/1_arcSec/IowaRiverAtIowaCity.metaDEM");
         hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
         metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".dir"));
         metaModif.setFormat("Byte");
@@ -985,6 +917,9 @@ public class ParallelSimulationToFile extends java.lang.Object {
         routingParams.put("lambda2",-0.1f);
         // DEFINE - CHECK IF RICARDO FIX THE 1/(1-LAMBDA1)
         routingParams.put("v_o",0.4f);
+
+        routingParams.put("dynaIndex",1);   // running default tile simulation to file
+
         // DEFINE THE STORM FILE - IF PRECIPITATION IS NOT CONSTANT
         //stormFile=new java.io.File("/usr/home/rmantill/CuencasDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/observed_events/EventIowaJuneMPE/May29toJune26/hydroNexrad.metaVHC");
         //stormFile=new java.io.File("/usr/home/rmantill/CuencasDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/observed_events/EventIowaJuneHydroNEXRAD/May29toJune26/hydroNexrad.metaVHC");
@@ -992,118 +927,58 @@ public class ParallelSimulationToFile extends java.lang.Object {
         java.util.Calendar zeroSimulationTime=java.util.Calendar.getInstance();
         // DEFINE THE INITIAL TIME OF THE SIMULATION
 
-        //zeroSimulationTime.set(2008,4, 29, 00, 00, 0);
-
-        java.io.File outputDirectory;
-
-       // for (float vd = 1.00f; vd <= 14.0f; vd+=2.0f) {
-//
-        int xOut=6602;
-        int yOut=1539; // Iowa River at Iowa City
-        outputDirectory=new java.io.File("/usr/home/rmantill/luciana/Parallel/snow/1IowaRiver_1day/");
-        outputDirectory.mkdirs();
-        stormFile=new java.io.File("usr/home/rmantill/CuencasDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/simulated_events/constant/1day/vhc/snow_1day.metaVHC");
-        zeroSimulationTime.set(2010,1, 1, 00, 00, 00);
-        new ParallelSimulationToFile(xOut,yOut,matDirs,magnitudes,horOrders,metaModif,stormFile,0.0f,5,routingParams,outputDirectory,zeroSimulationTime,myNodeNames,numNodes,4);
-
-       outputDirectory=new java.io.File("/usr/home/rmantill/luciana/Parallel/snow/1IowaRiver_7day/");
-       outputDirectory.mkdirs();
-       stormFile=new java.io.File("usr/home/rmantill/CuencasDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/simulated_events/constant/7day/vhc/snow_7day.metaVHC");
-       zeroSimulationTime.set(2010,1, 1, 00, 00, 00);
-       new ParallelSimulationToFile(xOut,yOut,matDirs,magnitudes,horOrders,metaModif,stormFile,0.0f,5,routingParams,outputDirectory,zeroSimulationTime,myNodeNames,numNodes,4);
-
-
-            //        }
-    }
-    public static void subMainLUCIANA_CEDAR1(String args[]) throws java.io.IOException, VisADException {
-
-        java.util.Hashtable<String,Boolean> myNodeNames=new java.util.Hashtable<String,Boolean>();
-        // DEFINE THE PROCESSORS TO BE USED IN THE KENNEDY MACHINE
-        // CHECK WHAT IS AVAILABLE
-        // USE ALL  NODES BUT NOT ALL PROCESSORS
-
-        for (int i = 44; i <= 60; i++){
-            for (int j = 0; j <= 1; j++){
-                myNodeNames.put("c0"+Double.toString(i/100.0+0.00001).substring(2,4)+"-"+j, false);
-            }
-        }
-
-        for (int i = 62; i <= 64; i++){
-            for (int j = 0; j <= 1; j++){
-                myNodeNames.put("c0"+Double.toString(i/100.0+0.00001).substring(2,4)+"-"+j, false);
-            }
-        }
-
-        int numNodes=myNodeNames.size();
-        // DEFINE THE DEM
-
-              java.io.File theFile=new java.io.File("/usr/home/rmantill/CuencasDataBases/Iowa_Rivers_DB/Rasters/Topography/1_arcSec/CedarRiver.metaDEM");
-        hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
-        metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".dir"));
-        metaModif.setFormat("Byte");
-        byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
-
-        metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".magn"));
-        metaModif.setFormat("Integer");
-        int [][] magnitudes=new hydroScalingAPI.io.DataRaster(metaModif).getInt();
-
-        metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".horton"));
-        metaModif.setFormat("Byte");
-        byte [][] horOrders=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
-
-        java.io.File stormFile;
-        java.util.Hashtable routingParams=new java.util.Hashtable();
-
-        // DEFINE BASIN PARAMETERS
-        routingParams.put("widthCoeff",1.0f);
-        routingParams.put("widthExponent",0.4f);
-        routingParams.put("widthStdDev",0.0f);
-
-        routingParams.put("chezyCoeff",14.2f);
-        routingParams.put("chezyExponent",-1/3.0f);
-
-        routingParams.put("lambda1",0.3f);
-        routingParams.put("lambda2",-0.1f);
-        // DEFINE - CHECK IF RICARDO FIX THE 1/(1-LAMBDA1)
-        routingParams.put("v_o",0.5f);
-        // DEFINE THE STORM FILE - IF PRECIPITATION IS NOT CONSTANT
-        //stormFile=new java.io.File("/usr/home/rmantill/CuencasDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/observed_events/EventIowaJuneMPE/May29toJune26/hydroNexrad.metaVHC");
-        //stormFile=new java.io.File("/usr/home/rmantill/CuencasDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/observed_events/EventIowaJuneHydroNEXRAD/May29toJune26/hydroNexrad.metaVHC");
-
-        java.util.Calendar zeroSimulationTime=java.util.Calendar.getInstance();
-        // DEFINE THE INITIAL TIME OF THE SIMULATION
-
-        //zeroSimulationTime.set(2008,4, 29, 00, 00, 0);
-        zeroSimulationTime.set(2010,2, 27, 00, 00, 0);
         java.io.File outputDirectory;
 
 //        for (float vd = 1.00f; vd <= 14.0f; vd+=2.0f) {
 //
 //        float rt=25/(1*24);
+        
+ 
+       int xOut=2734;
+       int yOut=1069;
+
+      float[] lam1a= {0.2f,0.3f};
+      float[] voa= {0.6f,0.4f,0.8f,0.2f,1.0f};
+        for (float in : lam1a)
+        {float lam1=in;
+           for (float iss : voa)
+           {float vo=iss;
+
+        routingParams.put("lambda1",lam1);
+        routingParams.put("lambda2",-0.1f);
+        routingParams.put("v_o",vo);
+
+        outputDirectory=new java.io.File("/usr/home/rmantill/luciana/Parallel/event2008/3IowaRiver/hydroNexrad/"+lam1+"/"+vo+"/");
+        outputDirectory.mkdirs();
+        System.out.println(outputDirectory);
+       
+        stormFile=new java.io.File("/usr/home/rmantill/CuencasDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/observed_events/EventIowaJuneHydroNEXRAD/May29toJune26/hydroNexrad.metaVHC");
 
 
+        zeroSimulationTime.set(2008,4, 29, 0, 0, 0);
+
+        System.out.println(stormFile);
+
+        xOut=2885;
+        yOut=690; // Iowa River at Iowa City
+        new ParallelSimulationToFile(xOut,yOut,matDirs,magnitudes,horOrders,metaModif,stormFile,0.0f,5,routingParams,outputDirectory,zeroSimulationTime,myNodeNames,numNodes,4);
+
+        xOut=2734;
+        yOut=1069;
 
 
-       int xOut=3164;
-       int yOut=7352;
+        outputDirectory=new java.io.File("/usr/home/rmantill/luciana/Parallel/event2008/3CedarRiver/hydroNexrad/"+lam1+"/"+vo+"/");
+        outputDirectory.mkdirs();
+        new ParallelSimulationToFile(xOut,yOut,matDirs,magnitudes,horOrders,metaModif,stormFile,0.0f,5,routingParams,outputDirectory,zeroSimulationTime,myNodeNames,numNodes,4);
 
-       outputDirectory=new java.io.File("/usr/home/rmantill/luciana/Parallel/snow/1CedarRiver_1day/");
-       outputDirectory.mkdirs();
-       stormFile=new java.io.File("usr/home/rmantill/CuencasDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/simulated_events/constant/7day/vhc/snow_1day.metaVHC");
-       zeroSimulationTime.set(2010,1, 1, 00, 00, 00);
-       new ParallelSimulationToFile(xOut,yOut,matDirs,magnitudes,horOrders,metaModif,stormFile,0.0f,5,routingParams,outputDirectory,zeroSimulationTime,myNodeNames,numNodes,4);
+          }
+       }
 
-
-       outputDirectory=new java.io.File("/usr/home/rmantill/luciana/Parallel/snow/1CedarRiver_7day/");
-       outputDirectory.mkdirs();
-       stormFile=new java.io.File("usr/home/rmantill/CuencasDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/simulated_events/constant/7day/vhc/snow_7day.metaVHC");
-       zeroSimulationTime.set(2010,1, 1, 00, 00, 00);
-       new ParallelSimulationToFile(xOut,yOut,matDirs,magnitudes,horOrders,metaModif,stormFile,0.0f,5,routingParams,outputDirectory,zeroSimulationTime,myNodeNames,numNodes,4);
-
- //       }//        }
 
 
    }
+
+
 
 
         
