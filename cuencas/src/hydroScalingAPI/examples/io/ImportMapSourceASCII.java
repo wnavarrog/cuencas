@@ -172,7 +172,7 @@ class GpsLocationProperties {
     public String CellName;
     
     public GpsLocationProperties(String st) {
-        State=st;//
+        State=st;
     }
    
 }
