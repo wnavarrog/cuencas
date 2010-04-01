@@ -69,21 +69,36 @@ public class IowaBasinsInfoScript{
 
         System.out.println(">> Reseting Rainfall Accumulation Files");
 
-        for(int k=1;k<=500;k++){
+        System.out.println(">> Working on File # 1");
+
+        outputDir = new FileOutputStream(dirOut.getPath()+"/Current/accum1");
+        bufferout=new BufferedOutputStream(outputDir);
+        newOutputStream=new DataOutputStream(bufferout);
+
+        for (int i=0;i<numRow_Rain;i++) for(int j=0;j<numCol_Rain;j++) {
+            if(matrix[i][j] != -99.0) {
+                newOutputStream.writeFloat(matrix[i][j]);
+            } else{
+                newOutputStream.writeFloat(0);
+            }
+        }
+
+        newOutputStream.close();
+        bufferout.close();
+        outputDir.close();
+
+        for(int k=2;k<=500;k++){
 
             System.out.println(">> Working on File # "+k);
 
-            outputDir = new FileOutputStream(dirOut.getPath()+"/Current/accum"+k);
-            bufferout=new BufferedOutputStream(outputDir);
-            newOutputStream=new DataOutputStream(bufferout);
+            java.nio.channels.FileChannel inChannel = new FileInputStream(new java.io.File(dirOut.getPath()+"/Current/accum1")).getChannel();
+            java.nio.channels.FileChannel outChannel = new FileOutputStream(new java.io.File(dirOut.getPath()+"/Current/accum"+k)).getChannel();
+            
+            inChannel.transferTo(0, inChannel.size(),outChannel);
 
-            for (int i=0;i<numRow_Rain;i++) for (int j=0;j<numCol_Rain;j++) {
-                newOutputStream.writeFloat(0.0f);
-            }
-
-            newOutputStream.close();
-            bufferout.close();
-            outputDir.close();
+            if (inChannel != null) inChannel.close();
+            if (outChannel != null) outChannel.close();
+            
             
         }
 
@@ -102,7 +117,7 @@ public class IowaBasinsInfoScript{
             BufferedReader is;
             String line;
 
-            file = new URL("http://s-iihr52.iihr.uiowa.edu/products/IFC7_S2/latest.txt");
+            file = new URL("http://s-iihr52.iihr.uiowa.edu/ricardo/quality/60/latest.txt");
             urlConn = file.openConnection();
 
 
@@ -113,17 +128,20 @@ public class IowaBasinsInfoScript{
             
             is.close();
             xover.close();
+
+            mostRecentFile = "H99999999_R6003_G_31MAR2010_221000.out";
             
-            System.out.println(">> Opening connection: "+"http://s-iihr52.iihr.uiowa.edu/products/IFC7_S2/"+mostRecentFile);
-            file = new URL("http://s-iihr52.iihr.uiowa.edu/products/IFC7_S2/"+mostRecentFile);
+            System.out.println(">> Opening connection: "+"http://s-iihr52.iihr.uiowa.edu/ricardo/quality/60/"+mostRecentFile);
+            file = new URL("http://s-iihr52.iihr.uiowa.edu/ricardo/quality/60/"+mostRecentFile);
             urlConn = file.openConnection();
 
 
             xover = new InputStreamReader(urlConn.getInputStream());
             is = new BufferedReader(xover);
 
-            is.readLine();//# file name: KMPX99999999_C11015N00G_00_25MAR2010_131500.out, KDVN99999999_C11015N00G_00_25MAR2010_131500.out, KARX99999999_C11015N00G_00_25MAR2010_131500.out, KFSD99999999_C11015N00G_00_25MAR2010_131500.out, KDMX99999999_C11015N00G_00_25MAR2010_131500.out, KEAX99999999_C11015N00G_00_25MAR2010_131500.out, KOAX99999999_C11015N00G_00_25MAR2010_131500.out
-            is.readLine();//# Reflectivity map [dBZ]
+            is.readLine();//# file name: H99999999_R6003_G_31MAR2010_221000.out
+            is.readLine();//# Accumulation map [mm]
+            is.readLine();//# Accumulation time [sec]: 3300
             is.readLine();//# number of columns: 1741
             is.readLine();//# number of rows: 1057
             is.readLine();//# grid: LATLON
@@ -152,7 +170,7 @@ public class IowaBasinsInfoScript{
                         System.out.println("NFE" + nfe.getMessage());
                     }
 
-                    matrix[i][j] = f;
+                    if(f != -99.0) matrix[i][j] = f;
 
                 }
             }
@@ -168,43 +186,42 @@ public class IowaBasinsInfoScript{
 
             for (int k=500;k>1;k--){
 
-//                dataPath=new java.io.FileInputStream("/Users/ricardo/rawData/RainfallAccumulations/Current/accum"+(k-1));
-//                dataBuffer=new java.io.BufferedInputStream(dataPath);
-//                dataDataStream=new java.io.DataInputStream(dataBuffer);
-//
-//                for (int i=0;i<numRow_Rain;i++) for(int j=0;j<numCol_Rain;j++) {
-//                    dataFloat[i][j]=dataDataStream.readFloat();
-//                }
-//
-//
-//                dataBuffer.close();
-//                dataDataStream.close();
-//
-//                outputDir = new FileOutputStream(dirOut.getPath()+"/Current/accum"+k);
-//                bufferout=new BufferedOutputStream(outputDir);
-//                newOutputStream=new DataOutputStream(bufferout);
-//
-//                for (int i=numRow_Rain-1;i>-1;i--) for (int j=0;j<numCol_Rain;j++) {
-//                    newOutputStream.writeFloat(dataFloat[i][j]+matrix[i][j]);
-//                }
-//
-//                newOutputStream.close();
-//                bufferout.close();
-//                outputDir.close();
+                System.out.println(">> Working on File # "+k);
+
+                dataPath=new java.io.FileInputStream("/Users/ricardo/rawData/RainfallAccumulations/Current/accum"+(k-1));
+                dataBuffer=new java.io.BufferedInputStream(dataPath);
+                dataDataStream=new java.io.DataInputStream(dataBuffer);
+
+                for (int i=0;i<numRow_Rain;i++) for(int j=0;j<numCol_Rain;j++) {
+                    dataFloat[i][j]=dataDataStream.readFloat();
+                }
+
+
+                dataBuffer.close();
+                dataDataStream.close();
+
+                outputDir = new FileOutputStream(dirOut.getPath()+"/Current/accum"+k);
+                bufferout=new BufferedOutputStream(outputDir);
+                newOutputStream=new DataOutputStream(bufferout);
+
+                for (int i=0;i<numRow_Rain;i++) for(int j=0;j<numCol_Rain;j++) {
+                    newOutputStream.writeFloat(dataFloat[i][j]+matrix[i][j]);
+                }
+
+                newOutputStream.close();
+                bufferout.close();
+                outputDir.close();
 
             }
 
-            outputDir = new FileOutputStream(dirOut.getPath()+"/Current/accum0");
+             System.out.println(">> Working on File # 1");
+
+            outputDir = new FileOutputStream(dirOut.getPath()+"/Current/accum1");
             bufferout=new BufferedOutputStream(outputDir);
             newOutputStream=new DataOutputStream(bufferout);
 
-            for (int i=numRow_Rain-1;i>-1;i--) for (int j=0;j<numCol_Rain;j++) {
-                if(matrix[i][j] != -99.0) {
-                    newOutputStream.writeFloat(matrix[i][j]);
-                } else{
-                    newOutputStream.writeFloat(0.0f);
-                }
-
+            for (int i=0;i<numRow_Rain;i++) for(int j=0;j<numCol_Rain;j++) {
+               newOutputStream.writeFloat(matrix[i][j]);
             }
 
             newOutputStream.close();
@@ -268,7 +285,7 @@ public class IowaBasinsInfoScript{
                 xover.close();
                 fin.close();
 
-                long fileIndex=Math.max(0L,Math.round(responseTime));
+                long fileIndex=Math.max(1L,Math.round(responseTime));
 
                 System.out.println("/Users/ricardo/rawData/RainfallAccumulations/Current/accum"+fileIndex);
 
@@ -278,7 +295,7 @@ public class IowaBasinsInfoScript{
 
                 for (int ii=0;ii<numRow_Rain;ii++) for(int jj=0;jj<numCol_Rain;jj++) {
                     matrix[ii][jj]=dataDataStream.readFloat();
-                    matrix[ii][jj] = (float)Math.random()+(float)ii/(float)numRow_Rain*10.0f;
+                    //matrix[ii][jj] = (float)Math.random()+(float)ii/(float)numRow_Rain*10.0f;
                 }
 
 
@@ -347,7 +364,7 @@ public class IowaBasinsInfoScript{
                     if(line2.equalsIgnoreCase("<PolyStyle><color>EA6BE3FD</color></PolyStyle></Style>")){
 
                         //Green
-                        line2="<PolyStyle><color>be22c122</color></PolyStyle></Style>";
+                        if(averageValue > 0.00) line2="<PolyStyle><color>be22c122</color></PolyStyle></Style>";
                         //Orange
                         if(averageValue > 5.00) line2="<PolyStyle><color>be0062ff</color></PolyStyle></Style>";
                         //Red
