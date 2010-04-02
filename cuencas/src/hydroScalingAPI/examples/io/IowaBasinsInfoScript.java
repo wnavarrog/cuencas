@@ -129,8 +129,6 @@ public class IowaBasinsInfoScript{
             is.close();
             xover.close();
 
-            mostRecentFile = "H99999999_R6003_G_31MAR2010_221000.out";
-            
             System.out.println(">> Opening connection: "+"http://s-iihr52.iihr.uiowa.edu/ricardo/quality/60/"+mostRecentFile);
             file = new URL("http://s-iihr52.iihr.uiowa.edu/ricardo/quality/60/"+mostRecentFile);
             urlConn = file.openConnection();
@@ -251,10 +249,11 @@ public class IowaBasinsInfoScript{
         File[] files = dir.listFiles(new hydroScalingAPI.util.fileUtilities.DirFilter());
         File[] inCity1,inCity2,inCity3,inCity4;
 
-        String tableRadek="City Name;River Name;Latitude;Longitude;File Polygon;File Network;Zoom Level"+ret;
+        String tableRadek="City Name;River Name;Latitude;Longitude;File Polygon;File Network;Westernmost Longitude;Southernmost Longitude;Easternmost Longitude;Northernmost Latitude"+ret;
         
         for (int i = 0; i < files.length; i++) {
         
+
             inCity1 = files[i].listFiles(new hydroScalingAPI.util.fileUtilities.NameDotFilter("Basin","txt.gz"));
             inCity2 = files[i].listFiles(new hydroScalingAPI.util.fileUtilities.NameDotFilter("Divide","kml"));
             inCity3 = files[i].listFiles(new hydroScalingAPI.util.fileUtilities.NameDotFilter("RiverNetworkLowRes","kml"));
@@ -318,13 +317,27 @@ public class IowaBasinsInfoScript{
 
                 line3 = is.readLine();
 
+                float minX=Float.MAX_VALUE;
+                float minY=Float.MAX_VALUE;
+                float maxX=-Float.MAX_VALUE;
+                float maxY=-Float.MAX_VALUE;
+
                 while ((line2 = is.readLine()) != null) {
                     linarray2 = line2.split(",");
-                    int xxx = (int)((Float.parseFloat(linarray2[0].trim())-minLon_Rain)/matRes_Rain);
-                    int yyy = (int)((Float.parseFloat(linarray2[1].trim())-minLat_Rain)/matRes_Rain);
+
+                    float xLon=Float.parseFloat(linarray2[0].trim());
+                    float yLat=Float.parseFloat(linarray2[1].trim());
+
+                    int xxx = (int)((xLon-minLon_Rain)/matRes_Rain);
+                    int yyy = (int)((yLat-minLat_Rain)/matRes_Rain);
 
                     averageValue += matrix[yyy][xxx];
                     numElements++;
+
+                    minX=Math.min(minX, xLon);
+                    minY=Math.min(minY, yLat);
+                    maxX=Math.max(maxX, xLon);
+                    maxY=Math.max(maxY, yLat);
 
                 }
 
@@ -361,7 +374,7 @@ public class IowaBasinsInfoScript{
 
                 while ((line2 = is.readLine()) != null) {
 
-                    if(line2.equalsIgnoreCase("<PolyStyle><color>EA6BE3FD</color></PolyStyle></Style>")){
+                    if(line2.equalsIgnoreCase("<PolyStyle><color>00000000</color></PolyStyle></Style>")){
 
                         //Green
                         if(averageValue > 0.00) line2="<PolyStyle><color>be22c122</color></PolyStyle></Style>";
@@ -417,7 +430,7 @@ public class IowaBasinsInfoScript{
                 xover.close();
                 fin.close();
 
-                tableRadek+=cityName[0]+";"+riverName[0]+";"+latitude+";"+longitude+";"+polyWebAddress+";"+netWebAddress+";10"+ret;
+                tableRadek+=cityName[0]+";"+riverName[0]+";"+latitude+";"+longitude+";"+polyWebAddress+";"+netWebAddress+";"+minX+";"+minY+";"+maxX+";"+maxY+ret;
 
                 
             }
@@ -449,28 +462,28 @@ public class IowaBasinsInfoScript{
         
         if(args.length == 0) {
 
-            command=new String[] {  System.getProperty("java.home")+System.getProperty("file.separator")+"bin"+System.getProperty("file.separator")+"java",
-                                    "-Xmx1500m",
-                                    "-Xrs",
-                                    "-cp",
-                                    System.getProperty("java.class.path"),
-                                    "hydroScalingAPI.examples.io.IowaBasinsInfoScript",
-                                    "reload-rain"};
-            localProcess0=java.lang.Runtime.getRuntime().exec(command);
-
-            String concat0="";
-
-            boolean monitor0=true;
-
-            while(monitor0){
-                String s1=new String(new byte[] {Byte.parseByte(""+localProcess0.getInputStream().read())});
-                concat0+=s1;
-                if(s1.equalsIgnoreCase("\n")) {
-                    System.out.print("Processor 0: "+concat0);
-                    if(concat0.substring(0, Math.min(39,concat0.length())).equalsIgnoreCase(">> Accumulations Files Update Completed")) monitor0=false;
-                    concat0="";
-                }
-            }
+//            command=new String[] {  System.getProperty("java.home")+System.getProperty("file.separator")+"bin"+System.getProperty("file.separator")+"java",
+//                                    "-Xmx1500m",
+//                                    "-Xrs",
+//                                    "-cp",
+//                                    System.getProperty("java.class.path"),
+//                                    "hydroScalingAPI.examples.io.IowaBasinsInfoScript",
+//                                    "reload-rain"};
+//            localProcess0=java.lang.Runtime.getRuntime().exec(command);
+//
+//            String concat0="";
+//
+//            boolean monitor0=true;
+//
+//            while(monitor0){
+//                String s1=new String(new byte[] {Byte.parseByte(""+localProcess0.getInputStream().read())});
+//                concat0+=s1;
+//                if(s1.equalsIgnoreCase("\n")) {
+//                    System.out.print("Processor 0: "+concat0);
+//                    if(concat0.substring(0, Math.min(39,concat0.length())).equalsIgnoreCase(">> Accumulations Files Update Completed")) monitor0=false;
+//                    concat0="";
+//                }
+//            }
 
             command=new String[] {  System.getProperty("java.home")+System.getProperty("file.separator")+"bin"+System.getProperty("file.separator")+"java",
                                     "-Xmx1500m",
@@ -479,7 +492,7 @@ public class IowaBasinsInfoScript{
                                     System.getProperty("java.class.path"),
                                     "hydroScalingAPI.examples.io.IowaBasinsInfoScript",
                                     "/Users/ricardo/rawData/BasinMasks/usgs_gauges/",
-                                    "/Volumes/ricardo/temp/iowa_basins_data/gauges/"};
+                                    "/Volumes/ricardo/temp/iowa_basins_data/usgs_gauges/"};
             localProcess1=java.lang.Runtime.getRuntime().exec(command);
 
             command=new String[] {  System.getProperty("java.home")+System.getProperty("file.separator")+"bin"+System.getProperty("file.separator")+"java",

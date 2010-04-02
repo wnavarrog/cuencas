@@ -110,6 +110,22 @@ public class MetaNetToKML_Eric {
         bufferout.close();
         outputDir.close();
 
+        String timeLegend="";
+
+        if(timeUpDay > 1) {
+            timeLegend=(int)Math.floor(timeUpDay)+" Day";
+
+            if(Math.floor(timeUpDay) > 1) timeLegend+="s";
+
+            if(timeUp-timeUpDay*24 >= 2)  {
+                timeLegend+=" and "+(int)Math.floor(timeUp-timeUpDay*24)+" Hour";
+                if(Math.floor(timeUp-timeUpDay*24) >= 2) timeLegend+="s";
+            }
+        } else {
+            timeLegend=Math.floor(timeUp)+" hours";
+        }
+
+
         String myDescription =  "<h3>Name: " + uniqueIdentifier + "</h3>"
                                 //+ "<b>Baisin Outlet Information</b><br><br>"
                                 //+ "<b>Latitude:</b> " + lat +"<br>"
@@ -117,9 +133,9 @@ public class MetaNetToKML_Eric {
                                 //+ "<b>Upstream Area:</b> " + areaUpSqMi + " [mi<sup>2</sup>] (" + areaUp + " [km<sup>2</sup>])"+ "<br>"
                                 //+ "<b>Main Channel Length:</b> "+lengthUpMi+" [miles] ("+lengthUp+" [km])"+ "<br>"
                                 //+ "<b>Typical Response Time:</b> "+timeUp+" [hours] ("+timeUpDay+" [days])"+ "<br>" + "<br>"
-                                + "<b>Upstream Area:</b> " + areaUpSqMi + " [mi<sup>2</sup>]"+ "<br>"
-                                + "<b>Main Channel Length:</b> "+lengthUpMi+" [miles]"+ "<br>"
-                                + "<b>Typical Response Time:</b> "+timeUp+" [hours]"+ "<br>" + "<br>"
+                                + "<b>Basin Area:</b> " + areaUpSqMi + " Square Miles"+ "<br>"
+                                + "<b>Main River Length:</b> "+lengthUpMi+" Miles"+ "<br>"
+                                + "<b>Rainfall Residence Time:</b> "+timeLegend+ "<br>" + "<br>"
                                 + "<b>Comment:</b>"+ "<br>"
                                 + "Monitoring rain over this area which controls potential flooding of "+riverName[0]+" that affects"+commentName[1]+".";
         
@@ -185,9 +201,9 @@ public class MetaNetToKML_Eric {
                             "/CuencasDataBases/Iowa_Rivers_DB/Rasters/Topography/4_arcsec/res",
                             "/Users/ricardo/rawData/BasinMasks/large_cities/"};
 
-//        args=new String[] { "/Users/ricardo/workFiles/myWorkingStuff/AdvisorThesis/Eric/res_usgs_gauges.log",
-//                            "/CuencasDataBases/Iowa_Rivers_DB/Rasters/Topography/4_arcsec/res",
-//                            "/Users/ricardo/rawData/BasinMasks/usgs_gauges/"};
+        args=new String[] { "/Users/ricardo/workFiles/myWorkingStuff/AdvisorThesis/Eric/res_usgs_gauges.log",
+                            "/CuencasDataBases/Iowa_Rivers_DB/Rasters/Topography/4_arcsec/res",
+                            "/Users/ricardo/rawData/BasinMasks/usgs_gauges/"};
 
         main1(args);
     }
