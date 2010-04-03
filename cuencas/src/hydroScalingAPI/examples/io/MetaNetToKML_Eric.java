@@ -117,9 +117,9 @@ public class MetaNetToKML_Eric {
 
             if(Math.floor(timeUpDay) > 1) timeLegend+="s";
 
-            if(timeUp-timeUpDay*24 >= 2)  {
-                timeLegend+=" and "+(int)Math.floor(timeUp-timeUpDay*24)+" Hour";
-                if(Math.floor(timeUp-timeUpDay*24) >= 2) timeLegend+="s";
+            if((int)Math.floor(timeUp-Math.floor(timeUpDay)*24) > 0)  {
+                timeLegend+=" and "+(int)Math.floor(timeUp-Math.floor(timeUpDay)*24)+" Hour";
+                if(Math.floor(timeUp-Math.floor(timeUpDay)*24) >= 2) timeLegend+="s";
             }
         } else {
             timeLegend=Math.floor(timeUp)+" hours";
@@ -201,9 +201,9 @@ public class MetaNetToKML_Eric {
                             "/CuencasDataBases/Iowa_Rivers_DB/Rasters/Topography/4_arcsec/res",
                             "/Users/ricardo/rawData/BasinMasks/large_cities/"};
 
-        args=new String[] { "/Users/ricardo/workFiles/myWorkingStuff/AdvisorThesis/Eric/res_usgs_gauges.log",
-                            "/CuencasDataBases/Iowa_Rivers_DB/Rasters/Topography/4_arcsec/res",
-                            "/Users/ricardo/rawData/BasinMasks/usgs_gauges/"};
+//        args=new String[] { "/Users/ricardo/workFiles/myWorkingStuff/AdvisorThesis/Eric/res_usgs_gauges.log",
+//                            "/CuencasDataBases/Iowa_Rivers_DB/Rasters/Topography/4_arcsec/res",
+//                            "/Users/ricardo/rawData/BasinMasks/usgs_gauges/"};
 
         main1(args);
     }

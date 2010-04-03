@@ -338,7 +338,7 @@ public class MetaPolygon {
         writerKml.write("<scale>0</scale></LabelStyle>" + ret);
         writerKml.write("<LineStyle><color>ff6e6e6e</color>" + ret);
         writerKml.write("<width>0.4</width></LineStyle>" +ret);
-        writerKml.write("<PolyStyle><color>00000000</color></PolyStyle></Style>" +ret);
+        writerKml.write("<PolyStyle><color>e6ffffff</color></PolyStyle></Style>" +ret);
     
         writerKml.write("<Placemark><description><![CDATA["+myDescription+"]]></description>"+ret+ "<styleUrl>#Polygon</styleUrl>"+ret);
         writerKml.write("   <Polygon>");
