@@ -330,34 +330,48 @@ public class MetaPolygon {
 
 
         
-        writerKml.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+ret);
+        writerKml.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + ret);
         writerKml.write("<kml xmlns=\"http://www.opengis.net/kml/2.2\" xmlns:gx=\"http://www.google.com/kml/ext/2.2\" xmlns:kml=\"http://www.opengis.net/kml/2.2\" xmlns:atom=\"http://www.w3.org/2005/Atom\">");
         writerKml.write("<Document>" + ret);
         writerKml.write("<Style id=\"Polygon\">" + ret);
-        writerKml.write("<LabelStyle><color>00000000</color>" +ret);
+        writerKml.write("<LabelStyle><color>00000000</color>" + ret);
         writerKml.write("<scale>0</scale></LabelStyle>" + ret);
         writerKml.write("<LineStyle><color>ff6e6e6e</color>" + ret);
-        writerKml.write("<width>0.4</width></LineStyle>" +ret);
-        writerKml.write("<PolyStyle><color>e6ffffff</color></PolyStyle></Style>" +ret);
-    
-        writerKml.write("<Placemark><description><![CDATA["+myDescription+"]]></description>"+ret+ "<styleUrl>#Polygon</styleUrl>"+ret);
-        writerKml.write("   <Polygon>");
-        writerKml.write("       <name>"+label+"</name>"+ret);
-        writerKml.write("       <outerBoundaryIs>"+ret);
-        writerKml.write("       <LinearRing>"+ret);
-        writerKml.write("          <coordinates>"+ret);
-        writerKml.write("          ");
-      for (int i=0;i<xyContour[0].length;i++){
-            writerKml.write(xyContour[0][i]+","+xyContour[1][i]+" ");
+        writerKml.write("<width>0.4</width></LineStyle>" + ret);
+        writerKml.write("<PolyStyle><color>e6ffffff</color></PolyStyle>" + ret);
+        writerKml.write("</Style>" + ret);
+        writerKml.write("<Style id=\"Point\">" + ret);
+        writerKml.write("<IconStyle>" + ret);
+        writerKml.write("<Icon>" + ret);
+        writerKml.write("<href>http://weather.iihr.uiowa.edu/ifc/graphics/icon.png</href>" + ret);
+        writerKml.write("</Icon>" + ret);
+        writerKml.write("</IconStyle>" + ret);
+        writerKml.write("</Style>" + ret);
+        writerKml.write("<Folder>" + ret);
+        writerKml.write("   <Placemark>" + ret + "<styleUrl>#Polygon</styleUrl>" + ret);
+        writerKml.write("      <Polygon>");
+        writerKml.write("          <name>" + label + "</name>" + ret);
+        writerKml.write("          <outerBoundaryIs>" + ret);
+        writerKml.write("          <LinearRing>" + ret);
+        writerKml.write("             <coordinates>" + ret);
+        writerKml.write("             ");
+        for (int i = 0; i < xyContour[0].length; i++) {
+            writerKml.write(xyContour[0][i] + "," + xyContour[1][i] + " ");
         }
         writerKml.write(ret);
-        writerKml.write("           </coordinates>"+ret);
-        writerKml.write("        </LinearRing>"+ret);
-        writerKml.write("     </outerBoundaryIs>"+ret);
-        writerKml.write("  </Polygon>"+ret);
-        writerKml.write("</Placemark>"+ret);
+        writerKml.write("              </coordinates>" + ret);
+        writerKml.write("           </LinearRing>" + ret);
+        writerKml.write("        </outerBoundaryIs>" + ret);
+        writerKml.write("     </Polygon>" + ret);
+        writerKml.write("   </Placemark>" + ret);
+        writerKml.write("   <Placemark><description><![CDATA[" + myDescription + "]]></description>" + ret + "<styleUrl>#Point</styleUrl>" + ret);
+        writerKml.write("      <Point>" + ret);
+        writerKml.write("          <coordinates>"+xyContour[0][0] + "," + xyContour[1][0] + " "+"</coordinates>" + ret);
+        writerKml.write("      </Point>" + ret);
+        writerKml.write("   </Placemark>" + ret);
+        writerKml.write("</Folder>" + ret);
         writerKml.write("</Document>" + ret);
-        writerKml.write("</kml>"+ret);
+        writerKml.write("</kml>" + ret);
 
         writerKml.close();
 

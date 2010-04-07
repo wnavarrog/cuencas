@@ -143,6 +143,7 @@ public class RSNDecomposition {
 
                 if(flagBreak && (((Scale-1) == linksOrders[0][incoming[j]]) || (i == (sizeMetaLink-1)))){
                     metaLinks[Scale-2].add(tempMetaLink.clone());
+
                     int codex=(int)((Scale-1)*1e6+metaLinks[Scale-2].size()-1);
                     metaLinksHeritage[Scale-2].add(new int[] {codex,parent,dsIndexes[incoming[j]]});
 
@@ -159,7 +160,6 @@ public class RSNDecomposition {
                         if(indexFamily[2]==toLookFor[0]) {
                             indexFamily[1]=parent;
                             metaLinksHeritage[Scale-2].set(k, indexFamily);
-                            break;
                         }
                     }
                 }

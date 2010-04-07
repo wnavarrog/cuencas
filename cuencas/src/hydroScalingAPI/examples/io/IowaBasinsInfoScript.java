@@ -68,6 +68,36 @@ public class IowaBasinsInfoScript{
 
     public void Reset() throws java.io.IOException{
 
+        String[] badFiles={
+//                            "what"};
+//                            "H99999999_R6007_G_06APR2010_060000.out.gz",
+//                            "H99999999_R6003_G_05APR2010_160000.out.gz",
+//                            "H99999999_R6003_G_05APR2010_154000.out.gz",
+                            "H99999999_R6007_G_03APR2010_120000.out.gz",
+                            "H99999999_R6007_G_03APR2010_060000.out.gz",
+                            "H99999999_R6007_G_03APR2010_010000.out.gz",
+                            "H99999999_R6003_G_02APR2010_110500.out.gz",
+                            "H99999999_R6004_G_02APR2010_090500.out.gz",
+                            "H99999999_R6007_G_02APR2010_080500.out.gz",
+                            "H99999999_R6007_G_02APR2010_070500.out.gz",
+                            "H99999999_R6007_G_02APR2010_060500.out.gz",
+                            "H99999999_R6007_G_02APR2010_050500.out.gz",
+                            "H99999999_R6002_G_02APR2010_040500.out.gz",
+                            "H99999999_R6003_G_02APR2010_030500.out.gz",
+                            "H99999999_R6007_G_01APR2010_200500.out.gz",
+                            "H99999999_R6007_G_01APR2010_131000.out.gz",
+                            "H99999999_R6005_G_01APR2010_101000.out.gz",
+                            "H99999999_R6002_G_01APR2010_091000.out.gz",
+                            "H99999999_R6003_G_01APR2010_031000.out.gz",
+                            "H99999999_R6003_G_31MAR2010_221000.out.gz",
+                            "H99999999_R6007_G_31MAR2010_201000.out.gz",
+                            "H99999999_R6003_G_31MAR2010_091000.out.gz",
+                            "H99999999_R6007_G_31MAR2010_081000.out.gz",
+                            "H99999999_R6007_G_31MAR2010_071000.out.gz",
+                            "H99999999_R6003_G_30MAR2010_221000.out.gz",
+                            "H99999999_R6004_G_30MAR2010_211000.out.gz",
+                            "H99999999_R6007_G_30MAR2010_201000.out.gz"};
+
         System.out.println(">> Reseting Rainfall Accumulation Files");
 
         URLConnection urlConn = null;
@@ -89,7 +119,9 @@ public class IowaBasinsInfoScript{
         line = is.readLine();
 
         while(line != null){
-            availableMapsOfRain.add(line);
+            boolean inList=false;
+            for (int i = 0; i < badFiles.length; i++) inList|=line.equalsIgnoreCase(badFiles[i]);
+            if(!inList)availableMapsOfRain.add(line);
             line = is.readLine();
         }
 
@@ -111,10 +143,11 @@ public class IowaBasinsInfoScript{
             urlConn = file.openConnection();
 
 
-            xover = new InputStreamReader(urlConn.getInputStream());
+            gzis = new GZIPInputStream(urlConn.getInputStream());
+            xover = new InputStreamReader(gzis);
             is = new BufferedReader(xover);
 
-            is.readLine();//# file name: H99999999_R6003_G_31MAR2010_221000.out
+            is.readLine();//# file name: "H99999999_R6003_G_31MAR2010_221000.out
             is.readLine();//# Accumulation map [mm]
             is.readLine();//# Accumulation time [sec]: 3300
             is.readLine();//# number of columns: 1741
@@ -126,7 +159,7 @@ public class IowaBasinsInfoScript{
             is.readLine();//# cellsize [dec deg]: 0.004167
             is.readLine();//# no data value: -99.0
 
-            System.out.println(">> Reading Real-Time Rainfall Data");
+            System.out.println(">> Reading High Quality Rainfall Data");
 
             line = is.readLine();
 
@@ -149,7 +182,7 @@ public class IowaBasinsInfoScript{
                             System.out.println("NFE" + nfe.getMessage());
                         }
 
-                        if(f > 0.0) matrix[i][j] += f;
+                        if(f > 0.0 && f < 60.0) matrix[i][j] += f;
 
                     }
 
@@ -160,7 +193,8 @@ public class IowaBasinsInfoScript{
 
             is.close();
             xover.close();
-
+            gzis.close();
+            
             System.out.println(">> Working on File # "+kk);
 
             outputDir = new FileOutputStream(dirOut.getPath()+"/Current/accum"+kk);
@@ -177,7 +211,7 @@ public class IowaBasinsInfoScript{
 
             kk++;
 
-            if(kk == 11) break;
+            //if(kk == 11) break;
 
         }
 
@@ -231,10 +265,11 @@ public class IowaBasinsInfoScript{
             urlConn = file.openConnection();
 
 
-            xover = new InputStreamReader(urlConn.getInputStream());
+            gzis = new GZIPInputStream(urlConn.getInputStream());
+            xover = new InputStreamReader(gzis);
             is = new BufferedReader(xover);
 
-            is.readLine();//# file name: H99999999_R6003_G_31MAR2010_221000.out
+            is.readLine();//# file name: "H99999999_R6003_G_31MAR2010_221000.out
             is.readLine();//# Accumulation map [mm]
             is.readLine();//# Accumulation time [sec]: 3300
             is.readLine();//# number of columns: 1741
@@ -272,15 +307,14 @@ public class IowaBasinsInfoScript{
                         System.out.println("NFE" + nfe.getMessage());
                     }
 
-                    if(f > 0) {
-                        matrix[i][j] = f;
-                    }
+                    if(f > 0.0 && f < 60.0) matrix[i][j] = f;
 
                 }
             }
 
             is.close();
             xover.close();
+            gzis.close();
 
             System.out.println(">> Matrix Read!");
 
@@ -359,7 +393,6 @@ public class IowaBasinsInfoScript{
         
         for (int i = 0; i < files.length; i++) {
         
-
             inCity1 = files[i].listFiles(new hydroScalingAPI.util.fileUtilities.NameDotFilter("Basin","txt.gz"));
             inCity2 = files[i].listFiles(new hydroScalingAPI.util.fileUtilities.NameDotFilter("Divide","kml"));
             inCity3 = files[i].listFiles(new hydroScalingAPI.util.fileUtilities.NameDotFilter("RiverNetworkLowRes","kml"));
@@ -409,7 +442,14 @@ public class IowaBasinsInfoScript{
                 dataDataStream.close();
 
                 float averageValue = 0.0f;
+                float averageValueTimeMachine = 0.0f;
                 float numElements = 0.0f;
+
+                java.io.RandomAccessFile[] accumFiles=new java.io.RandomAccessFile[500];
+                for (int k = 0; k < accumFiles.length; k++) {
+                    java.io.File rutaQuantity=new java.io.File("/Users/ricardo/rawData/RainfallAccumulations/Current/accum"+(k+1));
+                    accumFiles[k]=new java.io.RandomAccessFile(rutaQuantity,"r");
+                }
 
                 //Open the File for reading
 
@@ -434,6 +474,7 @@ public class IowaBasinsInfoScript{
 
                     float xLon=Float.parseFloat(linarray2[0].trim());
                     float yLat=Float.parseFloat(linarray2[1].trim());
+                    int tTime=(int)Math.floor(Float.parseFloat(linarray2[2].trim())*1000/0.75/3600.0)+1;
 
                     int xxx = (int)((xLon-minLon_Rain)/matRes_Rain);
                     int yyy = (int)((yLat-minLat_Rain)/matRes_Rain);
@@ -446,13 +487,28 @@ public class IowaBasinsInfoScript{
                     maxX=Math.max(maxX, xLon);
                     maxY=Math.max(maxY, yLat);
 
+                    if(numElements%10==0){
+
+                        if(tTime > 1){
+                            accumFiles[tTime].seek(4*(yyy*matrix[0].length+xxx));
+                            accumFiles[tTime-1].seek(4*(yyy*matrix[0].length+xxx));
+                            averageValueTimeMachine+=(float) (accumFiles[tTime].readFloat()-accumFiles[tTime-1].readFloat());
+                        } else {
+                            accumFiles[tTime].seek(4*(yyy*matrix[0].length+xxx));
+                            averageValueTimeMachine+=(float) accumFiles[tTime].readFloat();
+                        }
+
+                    }
+
                 }
 
                 averageValue/=numElements;
+                averageValueTimeMachine/=(numElements/10);
 
                 double averageValueInches=averageValue*0.039370079;
 
                 averageValue=Math.round(averageValue*100)/100.0f;
+                averageValueTimeMachine=Math.round(averageValueTimeMachine*100)/100.0f;
 
                 double responseTimeMinutes=responseTime*60;
 
@@ -470,6 +526,12 @@ public class IowaBasinsInfoScript{
                 xover.close();
                 gzis.close();
                 fin.close();
+
+                for (int k = 0; k < accumFiles.length; k++) {
+                    accumFiles[k].close();
+                }
+
+                System.out.println(">> >> Rates for this basin "+"Rain Rate: "+averageValue+" [mm] "+averageValueTimeMachine+" [mm] ");
 
                 String[] uniqueIdentifier=inCity1[j].getName().split("_");
                 String[] cityName=uniqueIdentifier[1].split(" \\(");
@@ -505,7 +567,7 @@ public class IowaBasinsInfoScript{
 
                     if(line2.startsWith("<Placemark><description>")){
                         int indOfString=line2.indexOf("]]></description>");
-                        line2=line2.substring(0, indOfString)+"<br><br><b>Rain Rate</b><br>"+averageValue+" mm ("+averageValueInches+" in)<br>"+"<b>Return Period</b><br>"+Math.max(1,(int)Math.round(Tr))+" years"+"]]></description>";
+                        line2=line2.substring(0, indOfString)+"<br><br><b>Rain Rate</b><br>"+averageValue+" mm ("+averageValueInches+" in)<br>"+"<b>Return Period</b><br>"+Math.max(1,(int)Math.round(Tr))+" years <br>"+"<b>Flood Index</b><br>"+averageValueTimeMachine+"]]></description>";
                     }
 
                     bufferout.write(line2.getBytes());
@@ -516,7 +578,7 @@ public class IowaBasinsInfoScript{
                 outputComprim.close();
                 outputDir.close();
 
-                System.out.println(">> >>Calculations for this basin "+"Rain Rate: "+averageValueInches+" [in]"+" Response Time "+responseTime+" [hr] Frequency "+alpha+" [*] Return Period "+Tr+" [months]");
+                System.out.println(">> >> Calculations for this basin "+"Rain Rate: "+averageValueInches+" [in]"+" Response Time "+responseTime+" [hr] Frequency "+alpha+" [*] Return Period "+Tr+" [months]");
 
                 is.close();
                 xover.close();
@@ -578,73 +640,72 @@ public class IowaBasinsInfoScript{
     public static void main(String[] args) throws IOException {
 
         String[] command;
-        java.lang.Process localProcess0,localProcess1,localProcess2;
-        
+        java.lang.Process localProcess0;
+
         if(args.length == 0) {
 
-            command=new String[] {  System.getProperty("java.home")+System.getProperty("file.separator")+"bin"+System.getProperty("file.separator")+"java",
+//            command=new String[] {  System.getProperty("java.home")+System.getProperty("file.separator")+"bin"+System.getProperty("file.separator")+"java",
+//                                    "-Xmx1500m",
+//                                    "-Xrs",
+//                                    "-cp",
+//                                    System.getProperty("java.class.path"),
+//                                    "hydroScalingAPI.examples.io.IowaBasinsInfoScript",
+//                                    "reload-rain"};
+//            localProcess0=java.lang.Runtime.getRuntime().exec(command);
+//
+//            String concat0="";
+//
+//            boolean monitor0=true;
+//
+//            while(monitor0){
+//                String s1=new String(new byte[] {Byte.parseByte(""+localProcess0.getInputStream().read())});
+//                concat0+=s1;
+//                if(s1.equalsIgnoreCase("\n")) {
+//                    System.out.print("Processor 0: "+concat0);
+//                    if(concat0.substring(0, Math.min(39,concat0.length())).equalsIgnoreCase(">> Accumulations Files Update Completed")) monitor0=false;
+//                    concat0="";
+//                }
+//            }
+
+            String[][] kmlInAndOut=new String[][] {{"/Users/ricardo/rawData/BasinMasks/usgs_gauges/","/Volumes/ricardo/temp/iowa_basins_data/usgs_gauges/"},
+                                                   {"/Users/ricardo/rawData/BasinMasks/large_cities/","/Volumes/ricardo/temp/iowa_basins_data/large_cities/"},
+                                                   {"/Users/ricardo/rawData/BasinMasks/medium_cities/","/Volumes/ricardo/temp/iowa_basins_data/medium_cities/"},
+                                                   {"/Users/ricardo/rawData/BasinMasks/small_cities/","/Volumes/ricardo/temp/iowa_basins_data/small_cities/"}
+                                                  };
+
+
+            java.lang.Process[] localProcess=new java.lang.Process[kmlInAndOut.length];
+            String[] concat=new String[kmlInAndOut.length];
+            boolean[] monitor= new boolean[kmlInAndOut.length]; java.util.Arrays.fill(monitor, true);
+
+            for (int i = 0; i < kmlInAndOut.length; i++) {
+                command=new String[] {  System.getProperty("java.home")+System.getProperty("file.separator")+"bin"+System.getProperty("file.separator")+"java",
                                     "-Xmx1500m",
                                     "-Xrs",
                                     "-cp",
                                     System.getProperty("java.class.path"),
                                     "hydroScalingAPI.examples.io.IowaBasinsInfoScript",
-                                    "reload-rain"};
-            localProcess0=java.lang.Runtime.getRuntime().exec(command);
+                                    kmlInAndOut[i][0],
+                                    kmlInAndOut[i][1]};
 
-            String concat0="";
-
-            boolean monitor0=true;
-
-            while(monitor0){
-                String s1=new String(new byte[] {Byte.parseByte(""+localProcess0.getInputStream().read())});
-                concat0+=s1;
-                if(s1.equalsIgnoreCase("\n")) {
-                    System.out.print("Processor 0: "+concat0);
-                    if(concat0.substring(0, Math.min(39,concat0.length())).equalsIgnoreCase(">> Accumulations Files Update Completed")) monitor0=false;
-                    concat0="";
-                }
+                localProcess[i]=java.lang.Runtime.getRuntime().exec(command);
             }
 
-            command=new String[] {  System.getProperty("java.home")+System.getProperty("file.separator")+"bin"+System.getProperty("file.separator")+"java",
-                                    "-Xmx1500m",
-                                    "-Xrs",
-                                    "-cp",
-                                    System.getProperty("java.class.path"),
-                                    "hydroScalingAPI.examples.io.IowaBasinsInfoScript",
-                                    "/Users/ricardo/rawData/BasinMasks/usgs_gauges/",
-                                    "/Volumes/ricardo/temp/iowa_basins_data/usgs_gauges/"};
-            localProcess1=java.lang.Runtime.getRuntime().exec(command);
+            boolean keepGoing=true;
 
-            command=new String[] {  System.getProperty("java.home")+System.getProperty("file.separator")+"bin"+System.getProperty("file.separator")+"java",
-                                    "-Xmx1500m",
-                                    "-Xrs",
-                                    "-cp",
-                                    System.getProperty("java.class.path"),
-                                    "hydroScalingAPI.examples.io.IowaBasinsInfoScript",
-                                    "/Users/ricardo/rawData/BasinMasks/large_cities/",
-                                    "/Volumes/ricardo/temp/iowa_basins_data/large_cities/"};
-            localProcess2=java.lang.Runtime.getRuntime().exec(command);
-
-            String concat1="";
-            String concat2="";
-
-            boolean monitor1=true,monitor2=true;
-
-            while(monitor1 || monitor2){
-                String s1=new String(new byte[] {Byte.parseByte(""+localProcess1.getInputStream().read())});
-                concat1+=s1;
-                if(s1.equalsIgnoreCase("\n") && monitor1) {
-                    System.out.print("Processor 1: "+concat1);
-                    if(concat1.substring(0, Math.min(20,concat1.length())).equalsIgnoreCase(">> Process Completed")) monitor1=false;
-                    concat1="";
+            while(keepGoing){
+                keepGoing=false;
+                for (int i = 0; i < monitor.length; i++) {
+                    String s1=new String(new byte[] {Byte.parseByte(""+localProcess[i].getInputStream().read())});
+                    concat[i]+=s1;
+                    if(s1.equalsIgnoreCase("\n") && monitor[i]) {
+                        System.out.print("Processor "+i+": "+concat[i]);
+                        if(concat[i].substring(0, Math.min(20,concat[i].length())).equalsIgnoreCase(">> Process Completed")) monitor[i]=false;
+                        concat[i]="";
+                    }
+                    keepGoing|=monitor[i];
                 }
-                String s2=new String(new byte[] {Byte.parseByte(""+localProcess2.getInputStream().read())});
-                concat2+=s2;
-                if(s2.equalsIgnoreCase("\n") && monitor2) {
-                    System.out.print("Processor 2: "+concat2);
-                    if(concat2.substring(0, Math.min(20,concat2.length())).equalsIgnoreCase(">> Process Completed")) monitor2=false;
-                    concat2="";
-                }
+
             }
             System.exit(0);
 

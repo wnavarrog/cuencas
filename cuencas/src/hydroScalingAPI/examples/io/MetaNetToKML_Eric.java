@@ -31,7 +31,7 @@ package hydroScalingAPI.examples.io;
  */
 public class MetaNetToKML_Eric {
     
-    public MetaNetToKML_Eric(hydroScalingAPI.io.MetaRaster metaModif, java.io.File outputDirectory,hydroScalingAPI.util.geomorphology.objects.Basin myCuenca,byte [][] matDir,String uniqueIdentifier) throws java.io.IOException{
+    public MetaNetToKML_Eric(hydroScalingAPI.io.MetaRaster metaModif, java.io.File outputDirectory,hydroScalingAPI.util.geomorphology.objects.Basin myCuenca,byte [][] matDir,float[][] gdo,String uniqueIdentifier) throws java.io.IOException{
 
         String[] cityName=uniqueIdentifier.split(" \\(");
         String[] riverName=cityName[1].split("\\)");
@@ -51,11 +51,6 @@ public class MetaNetToKML_Eric {
         hydroScalingAPI.util.geomorphology.objects.LinksAnalysis linksStructure=new hydroScalingAPI.util.geomorphology.objects.LinksAnalysis(myCuenca, metaDatos, matDir);
         hydroScalingAPI.modules.rainfallRunoffModel.objects.LinksInfo thisNetworkGeom=new hydroScalingAPI.modules.rainfallRunoffModel.objects.LinksInfo(linksStructure);
         
-        hydroScalingAPI.io.MetaPolygon metaPolyToWrite=new hydroScalingAPI.io.MetaPolygon ();
-        metaPolyToWrite.setName(myCuenca.toString());
-        metaPolyToWrite.setCoordinates(myCuenca.getLonLatBasinDivide());
-        metaPolyToWrite.setInformation("Basin Divide as captured by Cuencas");
-
         java.io.File fileSalida;
         java.io.FileOutputStream        outputDir;
         java.io.OutputStreamWriter      newfile;
@@ -70,10 +65,11 @@ public class MetaNetToKML_Eric {
         newfile=new java.io.OutputStreamWriter(bufferout);
 
         float[][] xyBasin=myCuenca.getLonLatBasin();
+        int[][] xyBasinIndex=myCuenca.getXYBasin();
 
         newfile.write(uniqueIdentifier+ret);
         for (int i = 0; i < xyBasin[0].length; i++) {
-            newfile.write(xyBasin[0][i]+","+xyBasin[1][i]+ret);
+            newfile.write(xyBasin[0][i]+","+xyBasin[1][i]+","+(gdo[xyBasinIndex[1][i]][xyBasinIndex[0][i]]-gdo[xyBasinIndex[1][0]][xyBasinIndex[0][0]])+ret);
         }
 
         newfile.close();
@@ -85,11 +81,11 @@ public class MetaNetToKML_Eric {
         String lat=hydroScalingAPI.tools.DegreesToDMS.getprettyString(yO, 0);
         double areaUp=Math.round(thisNetworkGeom.upStreamArea(linksStructure.OuletLinkNum)*10)/10.0;
         double lengthUp=Math.round(thisNetworkGeom.mainChannelLength(linksStructure.OuletLinkNum)*100)/100.0;
-        double timeUp=Math.round(thisNetworkGeom.mainChannelLength(linksStructure.OuletLinkNum)*1000/0.5/3600.0*100)/100.0;
+        double timeUp=Math.round(thisNetworkGeom.mainChannelLength(linksStructure.OuletLinkNum)*1000/0.75/3600.0*100)/100.0;
 
         double areaUpSqMi=Math.round(thisNetworkGeom.upStreamArea(linksStructure.OuletLinkNum)*0.38610*10)/10.0;
         double lengthUpMi=Math.round(thisNetworkGeom.mainChannelLength(linksStructure.OuletLinkNum)*0.62137*100)/100.0;
-        double timeUpDay=Math.round(thisNetworkGeom.mainChannelLength(linksStructure.OuletLinkNum)*1000/0.5/3600.0/24*100)/100.0;
+        double timeUpDay=Math.round(thisNetworkGeom.mainChannelLength(linksStructure.OuletLinkNum)*1000/0.75/3600.0/24*100)/100.0;
 
 
         fileSalida=new java.io.File(outputDirectory+"/InfoFile_"+uniqueIdentifier+".txt");
@@ -140,6 +136,11 @@ public class MetaNetToKML_Eric {
                                 + "Monitoring rain over this area which controls potential flooding of "+riverName[0]+" that affects"+commentName[1]+".";
         
         fileSalida=new java.io.File(outputDirectory+"/Divide_"+uniqueIdentifier+".kml");
+
+        hydroScalingAPI.io.MetaPolygon metaPolyToWrite=new hydroScalingAPI.io.MetaPolygon ();
+        metaPolyToWrite.setName(myCuenca.toString());
+        metaPolyToWrite.setCoordinates(myCuenca.getLonLatBasinDivide());
+        metaPolyToWrite.setInformation("Basin Divide as captured by Cuencas");
 
         metaPolyToWrite.writeKmlPolygon(fileSalida,uniqueIdentifier, myDescription);
 
@@ -205,6 +206,14 @@ public class MetaNetToKML_Eric {
 //                            "/CuencasDataBases/Iowa_Rivers_DB/Rasters/Topography/4_arcsec/res",
 //                            "/Users/ricardo/rawData/BasinMasks/usgs_gauges/"};
 
+//        args=new String[] { "/Users/ricardo/workFiles/myWorkingStuff/AdvisorThesis/Eric/res_medium_cities.log",
+//                            "/CuencasDataBases/Iowa_Rivers_DB/Rasters/Topography/4_arcsec/res",
+//                            "/Users/ricardo/rawData/BasinMasks/medium_cities/"};
+
+//        args=new String[] { "/Users/ricardo/workFiles/myWorkingStuff/AdvisorThesis/Eric/res_small_cities.log",
+//                            "/CuencasDataBases/Iowa_Rivers_DB/Rasters/Topography/4_arcsec/res",
+//                            "/Users/ricardo/rawData/BasinMasks/small_cities/"};
+
         main1(args);
     }
 
@@ -227,6 +236,12 @@ public class MetaNetToKML_Eric {
             metaModif.setFormat("Byte");
             byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
 
+            metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".gdo"));
+            metaModif.setFormat(hydroScalingAPI.tools.ExtensionToFormat.getFormat(".gdo"));
+            float[][] gdo=new hydroScalingAPI.io.DataRaster(metaModif).getFloat();
+
+
+
             for (int i = 0; i < basins.length; i++) {
             //for (int i = 0; i < 2; i++) {
 
@@ -247,7 +262,7 @@ public class MetaNetToKML_Eric {
                     java.io.File outputDir=new java.io.File(args[2]+cityName[0]);
                     outputDir.mkdirs();
 
-                    MetaNetToKML_Eric exporter=new MetaNetToKML_Eric(metaModif,outputDir,laCuenca,matDirs,uniqueIdentifier);
+                    MetaNetToKML_Eric exporter=new MetaNetToKML_Eric(metaModif,outputDir,laCuenca,matDirs,gdo,uniqueIdentifier);
 
                 }
             }
