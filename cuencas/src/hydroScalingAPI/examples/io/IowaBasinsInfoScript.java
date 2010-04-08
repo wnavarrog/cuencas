@@ -554,20 +554,20 @@ public class IowaBasinsInfoScript{
 
                 while ((line2 = is.readLine()) != null) {
 
-                    if(line2.equalsIgnoreCase("<PolyStyle><color>e6ffffff</color></PolyStyle></Style>")){
+                    if(line2.equalsIgnoreCase("<PolyStyle><color>e6ffffff</color></PolyStyle>")){
 
                         //Green
-                        if(Tr > 0.00) line2="<PolyStyle><color>be22c122</color></PolyStyle></Style>";
+                        if(Tr > 0.00) line2="<PolyStyle><color>be22c122</color></PolyStyle>";
                         //Orange
-                        if(Tr > 5.00) line2="<PolyStyle><color>be0062ff</color></PolyStyle></Style>";
+                        if(Tr > 5.00) line2="<PolyStyle><color>be0062ff</color></PolyStyle>";
                         //Red
-                        if(Tr > 10.00) line2="<PolyStyle><color>be2023ff</color></PolyStyle></Style>";
+                        if(Tr > 10.00) line2="<PolyStyle><color>be2023ff</color></PolyStyle>";
                         
                     }
 
-                    if(line2.startsWith("<Placemark><description>")){
+                    if(line2.startsWith("   <Placemark><description>") && line2.endsWith("<styleUrl>#Point</styleUrl>")){
                         int indOfString=line2.indexOf("]]></description>");
-                        line2=line2.substring(0, indOfString)+"<br><br><b>Rain Rate</b><br>"+averageValue+" mm ("+averageValueInches+" in)<br>"+"<b>Return Period</b><br>"+Math.max(1,(int)Math.round(Tr))+" years <br>"+"<b>Flood Index</b><br>"+averageValueTimeMachine+"]]></description>";
+                        line2=line2.substring(0, indOfString)+"<br><br><b>Accumulated Rainfall over Residence Time</b><br>"+averageValue+" mm ("+averageValueInches+" in)<br>"+"<b>Return Period</b><br>"+Math.max(1,(int)Math.round(Tr))+" years <br>"+"<b>Flood Index</b><br>"+averageValueTimeMachine+"<br><br>]]></description><styleUrl>#Point</styleUrl>";
                     }
 
                     bufferout.write(line2.getBytes());
@@ -614,7 +614,6 @@ public class IowaBasinsInfoScript{
 
                 tableRadek+=cityName[0]+";"+riverName[0]+";"+latitude+";"+longitude+";"+polyWebAddress+";"+netWebAddress+";"+minX+";"+minY+";"+maxX+";"+maxY+ret;
 
-                
             }
 
         }

@@ -348,7 +348,7 @@ public class MetaPolygon {
         writerKml.write("</IconStyle>" + ret);
         writerKml.write("</Style>" + ret);
         writerKml.write("<Folder>" + ret);
-        writerKml.write("   <Placemark>" + ret + "<styleUrl>#Polygon</styleUrl>" + ret);
+        writerKml.write("   <Placemark><description><![CDATA[" + myDescription.substring(0, myDescription.indexOf("<br><br><b>Comment")) + "]]></description>" + ret + "<styleUrl>#Polygon</styleUrl>" + ret);
         writerKml.write("      <Polygon>");
         writerKml.write("          <name>" + label + "</name>" + ret);
         writerKml.write("          <outerBoundaryIs>" + ret);
@@ -364,7 +364,7 @@ public class MetaPolygon {
         writerKml.write("        </outerBoundaryIs>" + ret);
         writerKml.write("     </Polygon>" + ret);
         writerKml.write("   </Placemark>" + ret);
-        writerKml.write("   <Placemark><description><![CDATA[" + myDescription + "]]></description>" + ret + "<styleUrl>#Point</styleUrl>" + ret);
+        writerKml.write("   <Placemark><description><![CDATA[" + myDescription + "]]></description><styleUrl>#Point</styleUrl>" + ret);
         writerKml.write("      <Point>" + ret);
         writerKml.write("          <coordinates>"+xyContour[0][0] + "," + xyContour[1][0] + " "+"</coordinates>" + ret);
         writerKml.write("      </Point>" + ret);
