@@ -65,7 +65,7 @@ public class ExternalNetworkExtraction extends Thread{
     
     public void run(){
         
-        command=new String[] {  System.getProperty("java.home")+"/bin/java",
+        command=new String[] {  System.getProperty("java.home")+System.getProperty("file.separator")+"bin"+System.getProperty("file.separator")+"java",
                                 "-Xmx256m",
                                 "-Xrs",
                                 "-cp",
@@ -75,6 +75,7 @@ public class ExternalNetworkExtraction extends Thread{
                                 demFileName};
         try{
             System.out.println("Throws the command "+metaFileName+" form "+executorName);
+            System.out.println(">> Command Sintax: "+java.util.Arrays.toString(command));
             localProcess=java.lang.Runtime.getRuntime().exec(command);
             System.out.println("The command "+metaFileName+" was thrown"+" form "+executorName);
             

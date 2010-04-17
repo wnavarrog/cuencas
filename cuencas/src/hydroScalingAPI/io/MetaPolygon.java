@@ -348,7 +348,10 @@ public class MetaPolygon {
         writerKml.write("</IconStyle>" + ret);
         writerKml.write("</Style>" + ret);
         writerKml.write("<Folder>" + ret);
-        writerKml.write("   <Placemark><description><![CDATA[" + myDescription.substring(0, myDescription.indexOf("<br><br><b>Comment")) + "]]></description>" + ret + "<styleUrl>#Polygon</styleUrl>" + ret);
+        if(myDescription.indexOf("<br><br><b>Comment") != -1)
+            writerKml.write("   <Placemark><description><![CDATA[" + myDescription.substring(0, myDescription.indexOf("<br><br><b>Comment")) + "]]></description>" + ret + "<styleUrl>#Polygon</styleUrl>" + ret);
+        else
+            writerKml.write("   <Placemark><description><![CDATA[" + myDescription+ "]]></description>" + ret + "<styleUrl>#Polygon</styleUrl>" + ret);
         writerKml.write("      <Polygon>");
         writerKml.write("          <name>" + label + "</name>" + ret);
         writerKml.write("          <outerBoundaryIs>" + ret);
