@@ -643,28 +643,28 @@ public class IowaBasinsInfoScript{
 
         if(args.length == 0) {
 
-//            command=new String[] {  System.getProperty("java.home")+System.getProperty("file.separator")+"bin"+System.getProperty("file.separator")+"java",
-//                                    "-Xmx1500m",
-//                                    "-Xrs",
-//                                    "-cp",
-//                                    System.getProperty("java.class.path"),
-//                                    "hydroScalingAPI.examples.io.IowaBasinsInfoScript",
-//                                    "reload-rain"};
-//            localProcess0=java.lang.Runtime.getRuntime().exec(command);
-//
-//            String concat0="";
-//
-//            boolean monitor0=true;
-//
-//            while(monitor0){
-//                String s1=new String(new byte[] {Byte.parseByte(""+localProcess0.getInputStream().read())});
-//                concat0+=s1;
-//                if(s1.equalsIgnoreCase("\n")) {
-//                    System.out.print("Processor 0: "+concat0);
-//                    if(concat0.substring(0, Math.min(39,concat0.length())).equalsIgnoreCase(">> Accumulations Files Update Completed")) monitor0=false;
-//                    concat0="";
-//                }
-//            }
+            command=new String[] {  System.getProperty("java.home")+System.getProperty("file.separator")+"bin"+System.getProperty("file.separator")+"java",
+                                    "-Xmx1500m",
+                                    "-Xrs",
+                                    "-cp",
+                                    System.getProperty("java.class.path"),
+                                    "hydroScalingAPI.examples.io.IowaBasinsInfoScript",
+                                    "reload-rain"};
+            localProcess0=java.lang.Runtime.getRuntime().exec(command);
+
+            String concat0="";
+
+            boolean monitor0=true;
+
+            while(monitor0){
+                String s1=new String(new byte[] {Byte.parseByte(""+localProcess0.getInputStream().read())});
+                concat0+=s1;
+                if(s1.equalsIgnoreCase("\n")) {
+                    System.out.print("Processor 0: "+concat0);
+                    if(concat0.substring(0, Math.min(39,concat0.length())).equalsIgnoreCase(">> Accumulations Files Update Completed")) monitor0=false;
+                    concat0="";
+                }
+            }
 
             String[][] kmlInAndOut=new String[][] {{"/Users/ricardo/rawData/BasinMasks/usgs_gauges/","/Volumes/ricardo/temp/iowa_basins_data/usgs_gauges/"},
                                                    {"/Users/ricardo/rawData/BasinMasks/large_cities/","/Volumes/ricardo/temp/iowa_basins_data/large_cities/"},
