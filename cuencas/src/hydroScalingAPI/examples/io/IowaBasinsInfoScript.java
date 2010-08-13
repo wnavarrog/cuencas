@@ -109,7 +109,7 @@ public class IowaBasinsInfoScript{
 
         java.util.Vector<String> availableMapsOfRain=new java.util.Vector<String>();
 
-        file = new URL("http://s-iihr52.iihr.uiowa.edu/ricardo/quality/60/archive.txt");
+        file = new URL("http://s-iihr57.iihr.uiowa.edu/ricardo/quality/60/archive.txt");
         urlConn = file.openConnection();
 
 
@@ -138,8 +138,8 @@ public class IowaBasinsInfoScript{
 
             String mostRecentFile=availableMapsOfRain.get(ff);
 
-            System.out.println(">> Opening connection: "+"http://s-iihr52.iihr.uiowa.edu/ricardo/quality/60/"+mostRecentFile);
-            file = new URL("http://s-iihr52.iihr.uiowa.edu/ricardo/quality/60/"+mostRecentFile);
+            System.out.println(">> Opening connection: "+"http://s-iihr57.iihr.uiowa.edu/ricardo/quality/60/"+mostRecentFile);
+            file = new URL("http://s-iihr57.iihr.uiowa.edu/ricardo/quality/60/"+mostRecentFile);
             urlConn = file.openConnection();
 
 
@@ -211,7 +211,7 @@ public class IowaBasinsInfoScript{
 
             kk++;
 
-            //if(kk == 11) break;
+            if(kk == 500) break;
 
         }
 
@@ -248,7 +248,7 @@ public class IowaBasinsInfoScript{
             BufferedReader is;
             String line;
 
-            file = new URL("http://s-iihr52.iihr.uiowa.edu/ricardo/speed/60/latest.txt");
+            file = new URL("http://s-iihr57.iihr.uiowa.edu/ricardo/speed/60/latest.txt");
             urlConn = file.openConnection();
 
 
@@ -260,8 +260,8 @@ public class IowaBasinsInfoScript{
             is.close();
             xover.close();
 
-            System.out.println(">> Opening connection: "+"http://s-iihr52.iihr.uiowa.edu/ricardo/speed/60/"+mostRecentFile);
-            file = new URL("http://s-iihr52.iihr.uiowa.edu/ricardo/speed/60/"+mostRecentFile);
+            System.out.println(">> Opening connection: "+"http://s-iihr57.iihr.uiowa.edu/ricardo/speed/60/"+mostRecentFile);
+            file = new URL("http://s-iihr57.iihr.uiowa.edu/ricardo/speed/60/"+mostRecentFile);
             urlConn = file.openConnection();
 
 
@@ -367,6 +367,13 @@ public class IowaBasinsInfoScript{
             outputDir.close();
 
             System.out.println(">> Accumulations Files Update Completed");
+
+            System.out.println(">> Writing Accumulations Files to Web Format");
+
+            WebWriter wr1=new WebWriter(mostRecentFile);
+            wr1.run();
+
+            System.out.println(">> Writing Accumulations Files to Web Format completed");
 
         }
         catch(MalformedURLException e){
@@ -557,17 +564,32 @@ public class IowaBasinsInfoScript{
                     if(line2.equalsIgnoreCase("<PolyStyle><color>e6ffffff</color></PolyStyle>")){
 
                         //Green
-                        if(Tr > 0.00) line2="<PolyStyle><color>be22c122</color></PolyStyle>";
+                        if(averageValueTimeMachine > 0.00) line2="<PolyStyle><color>be22c122</color></PolyStyle>";
                         //Orange
-                        if(Tr > 5.00) line2="<PolyStyle><color>be0062ff</color></PolyStyle>";
+                        if(averageValueTimeMachine > 1.00) line2="<PolyStyle><color>be0062ff</color></PolyStyle>";
                         //Red
-                        if(Tr > 10.00) line2="<PolyStyle><color>be2023ff</color></PolyStyle>";
+                        if(averageValueTimeMachine > 2.00) line2="<PolyStyle><color>be2023ff</color></PolyStyle>";
                         
                     }
 
                     if(line2.startsWith("   <Placemark><description>") && line2.endsWith("<styleUrl>#Point</styleUrl>")){
                         int indOfString=line2.indexOf("]]></description>");
                         line2=line2.substring(0, indOfString)+"<br><br><b>Accumulated Rainfall over Residence Time</b><br>"+averageValue+" mm ("+averageValueInches+" in)<br>"+"<b>Return Period</b><br>"+Math.max(1,(int)Math.round(Tr))+" years <br>"+"<b>Flood Index</b><br>"+averageValueTimeMachine+"<br><br>]]></description><styleUrl>#Point</styleUrl>";
+                    }
+
+                    if(line2.startsWith("<href>http://weather.iihr.uiowa.edu/ifc/graphics/icon.png</href>")){
+
+                        //Green
+                        if(averageValueTimeMachine > 0.00) line2="<href>http://weather.iihr.uiowa.edu/ifc/graphics/dots/l1.png</href>";
+                        //Blue
+                        if(averageValueTimeMachine > 1.00) line2="<href>http://weather.iihr.uiowa.edu/ifc/graphics/dots/l2.png</href>";
+                        //Yellow
+                        if(averageValueTimeMachine > 2.00) line2="<href>http://weather.iihr.uiowa.edu/ifc/graphics/dots/l3.png</href>";
+                        //Orange
+                        if(averageValueTimeMachine > 3.00) line2="<href>http://weather.iihr.uiowa.edu/ifc/graphics/dots/l4.png</href>";
+                        //Red
+                        if(averageValueTimeMachine > 4.00) line2="<href>http://weather.iihr.uiowa.edu/ifc/graphics/dots/l5.png</href>";
+
                     }
 
                     bufferout.write(line2.getBytes());
@@ -661,7 +683,7 @@ public class IowaBasinsInfoScript{
                 concat0+=s1;
                 if(s1.equalsIgnoreCase("\n")) {
                     System.out.print("Processor 0: "+concat0);
-                    if(concat0.substring(0, Math.min(39,concat0.length())).equalsIgnoreCase(">> Accumulations Files Update Completed")) monitor0=false;
+                    if(concat0.substring(0, Math.min(54,concat0.length())).equalsIgnoreCase(">> Writing Accumulations Files to Web Format completed")) monitor0=false;
                     concat0="";
                 }
             }
@@ -727,4 +749,104 @@ public class IowaBasinsInfoScript{
 
     }
 
+}
+
+
+
+
+
+
+class WebWriter implements Runnable {
+
+    java.io.FileInputStream dataPath;
+    java.io.BufferedInputStream dataBuffer;
+    java.io.DataInputStream dataDataStream;
+
+    String ret = "\n";
+    String timeStamp="";
+
+    String KMLsPath, OutputPath;
+
+
+    int numCol_Rain=1741;
+    int numRow_Rain=1057;
+
+    public WebWriter(String ts) {
+
+        timeStamp=ts;
+
+    }
+
+    public void run() { // thread dies when finished
+        try {
+            System.out.println(">> Rewriting Accumulations Files for Web Display");
+
+            OutputPath = "/Volumes/ricardo/temp/iowa_basins_data/";
+            new java.io.File(OutputPath + "/accumulations/").mkdirs();
+
+            float[][] dataFloat=new float[numRow_Rain][numCol_Rain];
+
+            for (int k = 1; k <= 500; k++) {
+
+                if(k == 1 || k == 3 || k == 6 || k == 24 || k == 168){
+
+                    dataPath = new java.io.FileInputStream("/Users/ricardo/rawData/RainfallAccumulations/Current/accum" + k);
+                    dataBuffer = new java.io.BufferedInputStream(dataPath);
+                    dataDataStream = new java.io.DataInputStream(dataBuffer);
+
+                    for (int i = 0; i < numRow_Rain; i++) {
+                        for (int j = 0; j < numCol_Rain; j++) {
+                            dataFloat[i][j] = dataDataStream.readFloat();
+                        }
+                    }
+
+
+                    dataBuffer.close();
+                    dataDataStream.close();
+
+                    System.out.println(OutputPath + "/accumulations/accum" + k + ".out.gz");
+
+                    java.io.FileOutputStream outputLocal=new java.io.FileOutputStream(new java.io.File(OutputPath + "/accumulations/accum" + k + ".out.gz"));
+                    java.util.zip.GZIPOutputStream outputComprim=new java.util.zip.GZIPOutputStream(outputLocal);
+                    java.io.BufferedWriter newfile = new java.io.BufferedWriter(new java.io.OutputStreamWriter(outputComprim));
+
+                    int nc = numCol_Rain;
+                    int nr = numRow_Rain;
+
+                    float missing = -99.99f;
+                    String retorno = "\n";
+
+                    newfile.write("# file name: "+timeStamp + retorno);
+                    newfile.write("# Accumulation map [mm] " + retorno);
+                    newfile.write("# Accumulation time [sec]: 3600" + retorno);
+                    newfile.write("# number of columns: 1741" + retorno);
+                    newfile.write("# number of rows: 1057" + retorno);
+                    newfile.write("# grid: LATLON " + retorno);
+                    newfile.write("# upper-left LATLONcorner(x,y): 6924 5409" + retorno);
+                    newfile.write("# xllcorner [lon]: -97.154167" + retorno);
+                    newfile.write("# yllcorner [lat]: 40.133331" + retorno);
+                    newfile.write("# cellsize [dec deg]: 0.004167" + retorno);
+                    newfile.write("# no data value: -99.0" + retorno);
+
+
+                    for (int i = (nr - 1); i >= 0; i--) {
+                        for (int j = 0; j < nc; j++) {
+                            if (dataFloat[i][j] == missing) {
+                                newfile.write(missing + " ");
+                            } else {
+                                newfile.write(dataFloat[i][j] + " ");
+                            }
+                        }
+                        newfile.write(retorno);
+                    }
+
+                    newfile.close();
+                    outputComprim.close();
+                    outputLocal.close();
+                }
+
+            }
+        } catch (IOException iOException) {
+        }
+    }
 }

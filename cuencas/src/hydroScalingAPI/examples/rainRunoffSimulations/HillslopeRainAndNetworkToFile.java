@@ -41,7 +41,7 @@ public class HillslopeRainAndNetworkToFile {
         
         thisHillsInfo.setStormManager(storm);
         
-        String Directory="/Users/ricardo/simulationResults/iowaRivers/";
+        String Directory="/Users/ricardo/simulationResults/iowaRivers/MPE/";
         String demName=md.getLocationBinaryFile().getName().substring(0,md.getLocationBinaryFile().getName().lastIndexOf("."));
         java.io.File theFile=new java.io.File(Directory+demName+"_"+x+"_"+y+"-"+storm.stormName()+".dat");
         System.out.println(theFile);
@@ -108,16 +108,16 @@ public class HillslopeRainAndNetworkToFile {
         //main0(args); //The mogollon test case
         //main1(args); //Whitewater 15-minute Rain
         //main2(args); //Nexrad Whitewater
-        //main3(args); //Nexrad MPE Iowa River Basins
-        main4(args); //Nexrad MPE Iowa River Basins
+        main3(args); //Nexrad MPE Iowa River Basins
+        //main4(args); //Nexrad MPE Iowa River Basins
     }
     
     public static void main0(String args[]) {
         
         try{
-            java.io.File theFile=new java.io.File("/hidrosigDataBases/Gila_River_DB/Rasters/Topography/1_ArcSec/mogollon.metaDEM");
+            java.io.File theFile=new java.io.File("/CuencasDataBases/Gila_River_DB/Rasters/Topography/1_ArcSec/mogollon.metaDEM");
             hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
-            metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Gila_River_DB/Rasters/Topography/1_ArcSec/mogollon.dir"));
+            metaModif.setLocationBinaryFile(new java.io.File("/CuencasDataBases/Gila_River_DB/Rasters/Topography/1_ArcSec/mogollon.dir"));
 
             String formatoOriginal=metaModif.getFormat();
             metaModif.setFormat("Byte");
@@ -128,7 +128,7 @@ public class HillslopeRainAndNetworkToFile {
             int [][] magnitudes=new hydroScalingAPI.io.DataRaster(metaModif).getInt();
 
             java.io.File stormFile;
-            stormFile=new java.io.File("/hidrosigDataBases/Gila_River_DB/Rasters/Hydrology/NexradPrecipitation/wholeSummer2003/nexrad_prec.metaVHC");
+            stormFile=new java.io.File("/CuencasDataBases/Gila_River_DB/Rasters/Hydrology/NexradPrecipitation/wholeSummer2003/nexrad_prec.metaVHC");
 
             new HillslopeRainAndNetworkToFile(282, 298,matDirs,magnitudes,metaModif,stormFile);
             
@@ -145,9 +145,9 @@ public class HillslopeRainAndNetworkToFile {
     public static void main1(String args[]) {
         
         try{
-            java.io.File theFile=new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS_2005/Whitewaters.metaDEM");
+            java.io.File theFile=new java.io.File("/CuencasDataBases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS_2005/Whitewaters.metaDEM");
             hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
-            metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS_2005/Whitewaters.dir"));
+            metaModif.setLocationBinaryFile(new java.io.File("/CuencasDataBases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS_2005/Whitewaters.dir"));
 
             metaModif.setFormat("Byte");
             byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
@@ -157,7 +157,7 @@ public class HillslopeRainAndNetworkToFile {
             int [][] magnitudes=new hydroScalingAPI.io.DataRaster(metaModif).getInt();
 
             java.io.File stormFile;
-            stormFile=new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Hydrology/storms/observed_events/EventLuc/prec.metaVHC");
+            stormFile=new java.io.File("/CuencasDataBases/Whitewater_database/Rasters/Hydrology/storms/observed_events/EventLuc/prec.metaVHC");
 
         
             new HillslopeRainAndNetworkToFile(1063,496,matDirs,magnitudes,metaModif,stormFile);
@@ -175,9 +175,9 @@ public class HillslopeRainAndNetworkToFile {
     public static void main2(String args[]) {
         
         try{
-            java.io.File theFile=new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS_2005/Whitewaters.metaDEM");
+            java.io.File theFile=new java.io.File("/CuencasDataBases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS_2005/Whitewaters.metaDEM");
             hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
-            metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS_2005/Whitewaters.dir"));
+            metaModif.setLocationBinaryFile(new java.io.File("/CuencasDataBases/Whitewater_database/Rasters/Topography/1_ArcSec_USGS_2005/Whitewaters.dir"));
 
             metaModif.setFormat("Byte");
             byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
@@ -187,7 +187,7 @@ public class HillslopeRainAndNetworkToFile {
             int [][] magnitudes=new hydroScalingAPI.io.DataRaster(metaModif).getInt();
 
             java.io.File stormFile;
-            stormFile=new java.io.File("/hidrosigDataBases/Whitewater_database/Rasters/Hydrology/storms/observed_events/EventLuc/prec.metaVHC");
+            stormFile=new java.io.File("/CuencasDataBases/Whitewater_database/Rasters/Hydrology/storms/observed_events/EventLuc/prec.metaVHC");
 
         
             new HillslopeRainAndNetworkToFile(1063,496,matDirs,magnitudes,metaModif,stormFile);
@@ -242,9 +242,9 @@ public class HillslopeRainAndNetworkToFile {
 
         
         try{
-            java.io.File theFile=new java.io.File("/hidrosigDataBases/Iowa_Rivers_DB/Rasters/Topography/3_arcSec/AveragedIowaRiverAtColumbusJunctions.metaDEM");
+            java.io.File theFile=new java.io.File("/CuencasDataBases/Iowa_Rivers_DB/Rasters/Topography/3_arcSec/AveragedIowaRiverAtColumbusJunctions.metaDEM");
             hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
-            metaModif.setLocationBinaryFile(new java.io.File("/hidrosigDataBases/Iowa_Rivers_DB/Rasters/Topography/3_arcSec/AveragedIowaRiverAtColumbusJunctions.dir"));
+            metaModif.setLocationBinaryFile(new java.io.File("/CuencasDataBases/Iowa_Rivers_DB/Rasters/Topography/3_arcSec/AveragedIowaRiverAtColumbusJunctions.dir"));
 
             metaModif.setFormat("Byte");
             byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
@@ -254,13 +254,13 @@ public class HillslopeRainAndNetworkToFile {
             int [][] magnitudes=new hydroScalingAPI.io.DataRaster(metaModif).getInt();
 
             java.io.File stormFile;
-            //stormFile=new java.io.File("/hidrosigDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/observed_events/EventIowaJuneMPE/hydroNexrad.metaVHC");
-            stormFile=new java.io.File("/hidrosigDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/observed_events/EventIowaJuneHydroNEXRAD/hydroNexrad.metaVHC");
+            stormFile=new java.io.File("/CuencasDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/observed_events/EventIowaJuneMPE/hydroNexrad.metaVHC");
+            //stormFile=new java.io.File("/CuencasDataBases/Iowa_Rivers_DB/Rasters/Hydrology/storms/observed_events/EventIowaJuneHydroNEXRAD/hydroNexrad.metaVHC");
         
+            //new HillslopeRainAndNetworkToFile(2646, 762,matDirs,magnitudes,metaModif,stormFile);
+//            new HillslopeRainAndNetworkToFile(2949, 741,matDirs,magnitudes,metaModif,stormFile);
 //            new HillslopeRainAndNetworkToFile(2885, 690,matDirs,magnitudes,metaModif,stormFile);
 //            new HillslopeRainAndNetworkToFile(2817, 713,matDirs,magnitudes,metaModif,stormFile);
-//            new HillslopeRainAndNetworkToFile(2646, 762,matDirs,magnitudes,metaModif,stormFile);
-//            new HillslopeRainAndNetworkToFile(2949, 741,matDirs,magnitudes,metaModif,stormFile);
 //            new HillslopeRainAndNetworkToFile(1312, 1112,matDirs,magnitudes,metaModif,stormFile);
 //            new HillslopeRainAndNetworkToFile(2858, 742,matDirs,magnitudes,metaModif,stormFile);
 //            new HillslopeRainAndNetworkToFile(2115, 801,matDirs,magnitudes,metaModif,stormFile);
@@ -268,29 +268,29 @@ public class HillslopeRainAndNetworkToFile {
 //            new HillslopeRainAndNetworkToFile(1871, 903,matDirs,magnitudes,metaModif,stormFile);
 //            new HillslopeRainAndNetworkToFile(2796, 629,matDirs,magnitudes,metaModif,stormFile);
 //            new HillslopeRainAndNetworkToFile(2958, 410,matDirs,magnitudes,metaModif,stormFile);
-            new HillslopeRainAndNetworkToFile(2734, 1069,matDirs,magnitudes,metaModif,stormFile);
-            new HillslopeRainAndNetworkToFile(1770, 1987,matDirs,magnitudes,metaModif,stormFile);
-            new HillslopeRainAndNetworkToFile(2256, 876,matDirs,magnitudes,metaModif,stormFile);
-            new HillslopeRainAndNetworkToFile(3186, 392,matDirs,magnitudes,metaModif,stormFile);
+//            new HillslopeRainAndNetworkToFile(2734, 1069,matDirs,magnitudes,metaModif,stormFile);
+//            new HillslopeRainAndNetworkToFile(1770, 1987,matDirs,magnitudes,metaModif,stormFile);
+//            new HillslopeRainAndNetworkToFile(2256, 876,matDirs,magnitudes,metaModif,stormFile);
+//            new HillslopeRainAndNetworkToFile(3186, 392,matDirs,magnitudes,metaModif,stormFile);
             new HillslopeRainAndNetworkToFile(3316, 116,matDirs,magnitudes,metaModif,stormFile);
-            
-            
-            new HillslopeRainAndNetworkToFile(2676, 465,matDirs,magnitudes,metaModif,stormFile);
-            new HillslopeRainAndNetworkToFile(2900, 768,matDirs,magnitudes,metaModif,stormFile);
-            new HillslopeRainAndNetworkToFile(1245, 1181,matDirs,magnitudes,metaModif,stormFile);
-            new HillslopeRainAndNetworkToFile(951, 1479,matDirs,magnitudes,metaModif,stormFile);
-            new HillslopeRainAndNetworkToFile(3113, 705,matDirs,magnitudes,metaModif,stormFile);
-            new HillslopeRainAndNetworkToFile(1978, 1403,matDirs,magnitudes,metaModif,stormFile);
-            new HillslopeRainAndNetworkToFile(1779, 1591,matDirs,magnitudes,metaModif,stormFile);
-            new HillslopeRainAndNetworkToFile(1932, 1695,matDirs,magnitudes,metaModif,stormFile);
-            new HillslopeRainAndNetworkToFile(1590, 1789,matDirs,magnitudes,metaModif,stormFile);
-            new HillslopeRainAndNetworkToFile(1682, 1858,matDirs,magnitudes,metaModif,stormFile);
-            new HillslopeRainAndNetworkToFile(1634, 1956,matDirs,magnitudes,metaModif,stormFile);
-            new HillslopeRainAndNetworkToFile(1775, 1879,matDirs,magnitudes,metaModif,stormFile);
-            new HillslopeRainAndNetworkToFile(903, 2499,matDirs,magnitudes,metaModif,stormFile);
-            new HillslopeRainAndNetworkToFile(1526, 2376,matDirs,magnitudes,metaModif,stormFile);
-            new HillslopeRainAndNetworkToFile(1730, 2341,matDirs,magnitudes,metaModif,stormFile);
-            new HillslopeRainAndNetworkToFile(1164, 3066,matDirs,magnitudes,metaModif,stormFile);
+//
+//
+//            new HillslopeRainAndNetworkToFile(2676, 465,matDirs,magnitudes,metaModif,stormFile);
+//            new HillslopeRainAndNetworkToFile(2900, 768,matDirs,magnitudes,metaModif,stormFile);
+//            new HillslopeRainAndNetworkToFile(1245, 1181,matDirs,magnitudes,metaModif,stormFile);
+//            new HillslopeRainAndNetworkToFile(951, 1479,matDirs,magnitudes,metaModif,stormFile);
+//            new HillslopeRainAndNetworkToFile(3113, 705,matDirs,magnitudes,metaModif,stormFile);
+//            new HillslopeRainAndNetworkToFile(1978, 1403,matDirs,magnitudes,metaModif,stormFile);
+//            new HillslopeRainAndNetworkToFile(1779, 1591,matDirs,magnitudes,metaModif,stormFile);
+//            new HillslopeRainAndNetworkToFile(1932, 1695,matDirs,magnitudes,metaModif,stormFile);
+//            new HillslopeRainAndNetworkToFile(1590, 1789,matDirs,magnitudes,metaModif,stormFile);
+//            new HillslopeRainAndNetworkToFile(1682, 1858,matDirs,magnitudes,metaModif,stormFile);
+//            new HillslopeRainAndNetworkToFile(1634, 1956,matDirs,magnitudes,metaModif,stormFile);
+//            new HillslopeRainAndNetworkToFile(1775, 1879,matDirs,magnitudes,metaModif,stormFile);
+//            new HillslopeRainAndNetworkToFile(903, 2499,matDirs,magnitudes,metaModif,stormFile);
+//            new HillslopeRainAndNetworkToFile(1526, 2376,matDirs,magnitudes,metaModif,stormFile);
+//            new HillslopeRainAndNetworkToFile(1730, 2341,matDirs,magnitudes,metaModif,stormFile);
+//            new HillslopeRainAndNetworkToFile(1164, 3066,matDirs,magnitudes,metaModif,stormFile);
             
 
         } catch (java.io.IOException IOE){

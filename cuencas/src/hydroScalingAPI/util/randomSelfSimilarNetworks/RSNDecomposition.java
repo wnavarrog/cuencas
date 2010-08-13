@@ -468,6 +468,8 @@ public class RSNDecomposition {
         
         //args=new String[] {"kentuckyRiver  845 2596  kentuckyRiver"};
         //args=new String[] {"kentuckyRiver  845 2595  kentuckyRiver"};
+
+        args=new String[] {"WalnutGulch_AZ  82 260  walnutGulchUpdated"};
         
         subMain1(args); //writes generators and geoemtric properties to files.  This algortithm is called
                         //by runAllBasinsRSN.sh
