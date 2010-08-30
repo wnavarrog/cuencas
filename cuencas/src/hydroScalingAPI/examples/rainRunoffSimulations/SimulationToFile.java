@@ -1069,38 +1069,20 @@ public class SimulationToFile extends java.lang.Object {
 
         float infil=0.0f;
 
+        int[] event_num={11,106,16,1,22,53,59,68,71,84,129};
+
         java.io.File stormFile;
-        stormFile=new java.io.File("/hidrosigDataBases/Goodwin_Creek_MS_database/Rasters/Hydrology/precipitation/storms/gaussian_events/05min_ts/event_01_sd1p00_coe2p85/precipitation_gaussian_ev01.metaVHC");
 
-        for (double lam1 = 0; lam1 <= 6; lam1 += 2) {
-            routingParams.put("lambda1", (float)(lam1/10.0));
-            for (double lam2 = -2; lam2 <= 1; lam2 += 1.0) {
+        for (int i : event_num) {
 
-                routingParams.put("lambda2", (float)(lam2/10.0));
+            String evNUM=(""+(i/1000.+0.0001)).substring(2,5);
 
-                for (float intV = 3f; intV <= 3f; intV += 1.0) {
-                    float v_o=(float)(intV/10.0f/Math.pow(10,lam1/10.0)/Math.pow(254,lam2/10.0));
-                    routingParams.put("v_o", v_o);
-                    new SimulationToFile(44,111,matDirs,magnitudes,metaModif,stormFile,0.0f,5,routingParams);
-                }
-            }
+            stormFile=new java.io.File("/CuencasDataBases/Goodwin_Creek_MS_database/Rasters/Hydrology/precipitation/storms/interpolated_events/05min_ts/events_singpeakB_rain01/event_"+evNUM+"/precipitation_interpolated_ev"+evNUM+".metaVHC");
+
+            new SimulationToFile(44, 111, matDirs, magnitudes, metaModif, stormFile, infil, 2, routingParams);
+
         }
 
-        stormFile=new java.io.File("/hidrosigDataBases/Goodwin_Creek_MS_database/Rasters/Hydrology/precipitation/storms/gaussian_events/05min_ts/event_04_sd6p00_coe2p85/precipitation_gaussian_ev04.metaVHC");
-
-        for (double lam1 = 0; lam1 <= 4; lam1 += 2) {
-            routingParams.put("lambda1", (float)(lam1/10.0));
-            for (double lam2 = -2; lam2 <= 1; lam2 += 1.0) {
-
-                routingParams.put("lambda2", (float)(lam2/10.0));
-
-                for (float intV = 3f; intV <= 3f; intV += 1.0) {
-                    float v_o=(float)(intV/10.0f/Math.pow(10,lam1/10.0)/Math.pow(254,lam2/10.0));
-                    routingParams.put("v_o", v_o);
-                    new SimulationToFile(44,111,matDirs,magnitudes,metaModif,stormFile,0.0f,5,routingParams);
-                }
-            }
-        }
     }
     
 }

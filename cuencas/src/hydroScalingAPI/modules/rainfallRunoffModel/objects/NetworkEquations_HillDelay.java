@@ -48,6 +48,8 @@ public class NetworkEquations_HillDelay implements hydroScalingAPI.util.ordDiffE
     private double So,Ts,Te,vh; // not an array because I assume uniform soil properties
     
     private double lamda1,lamda2;
+
+    private double generalRunoffCoeff;
     
     /**
      * Creates new NetworkEquations_Simple
@@ -86,6 +88,8 @@ public class NetworkEquations_HillDelay implements hydroScalingAPI.util.ordDiffE
         CkArray=linksHydraulicInfo.getCkArray();
         
         vh=0.1;
+
+        generalRunoffCoeff=1.0;//basinHillSlopesInfo.infiltRate(0,0);
         
     }
     
@@ -144,9 +148,9 @@ public class NetworkEquations_HillDelay implements hydroScalingAPI.util.ordDiffE
         thisDate.setTimeInMillis((long)(time*60.*1000.0));
         System.out.println("    "+thisDate.getTime()+" "+basinHillSlopesInfo.precipitation(0,time)+" "+input[287]);*/
         
-        double runoffCoeff=0.0;
+        double runoffCoeff=generalRunoffCoeff;
 
-        if(time >= 1.966746E7) runoffCoeff=0.3; else runoffCoeff=0.05;
+        //if(time >= 1.966746E7) runoffCoeff=0.3; else runoffCoeff=0.05;
 
         double maxInt=0;
         

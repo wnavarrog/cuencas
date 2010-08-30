@@ -41,7 +41,7 @@ public class HillslopeRainAndNetworkToFile {
         
         thisHillsInfo.setStormManager(storm);
         
-        String Directory="/Users/ricardo/simulationResults/iowaRivers/MPE/";
+        String Directory="/Users/ricardo/simulationResults/GoodwinCreek/Rainfall/";
         String demName=md.getLocationBinaryFile().getName().substring(0,md.getLocationBinaryFile().getName().lastIndexOf("."));
         java.io.File theFile=new java.io.File(Directory+demName+"_"+x+"_"+y+"-"+storm.stormName()+".dat");
         System.out.println(theFile);
@@ -108,8 +108,9 @@ public class HillslopeRainAndNetworkToFile {
         //main0(args); //The mogollon test case
         //main1(args); //Whitewater 15-minute Rain
         //main2(args); //Nexrad Whitewater
-        main3(args); //Nexrad MPE Iowa River Basins
+        //main3(args); //Nexrad MPE Iowa River Basins
         //main4(args); //Nexrad MPE Iowa River Basins
+        main5(args);  //Raingauge derived fields over Goodwin Creek by Peter Furey
     }
     
     public static void main0(String args[]) {
@@ -331,6 +332,54 @@ public class HillslopeRainAndNetworkToFile {
             System.exit(0);
         }
 
+    }
+
+    public static void main5(String args[]){
+
+        try{
+
+            java.io.File theFile=new java.io.File("/CuencasDataBases/Goodwin_Creek_MS_database/Rasters/Topography/1_ArcSec_USGS/newDEM/goodwinCreek-nov03.metaDEM");
+            hydroScalingAPI.io.MetaRaster metaModif=new hydroScalingAPI.io.MetaRaster(theFile);
+            metaModif.setLocationBinaryFile(new java.io.File("/CuencasDataBases/Goodwin_Creek_MS_database/Rasters/Topography/1_ArcSec_USGS/newDEM/goodwinCreek-nov03.dir"));
+
+            metaModif.setFormat("Byte");
+            byte [][] matDirs=new hydroScalingAPI.io.DataRaster(metaModif).getByte();
+
+            metaModif.setLocationBinaryFile(new java.io.File(theFile.getPath().substring(0,theFile.getPath().lastIndexOf("."))+".magn"));
+            metaModif.setFormat("Integer");
+            int [][] magnitudes=new hydroScalingAPI.io.DataRaster(metaModif).getInt();
+
+            java.io.File stormFile;
+
+            int iniEvent=1;
+            int finEvent=1;
+
+            int[] event_num=new int[finEvent-iniEvent+1];
+
+            int k=0;
+            for (int i=iniEvent;i<=finEvent;i++) {
+                event_num[k]=i;
+                k++;
+            }
+
+            for (int i : event_num) {
+
+                String evNUM=(""+(i/1000.+0.0001)).substring(2,5);
+
+                stormFile=new java.io.File("/CuencasDataBases/Goodwin_Creek_MS_database/Rasters/Hydrology/precipitation/storms/interpolated_events/05min_ts/events_singpeakB_rain01/event_"+evNUM+"/precipitation_interpolated_ev"+evNUM+".metaVHC");
+
+                new HillslopeRainAndNetworkToFile(44, 111, matDirs, magnitudes, metaModif, stormFile);
+
+            }
+
+            System.exit(0);
+        } catch (java.io.IOException IOE){
+            System.out.print(IOE);
+            System.exit(0);
+        } catch (VisADException v){
+            System.out.print(v);
+            System.exit(0);
+        }
     }
 
 }

@@ -268,7 +268,7 @@ public class SimulationToFileFurey_june06 extends java.lang.Object {
         
         /* PF ADDITION - ... END */
         
-        hydroScalingAPI.modules.rainfallRunoffModel.objects.NetworkEquations_S0S2 thisBasinEqSys=new hydroScalingAPI.modules.rainfallRunoffModel.objects.NetworkEquations_S0S2(linksStructure,thisHillsInfo,thisNetworkGeom);        
+        hydroScalingAPI.modules.rainfallRunoffModel.objects.NetworkEquations_S0S2 thisBasinEqSys=new hydroScalingAPI.modules.rainfallRunoffModel.objects.NetworkEquations_S0S2(linksStructure,thisHillsInfo,thisNetworkGeom,null);
         //hydroScalingAPI.modules.rainfallRunoffModel.objects.NetworkEquations_S1S2 thisBasinEqSys=new hydroScalingAPI.modules.rainfallRunoffModel.objects.NetworkEquations_S1S2(linksStructure,thisHillsInfo,thisNetworkGeom);        
         
         hydroScalingAPI.util.ordDiffEqSolver.RKF rainRunoffRaining=new hydroScalingAPI.util.ordDiffEqSolver.RKF(thisBasinEqSys,rkf_resolution,10/60.);

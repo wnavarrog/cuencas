@@ -307,6 +307,14 @@ public class HillSlopesInfo extends java.lang.Object {
         return etrate_mphr;
     }
 
+     public double Threshold(long seed, float mn_threshold, float[] normcdf_params){
+        java.util.Random r = new java.util.Random(seed);
+        double gauss_normsample = (normcdf_params[1]*r.nextGaussian())+normcdf_params[0];   // represents sample from normalized cdf
+        double ln_normsample = Math.exp(gauss_normsample);
+        float ln_sample = (float) ln_normsample*mn_threshold;
+        return ln_sample;
+    }
+
 
     /* Luciana Cunha Edition - To add land cover, soil hydrologic group and hillslope properties to the rainfall runoff transformation method
      *
